@@ -3,11 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Helpers\Collapse;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasName;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable implements HasName
 {
@@ -27,6 +30,18 @@ class User extends Authenticatable implements HasName
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function followersCount(): Attribute
+    {
+      return Attribute::make(
+        get: fn($value) => Collapse::make($value),
+      );
+    }
+
+    public function followers()
+    {
+      return $this->belongsToMany(User::class, 'followers', 'author_id', 'subscriber_id', 'id', 'id');
     }
 
     public function getFilamentName(): string

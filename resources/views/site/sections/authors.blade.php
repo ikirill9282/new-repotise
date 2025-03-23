@@ -1,7 +1,7 @@
 @php
 $authors = $variables->get('author_ids')?->value ?? [];
 if (!empty($authors)) {
-  $authors = \App\Models\User::whereIn('id', $authors)->get();
+  $authors = \App\Models\User::whereIn('id', $authors)->withCount('followers')->get();
   while ($authors->count() < 6) {
     $authors = $authors->collect()->merge($authors)->slice(0, 6);
   }
@@ -32,7 +32,7 @@ if (!empty($authors)) {
                                 <h3><a href="{{ $author->makeProfileUrl() }}">{{ $author->profile() }}</a></h3>
                                 <div class="followers">
                                     <img src="{{ asset('/assets/img/followers.svg') }}" alt="Followers">
-                                    <p>13к подписчиков</p>
+                                    <p>{{ $author->followers_count }} Followers</p>
                                 </div>
                             </div>
                         </div>

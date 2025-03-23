@@ -10,8 +10,7 @@ use App\Models\Category;
 use Illuminate\Support\Carbon;
 use App\Models\Article;
 use App\Models\Comment;
+use App\Models\User;
 
 Artisan::command('tt', function() {
-  $comment = Comment::withCount('likes')->where('id', 3)->first();
-  dd($comment->toArray());
 });
