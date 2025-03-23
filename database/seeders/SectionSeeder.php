@@ -154,9 +154,9 @@ class SectionSeeder extends Seeder
               'model' => Section::where(['slug' => 'authors'])->first(),
               'variables' => [
                 'heading' => 'h2',
-                'header' => 'Авторы и блогеры',
-                'author_ids' => [1],
-                'more_text' => 'Смотреть всех авторов',
+                'header' => 'Featured Creators',
+                'author_ids' => [1, 2, 3],
+                'more_text' => 'Connect with Creators',
                 'more_link' => '/authors',
               ]
             ],
