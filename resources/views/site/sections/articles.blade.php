@@ -12,10 +12,10 @@ $article = $articles->first();
               @for($i = 0; $i < 3; $i++)
               <div class="col-lg-4 col-md-6">
                   <div class="item">
-                      <a href="{{ url("/articles/$article->slug") }}">
+                      <a href="{{ $article->makeInsightsUrl() }}">
                         <img src="{{ url($article->preview->image) }}" alt="Article Preview" class="img_main">
                       </a>
-                      <a href="{{ url("/articles/$article->slug") }}">
+                      <a href="{{ $article->makeInsightsUrl() }}">
                         <h3>{{ $article->title }}</h3>
                       </a>
                       <p>{!! $article->short() !!}</p>
