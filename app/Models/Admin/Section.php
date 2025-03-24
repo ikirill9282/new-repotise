@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Section extends Model
 {
-    public function page()
+    public function pages()
     {
       return $this->belongsToMany(Page::class, 'page_sections');
     }
@@ -14,5 +14,10 @@ class Section extends Model
     public function variables()
     {
       return $this->hasMany(SectionVariables::class);
+    }
+
+    public function group()
+    {
+      return $this->hasMany(Section::class, 'parent_id');
     }
 }

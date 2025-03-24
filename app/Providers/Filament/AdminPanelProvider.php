@@ -18,9 +18,22 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Auth\Login;
+use Filament\Support\Assets\Css;
+use Filament\Support\Facades\FilamentAsset;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+      FilamentAsset::register([
+        Css::make('site', asset('/assets/css/site.css')),
+      ]);
+      
+      // Filament::registerStyles([
+      //     'https://unpkg.com/tippy.js@6/dist/tippy.css',
+      //     asset('css/my-styles.css'),
+      // ]);
+    }
     public function panel(Panel $panel): Panel
     {
         return $panel

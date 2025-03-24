@@ -6,7 +6,7 @@ $news_item = $news->first();
 <section class="news">
   <div class="container">
       <div class="about_block">
-          <h2>Новости</h2>
+          @include('site.components.heading', ['variables' => $variables])
           <div class="items_news">
             @for($i = 0; $i < 5; $i++)
               <div class="item">

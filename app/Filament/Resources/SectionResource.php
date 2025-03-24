@@ -27,10 +27,15 @@ use Illuminate\Support\Facades\Vite;
 use App\Models\Article;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Grouping\Group;
 
 class SectionResource extends Resource
 {
   protected static ?string $model = Section::class;
+
+  protected static ?string $navigationParentItem = 'Layout';
+
+  protected static ?string $navigationGroup = 'Layouts';
 
   protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -67,6 +72,11 @@ class SectionResource extends Resource
         TextColumn::make('created_at'),
         TextColumn::make('updated_at'),
       ])
+      ->groups([
+        Group::make('page.title')
+            ->label('Page #'),
+      ])
+      ->striped()
       ->filters([
         //
       ])

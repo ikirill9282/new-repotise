@@ -19,6 +19,10 @@ class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
+    protected static ?string $navigationParentItem = 'Layout';
+
+    protected static ?string $navigationGroup = 'Layouts';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -43,6 +47,7 @@ class PageResource extends Resource
                 TextColumn::make('created_at'),
                 TextColumn::make('updated_at'),
             ])
+            ->striped()
             ->filters([
                 //
             ])
