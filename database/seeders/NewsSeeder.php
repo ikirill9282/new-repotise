@@ -22,15 +22,5 @@ class NewsSeeder extends Seeder
           'slug' => Slug::make("Why do you need a Baby Monitor? We'll tell you in our article"),
           'text' => 'Love To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All SeasonsLove To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All SeasonsLove To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All SeasonsLove To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All Seasons Love To Dream Sleepsuit for All Seasons',
         ]);
-
-        $news_item->gallery()->firstOrCreate(
-          [
-            'image' => '/storage/images/img_articles.png',
-          ],
-          [
-            'image' => '/storage/images/img_articles.png',
-            'preview' => 1,
-          ]
-      );
     }
 }

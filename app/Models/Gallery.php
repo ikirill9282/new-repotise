@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ArticleGallery extends Model
+class Gallery extends Model
 {
     //
 }

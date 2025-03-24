@@ -2,12 +2,11 @@
 
 namespace App\Traits;
 
+use App\Models\Gallery;
 use Illuminate\Support\Facades\Storage;
 
 trait HasGallery
 {
-  abstract public function getGalleryClass();
-
   protected $deleted_gallery;
 
   protected static function booted()
@@ -26,11 +25,11 @@ trait HasGallery
 
   public function gallery()
   {
-    return $this->hasMany($this->getGalleryClass());
+    return $this->hasMany(Gallery::class, 'model_id')->where('type', $this->table);
   }
 
   public function preview()
   {
-    return $this->hasOne($this->getGalleryClass())->where('preview', 1);
+    return $this->hasOne(Gallery::class, 'model_id')->where('preview', 1)->where('type', $this->table);
   }
 }

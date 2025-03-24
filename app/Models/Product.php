@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Collapse;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use App\Traits\HasPrice;
@@ -11,11 +12,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class Product extends Model
 {
   use HasAuthor, HasGallery, HasPrice;
-
-  public function getGalleryClass()
-  {
-    return ProductGallery::class;
-  }
 
   public function categories()
   {
@@ -60,17 +56,7 @@ class Product extends Model
   public function reviewsCount(): Attribute
   {
     return Attribute::make(
-      get: function($value) {
-        if ($value > 1000000000) {
-          return round($value / 1000000000, 2) . 'kkk';
-        } elseif ($value > 1000000) {
-          return round($value / 1000000, 2) . 'kk';
-        } elseif ($value > 1000) {
-          return $value / 1000 . 'k';
-        } else {
-          return $value;
-        }
-      }
+      get: fn($value) => Collapse::make($value),
     );
   }
 }

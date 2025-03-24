@@ -39,7 +39,7 @@ class Insights extends Component
       if (!empty($additional)) {
        $this->articles = Article::query()
           ->whereIn('id', $additional)
-          ->with('author', 'tags')
+          ->with('author', 'tags', 'preview')
           ->withCount('likes')
           ->get()
           ->map(function($article) {
@@ -60,35 +60,14 @@ class Insights extends Component
       if ($id) {
         $this->articles[] = Article::query()
           ->where('id', $id->id)
-          ->with('author', 'tags')
+          ->with('author', 'tags', 'preview')
           ->withCount('likes')
           ->first();
-          // ->getFullComments()
-          // ->getAnalogs()
-          // ->getLikes();
       } else {
         $this->end = true;
         return;
       }
 
-      // $this->articles = $this->loadArticles();
-    }
-
-    public function loadArticles(array $ids)
-    {
-      return Article::query()
-        ->whereIn('id', $ids)
-        ->with('author', 'tags')
-        ->withCount('likes')
-        ->get()
-        ->map(function($article) {
-          $article = $article
-            ->getFullComments()
-            ->getAnalogs()
-            ->getLikes();
-
-          return $article;
-        });
     }
 
     #[On('load-next-article')] 

@@ -33,16 +33,6 @@ class ArticleSeeder extends Seeder
                             <h4>Heading 3</h4>
                             <p>Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.</p>'
             ]);
-    
-            $article->gallery()->firstOrCreate(
-              [
-                'image' => '/storage/images/img_articles.png',
-              ],
-              [
-                'image' => '/storage/images/img_articles.png',
-                'preview' => 1,
-              ]
-            ); 
         }
     }
 }

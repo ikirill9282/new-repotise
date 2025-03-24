@@ -10,9 +10,4 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class News extends Model
 {
   use HasAuthor, HasGallery;
-
-  public function getGalleryClass()
-  {
-    return NewsGallery::class;
-  }
 }
