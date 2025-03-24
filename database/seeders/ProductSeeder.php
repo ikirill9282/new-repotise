@@ -36,13 +36,5 @@ class ProductSeeder extends Seeder
       );
 
       $product->categories()->sync([1]);
-
-      $product->gallery()->firstOrCreate(
-        ['image' => '/storage/images/popular_proucts.png'],
-        [
-          'image' => '/storage/images/popular_proucts.png',
-          'preview' => 1,
-        ],
-      );
     }
 }

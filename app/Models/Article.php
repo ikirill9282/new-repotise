@@ -17,12 +17,7 @@ class Article extends Model
   {
     return static::query()->select(['id', 'title', 'user_id']);
   }
-
-  public function getGalleryClass()
-  {
-    return ArticleGallery::class;
-  }
-
+  
   public function tags()
   {
     return $this->belongsToMany(Tag::class, 'article_tags', 'article_id', 'tag_id', 'id', 'id');
@@ -98,7 +93,7 @@ class Article extends Model
     $tags = $this->tags->pluck('id')->values()->toArray();
     $analogs = Article::query()
       ->whereHas('tags', fn($query) => $query->whereIn('tags.id', $tags))
-      ->with('author')
+      ->with('author', 'preview')
       ->get()
       ->collect();
 
