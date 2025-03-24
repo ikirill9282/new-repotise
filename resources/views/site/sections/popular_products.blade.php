@@ -21,7 +21,7 @@ $products = collect(array_fill(0, 10, $products->first()));
                   <div class="item">
                       <div class="img_products">
                           <img src="{{ url($product->preview->image) }}" alt="Product Preview" class="main_img">
-                          <a href="{{ url('/user/favourite/add/product') }}" class="span_buy">
+                          <a href="{{ url('/user/favorite/add/product') }}" class="span_buy">
                             <svg xmlns="http://www.w3.org/2000/svg" width="27"
                                   height="26" viewBox="0 0 27 26" fill="none">
                                   <path

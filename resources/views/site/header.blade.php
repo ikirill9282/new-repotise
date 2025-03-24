@@ -30,7 +30,7 @@
               </div>
           </a>
           <a href="#" class="like rection_groups">
-              @include('icons.favourite')
+              @include('icons.favorite')
               <span>10</span>
           </a>
           <a href="#" class="basket rection_groups">

@@ -21,8 +21,8 @@ if (!empty($authors)) {
                             <div class="cards_group">
                                 <div class="img_products">
                                     <img src="{{ url($author->avatar) }}" alt="" class="main_img">
-                                    <a href="{{ url('/user/favourite/add/author') }}" class="span_buy">
-                                        @include('icons.favourite', ['stroke' => '#FF2C0C'])
+                                    <a href="{{ url('/user/favorite/add/author') }}" class="span_buy">
+                                        @include('icons.favorite', ['stroke' => '#FF2C0C'])
                                       </a>
                                 </div>
                                 <div class="name">
