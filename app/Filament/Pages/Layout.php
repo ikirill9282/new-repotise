@@ -3,10 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Models\Admin\Section;
-use App\Models\Admin\Page as ModelPage;
+use App\Models\Admin\Page;
 use App\Models\Admin\SectionVariables;
 use App\Models\Article;
-use Filament\Pages\Page;
+use Filament\Pages\Page as FilamentPage;
 use Illuminate\Support\Facades\Auth;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Grid;
@@ -30,7 +30,7 @@ use \App\Models\Admin\Page as PageModel;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\SelectConstraint;
 
-class Layout extends Page implements HasTable, HasForms
+class Layout extends FilamentPage implements HasTable, HasForms
 {
   use InteractsWithTable, InteractsWithForms;
 
@@ -43,6 +43,8 @@ class Layout extends Page implements HasTable, HasForms
   public $defaultAction = 'onboarding';
 
   public ?string $selected_page = null;
+
+  public $test = [];
 
   public static function canAccess(): bool
   {
@@ -60,6 +62,26 @@ class Layout extends Page implements HasTable, HasForms
         ->requiresConfirmation()
         ->action(fn() => dd($this)),
     ];
+  }
+
+
+  public function mount(): void
+  {
+    $this->fillForms();
+  }
+
+  protected function getForms(): array
+  {
+      return [
+          'addTestForm',
+          'addSectionForm',
+      ];
+  }
+
+  protected function fillForms(): void
+  {
+      $this->addTestForm->fill();
+      $this->addSectionForm->fill();
   }
 
   public function onboardingAction(): Action
@@ -103,6 +125,19 @@ class Layout extends Page implements HasTable, HasForms
               ->toArray()
           )
           ,
+        SelectFilter::make('section')
+            ->query(fn($query) => $query->when(
+              (isset($this->tableFilters['section']) && !empty($this->tableFilters['section']['value'])),
+              fn($subquery) => $subquery->where('section_id', $this->tableFilters['section']['value'])
+            ))
+            ->options(
+              Section::query()
+                ->select(['id', 'title'])
+                ->get()
+                ->pluck('title', 'id')
+                ->toArray()
+            )
+        ,
         SelectFilter::make('name')
           ->query(function (Builder $query, $state) {
             $filters = $this->tableFilters;
@@ -113,7 +148,9 @@ class Layout extends Page implements HasTable, HasForms
           })
           ->options(
             function () {
+              // dd($query->getFilters());
               $filters = $this->tableFilters;
+              // dump($filters);
               return SectionVariables::query()
                 ->distinct()
                 ->select(['name'])
@@ -123,6 +160,7 @@ class Layout extends Page implements HasTable, HasForms
           )
           ->searchable()
       ])
+      
       ->filtersTriggerAction(
         fn(TableAction $action) => $action
           ->button()
@@ -142,7 +180,7 @@ class Layout extends Page implements HasTable, HasForms
       Select::make('selected_page')
         ->placeholder('Page...')
         ->options(
-          ModelPage::select('id', 'title')
+          Page::select('id', 'title')
             ->orderBy('id')
             ->get()
             ->pluck('title', 'id')
@@ -177,28 +215,35 @@ class Layout extends Page implements HasTable, HasForms
   {
     if (str_contains($record->name, '_id')) {
       if (preg_match('/^.*_ids$/is', $record->name)) {
-        $arr = explode('_', $record->name);
-        $arr[0] = ($arr[0] == 'author') ? 'user' : $arr[0];
-        $modelClass = "\App\Models\\" . ucfirst($arr[0]);
-
-        $select = [
-          'user' => ['id', 'username'],
-          'default' => ['id', 'title'],
-        ];
-
-        $selected = isset($select[$arr[0]]) ? $select[$arr[0]] : $select['default'];
-        
+        $modelClass = $this->getModelName($record);
+        $selected = $this->getModelSelected($record);
         return [
           Select::make('value')
             ->multiple()
-            ->options(function () use($selected) {
+            ->options(function () use($selected, $modelClass) {
               return $modelClass::query()
                 ->select($selected)
                 ->get()
-                ->pluck('title', 'id')
+                ->pluck($selected[0], $selected[1])
                 ->toArray();
             })
             ->maxItems(3)
+        ];
+      }
+
+      if (preg_match('/^.*?_id$/is', $record->name)) {
+        $modelClass = $this->getModelName($record);
+        $selected = $this->getModelSelected($record);
+
+        return [
+          Select::make('value')
+            ->options(function () use($selected, $modelClass) {
+              return $modelClass::query()
+                ->select($selected)
+                ->get()
+                ->pluck($selected[0], $selected[1])
+                ->toArray();
+            })
         ];
       }
     }
@@ -220,5 +265,48 @@ class Layout extends Page implements HasTable, HasForms
       TextInput::make('value')
         ->required(),
     ];
+  }
+
+  public function addTestForm(Form $form): Form
+  {
+    return $form->schema([
+          TextInput::make('title')->required(),
+        ]);
+  }
+
+  public function addSectionForm(Form $form): Form
+  {
+    return $form->schema([
+      TextInput::make('title')->required(),
+      Select::make('type')
+        ->options([
+          'site' => 'site',
+          'wire' => 'wire',
+        ])
+        ->required(),
+      TextInput::make('component')->required(),
+    ]);
+  }
+
+  protected function getModelName($record): string
+  {
+    $arr = explode('_', $record->name);
+    $arr[0] = ($arr[0] == 'author') ? 'user' : $arr[0];
+
+    return "\App\Models\\" . ucfirst($arr[0]);
+  }
+
+  protected function getModelSelected($record): array
+  {
+
+    $arr = explode('_', $record->name);
+    $arr[0] = ($arr[0] == 'author') ? 'user' : $arr[0];
+
+    $select = [
+      'user' => ['username', 'id'],
+      'default' => ['title', 'id'],
+    ];
+
+    return isset($select[$arr[0]]) ? $select[$arr[0]] : $select['default'];
   }
 }
