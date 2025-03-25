@@ -33,11 +33,13 @@ class SectionResource extends Resource
 {
   protected static ?string $model = Section::class;
 
-  protected static ?string $navigationParentItem = 'Layout';
+  // protected static ?string $navigationParentItem = 'Layout';
 
   protected static ?string $navigationGroup = 'Layouts';
 
-  protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+  // protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+  protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
 
   public static function form(Form $form): Form
   {
@@ -76,7 +78,7 @@ class SectionResource extends Resource
         Group::make('page.title')
             ->label('Page #'),
       ])
-      ->striped()
+      // ->striped()
       ->filters([
         //
       ])
@@ -85,7 +87,7 @@ class SectionResource extends Resource
       ])
       ->bulkActions([
         Tables\Actions\BulkActionGroup::make([
-          Tables\Actions\DeleteBulkAction::make(),
+          // Tables\Actions\DeleteBulkAction::make(),
         ]),
       ]);
   }
