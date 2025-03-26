@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SectionResource\Pages;
 
 use App\Filament\Resources\SectionResource;
+use App\Filament\Widgets\SectionVariablesWidget;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -22,5 +23,24 @@ class EditSection extends EditRecord
   {
     $record->update($data);
     return $record;
-  } 
+  }
+
+  protected function getFooterWidgets(): array
+  {
+    return [
+      SectionVariablesWidget::make([
+        'config' => [
+          'search' => false,
+          'filter' => false,
+          'group' => false,
+        ]
+      ]),
+    ];
+  }
+
+  
+  public function getFooterWidgetsColumns(): int
+  {
+    return 4;
+  }
 }

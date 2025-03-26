@@ -43,6 +43,7 @@ class PageResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->selectable()
             ->columns([
                 TextColumn::make('title'),
                 TextColumn::make('slug'),

@@ -20,6 +20,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Auth\Login;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Support\Facades\Vite;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -27,6 +28,9 @@ class AdminPanelProvider extends PanelProvider
     {
       FilamentAsset::register([
         Css::make('site', asset('/assets/css/site.css')),
+        Css::make('site-tw', Vite::useHotFile('hot')
+            ->asset('resources/css/app.css','build'),
+        )
       ]);
       
       // Filament::registerStyles([

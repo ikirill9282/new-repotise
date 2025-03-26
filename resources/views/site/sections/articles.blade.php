@@ -2,7 +2,7 @@
 $articles = $variables->firstWhere('name', 'article_ids')->value;
 $articles = \App\Models\Article::whereIn('id', $articles)->with('author')->get();
 while ($articles->count() < 3) {
-    $articles = $articles->collect()->merge($articles)->slice(0, 6);
+    $articles = $articles->collect()->merge($articles)->slice(0, 3);
 }
 @endphp
 

@@ -31,98 +31,14 @@ class SectionVariablesResource extends Resource
 
   protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
   
+  protected static array $selectionFileds = [
+    'aticle' => ['title', 'id'],
+    'user' => ['username', 'id'],
+  ];
+
   public static function form(Form $form): Form
   {
-    return $form
-      ->schema([
-        //
-      ]);
-  }
-
-  public static function table(Table $table): Table
-  {
-    return $table
-      ->columns([
-        TextColumn::make('section.pages.title')->searchable(),
-        TextColumn::make('name')->label('Variable name')->searchable(),
-        TextColumn::make('value')->label('Variable value'),
-      ])
-      ->filters([
-        //
-      ])
-      ->defaultGroup(Group::make('section.title')->label("Section"))
-      ->defaultPaginationPageOption(10)
-      ->filters([
-        SelectFilter::make('page')
-          ->query(function (Builder $query, $state) {
-            $page_id = filter_var($state['value'], FILTER_VALIDATE_INT) ? intval($state['value']) : null;
-            $query->when(
-              !is_null($page_id),
-              function ($query) use ($page_id) {
-                $query->whereHas('section.pages', function ($subquery) use ($page_id) {
-                  $subquery->where('pages.id', $page_id);
-                });
-              }
-            );
-          })
-          ->options(
-            Page::query()
-              ->select('id', 'title')
-              ->get()
-              ->pluck('title', 'id')
-              ->toArray()
-          ),
-        SelectFilter::make('section')
-          ->query(function($query, $state) {
-            $section_id = filter_var($state['value'], FILTER_VALIDATE_INT) ? intval($state['value']) : null;
-            $query->when(
-              !is_null($section_id),
-              fn($subquery) => $subquery->where('section_id', $section_id)
-            );
-          })
-          ->options(
-            Section::query()
-              ->select(['id', 'title'])
-              ->get()
-              ->pluck('title', 'id')
-              ->toArray()
-          ),
-        SelectFilter::make('name')
-          ->query(function (Builder $query, $state) {
-            $name = (filter_var($state['value'], FILTER_DEFAULT) && strlen($state['value'])) ? $state['value'] : null;
-            $query->when(
-              !is_null($name),
-              fn($q) => $q->where('name', $name)
-            );
-          })
-          ->options(
-            function () {
-              // dd($query->getFilters());
-              $filters = [];
-              // dump($filters);
-              return SectionVariables::query()
-                ->distinct()
-                ->select(['name'])
-                ->get()
-                ->pluck('name', 'name');
-            }
-          )
-          ->searchable()
-      ])
-      ->filtersTriggerAction(
-        fn(TableAction $action) => $action
-          ->button()
-          ->label('Filter')
-      )
-      ->actions([
-        EditAction::make()
-          // ->form(fn($record) => $this->selectRecordField($record)),
-      ])
-      ->bulkActions([
-        Tables\Actions\BulkActionGroup::make([
-          // Tables\Actions\DeleteBulkAction::make(),
-        ]),
-      ]);
+    return $form->schema(fn($record) => static::selectRecordFields($record));
   }
 
   public static function getRelations(): array
@@ -141,14 +57,12 @@ class SectionVariablesResource extends Resource
     ];
   }
 
-
-
-  public function selectRecordField(Model $record)
+  public static function selectRecordFields(Model $record)
   {
     if (str_contains($record->name, '_id')) {
       if (preg_match('/^.*_ids$/is', $record->name)) {
-        $modelClass = $this->getModelName($record);
-        $selected = $this->getModelSelected($record);
+        $modelClass = static::getModelClass($record);
+        $selected = static::getModelSelected($record);
         return [
           Select::make('value')
             ->multiple()
@@ -164,8 +78,8 @@ class SectionVariablesResource extends Resource
       }
 
       if (preg_match('/^.*?_id$/is', $record->name)) {
-        $modelClass = $this->getModelName($record);
-        $selected = $this->getModelSelected($record);
+        $modelClass = static::getModelName($record);
+        $selected = static::getModelSelected($record);
 
         return [
           Select::make('value')
@@ -197,5 +111,40 @@ class SectionVariablesResource extends Resource
       TextInput::make('value')
         ->required(),
     ];
+  }
+
+
+  protected static function getModelClass(Model $record): ?string 
+  {
+    $name = static::getModelName($record);
+    if ($name) {
+      $name = ucfirst($name);
+      $classMap = [
+        "\App\Models\\$name",
+        "\App\Models\Admin\\$name",
+      ];
+
+      foreach($classMap as $class) {
+        if (class_exists($class)) {
+          return $class;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  protected static function getModelSelected(Model $record): array
+  {
+    $name = static::getModelName($record);
+    if ($name === 'author') $name = 'user';
+    
+    return static::$selectionFileds[$name] ?? ['title', 'id'];
+  }
+
+  protected static function getModelName(Model $record): ?string
+  {
+    $arr = explode('_', $record->name);
+    return $arr[0] ?? null;
   }
 }
