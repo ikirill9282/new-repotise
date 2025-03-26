@@ -91,6 +91,16 @@ class SectionSeeder extends Seeder
           ],
         );
 
+        $articles = Section::firstOrCreate(
+          ['slug' => 'custom'],
+          [
+            'title' => 'Custom',
+            'slug' => 'custom',
+            'type' => 'site',
+            'component' => 'custom',
+          ],
+        );
+
         $this->build();
     }
 
