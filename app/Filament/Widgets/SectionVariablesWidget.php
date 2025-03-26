@@ -111,7 +111,7 @@ class SectionVariablesWidget extends BaseWidget
       // ->extremePaginationLinks()
       ->columns($this->buildColumns())
       ->defaultGroup($this->buildDefaultGroup())
-      // ->defaultPaginationPageOption(10)
+      ->defaultPaginationPageOption(5)
 
       ->filters($this->buildFilters())
       ->actions([

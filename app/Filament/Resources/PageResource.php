@@ -51,6 +51,7 @@ class PageResource extends Resource
                 TextColumn::make('updated_at'),
             ])
             // ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 //
             ])
