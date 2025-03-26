@@ -61,8 +61,7 @@ class ListPages extends ListRecords
             'search' => false,
             'filter' => false,
             'group' => false,
-            // 'section' => $this->selected_section,
-            // 'page' => $this->selected_page,
+            'create' => false,
           ]
         ]),
       ];

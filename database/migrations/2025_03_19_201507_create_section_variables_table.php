@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('section_id')->unsigned()->index();
             $table->string('name');
-            $table->text('value');
+            $table->text('value')->nullable();
             $table->timestamps();
 
+            $table->unique(['section_id', 'name']);
             $table->foreign('section_id')->references('id')->on('sections')->onDelete('cascade');
         });
     }

@@ -17,10 +17,14 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Admin\Page;
 use App\Models\Admin\Section;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
+use Filament\Actions\Action;
+use App\Helpers\Slug;
+
 
 class SectionVariablesWidget extends BaseWidget
 {
@@ -28,14 +32,17 @@ class SectionVariablesWidget extends BaseWidget
 
   // protected static ?int $sort = 1;
 
-  // protected int | string | array $columnSpan = 'full';
+  protected int | string | array $columnSpan = 'full';
 
-  // protected static string $view = "admin.components.custom_widget";
+  protected static string $view = "filament.widgets.section-variables-widget";
 
   protected $listeners =  ['sectionFormUpdated'];
 
   public $selected_section = null;
   public $selected_page = null;
+
+  public $name = null;
+  public $value = null;
 
   protected array $searchableTableColumns = [
     'section.pages.title',
@@ -54,6 +61,7 @@ class SectionVariablesWidget extends BaseWidget
     'search' => true,
     'filter' => true,
     'group' => true,
+    'create' => true,
   ];
 
   public array $config = [];
@@ -66,9 +74,19 @@ class SectionVariablesWidget extends BaseWidget
   public function form(Form $form): Form
   {
     return $form->schema([
-      TextInput::make('test'),
-      TextInput::make('test2'),
+      TextInput::make('name'),
+      RichEditor::make('value')
+        ->fileAttachmentsDisk('public')
+        ->fileAttachmentsDirectory('images')
+        ->fileAttachmentsVisibility('public')
+        ,
     ]);
+  }
+
+  public function createSectionVariableAction(): Action
+  {
+    return Action::make('createSectionVariable')
+      ->action(fn($action) => $this->createSectionVariable());
   }
 
   public function sectionFormUpdated($args)
@@ -77,7 +95,6 @@ class SectionVariablesWidget extends BaseWidget
     $this->selected_page = $args['selected_page'] ?? null;
     $this->resetTable();
   }
-
 
   public function table(Table $table): Table
   {
@@ -112,7 +129,6 @@ class SectionVariablesWidget extends BaseWidget
       ->columns($this->buildColumns())
       ->defaultGroup($this->buildDefaultGroup())
       ->defaultPaginationPageOption(5)
-
       ->filters($this->buildFilters())
       ->actions([
         EditAction::make()
@@ -137,6 +153,13 @@ class SectionVariablesWidget extends BaseWidget
         : $col,
       $cols
     );
+
+    if (isset($this->config['exclude']) && is_array($this->config['exclude'])) {
+      $cols = array_filter(
+        $cols,
+        fn($col) => !in_array($col->getName(), $this->config['exclude']),
+      );
+    }
 
     return $cols;
   }
@@ -186,8 +209,19 @@ class SectionVariablesWidget extends BaseWidget
     return $this->config['cols'] ?? parent::getColumnSpan();
   }
 
-  public function selectRecordFields(Model $record)
+  public function selectRecordFields(?Model $record = null)
   {
+    if (is_null($record)) {
+      return [
+        TextInput::make('value')
+        ->required(),
+        RichEditor::make('value')
+          ->fileAttachmentsDisk('public')
+          ->fileAttachmentsDirectory('images')
+          ->fileAttachmentsVisibility('public')
+      ];
+    }
+
     if (str_contains($record->name, '_id')) {
       if (preg_match('/^.*_ids$/is', $record->name)) {
         $modelClass = $this->getModelClass($record);
@@ -236,6 +270,15 @@ class SectionVariablesWidget extends BaseWidget
         ->required()
     ];
 
+    if (strlen($record->value) > 100) {
+      return [
+        RichEditor::make('value')
+          ->fileAttachmentsDisk('public')
+          ->fileAttachmentsDirectory('images')
+          ->fileAttachmentsVisibility('public')
+      ];
+    }
+
     return [
       TextInput::make('value')
         ->required(),
@@ -273,5 +316,14 @@ class SectionVariablesWidget extends BaseWidget
   {
     $arr = explode('_', $record->name);
     return $arr[0] ?? null;
+  }
+
+  protected function createSectionVariable()
+  {
+    SectionVariablesModel::create([
+      'section_id' => $this->record->id,
+      'name' => Slug::makeEn($this->name),
+      'value' => $this->value,
+    ]);
   }
 }

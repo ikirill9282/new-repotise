@@ -37,7 +37,7 @@ class Insights extends Component
     public function appendArticle(array $additional = [])
     {
       if (!empty($additional)) {
-       $this->articles = Article::query()
+       $articles = Article::query()
           ->whereIn('id', $additional)
           ->with('author', 'tags', 'preview')
           ->withCount('likes')
@@ -50,6 +50,9 @@ class Insights extends Component
 
             return $article;
           });
+        foreach ($articles as $article) {
+          $this->articles[] = $article;
+        } 
       }
 
       $id = Article::select(['id'])

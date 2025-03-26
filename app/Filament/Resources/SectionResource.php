@@ -50,7 +50,7 @@ class SectionResource extends Resource
     return $form
       ->schema([
         TextInput::make('title')->required(),
-        TextInput::make('slug')->disabled(),
+        TextInput::make('slug')->required(),
         Select::make('type')
           ->options([
             'site' => 'site',
