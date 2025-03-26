@@ -1,3 +1,13 @@
-.fi-ta-text-item-label {
-  /* text-wrap: wrap; */
+.custom-section p {
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.custom-section h1,
+.custom-section h2,
+.custom-section h3,
+.custom-section h4,
+.custom-section h5,
+.custom-section h6 {
+  margin-bottom: 20px;
 }

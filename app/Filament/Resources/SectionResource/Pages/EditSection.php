@@ -18,7 +18,7 @@ class EditSection extends EditRecord
       Actions\DeleteAction::make(),
     ];
   }
-
+  
   protected function handleRecordUpdate(Model $record, array $data): Model
   {
     $record->update($data);

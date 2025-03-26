@@ -20,6 +20,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\RichEditor;
 
 class SectionVariablesResource extends Resource
 {
@@ -36,9 +37,11 @@ class SectionVariablesResource extends Resource
     'user' => ['username', 'id'],
   ];
 
+  public ?Model $record = null;
+
   public static function form(Form $form): Form
   {
-    return $form->schema(fn($record) => static::selectRecordFields($record));
+    return $form->schema(fn($record) => static::selectRecordFields($record))->columns(1);
   }
 
   public static function getRelations(): array
@@ -57,8 +60,19 @@ class SectionVariablesResource extends Resource
     ];
   }
 
-  public static function selectRecordFields(Model $record)
+  public static function selectRecordFields(?Model $record = null)
   {
+    if (is_null($record)) {
+      return [
+        TextInput::make('value')
+        ->required(),
+        RichEditor::make('value')
+          ->fileAttachmentsDisk('public')
+          ->fileAttachmentsDirectory('images')
+          ->fileAttachmentsVisibility('public')
+      ];
+    }
+
     if (str_contains($record->name, '_id')) {
       if (preg_match('/^.*_ids$/is', $record->name)) {
         $modelClass = static::getModelClass($record);
@@ -106,6 +120,15 @@ class SectionVariablesResource extends Resource
         ])
         ->required()
     ];
+
+    if (strlen($record->value) > 100) {
+      return [
+        RichEditor::make('value')
+          ->fileAttachmentsDisk('public')
+          ->fileAttachmentsDirectory('images')
+          ->fileAttachmentsVisibility('public')
+      ];
+    }
 
     return [
       TextInput::make('value')

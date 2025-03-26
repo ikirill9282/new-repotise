@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('page_id')->unsigned()->index();
             $table->bigInteger('section_id')->unsigned()->index();
-            $table->integer('order_id')->default(0);
+            $table->integer('order')->default(0);
             $table->timestamps();
 
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');

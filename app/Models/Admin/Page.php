@@ -12,7 +12,7 @@ class Page extends Model
 
   public function sections()
   {
-    return $this->hasManyThrough(Section::class, PageSection::class, 'page_id', 'id', 'id', 'section_id');
+    return $this->belongsToMany(Section::class, PageSection::class, 'page_id', 'section_id', 'id', 'id')->withPivot('order');
   }
 
   public function url(): Attribute

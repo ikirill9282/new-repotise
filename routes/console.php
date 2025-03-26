@@ -13,6 +13,6 @@ use App\Models\Comment;
 use App\Models\User;
 
 Artisan::command('tt', function() {
-  $t = Article::where('id', 1)->with('gallery')->get();
-  dd($t);
+  $t = Page::find(1);
+  dd($t->sections->toArray());
 });

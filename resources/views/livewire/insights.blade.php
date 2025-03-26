@@ -14,7 +14,7 @@
                   </div>
               </div>
           </section>
-            <sectopn class="comments_group" @if(array_key_last($articles->all()) == $key && !$end) id="stopper" @endif>
+            <sectopn class="comments_group" @if(array_key_last($articles) == $key && !$end) id="stopper" @endif>
               <div class="container">
                   <div class="about_block">
                       <div class="title_block">
