@@ -11,3 +11,7 @@
 .custom-section h6 {
   margin-bottom: 20px;
 }
+
+figcaption {
+  display: none;
+}

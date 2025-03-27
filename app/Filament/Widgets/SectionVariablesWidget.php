@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -24,10 +25,12 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Filament\Actions\Action;
 use App\Helpers\Slug;
-
+use Filament\Forms\Concerns\HasFormComponentActions;
 
 class SectionVariablesWidget extends BaseWidget
 {
+  use HasFormComponentActions;
+
   public ?Model $record = null;
 
   // protected static ?int $sort = 1;
@@ -131,10 +134,13 @@ class SectionVariablesWidget extends BaseWidget
       ->defaultPaginationPageOption(5)
       ->filters($this->buildFilters())
       ->actions([
-        EditAction::make()
-          ->form(fn(Model $record) => $this->selectRecordFields($record)),
+        EditAction::make('edit')
+          ->form(fn(Model $record) => $this->selectRecordFields($record))
+          ->action(fn($record, $data) => $this->updateSectionVariable($record, $data))
+          ,
       ])
-      ->bulkActions([]);
+      ->bulkActions([])
+      ;
 
     return $result;
   }
@@ -325,5 +331,38 @@ class SectionVariablesWidget extends BaseWidget
       'name' => Slug::makeEn($this->name),
       'value' => $this->value,
     ]);
+  }
+
+  protected function updateSectionVariable(Model $record, array $data)
+  {
+    if (str_contains($data['value'], 'figure')) {
+      preg_match_all('/<figure.*?<\/figure>/i', $data['value'], $figure);
+      if (isset($figure[0])) {
+        $figure = $figure[0];
+        foreach ($figure as $item) {
+          preg_match('/img\s+src="(.*?)"/i', $item, $img_src);
+          $img_src = $img_src[1] ?? null;
+          if ($img_src) {
+            $img_path = preg_replace("/^.*?(\/storage.*?)$/is", "$1", $img_src);
+            $img_url = url($img_path);
+            $img = "<img src='$img_url' alt='Article image' />";
+            $data['value'] = str_ireplace($item, $img, $data['value']);
+          }
+        }
+      }
+    }
+
+    try {
+      $record->update($data);
+      Notification::make()
+        ->title('Saved successfully')
+        ->success()
+        ->send();
+    } catch (\Exception $e) {
+      Notification::make()
+        ->title($e->getMessage())
+        ->error()
+        ->send();
+    }
   }
 }

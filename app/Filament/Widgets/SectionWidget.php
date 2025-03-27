@@ -56,4 +56,5 @@ class SectionWidget extends BaseWidget
     {
       return $this->config['cols'] ?? parent::getColumnSpan();
     }
+
 }

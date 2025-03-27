@@ -41,7 +41,9 @@ class SectionVariablesResource extends Resource
 
   public static function form(Form $form): Form
   {
-    return $form->schema(fn($record) => static::selectRecordFields($record))->columns(1);
+    return $form
+      ->schema(fn($record) => static::selectRecordFields($record))
+      ->columns(1);
   }
 
   public static function getRelations(): array

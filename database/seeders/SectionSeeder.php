@@ -91,7 +91,7 @@ class SectionSeeder extends Seeder
           ],
         );
 
-        $articles = Section::firstOrCreate(
+        $custom = Section::firstOrCreate(
           ['slug' => 'custom'],
           [
             'title' => 'Custom',
