@@ -33,6 +33,7 @@ class EditSection extends EditRecord
           'search' => false,
           'filter' => false,
           'group' => false,
+          'delete' => true,
         ]
       ]),
     ];

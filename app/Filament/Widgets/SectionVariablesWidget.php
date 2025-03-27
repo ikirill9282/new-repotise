@@ -26,6 +26,7 @@ use Illuminate\Support\Collection as SupportCollection;
 use Filament\Actions\Action;
 use App\Helpers\Slug;
 use Filament\Forms\Concerns\HasFormComponentActions;
+use Filament\Tables\Actions\DeleteAction;
 
 class SectionVariablesWidget extends BaseWidget
 {
@@ -65,6 +66,7 @@ class SectionVariablesWidget extends BaseWidget
     'filter' => true,
     'group' => true,
     'create' => true,
+    'delete' => false,
   ];
 
   public array $config = [];
@@ -133,12 +135,7 @@ class SectionVariablesWidget extends BaseWidget
       ->defaultGroup($this->buildDefaultGroup())
       ->defaultPaginationPageOption(5)
       ->filters($this->buildFilters())
-      ->actions([
-        EditAction::make('edit')
-          ->form(fn(Model $record) => $this->selectRecordFields($record))
-          ->action(fn($record, $data) => $this->updateSectionVariable($record, $data))
-          ,
-      ])
+      ->actions($this->buildActions())
       ->bulkActions([])
       ;
 
@@ -176,6 +173,23 @@ class SectionVariablesWidget extends BaseWidget
     return $this->config['group']
       ? Group::make('section.title')->label("Section")
       : null;
+  }
+
+  public function buildActions()
+  {
+    $actions = [
+      EditAction::make('edit')
+          ->form(fn(Model $record) => $this->selectRecordFields($record))
+          ->action(fn($record, $data) => $this->updateSectionVariable($record, $data))
+          ,
+    ];
+
+    if ($this->config['delete']) {
+      $actions[] = DeleteAction::make('delete')
+        ->requiresConfirmation();
+    }
+
+    return $actions;
   }
 
   public function buildFilters()
