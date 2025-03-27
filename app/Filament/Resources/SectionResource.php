@@ -46,7 +46,19 @@ class SectionResource extends Resource
             'wire' => 'wire',
           ])
           ->required(),
-        TextInput::make('component'),
+        Select::make('component')
+          ->options(function() {
+            $path = app()->basePath() . '/resources/views/site/sections';
+            $sections = glob("$path/*");
+            $options = [];
+            foreach ($sections as $section) {
+              $name = str_ireplace("$path/", '', $section);
+              $name = str_ireplace('.blade.php', '', $name);
+              $options[$name] = $name;
+            }
+
+            return $options;
+          }),
       ])
       ->extraAttributes(['class' => 'w-full'])
       ->columns(1);
