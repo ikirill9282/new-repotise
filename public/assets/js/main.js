@@ -7,31 +7,31 @@ const swiper = new Swiper(".mySwiper", {
     },
     breakpoints: {
         320: {
-            slidesPerView: 1.2,
-            spaceBetween: 10,
-        },
-        400: {
             slidesPerView: 1.4,
             spaceBetween: 10,
         },
+        400: {
+            slidesPerView: 1.6,
+            spaceBetween: 10,
+        },
         500: {
-            slidesPerView: 1.7,
+            slidesPerView: 2.2,
             spaceBetween: 10,
         },
         600: {
-            slidesPerView: 1.9,
+            slidesPerView: 2.4,
             spaceBetween: 10,
         },
         700: {
-            slidesPerView: 2.2,
+            slidesPerView: 3.2,
             spaceBetween: 10,
         },
         768: {
-            slidesPerView: 2.2,
+            slidesPerView: 3.2,
             spaceBetween: 15,
         },
         1024: {
-            slidesPerView: 3,
+            slidesPerView: 4,
             spaceBetween: 20,
         },
         1200: {
@@ -50,15 +50,15 @@ const swiper1 = new Swiper(".mySwiper1", {
     },
     breakpoints: {
         320: {
-            slidesPerView: 1.2,
+            slidesPerView: 1.1,
             spaceBetween: 10,
         },
         400: {
-            slidesPerView: 1.4,
+            slidesPerView: 1.3,
             spaceBetween: 10,
         },
         500: {
-            slidesPerView: 1.7,
+            slidesPerView: 1.6,
             spaceBetween: 10,
         },
         600: {

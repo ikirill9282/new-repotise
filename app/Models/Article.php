@@ -13,6 +13,8 @@ class Article extends Model
 
   protected Collection|array $all_comments = [];
 
+  public array|Collection $comments = [];
+
   public static function selectShort()
   {
     return static::query()->select(['id', 'title', 'user_id']);

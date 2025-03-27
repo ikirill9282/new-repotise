@@ -13,5 +13,4 @@
               fill="#FF2C0C" />
       </svg>
   </a>
-  <span>{{ $count ?? 'null' }}</span>
 </div>

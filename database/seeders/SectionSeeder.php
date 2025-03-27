@@ -179,7 +179,7 @@ class SectionSeeder extends Seeder
               'model' => Section::where('slug', 'insights')->first(),
               'variables' => [
                 'subscribe_heading' => 'h3',
-                'subscribe_message' => "Don't Miss Out!<br> Subscribe for Exclusive Content",
+                'subscribe_message' => "Don't Miss Out! Subscribe for Exclusive Content",
                 'subscribe_button' => 'Subscribe',
                 'last_news_heading' => 'h3',
                 'last_news_title' => 'Travel News'

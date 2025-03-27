@@ -23,14 +23,15 @@
 
 <body>
 
-    @include('site.header')
-
     <div class="wrapper">
+        @include('site.header')
+
         @yield('content')
+
+        @include('site.footer')
     </div>
 
-    @include('site.footer')
-
+    {{-- @include('site.sections.accept_cookie') --}}
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('/assets/js/swiper-bundle.min.js') }}"></script>
     <script src="{{ asset('/assets/js/bootstrap.bundle.min.js') }}"></script>

@@ -18,7 +18,7 @@ class Insights extends Component
     public Collection|array $articles = [];
     public Collection|array $variables = [];
     public bool $end = false;
-    public $article_ids = [];
+    public array $article_ids = [];
 
     public function mount(Arrayable|array $variables): void
     {
@@ -34,43 +34,32 @@ class Insights extends Component
       $this->appendLastNews();
     }
 
+    public function loadArticles()
+    {
+      $this->articles = [];
+      $articles = Article::query()
+        ->whereIn('id', $this->article_ids)
+        ->with('author', 'tags', 'preview')
+        ->withCount('likes')
+        ->get()
+        ->map(fn($article) => $article->getFullComments()->getAnalogs()->getLikes());
+
+      foreach ($this->article_ids as $id) {
+        $this->articles[] = $articles->firstWhere('id', $id);
+      }
+    }
+
     public function appendArticle(array $additional = [])
     {
-      if (!empty($additional)) {
-       $articles = Article::query()
-          ->whereIn('id', $additional)
-          ->with('author', 'tags', 'preview')
-          ->withCount('likes')
-          ->get()
-          ->map(function($article) {
-            $article = $article
-              ->getFullComments()
-              ->getAnalogs()
-              ->getLikes();
 
-            return $article;
-          });
-        foreach ($articles as $article) {
-          $this->articles[] = $article;
-        } 
-      }
+      $this->article_ids = array_merge($this->article_ids, $additional);
 
       $id = Article::select(['id'])
         ->whereNotIn('id', $this->getArticlesIds())
         ->orderByDesc('id')
         ->first();
 
-      if ($id) {
-        $this->articles[] = Article::query()
-          ->where('id', $id->id)
-          ->with('author', 'tags', 'preview')
-          ->withCount('likes')
-          ->first();
-      } else {
-        $this->end = true;
-        return;
-      }
-
+      if ($id) $this->article_ids[] = $id->id;
     }
 
     #[On('load-next-article')] 
@@ -79,7 +68,7 @@ class Insights extends Component
       if (count($this->articles) == Article::count()) {
         $this->end = true;
       }
-      if ($this->end) return;
+      if ($this->end) return true;
     
       $this->appendArticle();
     }
@@ -92,6 +81,7 @@ class Insights extends Component
 
     public function render()
     {
+      $this->loadArticles();
       return view('livewire.insights');
     }
 }

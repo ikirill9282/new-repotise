@@ -1,85 +1,64 @@
 <div class="left_name_text">
     <h2>{{ $article->title }}</h2>
-    <div class="talmaev">
+    <div class="theme_articles">
+      <div class="talmaev">
         <div class="profile">
             <img src="{{ $article->author->avatar }}" alt="Avatar">
-            <p>{{ $article->author->getName() }} <a href="#">@talmaev1</a></p>
+            <p>{{ $article->author->getName() }} <a
+                    href="{{ url("/creators/{$article->author->profile}") }}">{{ $article->author->profile }}</a>
+            </p>
         </div>
-        <a href="/user/{{ $article->author->id }}/follow" class="follow">Подписаться</a>
-    </div>
-    <div class="block_date">
-        <span>{{ \Illuminate\Support\Carbon::parse($article->created_at)->format('d.m.Y') }}</span>
-        <span>{{ $article->views }} views</span>
-    </div>
-    <div class="theme_articles">
-        {!! $article->text !!}
+        <a href="{{ url("/creators/subscribe/{$article->author->profile}") }}" class="follow">Subscribe</a>
+      </div>
+      <div class="block_date">
+          <span>{{ \Illuminate\Support\Carbon::parse($article->created_at)->format('d.m.Y') }}</span>
+          <span>{{ $article->views }} Views</span>
+      </div>
+      {!! $article->text !!}
     </div>
     <div class="follow_to_canal">
         <{{ $variables->get('subscribe_heading')->value }}>
-            {!! $variables->get('subscribe_message')->value !!}
-            </{{ $variables->get('subscribe_heading')->value }}>
-            <a href="/user/follow">{{ $variables->get('subscribe_button')->value }}</a>
+          {!! $variables->get('subscribe_message')->value !!}
+        </{{ $variables->get('subscribe_heading')->value }}>
+        <a href="{{ url("/creators/subscribe/{$article->author->profile}") }}">{{ $variables->get('subscribe_button')->value }}</a>
     </div>
     <div class="bottom_group">
         <div class="tegs">
-            @if (isset($article->tags) && $article->tags->isNotEmpty())
-                @foreach ($article->tags as $tag)
-                    <a href="{{ url("/articles/tag/$tag->id") }}">{{ $tag->title }}</a>
-                @endforeach
-            @endif
+          @if (isset($article->tags) && $article->tags->isNotEmpty())
+            @foreach ($article->tags as $tag)
+                <a href="{{ url("/articles/tag/$tag->id") }}">{{ $tag->title }}</a>
+            @endforeach
+          @endif
         </div>
         <div class="share_group">
             @if ($article->likes_count > 0)
                 <div class="avatar">
+                  <div class="img_men">
                     @foreach ($article->likes as $k => $like)
                         <img class="@if ($k > 0) last_img @endif"
                             src="{{ $like->author->avatar }}" alt="Avatar">
                     @endforeach
+                  </div>
                 </div>
             @endif
             <div class="like">
-                <a href="#">
-                    @include('icons.like')
+                <a href="{{ url("/articles/like/{$article->id}") }}">
+                  @include('icons.like')
                 </a>
-                <p>likes</p>
+                <p>Like</p>
                 <span>{{ $article->likes_count }}</span>
             </div>
             <div class="connects">
-                <a href="#" class="first_connect"><svg xmlns="http://www.w3.org/2000/svg" width="25"
-                        height="25" viewBox="0 0 50 51" fill="none">
-                        <g opacity="0.5">
-                            <path
-                                d="M49.9965 25.0073C49.9965 37.6372 40.6373 48.0785 28.4788 49.7729C27.342 49.9306 26.1789 50.013 24.9982 50.013C23.6354 50.013 22.2972 49.9043 20.9939 49.6941C9.09123 47.7772 0 37.4532 0 25.0073C0 11.1965 11.1932 0 25 0C38.8068 0 50 11.1965 50 25.0073H49.9965Z"
-                                fill="#484134"></path>
-                            <path
-                                d="M28.4814 20.0802V25.5278H35.2183L34.1515 32.866H28.4814V49.7729C27.3445 49.9306 26.1814 50.013 25.0008 50.013C23.638 50.013 22.2997 49.9044 20.9964 49.6941V32.866H14.7832V25.5278H20.9964V18.8624C20.9964 14.7272 24.3474 11.3735 28.4831 11.3735V11.377C28.4954 11.377 28.5059 11.3735 28.5181 11.3735H35.2201V17.72H30.8409C29.5394 17.72 28.4831 18.7766 28.4831 20.0785L28.4814 20.0802Z"
-                                fill="white"></path>
-                        </g>
-                    </svg>
+                <a href="#" class="first_connect">
+                  @include('icons.facebook-sm')
                 </a>
-                <a href="#" class="second_connect"><svg xmlns="http://www.w3.org/2000/svg" width="25"
-                        height="25" viewBox="0 0 50 51" fill="none">
-                        <g opacity="0.5">
-                            <path
-                                d="M49.9965 25.0074C49.9965 37.6372 40.6373 48.0786 28.4788 49.7729C27.342 49.9306 26.1789 50.013 24.9982 50.013C23.6354 50.013 22.2972 49.9044 20.9939 49.6941C9.09123 47.7772 0 37.4532 0 25.0074C0 11.1965 11.1932 0 25 0C38.8068 0 50 11.1965 50 25.0074H49.9965Z"
-                                fill="#484134"></path>
-                            <path
-                                d="M10.1421 11.0303L21.6717 26.4496L10.0703 38.9866H12.6821L22.8401 28.0108L31.0467 38.9866H39.933L27.7553 22.6999L38.5544 11.0303H35.9426L26.5887 21.1387L19.0302 11.0303H10.1439H10.1421ZM13.9818 12.9542H18.0632L36.0898 37.0627H32.0084L13.9818 12.9542Z"
-                                fill="white"></path>
-                        </g>
-                    </svg>
+                <a href="#" class="second_connect">
+                  @include('icons.twitter-sm')
                 </a>
-                <a href="#" class="third_connect"><svg xmlns="http://www.w3.org/2000/svg" width="25"
-                        height="25" viewBox="0 0 25 25" fill="none">
-                        <path opacity="0.5"
-                            d="M13.0121 0.5H12.9574C6.34705 0.5 0.988281 5.86035 0.988281 12.4727V12.5273C0.988281 19.1397 6.34705 24.5 12.9574 24.5H13.0121C19.6224 24.5 24.9812 19.1397 24.9812 12.5273V12.4727C24.9812 5.86035 19.6224 0.5 13.0121 0.5Z"
-                            fill="#484134" />
-                        <path
-                            d="M20.4192 12.1995C20.22 11.2956 19.3945 10.7096 18.5758 10.8903C18.2967 10.9517 18.0563 11.0955 17.8663 11.2923C16.7643 10.4918 15.2597 9.96289 13.5793 9.86283L14.3838 6.51294L16.7702 7.08387C16.8097 7.73636 17.3502 8.25347 18.0126 8.25347C18.675 8.25347 19.2583 7.69516 19.2583 7.00736C19.2583 6.31955 18.7002 5.76123 18.0126 5.76123C17.5141 5.76123 17.0846 6.05468 16.8862 6.47847L14.2972 5.85877C14.0938 5.81 13.8895 5.93528 13.8399 6.13877L12.9497 9.84602C11.0752 9.85611 9.38394 10.3985 8.17013 11.267C8.11045 11.2115 8.04657 11.1602 7.9768 11.1148C7.26986 10.6633 6.29309 10.9299 5.79547 11.7093C5.29784 12.4896 5.4668 13.4877 6.17373 13.9392C6.21576 13.9661 6.25863 13.9897 6.30234 14.0115C6.27376 14.1856 6.25863 14.363 6.25863 14.5421C6.25863 17.1361 9.27719 19.239 13.001 19.239C16.7248 19.239 19.7434 17.1361 19.7434 14.5421C19.7434 14.3605 19.7274 14.1814 19.698 14.0056C20.2721 13.6718 20.5848 12.9445 20.4209 12.1995H20.4192ZM9.54366 13.454C9.54366 12.8629 10.0228 12.3837 10.6137 12.3837C11.2047 12.3837 11.6838 12.8629 11.6838 13.454C11.6838 14.0451 11.2047 14.5244 10.6137 14.5244C10.0228 14.5244 9.54366 14.0451 9.54366 13.454ZM15.4866 16.8334C15.158 17.1319 14.2501 17.8281 12.9211 17.8407C12.9094 17.8407 12.8968 17.8407 12.885 17.8407C11.5384 17.8407 10.6188 17.1378 10.2834 16.8334C10.1758 16.7358 10.1682 16.5693 10.2657 16.4626C10.3632 16.3549 10.5297 16.3474 10.6364 16.4449C10.9281 16.7106 11.7342 17.3269 12.9161 17.316C14.0652 17.3051 14.8494 16.7039 15.1336 16.4457C15.2412 16.3482 15.4068 16.3558 15.5043 16.4634C15.6018 16.571 15.5942 16.7367 15.4866 16.8342V16.8334ZM15.3572 14.5244C14.7662 14.5244 14.2871 14.0451 14.2871 13.454C14.2871 12.8629 14.7662 12.3837 15.3572 12.3837C15.9481 12.3837 16.4272 12.8629 16.4272 13.454C16.4272 14.0451 15.9481 14.5244 15.3572 14.5244Z"
-                            fill="white" />
-                    </svg>
+                <a href="#" class="third_connect">
+                  @include('icons.reddit-sm')
                 </a>
-                <a href="#" class="share">Поделиться</a>
+                <a href="#" class="share">Share</a>
             </div>
         </div>
     </div>
