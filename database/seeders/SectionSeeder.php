@@ -214,7 +214,7 @@ class SectionSeeder extends Seeder
                 'last_news_heading' => 'h3',
                 'last_news_header' => 'Travel News',
                 'share_message' => 'Share',
-                'comment_headign' => 'h2',
+                'comment_heading' => 'h2',
                 'comment_header' => 'Comments',
                 'comment_add_message' => 'Add a comment...',
                 'comment_more_message' => 'More',
