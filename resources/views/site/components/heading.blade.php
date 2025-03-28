@@ -1,3 +1,14 @@
-<{{ $variables->get('heading')?->value ?? 'h2' }}>
-  {!! $variables->get('header')?->value ?? (isset($title) ? $title : '') !!}
-</{{ $variables->get('heading')?->value ?? 'h2' }}>
+@php
+$heading = (isset($variables) && isset($title)) ? $variables->firstWhere(fn($var) => str_contains($var, "{$title}_heading"))?->name : null;
+$header = (isset($variables) && isset($title)) ? $variables->firstWhere(fn($var) => str_contains($var, "{$title}_header"))?->name : null;
+@endphp
+
+@if(isset($title) && !is_null($heading) && !is_null($header))
+  <{{ print_var($heading, $variables) }}>
+    {!! print_var($header, $variables) !!}
+  </{{ print_var($heading, $variables) }}>
+@elseif (isset($variables))
+  <{{ print_var('heading', $variables) }}>
+    {!! print_var('header', $variables) !!}
+  </{{ print_var('heading', $variables) }}>
+@endif

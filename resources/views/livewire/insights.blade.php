@@ -15,8 +15,8 @@
             <div class="about_block">
                 @include('site.components.heading', ['variables' => $variables])
                 @include('site.components.breadcrumbs')
-
-                <div class="input_group">
+                @include('site.components.search')
+                {{-- <div class="input_group">
                     <div class="search_block">
                         <label for="search">
                             @include('icons.search')
@@ -28,7 +28,7 @@
                             @include('icons.search', ['stroke' => '#ffffff'])
                         </a>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </section>

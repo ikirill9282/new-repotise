@@ -120,6 +120,16 @@ class SectionSeeder extends Seeder
             'component' => 'callback_form',
           ],
         );
+        
+        $error_404 = Section::firstOrCreate(
+          ['slug' => 'error-404'],
+          [
+            'title' => 'Error 404',
+            'slug' => 'error-404',
+            'type' => 'site',
+            'component' => '404',
+          ],
+        );
 
         $this->build();
     }
@@ -153,9 +163,9 @@ class SectionSeeder extends Seeder
               'model' => Section::where(['slug' => 'main-articles'])->first(),
               'variables' => [
                 'heading' => 'h2',
-                'header' => 'Статьи',
+                'header' => 'Travel Insights',
                 'article_ids' => [1, 2, 3],
-                'more_text' => 'Смотреть все',
+                'more_text' => 'Read Travel Stories',
                 'more_link' => '/insights',
               ]
             ],
@@ -163,8 +173,8 @@ class SectionSeeder extends Seeder
               'model' => Section::where(['slug' => 'news'])->first(),
               'variables' => [
                 'heading' => 'h2',
-                'header' => 'Новости',
-                'more_text' => 'Смотреть все',
+                'header' => 'Travel News',
+                'more_text' => 'Latest Updates',
                 'more_link' => '/news',
               ]
             ],
@@ -172,9 +182,9 @@ class SectionSeeder extends Seeder
               'model' => Section::where(['slug' => 'popular-products'])->first(),
               'variables' => [
                 'heading' => 'h2',
-                'header' => 'Популярные товары',
+                'header' => 'Trending Products',
                 'product_ids' => [1],
-                'more_text' => 'Смотреть все товары',
+                'more_text' => 'Discover Now',
                 'more_link' => '/products',
                 'cart_button_text' => 'Add to cart'
               ]
@@ -198,11 +208,11 @@ class SectionSeeder extends Seeder
               'model' => Section::where('slug', 'feed')->first(),
               'variables' => [
                 'subscribe_heading' => 'h3',
-                'subscribe_message' => "Don't Miss Out! Subscribe for Exclusive Content",
+                'subscribe_header' => "Don't Miss Out! Subscribe for Exclusive Content",
                 'subscribe_button' => 'Subscribe',
                 'profile_subscribe_message' => 'Subscribe',
                 'last_news_heading' => 'h3',
-                'last_news_title' => 'Travel News',
+                'last_news_header' => 'Travel News',
                 'share_message' => 'Share',
                 'comment_headign' => 'h2',
                 'comment_header' => 'Comments',
@@ -230,7 +240,7 @@ class SectionSeeder extends Seeder
                 'header' => 'Travel Insights',
                 'search_text' => 'Search by keywords and tags',
                 'last_news_heading' => 'h3',
-                'last_news_title' => 'Travel News'
+                'last_news_header' => 'Travel News'
               ],
             ],
           ]
@@ -250,7 +260,7 @@ class SectionSeeder extends Seeder
                 'creator_heading' => 'h2',
                 'creator_header' => 'For Creators:',
                 'last_news_heading' => 'h3',
-                'last_news_title' => 'Travel News'
+                'last_news_header' => 'Travel News'
               ],
             ],
             [
@@ -265,6 +275,24 @@ class SectionSeeder extends Seeder
                 'button_message' => 'Submit',
               ]
             ]
+          ]
+        ],
+        [
+          'page' => Page::where('slug', 'error-404')->first(),
+          'sections' => [
+            [
+              'model' => Section::where('slug', 'error-404')->first(),
+              'variables' => [
+                'heading' => 'h2',
+                'header' => 'Oops! Page Not Found',
+                'subtitle' => 'If you were looking for something specific, try using the search bar.<br>If you think you\'ve reached this page in error, please get in touch so we can help.',
+                'search_text' => 'Search for travel guides, maps, or articles...',
+                'product_link' => '/products',
+                'product_message' => 'All Products',
+                'report_link' => '/report',
+                'report_message' => 'Report a Problem',
+              ]
+            ],
           ]
         ]
       ];

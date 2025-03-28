@@ -33,5 +33,9 @@ class PageSeeder extends Seeder
         'title' => 'Help Center',
         'slug' => 'help-center',
       ]);
+      $error_404 = Page::firstOrCreate([
+        'title' => '404',
+        'slug' => 'error-404',
+      ]);
     }
 }

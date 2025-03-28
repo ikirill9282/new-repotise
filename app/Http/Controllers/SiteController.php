@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Admin\Page;
 use Illuminate\Http\Request;
 use App\Models\Admin\Section;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SiteController extends Controller
 {
@@ -14,6 +15,10 @@ class SiteController extends Controller
     $page = Page::where('slug', $title)
       ->with('sections.variables')
       ->first();
+
+    if (is_null($page)) {
+      throw new NotFoundHttpException('Not found');
+    }
 
     return view("site.page", ['page' => $page]);
   }

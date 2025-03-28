@@ -18,8 +18,9 @@ $news = \App\Models\News::getLastNews(5);
                 </div>
               @endforeach
           </div>
-          <a href="{{ $variables->get('more_link')->value }}" class="look_more">
-            {{ $variables->get('more_text')->value }}
+          
+          <a href="{{ print_var('more_link', $variables) }}" class="look_more">
+            {{ print_var('more_text', $variables) }}
           </a>
       </div>
   </div>

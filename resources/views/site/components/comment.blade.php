@@ -16,13 +16,13 @@
                   {!! $comment['text'] !!}
                 </p>
                 <span class="show-more" onclick="toggleText()">
-                  {{ $variables->get('comment_more_message')?->value ?? '' }}
+                  {{ print_var('comment_more_message', $variables) }}
                 </span>
             </div>
             <div class="likes">
                 <div class="left_groups_like">
                   <a href="#" class="for_answer">
-                    {{ $variables->get('comment_reply_message')?->value ?? '' }}
+                    {{ print_var('comment_reply_message', $variables) }}
                   </a>
                   @if (isset($comment['likes']) && !empty($comment['likes']))
                     <div class="img_men">
@@ -42,9 +42,9 @@
                 </div>
             </div>
             <div class="right_edit">
-                <a href="#">{{ $variables->get('comment_report_message')?->value ?? '' }}</a>
-                <a href="#">{{ $variables->get('comment_edit_message')?->value ?? '' }}</a>
-                <a href="#">{{ $variables->get('comment_delete_message')?->value ?? '' }}</a>
+                <a href="#">{{ print_var('comment_report_message', $variables) }}</a>
+                <a href="#">{{ print_var('comment_edit_message', $variables) }}</a>
+                <a href="#">{{ print_var('comment_delete_message', $variables) }}</a>
             </div>
         </div>
     </div>
@@ -57,7 +57,7 @@
 
     @if(!isset($replies))
       <div class="more_answers">
-        <a href="#">{{ $variables->get('comment_show_replies')?->value ?? '' }} (50 of 248)</a>
+        <a href="#">{{ print_var('comment_show_replies', $variables) }} (50 of 248)</a>
       </div>
     @endif
 </div>

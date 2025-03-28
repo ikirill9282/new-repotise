@@ -4,7 +4,11 @@
     @if (isset($page) && isset($page->sections) && !empty($page->sections))
         @foreach ($page->sections as $section)
             @php
-              $variables = $section->variables->keyBy('name');
+                if (isset($section->variables)) {
+                    $variables = $section->variables->keyBy('name');
+                } else {
+                    $variables = collect([]);
+                }
             @endphp
 
             @if ($section->type === 'wire')

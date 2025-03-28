@@ -11,7 +11,7 @@ if (!empty($authors)) {
 <section class="authors_blogers">
   <div class="container">
       <div class="about_block">
-          @include('site.components.heading', ['variables' => $variables])
+          @include('site.components.heading')
           <div class="group_authors">
               <div class="swiper mySwiper">
                   <div class="swiper-wrapper">
@@ -46,8 +46,8 @@ if (!empty($authors)) {
                     @include('icons.analog_arrow_prev')
                   </div>
               </div>
-              <a href="{{ $variables->get('more_link')?->value ?? '#' }}" class="look_more">
-                {{ $variables->get('more_text')?->value ?? '' }}
+              <a href="{{ print_var('more_link', $variables) }}" class="look_more">
+                {{ print_var('more_text', $variables) }}
               </a>
           </div>
       </div>

@@ -14,7 +14,7 @@ $products = collect(array_fill(0, 10, $products->first()));
 <section class="popular_products">
   <div class="container">
       <div class="about_block">
-          <h2>Trending Products</h2>
+          @include('site.components.heading')
           <div class="products_item">
               @foreach($products as $product)
                 <div class="item">
@@ -24,7 +24,7 @@ $products = collect(array_fill(0, 10, $products->first()));
                           @include('icons.favorite', ['stroke' => '#FF2C0C'])
                         </a>
                         <a href="{{ url('/user/cart/add') }}" class="to_basket">
-                          {{ $variables->get('cart_button_text')?->value ?? '' }}
+                          {{ print_var('cart_button_text', $variables) }}
                         </a>
                     </div>
                     <h3>{{ $product->title }}</h3>
@@ -50,7 +50,7 @@ $products = collect(array_fill(0, 10, $products->first()));
                 </div>
               @endforeach
           </div>
-          <a href="{{ $variables->get('more_link')?->value ?? '#' }}" class="look_more">{{ $variables->get('more_text')?->value ?? '' }}</a>
+          <a href="{{ print_var('more_link', $variables) }}" class="look_more">{{ print_var('more_text', $variables) }}</a>
       </div>
   </div>
 </section>

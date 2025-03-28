@@ -9,7 +9,7 @@
 <section class="articles authorization_articles">
     <div class="container">
         <div class="about_block">
-            @include('site.components.heading', ['variables' => $variables])
+            @include('site.components.heading')
             <div class="block_cards">
                 @foreach ($articles as $article)
                     <div class="item">
@@ -27,8 +27,8 @@
                     </div>
                 @endforeach
             </div>
-            <a href="{{ $variables->get('more_link')->value }}" class="look_more">
-              {{ $variables->get('more_text')->value }}
+            <a href="{{ print_var('more_link', $variables) }}" class="look_more">
+              {{ print_var('more_text', $variables) }}
             </a>
         </div>
     </div>

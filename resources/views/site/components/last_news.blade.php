@@ -1,7 +1,5 @@
 <div class="last_news">
-  <{{ $variables->get('last_news_heading')?->value ?? 'h3' }}>
-    {{ $variables->get('last_news_title')?->value ?? 'Travel Insights' }}
-  </{{ $variables->get('last_news_heading')?->value ?? 'h3' }}>
+  @include('site.components.heading', ['title' => 'last_news'])
   <div class="block_news_items">
     @if (isset($news))
       @foreach ($news as $news_item)

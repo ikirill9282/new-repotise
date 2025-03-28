@@ -23,15 +23,13 @@
             <div class="container">
                 <div class="about_block">
                     <div class="title_block">
-                        <{{ $variables->get('comment_headign')?->value ?? 'h2' }}>
-                          {{ $variables->get('comment_header')?->value ?? '' }}
-                        </{{ $variables->get('comment_headign')?->value ?? 'h2' }}>
+                        @include('site.components.heading', ['title' => 'comment'])
                         <span>{{ $article->countComments() }}</span>
                     </div>
                     <div class="write_comment_group">
                         <div class="write_comment">
                             <h3>@talmaev1</h3>
-                            <input type="text" placeholder="{{ $variables->get('comment_add_message')?->value ?? '' }}">
+                            <input type="text" placeholder="{{ print_var('comment_add_message', $variables) }}">
                             <div class="right_stickers">
                                 <a href="#" class="numbers">0/1000</a>
                                 <a href="#" class="first_stick">
@@ -49,7 +47,7 @@
                         @endforeach
 
                         <div class="more_commends_group">
-                          <a href="#">{{ $variables->get('comment_more_comments')?->value  ?? ''}} (50 of 248)</a>
+                          <a href="#">{{ print_var('comment_more_comments', $variables) }} (50 of 248)</a>
                         </div>
                     </div>
                 </div>
@@ -58,9 +56,7 @@
         <section class="similar_materials">
         <div class="container">
             <div class="about_block">
-                <{{ $variables->get('analog_heading')?->value ?? '' }}>
-                  {{ $variables->get('analog_header')?->value ?? '' }}
-                </{{ $variables->get('analog_heading')?->value ?? '' }}>
+                @include('site.components.heading', ['title' => 'subscribe'])
                 <div class="materials_group">
                     <div class="swiper" id="analogs-swiper-{{ $article->id }}">
                         <div class="swiper-wrapper">

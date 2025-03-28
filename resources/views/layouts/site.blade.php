@@ -23,7 +23,6 @@
 </head>
 
 <body>
-
     <div class="wrapper">
         @include('site.header')
 

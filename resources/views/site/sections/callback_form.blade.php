@@ -3,26 +3,27 @@
         <div class="about_block">
             <div class="left_group">
                 @include('site.components.heading', ['variables' => $variables])
-                <p>{!! $variables->get('subtitle')?->value ?? '' !!}</p>
+                <p>{!! print_var('subtitle', $variables) !!}</p>
                 <form>
                     <div class="input_block">
-                        <input type="text" placeholder="{{ $variables->get('name_placeholder')?->value ?? '' }}">
+                        <input type="text" placeholder="{{ print_var('name_placeholder', $variables) }}">
                         @include('icons.shield_answer')
                     </div>
                     <select>
-                        <option value="" disabled selected>{{ $variables->get('subject_placeholder')?->value ?? '' }}</option>
+                        <option value="" disabled selected>{{ print_var('subject_placeholder', $variables) }}
+                        </option>
                         <option value="Subject">Subject</option>
                         <option value="Subject1">Subject1</option>
                         <option value="Subject2">Subject2</option>
                     </select>
                     <div class="textarea_block">
-                        <textarea placeholder="{!! $variables->get('message_placeholder')?->value ?? '' !!}"></textarea>
+                        <textarea placeholder="{!! print_var('message_placeholder', $variables) !!}"></textarea>
                         @include('icons.shield_answer')
                     </div>
                     <a href="#">
-                      @include('icons.download')
+                        @include('icons.download')
                     </a>
-                    <button>{{ $variables->get('button_message')?->value ?? '' }}</button>
+                    <button>{{ print_var('button_message', $variables) }}</button>
                 </form>
             </div>
             <img src="{{ asset('/assets/img/img_touch.png') }}" alt="Form Image">
