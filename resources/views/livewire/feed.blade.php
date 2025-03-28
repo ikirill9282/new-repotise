@@ -6,7 +6,7 @@
 
         @if ($perPage == 1)
             <div x-intersect="$wire.loadNextArticle"></div>
-        @elseif (($key + ($perPage - $key))  == $perPage)
+        @elseif (($key + ceil($perPage / 2))  == $perPage)
             <div x-intersect="$wire.loadNextArticle"></div>
         @endif
 
