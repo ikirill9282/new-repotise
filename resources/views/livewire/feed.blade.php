@@ -3,6 +3,13 @@
         @php
             $article = $article->getFullComments()->getAnalogs()->getLikes();
         @endphp
+
+        @if ($perPage == 1)
+            <div x-intersect="$wire.loadNextArticle"></div>
+        @elseif ($key + 2 == $perPage)
+            <div x-intersect="$wire.loadNextArticle"></div>
+        @endif
+
         <section class="name_articles">
             <section class="breadcrumb_block">
                 <div class="container">
@@ -19,7 +26,8 @@
                 </div>
             </div>
         </section>
-        <section class="comments_group" @if (array_key_last($articles) == $key && !$end) id="stopper" @endif>
+        {{-- <section class="comments_group" @if (array_key_last($articles) == $key && !$end) id="stopper" @endif> --}}
+        <section class="comments_group">
             <div class="container">
                 <div class="about_block">
                     <div class="title_block">
@@ -47,53 +55,54 @@
                         @endforeach
 
                         <div class="more_commends_group">
-                          <a href="#">{{ print_var('comment_more_comments', $variables) }} (50 of 248)</a>
+                            <a href="#">{{ print_var('comment_more_comments', $variables) }} (50 of 248)</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         <section class="similar_materials">
-        <div class="container">
-            <div class="about_block">
-                @include('site.components.heading', ['title' => 'subscribe'])
-                <div class="materials_group">
-                    <div class="swiper" id="analogs-swiper-{{ $article->id }}">
-                        <div class="swiper-wrapper">
-                          @if (isset($article->analogs) && !empty($article->analogs))
-                            @foreach ($article->analogs as $analog)
-                              <div class="swiper-slide">
-                                  <div class="cards_group">
-                                      <a href="{{ $analog->makeFeedUrl() }}">
-                                        <img src="{{ url($analog->preview->image) }}" alt="Analog {{ $analog->id }}" class="main_img">
-                                      </a>
-                                      <a href="{{ $analog->makeFeedUrl() }}">
-                                          <h3>{{ $analog->title }}</h3>
-                                      </a>
-                                      <p>{!! $analog->short() !!}</p>
-                                      <div class="date">
-                                          <span>{{ \Illuminate\Support\Carbon::parse($analog->created_at)->format('d.m.Y') }}</span>
-                                          <div class="name_author">
-                                              <img src="{{ url($analog->author->avatar) }}" alt="Avatar">
-                                              <p>{{ $analog->author->profile }}</p>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                            @endforeach
-                          @endif
-                        </div>
-                        <div class="swiper-button-next">
-                          @include('icons.analog_arrow_prev')
-                        </div>
-                        <div class="swiper-button-prev">
-                          @include('icons.analog_arrow_next')
+            <div class="container">
+                <div class="about_block">
+                    @include('site.components.heading', ['title' => 'subscribe'])
+                    <div class="materials_group">
+                        <div class="swiper" id="analogs-swiper-{{ $article->id }}">
+                            <div class="swiper-wrapper">
+                                @if (isset($article->analogs) && !empty($article->analogs))
+                                    @foreach ($article->analogs as $analog)
+                                        <div class="swiper-slide">
+                                            <div class="cards_group">
+                                                <a href="{{ $analog->makeFeedUrl() }}">
+                                                    <img src="{{ url($analog->preview->image) }}"
+                                                        alt="Analog {{ $analog->id }}" class="main_img">
+                                                </a>
+                                                <a href="{{ $analog->makeFeedUrl() }}">
+                                                    <h3>{{ $analog->title }}</h3>
+                                                </a>
+                                                <p>{!! $analog->short() !!}</p>
+                                                <div class="date">
+                                                    <span>{{ \Illuminate\Support\Carbon::parse($analog->created_at)->format('d.m.Y') }}</span>
+                                                    <div class="name_author">
+                                                        <img src="{{ url($analog->author->avatar) }}" alt="Avatar">
+                                                        <p>{{ $analog->author->profile }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                            <div class="swiper-button-next">
+                                @include('icons.analog_arrow_prev')
+                            </div>
+                            <div class="swiper-button-prev">
+                                @include('icons.analog_arrow_next')
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
     @endforeach
 
     @push('js')
@@ -115,6 +124,11 @@
                         Livewire.dispatch('load-next-article');
                     }
                 })
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                history.scrollRestoration = 'manual';
             });
         </script>
     @endpush

@@ -30,7 +30,7 @@ class EditSectionVariables extends EditRecord
             $img_src = $img_src[1] ?? null;
             if ($img_src) {
               $img_path = preg_replace("/^.*?(\/storage.*?)$/is", "$1", $img_src);
-              $img_url = url($img_path);
+              $img_url = url("/$img_path");
               $img = "<img src='$img_url' alt='Article image' />";
               $data['value'] = str_ireplace($item, $img, $data['value']);
             }
