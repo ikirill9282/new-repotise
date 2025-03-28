@@ -1,9 +1,5 @@
 @php
-$news = $variables->get('news_ids')->value;
-$news = \App\Models\News::whereIn('id', $news)->get();
-while ($news->count() < 5) {
-  $news = $news->collect()->merge($news)->slice(0, 5);
-}
+$news = \App\Models\News::getLastNews(5);
 @endphp
 
 <section class="news">
