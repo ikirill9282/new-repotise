@@ -4,7 +4,7 @@
         <div class="right_text_group">
             <div class="name_commendor">
                 <div class="left_text">
-                    <a href="#">@talmaev1</a>
+                    <a href="{{ url("/users/profile/" . $comment['author']['profile']) }}">{{ $comment['author']['profile'] }}</a>
                 </div>
                 <a href="#"><img src="{{ asset('assets/img/options.svg') }}" alt="Options"></a>
             </div>
@@ -15,11 +15,15 @@
                 <p>
                   {!! $comment['text'] !!}
                 </p>
-                <span class="show-more" onclick="toggleText()">More</span>
+                <span class="show-more" onclick="toggleText()">
+                  {{ $variables->get('comment_more_message')?->value ?? '' }}
+                </span>
             </div>
             <div class="likes">
                 <div class="left_groups_like">
-                  <a href="#" class="for_answer">Reply</a>
+                  <a href="#" class="for_answer">
+                    {{ $variables->get('comment_reply_message')?->value ?? '' }}
+                  </a>
                   @if (isset($comment['likes']) && !empty($comment['likes']))
                     <div class="img_men">
                       @foreach ($comment['likes'] as $key => $like)
@@ -38,9 +42,9 @@
                 </div>
             </div>
             <div class="right_edit">
-                <a href="#">Report</a>
-                <a href="#">Edit</a>
-                <a href="#">Delete</a>
+                <a href="#">{{ $variables->get('comment_report_message')?->value ?? '' }}</a>
+                <a href="#">{{ $variables->get('comment_edit_message')?->value ?? '' }}</a>
+                <a href="#">{{ $variables->get('comment_delete_message')?->value ?? '' }}</a>
             </div>
         </div>
     </div>
@@ -53,7 +57,7 @@
 
     @if(!isset($replies))
       <div class="more_answers">
-        <a href="#">Show More Replies (50 of 248)</a>
+        <a href="#">{{ $variables->get('comment_show_replies')?->value ?? '' }} (50 of 248)</a>
       </div>
     @endif
 </div>

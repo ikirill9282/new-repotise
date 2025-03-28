@@ -1,6 +1,6 @@
 <div class="last_news">
   <{{ $variables->get('last_news_heading')?->value ?? 'h3' }}>
-    {{ $variables->get('last_news_title')?->value ?? 'Travel Insights 123' }}
+    {{ $variables->get('last_news_title')?->value ?? 'Travel Insights' }}
   </{{ $variables->get('last_news_heading')?->value ?? 'h3' }}>
   <div class="block_news_items">
     @if (isset($news))

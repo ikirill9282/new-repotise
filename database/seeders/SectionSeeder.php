@@ -72,22 +72,22 @@ class SectionSeeder extends Seeder
         );
 
         $article_feed = Section::firstOrCreate(
+          ['slug' => 'feed'],
+          [
+            'title' => 'Feed',
+            'slug' => 'feed',
+            'type' => 'wire',
+            'component' => 'feed',
+          ],
+        );
+
+        $insights = Section::firstOrCreate(
           ['slug' => 'insights'],
           [
             'title' => 'insights',
             'slug' => 'insights',
             'type' => 'wire',
             'component' => 'insights',
-          ],
-        );
-
-        $articles = Section::firstOrCreate(
-          ['slug' => 'articles'],
-          [
-            'title' => 'articles',
-            'slug' => 'articles',
-            'type' => 'wire',
-            'component' => 'articles',
           ],
         );
 
@@ -98,6 +98,16 @@ class SectionSeeder extends Seeder
             'slug' => 'custom',
             'type' => 'site',
             'component' => 'custom',
+          ],
+        );
+
+        $helpCenter = Section::firstOrCreate(
+          ['slug' => 'help-center'],
+          [
+            'title' => 'Help Center',
+            'slug' => 'help-center',
+            'type' => 'site',
+            'component' => 'help_center',
           ],
         );
 
@@ -136,7 +146,7 @@ class SectionSeeder extends Seeder
                 'header' => 'Статьи',
                 'article_ids' => [1, 2, 3],
                 'more_text' => 'Смотреть все',
-                'more_link' => '/articles',
+                'more_link' => '/insights',
               ]
             ],
             [
@@ -173,25 +183,39 @@ class SectionSeeder extends Seeder
           ]
         ],
         [
-          'page' => Page::where('slug', 'insights')->first(),
+          'page' => Page::where('slug', 'feed')->first(),
           'sections' => [
             [
-              'model' => Section::where('slug', 'insights')->first(),
+              'model' => Section::where('slug', 'feed')->first(),
               'variables' => [
                 'subscribe_heading' => 'h3',
                 'subscribe_message' => "Don't Miss Out! Subscribe for Exclusive Content",
                 'subscribe_button' => 'Subscribe',
+                'profile_subscribe_message' => 'Subscribe',
                 'last_news_heading' => 'h3',
-                'last_news_title' => 'Travel News'
+                'last_news_title' => 'Travel News',
+                'share_message' => 'Share',
+                'comment_headign' => 'h2',
+                'comment_header' => 'Comments',
+                'comment_add_message' => 'Add a comment...',
+                'comment_more_message' => 'More',
+                'comment_reply_message' => 'Reply',
+                'comment_show_replies' => 'Show More Replies',
+                'comment_more_comments' => 'Load More Comments',
+                'comment_report_message' => 'Report',
+                'comment_edit_message' => 'Edit',
+                'comment_delete_message' => 'Delete',
+                'analog_heading' => 'h2',
+                'analog_header' => 'You Might Also Like',
               ],
             ]
           ]
         ],
         [
-          'page' => Page::where('slug', 'articles')->first(),
+          'page' => Page::where('slug', 'insights')->first(),
           'sections' => [
             [
-              'model' => Section::where('slug', 'articles')->first(),
+              'model' => Section::where('slug', 'insights')->first(),
               'variables' => [
                 'heading' => 'h2',
                 'header' => 'Travel Insights',
@@ -200,6 +224,15 @@ class SectionSeeder extends Seeder
                 'last_news_title' => 'Travel News'
               ],
             ],
+          ]
+        ],
+        [
+          'page' => Page::where('slug', 'help-center')->first(),
+          'sections' => [
+            [
+              'model' => Section::where('slug', 'help-center')->first(),
+              'variables' => [],
+            ]
           ]
         ]
       ];

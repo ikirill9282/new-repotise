@@ -19,15 +19,19 @@ class PageSeeder extends Seeder
       ]);
       $articles_page = Page::firstOrCreate([
         'title' => 'Travel Insights',
-        'slug' => 'articles',
+        'slug' => 'insights',
       ]);
       $news_page = Page::firstOrCreate([
         'title' => 'news',
         'slug' => 'news',
       ]);
-      $insights_page = Page::firstOrCreate([
-        'title' => 'insights',
-        'slug' => 'insights',
+      $feed_page = Page::firstOrCreate([
+        'title' => 'Feed',
+        'slug' => 'feed',
+      ]);
+      $faq = Page::firstOrCreate([
+        'title' => 'Help Center',
+        'slug' => 'help-center',
       ]);
     }
 }

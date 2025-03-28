@@ -58,7 +58,7 @@
                 <a href="#" class="third_connect">
                   @include('icons.reddit-sm')
                 </a>
-                <a href="#" class="share">Share</a>
+                <a href="#" class="share">{{ $variables->get('share_message')?->value ?? '' }}</a>
             </div>
         </div>
     </div>

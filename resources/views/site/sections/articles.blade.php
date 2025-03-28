@@ -13,10 +13,10 @@
             <div class="block_cards">
                 @foreach ($articles as $article)
                     <div class="item">
-                        <a href="{{ url($article->makeInsightsUrl()) }}">
+                        <a href="{{ url($article->makeFeedUrl()) }}">
                           <img src="{{ url($article->preview->image) }}" alt="Article {{ $article->id }}" class="img_main">
                         </a>
-                        <a href="{{ $article->makeInsightsUrl() }}">
+                        <a href="{{ $article->makeFeedUrl() }}">
                             <h3>{{ $article->title }}</h3>
                         </a>
                         <p>{!! $article->short() !!}</p>

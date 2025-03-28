@@ -118,8 +118,8 @@ class Article extends Model
     return $this;
   }
 
-  public function makeInsightsUrl()
+  public function makeFeedUrl()
   {
-    return url("articles/insights/$this->slug?aid=$this->id");
+    return url("insights/feed/$this->slug?aid=$this->id");
   }
 }
