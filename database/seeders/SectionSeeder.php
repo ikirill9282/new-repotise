@@ -110,6 +110,16 @@ class SectionSeeder extends Seeder
             'component' => 'help_center',
           ],
         );
+        
+        $callbackForm = Section::firstOrCreate(
+          ['slug' => 'callback-form'],
+          [
+            'title' => 'Callback Form',
+            'slug' => 'callback-form',
+            'type' => 'site',
+            'component' => 'callback_form',
+          ],
+        );
 
         $this->build();
     }
@@ -154,7 +164,6 @@ class SectionSeeder extends Seeder
               'variables' => [
                 'heading' => 'h2',
                 'header' => 'Новости',
-                'news_ids' => [1],
                 'more_text' => 'Смотреть все',
                 'more_link' => '/news',
               ]
@@ -231,7 +240,30 @@ class SectionSeeder extends Seeder
           'sections' => [
             [
               'model' => Section::where('slug', 'help-center')->first(),
-              'variables' => [],
+              'variables' => [
+                'heading' => 'h2',
+                'header' => 'Help Center',
+                'general_heading' => 'h2',
+                'general_header' => 'General Questions:',
+                'customer_heading' => 'h2',
+                'customer_header' => 'For Customers:',
+                'creator_heading' => 'h2',
+                'creator_header' => 'For Creators:',
+                'last_news_heading' => 'h3',
+                'last_news_title' => 'Travel News'
+              ],
+            ],
+            [
+              'model' => Section::where('slug', 'callback-form')->first(),
+              'variables' => [
+                'heading' => 'h2',
+                'header' => 'Get in Touch',
+                'subtitle' => 'Have a question? We\'re here to assist. Send us a message.',
+                'name_placeholder' => 'Your Name',
+                'subject_placeholder' => 'Subject...',
+                'message_placeholder' => 'Your Message&#10;Please provide details about your request',
+                'button_message' => 'Submit',
+              ]
             ]
           ]
         ]

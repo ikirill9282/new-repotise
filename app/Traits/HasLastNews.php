@@ -14,17 +14,6 @@ trait HasLastNews
 
   public function appendLastNews(): void
   {
-    $this->last_news = News::orderByDesc('id')->limit($this->maximum_models)->get();
-    if ($this->last_news->isNotEmpty() && $this->last_news->count() < 4) {
-      for (
-        $i = $this->last_news->count();
-        $i < $this->maximum_models; 
-        $i++
-      ) {
-        $this->last_news = collect(array_merge($this->last_news->all(), $this->last_news->all()));
-      }
-    }
-    
-    $this->last_news = $this->last_news->slice($this->maximum_models);
+    $this->last_news = News::getLastNews($this->maximum_models);
   }
 }

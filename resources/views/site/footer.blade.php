@@ -15,7 +15,7 @@
               <li><a href="#">For Creators</a></li>
               <li><a href="#">For Investors & Partners</a></li>
               <li><a href="#">Referral Program</a></li>
-              <li><a href="#">Help Center</a></li>
+              <li><a href="{{ url('/help-center') }}">Help Center</a></li>
           </ul>
           <ul>
               <h3>Legal</h3>

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{ asset('/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('/assets/css/site.css') }}">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('/favicon.svg') }}">
     <title>@yield('title', config('app.name'))</title>

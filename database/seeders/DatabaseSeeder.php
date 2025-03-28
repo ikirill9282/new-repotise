@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
         LikeSeeder::class,
         FollowerSeeder::class,
         GallerySeeder::class,
+        FaqSeeder::class,
       ]);
     }
 }

@@ -15,15 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
                   ['bold', 'italic', 'underline'],
                   ['link', 'image'],
                   [{ list: 'ordered'}, { list: 'bullet' }],
-                  ['clean']                                         // Remove formatting button
+                  ['clean']
               ]
           }
       });
 
       quill.on('text-change', function() {
-          // Обновляем скрытое поле с содержимым редактора
           const content = quill.root.innerHTML;
-          editor.value = content; // Обновляем значение поля
+          editor.value = content;
       });
   });
 });
