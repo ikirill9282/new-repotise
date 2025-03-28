@@ -22,7 +22,7 @@ class Feed extends Component
     // public bool $end = false;
     // public array $article_ids = [];
     // public int $visible = 3;
-    public int $perPage = 2;
+    public int $perPage = 10;
     public int $totalRecords;
 
     public function mount(Arrayable|array $variables): void
@@ -35,7 +35,11 @@ class Feed extends Component
     #[On('load-next-article')] 
     public function loadNextArticle()
     {
-      $this->perPage += 2;
+      if ($this->perPage >= $this->totalRecords) {
+        // $this->perPage = 2;
+        // $this->dispatch('refresh-page');
+      }
+      $this->perPage += 10;
     }
 
     public function render()

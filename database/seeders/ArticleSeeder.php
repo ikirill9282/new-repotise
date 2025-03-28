@@ -16,7 +16,7 @@ class ArticleSeeder extends Seeder
     public function run(): void
     {
       $cnt = 1;
-      for ($x = 0; $x < 5; $x++) {
+      for ($x = 0; $x < 6; $x++) {
         for ($i = 1; $i <= 5; $i++) {
           $article = Article::firstOrCreate(
             ['user_id' => $i, 'title' => 'Article Title'],

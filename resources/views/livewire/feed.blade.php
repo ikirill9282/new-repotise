@@ -6,7 +6,7 @@
 
         @if ($perPage == 1)
             <div x-intersect="$wire.loadNextArticle"></div>
-        @elseif ($key + 2 == $perPage)
+        @elseif (($key + ($perPage - $key))  == $perPage)
             <div x-intersect="$wire.loadNextArticle"></div>
         @endif
 
@@ -129,7 +129,14 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 history.scrollRestoration = 'manual';
+                // scrollTo({top: 0, behavior: 'instant'});
             });
+        </script>
+        <script>
+          window.addEventListener('refresh-page', event => {
+             window.location.reload(false);
+            //  scrollTo({top: 0, behavior: 'instant'});
+          })
         </script>
     @endpush
     @script
