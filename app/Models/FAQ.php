@@ -12,4 +12,9 @@ class FAQ extends Model
     {
       return $this->hasOne(FAQ::class, 'parent_id');
     }
+
+    public function question()
+    {
+      return $this->belongsTo(FAQ::class, 'id', 'parent_id');
+    }
 }
