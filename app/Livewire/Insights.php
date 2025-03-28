@@ -25,7 +25,7 @@ class Insights extends Component
     public function render()
     {
         return view('livewire.insights', [
-          'articles' => Article::paginate(9),
+          'articles' => Article::orderByDesc('id')->paginate(9),
         ]);
     }
 }
