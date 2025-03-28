@@ -24,6 +24,8 @@ class User extends Authenticatable implements HasName
         'remember_token',
     ];
 
+    public $appends = ['profile'];
+
     protected function casts(): array
     {
         return [
@@ -36,6 +38,13 @@ class User extends Authenticatable implements HasName
     {
       return Attribute::make(
         get: fn($value) => Collapse::make($value),
+      );
+    }
+
+    public function profile(): Attribute
+    {
+      return Attribute::make(
+        get: fn() => "@" . $this->username,
       );
     }
 
@@ -59,8 +68,8 @@ class User extends Authenticatable implements HasName
       return ucfirst($this->username);
     }
 
-    public function profile()
-    {
-      return "@$this->username";
-    }
+    // public function profile()
+    // {
+    //   return "@$this->username";
+    // }
 }

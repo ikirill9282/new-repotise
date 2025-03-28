@@ -1,48 +1,61 @@
+
 <footer>
   <div class="container">
-      <div class="top_menu_group">
+      <nav class="top_menu_group">
           <ul>
-              <h3>Основные раздела</h3>
-              <li><a href="#">Главная</a></li>
-              <li><a href="#">Каталог</a></li>
-              <li><a href="#">Избранное</a></li>
-              <li><a href="#">Авторы и блогеры</a></li>
-              <li><a href="#">Советы и новости</a></li>
+              <h3>Explore <img src="{{ asset('assets/img/icon_footer.svg') }}" alt="Arrow"></h3>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">All Products</a></li>
+              <li><a href="#">Favourite</a></li>
+              <li><a href="#">Creators</a></li>
+              <li><a href="#">Travel Insights</a></li>
           </ul>
           <ul>
-              <h3>Партнерам</h3>
-              <li><a href="#">Для авторов</a></li>
-              <li><a href="#">Для партнеров</a></li>
-              <li><a href="#">Свяжитесь с нами (FAQ)</a></li>
+              <h3>Partnerships <img src="{{ asset('assets/img/icon_footer.svg') }}" alt="Arrow"></h3>
+              <li><a href="#">For Creators</a></li>
+              <li><a href="#">For Investors & Partners</a></li>
+              <li><a href="#">Referral Program</a></li>
+              <li><a href="#">Help Center</a></li>
           </ul>
           <ul>
-              <h3>Юридическая информация</h3>
+              <h3>Legal</h3>
               <li><a href="#">Terms and Conditions</a></li>
               <li><a href="#">Privacy Policy</a></li>
               <li><a href="#">Cookie Policy</a></li>
-              <li><a href="#">All Policies</a></li>
+              <li><a href="#">More Policies</a></li>
           </ul>
           <ul>
-              <h3>Личный кабинет</h3>
-              <li><a href="#">Меню</a></li>
-              <li><a href="#">Профиль</a></li>
-              <li><a href="#">Покупки и финансы</a></li>
-              <li><a href="#">Продукты и подписки</a></li>
-              <li><a href="#">Статьи и новости</a></li>
+              <h3>My Account <img src="{{ asset('assets/img/icon_footer.svg') }}" alt="Arrow"></h3>
+              <li><a href="#">Join / Sign In</a></li>
+              <li><a href="#">Forgot Password?</a></li>
           </ul>
-      </div>
+      </nav>
       <div class="bottom_connecting_group">
           <div class="logo">
-              <a href="#"><img src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
+              <a href="#">
+                @include('icons.footer_logo')
+              </a>
           </div>
           <div class="connecting">
               <a href="#" class="first_connect">
                 @include('icons.facebook')
-                </a>
+              </a>
               <a href="#" class="second_connect">
                 @include('icons.twitter')
               </a>
           </div>
+      </div>
+      <nav class="menu_bottom">
+          <ul>
+              <li><a href="#">Terms and Conditions</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Cookie Policy</a></li>
+              <li><a href="#">More Policies</a></li>
+          </ul>
+      </nav>
+      <div class="bottom_by_des">
+          <span class="TrekGuider_span">2025 TrekGuider Ink.</span>
+          <span class="by_to">by moloko69.ru</span>
       </div>
   </div>
 </footer>

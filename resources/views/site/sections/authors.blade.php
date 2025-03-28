@@ -15,29 +15,29 @@ if (!empty($authors)) {
           <div class="group_authors">
               <div class="swiper mySwiper">
                   <div class="swiper-wrapper">
-                    @if(!empty($authors))
-                      @foreach ($authors as $author)
-                        <div class="swiper-slide">
-                            <div class="cards_group">
-                                <div class="img_products">
-                                    <img src="{{ url($author->avatar) }}" alt="" class="main_img">
-                                    <a href="{{ url('/user/favorite/add/author') }}" class="span_buy">
+                      @if(!empty($authors))
+                        @foreach ($authors as $author)
+                          <div class="swiper-slide">
+                              <div class="cards_group">
+                                  <div class="img_products">
+                                      <img src="{{ url($author->avatar) }}" alt="Autho {{ $author->getName() }}" class="main_img">
+                                      <a href="{{ url('/user/favorite/add/author') }}" class="span_buy">
                                         @include('icons.favorite', ['stroke' => '#FF2C0C'])
                                       </a>
-                                </div>
-                                <div class="name">
-                                    <p>{{ $author->getName() }}</p>
-                                    <img src="{{ asset('/assets/img/icon_verif.svg') }}" alt="Verified">
-                                </div>
-                                <h3><a href="{{ $author->makeProfileUrl() }}">{{ $author->profile() }}</a></h3>
-                                <div class="followers">
-                                    <img src="{{ asset('/assets/img/followers.svg') }}" alt="Followers">
-                                    <p>{{ $author->followers_count }} Followers</p>
-                                </div>
-                            </div>
-                        </div>
-                      @endforeach
-                    @endif
+                                  </div>
+                                  <div class="name">
+                                      <p>{{ $author->getName() }}</p>
+                                      <img src="{{ asset('/assets/img/icon_verif.svg') }}" alt="Verify">
+                                  </div>
+                                  <h3>{{ $author->getName() }}</h3>
+                                  <div class="followers">
+                                      <img src="{{ asset('/assets/img/followers.svg') }}" alt="Followers">
+                                      <p>{{ $author->followers_count }} Followers</p>
+                                  </div>
+                              </div>
+                          </div>
+                        @endforeach
+                      @endif
                   </div>
                   <div class="swiper-button-next">
                     @include('icons.analog_arrow_next')

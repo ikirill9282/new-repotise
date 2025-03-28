@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Str;
 
 trait HasAuthor
 {
@@ -18,6 +19,6 @@ trait HasAuthor
 
   public function short(int $symbols = 200)
   {
-    return mb_substr($this->text, 0, $symbols) . '...';
+    return trim(mb_substr($this->text, 0, $symbols) . '...');
   }
 }

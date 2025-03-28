@@ -10,9 +10,16 @@
     <div class="container">
         <ol class="breadcrumb">
             @foreach ($breadcrumbs as $name => $breadcrumb)
-                <li class="breadcrumb-item">
-                    <a href="{{ $breadcrumb }}">{{ ucfirst($name) }}</a>
+                @if (array_key_last($breadcrumbs) !== $name)
+                  <li class="breadcrumb-item">
+                      <a href="{{ $breadcrumb }}">{{ ucfirst($name) }}</a>
+                  </li>
+                @else
+                <li class="breadcrumb-item active" aria-current="page">
+                  {{ ucfirst($name) }}
                 </li>
+                @endif
+
                 @if (array_key_last($breadcrumbs) !== $name)
                     <span>•</span>
                 @endif

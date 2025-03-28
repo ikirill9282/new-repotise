@@ -13,8 +13,8 @@ use Illuminate\Http\Request;
 
 Route::get('/', SiteController::class)->name('home');
 Route::get('/{slug}', SiteController::class);
-Route::get('/articles/{slug}', SiteController::class);
-Route::get('/articles/{slug}/{article}', SiteController::class);
+Route::get('/insights/{slug}', SiteController::class);
+Route::get('/insights/{slug}/{article}', SiteController::class);
 
 Route::match(['get', 'post'], '/variables/edit', function(Request $request) {
   dd($request->all());
