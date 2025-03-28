@@ -6,12 +6,15 @@ use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class Article extends Model
 {
   use HasAuthor, HasGallery;
 
   protected Collection|array $all_comments = [];
+
+  protected int $amountAnalogs = 6;
 
   public array|Collection $comments = [];
 
@@ -45,8 +48,6 @@ class Article extends Model
       ->withCount('likes')
       ->with('author')
       ->get();
-
-
     
     foreach ($this->comments as $key => &$comment) {
       if ($this->comments_loading && $comment->children()->exists()) {
@@ -93,16 +94,23 @@ class Article extends Model
   public function getAnalogs()
   {
     $tags = $this->tags->pluck('id')->values()->toArray();
-    $analogs = Article::query()
-      ->whereHas('tags', fn($query) => $query->whereIn('tags.id', $tags))
-      ->with('author', 'preview')
-      ->get()
-      ->collect();
+    if (empty($tags)) {
+      $query = Article::query()
+        ->orderByDesc('id')
+        ->limit($this->amountAnalogs)
+      ;
+    } else {
+      $query = Article::query()
+        ->whereHas('tags', fn($query) => $query->whereIn('tags.id', $tags))
+        ->with('author', 'preview')
+      ;
+    }
 
-    while ($analogs->count() < 6) {
+    $analogs = $query->get()->collect();
+    while ($analogs->count() < $this->amountAnalogs) {
       $analogs = $analogs->merge($analogs->all());
     }
-    $this->analogs = $analogs->slice(0, 6);
+    $this->analogs = $analogs->slice(0, $this->amountAnalogs);
 
     return $this;
   }
@@ -121,5 +129,10 @@ class Article extends Model
   public function makeFeedUrl()
   {
     return url("insights/feed/$this->slug?aid=$this->id");
+  }
+
+  public function setAmountAnalogs(int $amount)
+  {
+    $this->amountAnalogs = $amount;
   }
 }
