@@ -27,7 +27,7 @@
                         <li><a href="{{ url('/products') }}">All Products</a></li>
                         <li><a href="{{ url('/creators') }}">Creators</a></li>
                         <li class="last_menu">
-                            <a href="{{ url('/articles') }}">Travel Insights</a>
+                            <a href="{{ url('/insights') }}">Travel Insights</a>
                         </li>
                         <a href="#" class="profile">
                             <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
@@ -51,7 +51,7 @@
                     <ul>
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ url('/creators') }}">Creators</a></li>
-                        <li><a href="{{ url('/articles') }}">Travel Insights</a></li>
+                        <li><a href="{{ url('/insights') }}">Travel Insights</a></li>
                     </ul>
                 </nav>
                 <a href="#" class="login">
