@@ -14,7 +14,7 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
       $admin = Role::firstOrCreate(['name' => 'admin'], ['name' => 'admin', 'title' => 'Admin']);
-      $buyer = Role::firstOrCreate(['name' => 'buyer'], ['name' => 'buyer', 'title' => 'Buyer']);
-      $seller = Role::firstOrCreate(['name' => 'seller'], ['name' => 'seller', 'title' => 'Seller']);
+      $buyer = Role::firstOrCreate(['name' => 'customer'], ['name' => 'customer', 'title' => 'Customer']);
+      $seller = Role::firstOrCreate(['name' => 'creator'], ['name' => 'creator', 'title' => 'Creator']);
     }
 }

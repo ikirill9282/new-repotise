@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
         FollowerSeeder::class,
         GallerySeeder::class,
         FaqSeeder::class,
+        OptionSeeder::class,
       ]);
     }
 }

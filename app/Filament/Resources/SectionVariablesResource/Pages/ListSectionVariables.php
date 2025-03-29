@@ -3,16 +3,19 @@
 namespace App\Filament\Resources\SectionVariablesResource\Pages;
 
 use App\Filament\Resources\SectionVariablesResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Widgets\SectionFormWidget;
 use App\Models\Admin\Section;
 use App\Models\Admin\SectionVariables;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Support\Collection;
+use Filament\Actions\CreateAction;
 
 class ListSectionVariables extends ListRecords
 {
@@ -57,65 +60,6 @@ class ListSectionVariables extends ListRecords
       ->filters([
         //
       ])
-      // ->defaultGroup(Group::make('section.title')->label("Section"))
-      // ->defaultPaginationPageOption(10)
-      ->filters([
-        // SelectFilter::make('page')
-        //   ->query(function (Builder $query, $state) {
-        //     $page_id = filter_var($state['value'], FILTER_VALIDATE_INT) ? intval($state['value']) : null;
-        //     $query->when(
-        //       !is_null($page_id),
-        //       function ($query) use ($page_id) {
-        //         $query->whereHas('section.pages', function ($subquery) use ($page_id) {
-        //           $subquery->where('pages.id', $page_id);
-        //         });
-        //       }
-        //     );
-        //   })
-        //   ->options(
-        //     Page::query()
-        //       ->select('id', 'title')
-        //       ->get()
-        //       ->pluck('title', 'id')
-        //       ->toArray()
-        //   ),
-        // SelectFilter::make('section')
-        //   ->query(function($query, $state) {
-        //     $section_id = filter_var($state['value'], FILTER_VALIDATE_INT) ? intval($state['value']) : null;
-        //     $query->when(
-        //       !is_null($section_id),
-        //       fn($subquery) => $subquery->where('section_id', $section_id)
-        //     );
-        //   })
-        //   ->options(
-        //     Section::query()
-        //       ->select(['id', 'title'])
-        //       ->get()
-        //       ->pluck('title', 'id')
-        //       ->toArray()
-        //   ),
-        // SelectFilter::make('name')
-        //   ->query(function (Builder $query, $state) {
-        //     $name = (filter_var($state['value'], FILTER_DEFAULT) && strlen($state['value'])) ? $state['value'] : null;
-        //     $query->when(
-        //       !is_null($name),
-        //       fn($q) => $q->where('name', $name)
-        //     );
-        //   })
-        //   ->options(
-        //     SectionVariables::query()
-        //       ->distinct()
-        //       ->select(['name'])
-        //       ->get()
-        //       ->pluck('name', 'name')
-        //   )
-        //   ->searchable()
-      ])
-      // ->filtersTriggerAction(
-      //   fn(TableAction $action) => $action
-      //     ->button()
-      //     ->label('Filter')
-      // )
       ->actions([
         EditAction::make()
           ->form(fn($record) => $this->selectRecordFields($record)),
@@ -123,6 +67,11 @@ class ListSectionVariables extends ListRecords
       ->bulkActions([
         BulkActionGroup::make([
           // Tables\Actions\DeleteBulkAction::make(),
+          BulkAction::make('edit')
+            ->form([
+              TextInput::make('value'),
+            ])
+            ->action(fn(Collection $records, BulkAction $action) => $this->bulkUpdate($records, $action)),
         ]),
       ]);
   }
@@ -130,7 +79,7 @@ class ListSectionVariables extends ListRecords
   protected function getHeaderActions(): array
   {
     return [
-      Actions\CreateAction::make(),
+      CreateAction::make(),
     ];
   }
 
@@ -143,5 +92,10 @@ class ListSectionVariables extends ListRecords
         ]
       ]),
     ];
+  }
+
+  public function bulkUpdate(Collection $records, BulkAction $action): void
+  {
+     $records->map(fn($record) => $record->update($action->getFormData()));
   }
 }

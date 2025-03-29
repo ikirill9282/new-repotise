@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
@@ -14,56 +15,66 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-      if (!empty(env('ADMIN_LOGIN')) && !empty(env('ADMIN_PASS'))) {
+      if (!empty(env('ADMIN_MAIL')) && !empty(env('ADMIN_PASS'))) {
         $admin = User::firstOrCreate(
-          ['username' => env('ADMIN_LOGIN')],
+          ['email' => env('ADMIN_MAIL')],
           [
-            'username' => env('ADMIN_LOGIN'), 
+            'name' => 'Admin',
+            'email' => env('ADMIN_MAIL'), 
+            'email_verified_at' => Carbon::now(),
             'password' => env('ADMIN_PASS'),
-            'avatar' => '/storage/images/man.png',
+            // 'avatar' => '/storage/images/man.png',
           ],
         );
         if (!$admin->hasRole('admin')) $admin->assignRole(Role::findByName('admin'));
       }
 
       $seller = User::firstOrCreate(
-        ['username' => 'Seller'],
+        ['email' => 'seller@gmail.com'],
         [
-          'username' => 'Seller',
+          'name' => 'Seller',
+          'email' => 'seller@gmail.com',
+          'email_verified_at' => Carbon::now(),
           'password' => 'yX2zYInvor',
-          'avatar' => '/storage/images/man.png',
+          // 'avatar' => '/storage/images/man.png',
         ],
       );
       $seller2 = User::firstOrCreate(
-        ['username' => 'Seller2'],
+        ['email' => 'seller2@gmail.com'],
         [
-          'username' => 'Seller2',
+          'name' => 'Seller2',
+          'email' => 'seller2@gmail.com',
+          'email_verified_at' => Carbon::now(),
           'password' => 'yX2zYInvor',
-          'avatar' => '/storage/images/man.png',
+          // 'avatar' => '/storage/images/man.png',
         ],
       );
 
       $buyer = User::firstOrCreate(
-        ['username' => 'Buyer'],
+        ['email' => 'buyer@gmail.com'],
         [
-          'username' => 'Buyer', 
+          'name' => 'Buyer',
+          'email' => 'buyer@gmail.com',
+          'email_verified_at' => Carbon::now(),
           'password' => '5MsIqDLxpR',
-          'avatar' => '/storage/images/man.png',
+          // 'avatar' => '/storage/images/man.png',
         ],
       );
 
       $buyer2 = User::firstOrCreate(
-        ['username' => 'Buyer2'],
+        ['email' => 'buyer2@gmail.com'],
         [
-          'username' => 'Buyer2', 
+          'name' => 'Buyer2',
+          'email' => 'buyer2@gmail.com',
+          'email_verified_at' => Carbon::now(),
           'password' => 'k48dvR6aT3',
-          'avatar' => '/storage/images/man.png',
+          // 'avatar' => '/storage/images/man.png',
         ],
       );
 
-      if (!$buyer->hasRole('buyer')) $buyer->assignRole(Role::findByName('buyer'));
-      if (!$buyer2->hasRole('buyer')) $buyer->assignRole(Role::findByName('buyer'));
-      if (!$seller->hasRole('seller')) $seller->assignRole(Role::findByName('seller'));
-      if (!$seller2->hasRole('seller')) $seller->assignRole(Role::findByName('seller'));
+      if (!$buyer->hasRole('customer')) $buyer->assignRole(Role::findByName('customer'));
+      if (!$buyer2->hasRole('customer')) $buyer->assignRole(Role::findByName('customer'));
+      if (!$seller->hasRole('creator')) $seller->assignRole(Role::findByName('creator'));
+      if (!$seller2->hasRole('creator')) $seller->assignRole(Role::findByName('creator'));
     }
 }

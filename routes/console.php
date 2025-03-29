@@ -10,9 +10,10 @@ use App\Models\Category;
 use Illuminate\Support\Carbon;
 use App\Models\Article;
 use App\Models\Comment;
+use App\Models\Options;
 use App\Models\User;
 
 Artisan::command('tt', function() {
-  $t = Page::find(1);
-  dd($t->sections->toArray());
+  $t = User::find(1);
+  dd($t->avatar);
 });
