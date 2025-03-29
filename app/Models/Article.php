@@ -120,8 +120,9 @@ class Article extends Model
     $this->load([
       'likes' => function($query) {
         $query->with('author')->orderByDesc('id')->limit(3);
-      }
-    ]);
+      },
+    ])
+    ->loadCount('likes');
 
     return $this;
   }

@@ -17,12 +17,8 @@ class Feed extends Component
     use HasLastNews;
     use WithPagination;
 
-    // public Collection|array $articles = [];
     public Collection|array $variables = [];
-    // public bool $end = false;
-    // public array $article_ids = [];
-    // public int $visible = 3;
-    public int $perPage = 10;
+    public int $perPage = 5;
     public int $totalRecords;
 
     public function mount(Arrayable|array $variables): void
@@ -39,18 +35,19 @@ class Feed extends Component
         // $this->perPage = 2;
         // $this->dispatch('refresh-page');
       }
-      $this->perPage += 10;
+      $this->perPage += 5;
     }
 
     public function render()
     {
       if (Request::has('aid') && filter_var(Request::get('aid'), FILTER_VALIDATE_INT)) {
         $id = intval(Request::get('aid'));
-        $first_article = Article::where('id', $id);
+        $first_article = Article::find($id);
       }
-      return view('livewire.feed')->with(
+      return view('livewire.feed', ['first_article' => $first_article ?? null])->with(
         'articles', 
         Article::query()
+          ->when(isset($id), fn($query) => $query->where('id', '!=', $id))
           ->orderByDesc('id')
           ->paginate($this->perPage)
       );

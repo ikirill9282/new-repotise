@@ -1,4 +1,10 @@
 <div>
+    @php
+      $articles = $articles->items();
+      if ($first_article) {
+        array_unshift($articles, $first_article);
+      }
+    @endphp
     @foreach ($articles as $key => $article)
         @php
             $article = $article->getFullComments()->getAnalogs()->getLikes();
@@ -6,7 +12,7 @@
 
         @if ($perPage == 1)
             <div x-intersect="$wire.loadNextArticle"></div>
-        @elseif (($key + ceil($perPage / 2))  == $perPage)
+        @elseif ($key == ($perPage - 2))
             <div x-intersect="$wire.loadNextArticle"></div>
         @endif
 
