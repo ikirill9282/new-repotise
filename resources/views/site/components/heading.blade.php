@@ -5,10 +5,22 @@ $header = (isset($variables) && isset($title)) ? $variables->firstWhere(fn($var)
 
 @if(isset($title) && !is_null($heading) && !is_null($header))
   <{{ print_var($heading, $variables) }}>
-    {!! print_var($header, $variables) !!}
+        
+    @if(isset($header_text) && !empty($header_text)) 
+      {!! $header_text !!}
+    @else
+      {!! print_var($header, $variables) !!}
+    @endif
+    
   </{{ print_var($heading, $variables) }}>
 @elseif (isset($variables))
   <{{ print_var('heading', $variables) }}>
-    {!! print_var('header', $variables) !!}
-  </{{ print_var('heading', $variables) }}>
+
+    @if(isset($header_text) && !empty($header_text)) 
+      {!! $header_text !!}
+    @else
+      {!! print_var('header', $variables) !!}
+    @endif
+  
+    </{{ print_var('heading', $variables) }}>
 @endif

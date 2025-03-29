@@ -8,7 +8,7 @@ $article = \App\Models\Article::find($variables->firstWhere('name', 'article_id'
           <div class="left_text">
               @include('site.components.heading', [
                 'variables' => $variables, 
-                'title' => $article->title
+                'header_text' => $article->title
               ])
               <p>{!! $article->short(600) !!}</p>
               <div class="name_author">
