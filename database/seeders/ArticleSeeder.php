@@ -18,8 +18,9 @@ class ArticleSeeder extends Seeder
       $cnt = 1;
       for ($x = 0; $x < 6; $x++) {
         for ($i = 1; $i <= 5; $i++) {
+          try {
           $article = Article::firstOrCreate(
-            ['user_id' => $i, 'title' => 'Article Title'],
+            ['user_id' => $i, 'title' => "Article Title"],
             [
               'user_id' => $i,
               'title' => "Article Title $cnt",
@@ -36,7 +37,10 @@ class ArticleSeeder extends Seeder
                             <p>Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.Among the manufacturers of prestigious Swiss watches there are recognized leaders - these are Breguet, Patek Philippe, Audemars Piguet, Vacheron Constantin.</p>'
             ]);
             $cnt++;
-            
+
+          } catch (\Exception $e) {
+            dd(User::all());
+          }
         }
       }
   }
