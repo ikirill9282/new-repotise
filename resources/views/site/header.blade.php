@@ -54,7 +54,7 @@
                         <li><a href="{{ url('/insights') }}">Travel Insights</a></li>
                     </ul>
                 </nav>
-                <a href="#" class="login">
+                <a href="#" class="login open_auth">
                     @include('icons.user')
                     <span>Join / Sign in</span>
                 </a>

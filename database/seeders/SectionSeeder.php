@@ -130,6 +130,16 @@ class SectionSeeder extends Seeder
             'component' => '404',
           ],
         );
+        
+        $auth = Section::firstOrCreate(
+          ['slug' => 'auth'],
+          [
+            'title' => 'Auth',
+            'slug' => 'auth',
+            'type' => 'wire',
+            'component' => 'auth',
+          ],
+        );
 
         $this->build();
     }
@@ -294,21 +304,39 @@ class SectionSeeder extends Seeder
               ]
             ],
           ]
+        ],
+        [
+          'page' => '*',
+          'sections' => [
+            [
+              'model' => Section::where('slug', 'auth')->first(),
+              'variables' => [
+                'heading' => 'h2',
+                'header' => 'Auth',
+                'login_button' => 'Login',
+                'remember_label' => 'Remember me',
+                'email_label' => 'Email',
+                'password_label' => 'Password',
+              ]
+            ]
+          ]
         ]
       ];
 
       foreach ($data as $item) {
         foreach ($item['sections'] as $section) {
-          PageSection::firstOrCreate(
-            [
-              'page_id' => $item['page']->id,
-              'section_id' => $section['model']->id,
-            ],
-            [
-              'page_id' => $item['page']->id,
-              'section_id' => $section['model']->id,
-            ]
-          );
+          if ($item['page'] != '*') {
+            PageSection::firstOrCreate(
+              [
+                'page_id' => $item['page']->id,
+                'section_id' => $section['model']->id,
+              ],
+              [
+                'page_id' => $item['page']->id,
+                'section_id' => $section['model']->id,
+              ]
+            );
+          }
     
           foreach ($section['variables'] as $name => $value) {
             SectionVariables::firstOrCreate([
