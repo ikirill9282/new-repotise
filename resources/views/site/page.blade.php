@@ -4,6 +4,7 @@
     @if (isset($page) && isset($page->sections) && !empty($page->sections))
         @foreach ($page->sections as $section)
             @php
+                // dd(auth()->user());
                 if (isset($section->variables)) {
                     $variables = $section->variables->keyBy('name');
                 } else {
@@ -20,4 +21,6 @@
             @endif
         @endforeach
     @endif
+
+    @livewire('auth')
 @endsection

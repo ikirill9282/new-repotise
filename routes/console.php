@@ -12,8 +12,12 @@ use App\Models\Article;
 use App\Models\Comment;
 use App\Models\Options;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyMail;
 
 Artisan::command('tt', function() {
-  $t = User::find(1);
-  dd($t->avatar);
+  $mail = Mail::to('9dmdlo40s4@zudpck.com')->send(new VerifyMail([
+    'name' => 'Demo',
+  ]));
+  dd($mail);
 });

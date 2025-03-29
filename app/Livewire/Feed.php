@@ -20,6 +20,7 @@ class Feed extends Component
     public Collection|array $variables = [];
     public int $perPage = 3;
     public int $totalRecords;
+    public $first_article;
 
     public function mount(Arrayable|array $variables): void
     {
@@ -42,9 +43,9 @@ class Feed extends Component
     {
       if (Request::has('aid') && filter_var(Request::get('aid'), FILTER_VALIDATE_INT)) {
         $id = intval(Request::get('aid'));
-        $first_article = Article::find($id);
+        $this->first_article = Article::find($id);
       }
-      return view('livewire.feed', ['first_article' => $first_article ?? null])->with(
+      return view('livewire.feed')->with(
         'articles', 
         Article::query()
           ->when(isset($id), fn($query) => $query->where('id', '!=', $id))

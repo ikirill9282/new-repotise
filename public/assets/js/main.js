@@ -97,3 +97,22 @@ function toggleText() {
         button.style.display = "none";
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const open_auth_items = [...document.querySelectorAll('.open_auth')];
+  if (open_auth_items.length) {
+    open_auth_items.map((item) => item.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      $('#auth_modal').css("display", "flex").hide().fadeIn();
+    }));
+  }
+
+  const close_auth_items = [...document.querySelectorAll('.close_auth')];
+  if (close_auth_items.length) {
+    close_auth_items.map((item) => item.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      $('#auth_modal').fadeOut();
+    }))
+  }
+  
+});

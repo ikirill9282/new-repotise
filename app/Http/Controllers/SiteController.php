@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin\Page;
 use Illuminate\Http\Request;
-use App\Models\Admin\Section;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SiteController extends Controller
