@@ -18,7 +18,7 @@ class Feed extends Component
     use WithPagination;
 
     public Collection|array $variables = [];
-    public int $perPage = 5;
+    public int $perPage = 3;
     public int $totalRecords;
 
     public function mount(Arrayable|array $variables): void
@@ -35,7 +35,7 @@ class Feed extends Component
         // $this->perPage = 2;
         // $this->dispatch('refresh-page');
       }
-      $this->perPage += 5;
+      $this->perPage += 3;
     }
 
     public function render()

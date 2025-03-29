@@ -12,7 +12,7 @@
 
         @if ($perPage == 1)
             <div x-intersect="$wire.loadNextArticle"></div>
-        @elseif ($key == ($perPage - 2))
+        @elseif ($key == ($perPage - 3))
             <div x-intersect="$wire.loadNextArticle"></div>
         @endif
 
