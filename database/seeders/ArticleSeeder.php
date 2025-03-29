@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Helpers\Slug;
 use Illuminate\Support\Carbon;
+use App\Models\User;
 
 class ArticleSeeder extends Seeder
 {
