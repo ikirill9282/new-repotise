@@ -33,7 +33,7 @@
                             <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
                             <div class="right_text">
                                 <div class="name">
-                                    <h3>{{ auth()->user()->profile }}</h3>
+                                    <h3>{{ auth()->user()?->profile }}</h3>
                                 </div>
                             </div>
                         </a>
@@ -72,10 +72,10 @@
                   </a>
                 @else
                   <a href="#" class="profile">
-                    <img src="{{ url(auth()->user()->avatar) }}" alt="avatar" class="profile_img">{{-- rounded-full w-8 --}}
+                    <img src="{{ url(auth()->user()?->avatar) }}" alt="avatar" class="profile_img">{{-- rounded-full w-8 --}}
                     <div class="right_text">
                       <div class="name">
-                        <h3>{{ auth()->user()->profile }}</h3>
+                        <h3>{{ auth()->user()?->profile }}</h3>
                       </div>
                       <img src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
                     </div>
