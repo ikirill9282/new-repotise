@@ -16,8 +16,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifyMail;
 
 Artisan::command('tt', function() {
-  $mail = Mail::to('errewer123@gmail.com')->send(new VerifyMail([
+  $mail = Mail::to('perepelitso01@gmail.com')->send(new VerifyMail([
     'name' => 'Demo',
-  ]))->send();
+  ]));
+
   dd($mail);
 });
