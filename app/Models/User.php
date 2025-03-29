@@ -24,7 +24,24 @@ class User extends Authenticatable implements HasName
         'remember_token',
     ];
 
-    public $appends = ['profile'];
+    public $appends = [
+      'profile',
+      'avatar',
+    ];
+
+    protected static function boot()
+    {
+      parent::boot();
+
+      self::creating(function($model) {
+        $username = preg_replace("/^(.*?)@.*$/is", "$1", $model->email);
+        while (static::where('username', $username)->exists()) {
+          $username = "$username" . random_int(0, 100);
+        }
+
+        $model->username = $username;
+      });
+    }
 
     protected function casts(): array
     {
@@ -48,6 +65,20 @@ class User extends Authenticatable implements HasName
       );
     }
 
+    public function avatar(): Attribute
+    {
+      return Attribute::make(
+        get: fn() => $this->options()
+          ->where([
+            'type' => 'image',
+            'name' => 'avatar',
+          ])
+          ->where('name', 'avatar')
+          ->first()
+          ?->pivot->value,
+      );
+    }
+
     public function followers()
     {
       return $this->belongsToMany(User::class, 'followers', 'author_id', 'subscriber_id', 'id', 'id');
@@ -68,8 +99,18 @@ class User extends Authenticatable implements HasName
       return ucfirst($this->username);
     }
 
+    public function options()
+    {
+      return $this->belongsToMany(Options::class, 'user_options', 'user_id', 'option_id')->withPivot(['value']);
+    }
+
     // public function profile()
     // {
     //   return "@$this->username";
+    // }
+
+    // public function avatar()
+    // {
+    //   return $this->options()->where('type', 'image')->where('name', 'avatar');
     // }
 }
