@@ -19,7 +19,7 @@ Artisan::command('tt', function() {
   $m = new VerifyMail([
     'name' => 'Demo',
   ]);
-  $mail = Mail::to('perepelitso01@gmail.com')->send($m);
+  $mail = Mail::to('errewer123@gmail.com')->send($m);
 
   dd($mail);
 });
