@@ -8,10 +8,23 @@ use App\Traits\HasGallery;
 use App\Traits\HasPrice;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-  use HasAuthor, HasGallery, HasPrice;
+  use HasAuthor, HasGallery, HasPrice, Searchable;
+
+  public function toSearchableArray(): array
+  {
+      $array = $this->toArray();
+
+      $array['author'] = $this->author->toArray();
+      $array['categories'] = $this->categories->toArray();
+      $array['type'] = $this->type->toArray();
+      $array['location'] = $this->location->toArray();
+
+      return $array;
+  }
 
   public function categories()
   {

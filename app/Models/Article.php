@@ -7,10 +7,11 @@ use App\Traits\HasGallery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Laravel\Scout\Searchable;
 
 class Article extends Model
 {
-  use HasAuthor, HasGallery;
+  use HasAuthor, HasGallery, Searchable;
 
   protected Collection|array $all_comments = [];
 
@@ -31,6 +32,17 @@ class Article extends Model
   public function likes()
   {
     return $this->hasMany(Likes::class, 'model_id')->where('type', 'article');
+  }
+
+
+  public function toSearchableArray(): array
+  {
+      $array = $this->toArray();
+
+      $array['tags'] = $this->tags->toArray();
+      $array['author'] = $this->author->toArray();
+
+      return $array;
   }
 
   public function getFullComments(int $limit = 10): Article
