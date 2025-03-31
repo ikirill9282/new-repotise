@@ -13,11 +13,12 @@ use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Filament\Panel;
+use Laravel\Scout\Searchable;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, Searchable;
 
     protected $guarded = ['id'];
 
@@ -30,6 +31,15 @@ class User extends Authenticatable implements HasName, FilamentUser
       'profile',
       'avatar',
     ];
+
+    public function toSearchableArray(): array
+    {
+        $array = $this->toArray();
+
+        $array['options'] = $this->options->toArray();
+
+        return $array;
+    }
 
     protected static function boot()
     {

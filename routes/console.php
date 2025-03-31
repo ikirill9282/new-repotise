@@ -54,29 +54,30 @@ Artisan::command('tt2', function() {
   // dd($index->stats()['numberOfDocuments']);
   // $index->addDocuments($articles->toArray());
 
-  $str = 'buyer 17';
-  $qs = array_map(function($w) {
-    $query = (new SearchQuery())
-      ->setIndexUid('articles')
-      ->setQuery($w)
-      ->setLimit(1000)
-      ->setAttributesToRetrieve(['id', 'title', 'subtitle', 'slug', 'author.name'])
-      ;
-    return $query;
+  $str = '';
+  // $qs = array_map(function($w) {
+  //   $query = (new SearchQuery())
+  //     ->setIndexUid('articles')
+  //     ->setQuery($w)
+  //     ->setLimit(1000)
+  //     ->setAttributesToRetrieve(['id', 'title', 'subtitle', 'slug', 'author.name'])
+  //     ;
+  //   return $query;
 
-  }, explode(' ', $str));
+  // }, explode(' ', $str));
 
-  $r = $client->multiSearch($qs);
-  // $r = Article::search($str)
-  //   ->options([
-  //   'limit' => 1000,
-  //   // 'offset' => 0,
-  //   'attributesToRetrieve' => ['id', 'title', 'subtitle', 'slug', 'author.name', 'tags.title'],
-  //   // 'attributesToHighlight' => ['title', 'subtitle', 'slug'],
-  // ])
-  //   ->raw();
-  $r = collect($r['results'])
-    ->flatMap(fn($item) => $item['hits']);
+  // $r = $client->multiSearch($qs);
+
+  $r = Article::search($str)
+    ->options([
+    'limit' => 1000,
+    // 'offset' => 0,
+    'attributesToRetrieve' => ['id', 'title', 'subtitle', 'slug', 'author.name', 'text'],
+  ])
+      // ->get();
+    ->raw();
+  // $r = collect($r['results'])
+  //   ->flatMap(fn($item) => $item['hits']);
   dd($r);
 });
 
@@ -84,8 +85,10 @@ Artisan::command('rl_index', function() {
   Artisan::call('scout:flush', ['model' => Product::class]);
   Artisan::call('scout:flush', ['model' => Article::class]);
   Artisan::call('scout:flush', ['model' => News::class]);
+  Artisan::call('scout:flush', ['model' => User::class]);
 
   Artisan::call('scout:import', ['model' => Product::class]);
   Artisan::call('scout:import', ['model' => Article::class]);
   Artisan::call('scout:import', ['model' => News::class]);
+  Artisan::call('scout:import', ['model' => User::class]);
 });

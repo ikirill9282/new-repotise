@@ -140,6 +140,26 @@ class SectionSeeder extends Seeder
             'component' => 'auth',
           ],
         );
+        
+        $search_hero = Section::firstOrCreate(
+          ['slug' => 'search-hero'],
+          [
+            'title' => 'Search Hero',
+            'slug' => 'search-hero',
+            'type' => 'site',
+            'component' => 'search_hero',
+          ],
+        );
+        
+        $search_res = Section::firstOrCreate(
+          ['slug' => 'search-result'],
+          [
+            'title' => 'Search Result',
+            'slug' => 'search-result',
+            'type' => 'site',
+            'component' => 'search_result',
+          ],
+        );
 
         $this->build();
     }
@@ -303,6 +323,24 @@ class SectionSeeder extends Seeder
                 'report_message' => 'Report a Problem',
               ]
             ],
+          ]
+        ],
+        [
+          'page' => Page::where('slug', 'search')->first(),
+          'sections' => [
+            [
+              'model' => Section::where('slug', 'search-hero')->first(),
+              'variables' => [
+                'heading' => 'h2',
+                'header' => 'Search Results',
+                'search_placeholder' => 'Search for travel guides, maps, or articles...',
+              ]
+            ],
+            [
+              'model' => Section::where('slug', 'search-result')->first(),
+              'variables' => [
+              ]
+            ]
           ]
         ],
         [

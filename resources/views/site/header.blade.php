@@ -1,3 +1,4 @@
+
 <header class="@if(!auth()->check()) authorization_header @endif">
     <div class="container">
         <div class="about_block">
@@ -5,12 +6,19 @@
                 <a href="{{ route('home') }}"><img src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
             </div>
             <div class="right_group_block">
-                <div class="search">
+                <form class="search" method="GET" action="{{ url('/search') }}">
                     <label for="search">
                         @include('icons.search')
                     </label>
-                    <input type="search" placeholder="Search the site...">
-                </div>
+                    <input 
+                      type="search" 
+                      name="q"
+                      placeholder="Search the site..."
+                      @if(request()->has('q') && (!isset(request()->route()->parameters['slug']) || request()->route()->parameters['slug'] != 'search'))
+                        value="{{ request()->get('q') }}"
+                      @endif
+                    >
+                </form>
                 <div class="hamburger-menu">
                     <input id="menu__toggle" type="checkbox" />
                     <label class="menu__btn" for="menu__toggle">

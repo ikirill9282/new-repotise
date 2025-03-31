@@ -37,5 +37,9 @@ class PageSeeder extends Seeder
         'title' => '404',
         'slug' => 'error-404',
       ]);
+      $search = Page::firstOrCreate([
+        'title' => 'Search Results',
+        'slug' => 'search',
+      ]);
     }
 }
