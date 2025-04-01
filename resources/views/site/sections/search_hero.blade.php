@@ -6,14 +6,13 @@
           <div class="input_group">
               @include('site.components.search')
           </div>
-          <div class="name_tags">
-              <a href="#">name tag</a>
-              <a href="#">name tag</a>
-              <a href="#">name tag</a>
-              <a href="#">name tag</a>
-              <a href="#">name tag</a>
-              <a href="#">name tag</a>
-          </div>
+          @if(isset($tags) && !empty($tags))
+            <div div class="name_tags">
+              @foreach($tags as $tag)
+                <a href="{{ url("search?q={$tag['title']}") }}">{{ $tag['title'] }}</a>
+                @endforeach
+            </div>
+          @endif
       </div>
   </div>
 </section>

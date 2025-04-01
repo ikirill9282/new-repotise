@@ -27,6 +27,8 @@ class SiteController extends Controller
     if ($page->slug === 'search') {
       $query = ($request->has('q') && !empty($request->get('q'))) ? $request->get('q') : null;
       $response_data['search_results'] = is_null($query) ? [] : Search::full($query);
+      $response_data['tags'] = Search::getTagsFromItem($response_data['search_results'][0] ?? []);
+
       // dd($response_data);
     }
 

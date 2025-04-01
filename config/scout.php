@@ -3,6 +3,7 @@
 use App\Models\Article;
 use App\Models\News;
 use App\Models\Product;
+use App\Models\User;
 
 return [
 
@@ -145,9 +146,9 @@ return [
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
             Article::class => [
-              'filterableAttributes' => ['title'],
+              // 'filterableAttributes' => ['title'],
               'sortableAttributes' => ['id', 'created_at'],
-              'searchableAttributes' => ['title', 'subtitle', 'text', 'tags', 'author.'],
+              // 'searchableAttributes' => ['title', 'subtitle', 'text', 'tags', 'author'],
               'typoTolerance' => [
                 'enabled' => true,
                 'minWordSizeforTypos' => [
@@ -157,10 +158,34 @@ return [
               ]
             ],
             News::class => [
-              'filterableAttributes' => ['title'],
+              // 'filterableAttributes' => ['title'],
+              'typoTolerance' => [
+                'enabled' => true,
+                'minWordSizeforTypos' => [
+                  'oneTypo' => 1,
+                  'twoTypos' => 4,
+                ]
+              ]
             ],
             Product::class => [
-              'filterableAttributes' => ['title'],
+              // 'filterableAttributes' => ['title'],
+              'typoTolerance' => [
+                'enabled' => true,
+                'minWordSizeforTypos' => [
+                  'oneTypo' => 1,
+                  'twoTypos' => 4,
+                ]
+              ]
+            ],
+            User::class => [
+              // 'filterableAttributes' => ['title'],
+              'typoTolerance' => [
+                'enabled' => true,
+                'minWordSizeforTypos' => [
+                  'oneTypo' => 1,
+                  'twoTypos' => 4,
+                ]
+              ]
             ],
             // 'users' => [
             //     'filterableAttributes'=> ['id', 'name', 'email'],
