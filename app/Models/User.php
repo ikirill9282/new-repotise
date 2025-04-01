@@ -41,9 +41,43 @@ class User extends Authenticatable implements HasName, FilamentUser
         }
         $array['description'] = $this->description;
         $array['followers_count'] = $this->loadCount('followers')->followers_count;
-
+        
+        $products = $this->products()
+        ->with([
+          'categories' => function ($query) {
+            $query->select(['categories.id', 'categories.title']);
+          },
+          'location' => function ($query) {
+            $query->select(['locations.id', 'locations.title']);
+          },
+          'type' => function ($query) {
+            $query->select(['types.id', 'types.title']);
+          },
+        ])
+        ->select(['id', 'title', 'type_id', 'location_id', 'user_id'])
+        ->get()
+        ->toArray();
+        
+        $array['products'] = collect($products)->select('id', 'title')->toArray();
+        $array['categories'] = collect($products)->pluck('categories')
+          ->flatten(1)
+          ->select(['id', 'title'])
+          ->unique('id')
+          ->toArray()
+        ;
+        $array['types'] = collect($products)->pluck('type')
+          ->unique('id')
+          ->toArray()
+        ;
+        
+        $array['locations'] = collect($products)->pluck('location')
+          ->unique('id')
+          ->toArray()
+        ;
+        
         return $array;
     }
+    
 
     protected static function boot()
     {
@@ -71,6 +105,11 @@ class User extends Authenticatable implements HasName, FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function products()
+    {
+      return $this->hasMany(Product::class);
     }
 
     public function followersCount(): Attribute

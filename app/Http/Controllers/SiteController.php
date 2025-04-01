@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Search;
+use App\Search\SearchClient;
 use App\Models\Admin\Page;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Models\User;
 
 class SiteController extends Controller
 {
@@ -20,14 +21,17 @@ class SiteController extends Controller
       throw new NotFoundHttpException('Not found');
     }
 
+
+    // dd(User::find(3)->toSearchableArray());
+
     $response_data = [
       'page' => $page,
     ];
 
     if ($page->slug === 'search') {
       $query = ($request->has('q') && !empty($request->get('q'))) ? $request->get('q') : null;
-      $response_data['search_results'] = is_null($query) ? [] : Search::full($query);
-      $response_data['tags'] = Search::getTagsFromItem($response_data['search_results'][0] ?? []);
+      $response_data['search_results'] = is_null($query) ? [] : SearchClient::full($query);
+      $response_data['tags'] = SearchClient::getTagsFromItem($response_data['search_results'][0] ?? []);
 
       // dd($response_data);
     }

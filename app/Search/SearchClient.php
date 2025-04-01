@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Search;
 
 use App\Models\Article;
 use App\Models\Category;
@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 
-class Search
+class SearchClient
 {
   protected static function getClient(): Client
   {
@@ -51,6 +51,21 @@ class Search
           'categories',
         ]),
         (new SearchQuery())
+          ->setIndexUid('users')
+          ->setQuery($query)
+          ->setLimit(20)
+          ->setAttributesToRetrieve([
+            'id', 
+            'name', 
+            'slug', 
+            'profile', 
+            'avatar', 
+            'description',
+            'followers_count',
+          ])
+          
+          ,
+        (new SearchQuery())
           ->setIndexUid('articles')
           ->setQuery($query)
           ->setLimit(1000)
@@ -66,20 +81,6 @@ class Search
             'tags',
           ])
           ->setSort(['created_at:desc'])
-          ,
-        (new SearchQuery())
-          ->setIndexUid('users')
-          ->setQuery($query)
-          ->setLimit(20)
-          ->setAttributesToRetrieve([
-            'id', 
-            'name', 
-            'slug', 
-            'profile', 
-            'avatar', 
-            'description',
-            'followers_count',
-          ])
           ,
       ],
     );
