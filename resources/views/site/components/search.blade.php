@@ -6,7 +6,7 @@
       <input 
         type="search"
         name="q"
-        placeholder="{{ print_var('search_text', $variables ?? null) }}"
+        placeholder="{{ print_var('search_placeholder', $variables ?? null) }}"
         @if(request()->has('q'))
           value="{{ request()->get('q') }}"
         @endif

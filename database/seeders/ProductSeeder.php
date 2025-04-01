@@ -18,11 +18,11 @@ class ProductSeeder extends Seeder
     {
       $product = Product::firstOrCreate(
         [
-          'user_id' => 4,
+          'user_id' => 3,
           'title' => 'Get to know Japan',
         ],
         [
-          'user_id' => 4,
+          'user_id' => 3,
           'title' => 'Get to know Japan',
           'slug' => Slug::makeEn('Get to know Japan') . '-' . Carbon::now()->format('YmdHis'),
           'price' => 20000,

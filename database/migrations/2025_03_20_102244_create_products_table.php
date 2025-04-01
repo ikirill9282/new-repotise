@@ -25,6 +25,7 @@ return new class extends Migration
           $table->longText('text');
           $table->timestamps();
 
+          $table->foreign('user_id')->references('id')->on('users');
           $table->foreign('type_id')->references('id')->on('types');
           $table->foreign('location_id')->references('id')->on('locations');
         });

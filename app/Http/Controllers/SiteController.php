@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Search;
 use App\Models\Admin\Page;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,7 +20,16 @@ class SiteController extends Controller
       throw new NotFoundHttpException('Not found');
     }
 
-    return view("site.page", ['page' => $page]);
+    $response_data = [
+      'page' => $page,
+    ];
+
+    if ($page->slug === 'search') {
+      $response_data['search_results'] = Search::full($request->input('q', ''));
+      // dd($response_data);
+    }
+
+    return view("site.page", $response_data);
   }
 
   // public function main(Request $request)
