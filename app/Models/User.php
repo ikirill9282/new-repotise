@@ -32,11 +32,15 @@ class User extends Authenticatable implements HasName, FilamentUser
       'avatar',
     ];
 
-    public function toSearchableArray(): array
+    public function toSearchableArray(bool $load_options = true): array
     {
         $array = $this->toArray();
 
-        $array['options'] = $this->options->toArray();
+        if ($load_options) {
+          $array['options'] = $this->options->toArray();
+        }
+        $array['description'] = $this->description;
+        $array['followers_count'] = $this->loadCount('followers')->followers_count;
 
         return $array;
     }
@@ -83,6 +87,19 @@ class User extends Authenticatable implements HasName, FilamentUser
       );
     }
 
+    public function description(): Attribute
+    {
+      return Attribute::make(
+        get: fn($val) => $this->options()
+          ->where([
+            'type' => 'text',
+            'name' => 'description',
+          ])
+          ->first()
+          ?->pivot->value,
+      );
+    }
+
     public function avatar(): Attribute
     {
       return Attribute::make(
@@ -91,7 +108,6 @@ class User extends Authenticatable implements HasName, FilamentUser
             'type' => 'image',
             'name' => 'avatar',
           ])
-          ->where('name', 'avatar')
           ->first()
           ?->pivot->value,
       );
@@ -121,14 +137,4 @@ class User extends Authenticatable implements HasName, FilamentUser
     {
       return $this->belongsToMany(Options::class, 'user_options', 'user_id', 'option_id')->withPivot(['value']);
     }
-
-    // public function profile()
-    // {
-    //   return "@$this->username";
-    // }
-
-    // public function avatar()
-    // {
-    //   return $this->options()->where('type', 'image')->where('name', 'avatar');
-    // }
 }

@@ -40,7 +40,9 @@ class Article extends Model
       $array = $this->toArray();
 
       $array['tags'] = $this->tags->toArray();
-      $array['author'] = $this->author->toArray();
+      $array['preview'] = $this->preview?->image ?? '';
+      $array['author'] = $this->author->toSearchableArray(false);
+      $array['short'] = $this->short();
 
       return $array;
   }

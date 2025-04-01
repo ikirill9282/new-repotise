@@ -135,6 +135,7 @@
           if (id) {
             const hits = $(`#${id}`);
             const items = response.data;
+            console.log(items);
             
             const formatted = [...items]
               .map((item) => {

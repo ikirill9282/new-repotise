@@ -30,7 +30,6 @@ class ProductSeeder extends Seeder
           'type_id' => 1,
           'location_id' => 1,
           'rating' => 3.5,
-          'reviews' => 13,
           'text' => "This luxury watch combines Swiss quality, stylish design and excellent performance. Classics. Original wristwatch. The mechanism has 8 stones. The round steel case is decorated with diamond pavé. Mother-of-pearl dial. No second hand. Markers in the form of Roman numerals. The date window is located at the 6 o'clock position. <br><br> This luxury watch combines Swiss quality, stylish design and excellent performance. Classics. Original wristwatch. The mechanism has 8 stones. The round steel case is decorated with diamond pavé. Mother-of-pearl dial. No second hand. Markers in the form of Roman numerals. The date window is located at the 6 o'clock position. <br><br> This luxury watch combines Swiss quality, stylish design and excellent performance. Classics. Original wristwatch. The mechanism has 8 stones. The round steel case is decorated with diamond pavé. Mother-of-pearl dial. No second hand. Markers in the form of Roman numerals. The date window is located at the 6 o'clock position.",
         ]
       );

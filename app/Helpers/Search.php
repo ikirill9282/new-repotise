@@ -28,23 +28,52 @@ class Search
 
     $records = $client->multiSearch(
       [
+      (new SearchQuery())
+        ->setIndexUid('products')
+        ->setQuery($query)
+        ->setLimit(20)
+        ->setAttributesToRetrieve([
+          'id', 
+          'name', 
+          'slug', 
+          'title', 
+          'rating',
+          'author',
+          'price', 
+          'old_price', 
+          'type',  
+          'preview',
+          'reviews_count',
+        ]),
         (new SearchQuery())
           ->setIndexUid('articles')
           ->setQuery($query)
           ->setLimit(1000)
-          ->setAttributesToRetrieve(['id', 'title', 'subtitle', 'slug', 'author.name'])
+          ->setAttributesToRetrieve([
+            'id', 
+            'title', 
+            'subtitle', 
+            'slug', 
+            'author',
+            'preview',
+            'short',
+            'created_at',
+          ])
           ->setSort(['created_at:desc'])
           ,
         (new SearchQuery())
           ->setIndexUid('users')
           ->setQuery($query)
           ->setLimit(20)
-          ->setAttributesToRetrieve(['id', 'name', 'slug']),
-        (new SearchQuery())
-          ->setIndexUid('products')
-          ->setQuery($query)
-          ->setLimit(20)
-          ->setAttributesToRetrieve(['id', 'name', 'slug', 'title', 'author', 'pritce', 'old_price', 'type']),
+          ->setAttributesToRetrieve([
+            'id', 
+            'name', 
+            'slug', 
+            'profile', 
+            'avatar', 
+            'description',
+            'followers_count',
+          ]),
       ],
     );
     $records = collect($records['results'])
@@ -67,6 +96,7 @@ class Search
           if (array_key_exists($key, $record['hits'])) {
             $row = $record['hits'][$key];
             $row['index'] = $record['indexUid'];
+            $row['label'] = (isset($row['title']) || isset($row['name'])) ? ($row['title'] ?? $row['name']) : 'null';
             array_push($result, $row);
             $finish = false;
           }

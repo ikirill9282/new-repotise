@@ -21,7 +21,6 @@ return new class extends Migration
           $table->bigInteger('type_id')->unsigned()->index();
           $table->bigInteger('location_id')->unsigned()->index();
           $table->float('rating')->default(0);
-          $table->integer('reviews')->default(0);
           $table->longText('text');
           $table->timestamps();
 

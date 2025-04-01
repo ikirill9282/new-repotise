@@ -34,12 +34,18 @@ class OptionSeeder extends Seeder
           'type' => 'social',
           'default' => 0,
         ],
+        [
+          'name' => 'description',
+          'label' => 'Description',
+          'type' => 'text',
+          'default' => 0,
+        ],
       ];
       $options = array_map(fn($option) => Options::firstOrCreate($option), $options);
       
       foreach (User::all() as $user) {
         foreach ($options as $option) {
-          UserOptions::firstOrCreate(
+          $user_option = UserOptions::firstOrCreate(
             ['user_id' => $user->id, 'option_id' => $option->id],
             [
               'user_id' => $user->id,
@@ -47,6 +53,11 @@ class OptionSeeder extends Seeder
               'value' => ($option->type === 'image') ? '/storage/images/man.png' : null,
             ]
           );
+
+          if ($option->name == 'description') {
+            $user_option->update(['value' => '<p>Love To Dream Sleepsuit for All Seasons <span>Love To Dream</span> Sleepsuit for
+                                              All <span>Seasons Love To Dream</span> Sleepsuit for All Seasons</p>']);
+          }
         }
       }
     }
