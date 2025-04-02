@@ -150,7 +150,7 @@ return [
             Article::class => [
               // 'filterableAttributes' => ['title'],
               'sortableAttributes' => ['id', 'created_at'],
-              'searchableAttributes' => ['title', 'slug', 'subtitle', 'annotation', 'tags', 'author', 'text'],
+              'searchableAttributes' => ['title', 'slug', 'subtitle', 'annotation', 'tags', 'keywords', 'author', 'text'],
               'typoTolerance' => [
                 'enabled' => true,
                 'minWordSizeforTypos' => [
