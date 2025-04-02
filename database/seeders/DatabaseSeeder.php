@@ -21,11 +21,14 @@ class DatabaseSeeder extends Seeder
         UserSeeder::class,
         PageSeeder::class,
         SectionSeeder::class,
-        ArticleSeeder::class,
         NewsSeeder::class,
         TypeSeeder::class,
         LocationSeeder::class,
         CategorySeeder::class,
+        
+        MeilisearchSeeder::class,
+        
+        ArticleSeeder::class,
         ProductSeeder::class,
         ReviewSeeder::class,
         TagSeeder::class,
@@ -36,7 +39,6 @@ class DatabaseSeeder extends Seeder
         FaqSeeder::class,
         OptionSeeder::class,
 
-        MeilisearchSeeder::class,
       ]);
     }
 }
