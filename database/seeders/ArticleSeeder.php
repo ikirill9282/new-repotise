@@ -19,7 +19,7 @@ class ArticleSeeder extends Seeder
       $cnt = 1;
       for ($x = 0; $x < 6; $x++) {
         for ($i = 1; $i <= 5; $i++) {
-          try {
+          // try {
           $article = Article::firstOrCreate(
             ['user_id' => $i, 'title' => "Article Title $cnt"],
             [
@@ -39,9 +39,9 @@ class ArticleSeeder extends Seeder
             ]);
             $cnt++;
 
-          } catch (\Exception $e) {
-            dd($e->getMessage());
-          }
+          // } catch (\Exception $e) {
+          //   dd($e->getMessage());
+          // }
         }
       }
   }
