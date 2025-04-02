@@ -21,7 +21,7 @@ class ArticleSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
           try {
           $article = Article::firstOrCreate(
-            ['user_id' => $i, 'title' => "Article Title"],
+            ['user_id' => $i, 'title' => "Article Title $cnt"],
             [
               'user_id' => $i,
               'title' => "Article Title $cnt",
