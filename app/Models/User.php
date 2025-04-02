@@ -30,6 +30,7 @@ class User extends Authenticatable implements HasName, FilamentUser
     public $appends = [
       'profile',
       'avatar',
+      'name',
     ];
 
     public function toSearchableArray(bool $load_options = true): array
@@ -123,6 +124,13 @@ class User extends Authenticatable implements HasName, FilamentUser
     {
       return Attribute::make(
         get: fn() => "@" . $this->username,
+      );
+    }
+
+    public function name(): Attribute
+    {
+      return Attribute::make(
+        get: fn() => ucfirst($this->username),
       );
     }
 

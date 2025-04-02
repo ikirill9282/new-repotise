@@ -10,6 +10,7 @@ use App\Models\Category;
 use Illuminate\Support\Carbon;
 use App\Models\Article;
 use App\Models\Comment;
+use App\Models\Location;
 use App\Models\Options;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -86,9 +87,13 @@ Artisan::command('rl_index', function() {
   Artisan::call('scout:flush', ['model' => Article::class]);
   Artisan::call('scout:flush', ['model' => News::class]);
   Artisan::call('scout:flush', ['model' => User::class]);
+  Artisan::call('scout:flush', ['model' => Category::class]);
+  Artisan::call('scout:flush', ['model' => Location::class]);
 
   Artisan::call('scout:import', ['model' => Product::class]);
   Artisan::call('scout:import', ['model' => Article::class]);
   Artisan::call('scout:import', ['model' => News::class]);
   Artisan::call('scout:import', ['model' => User::class]);
+  Artisan::call('scout:import', ['model' => Category::class]);
+  Artisan::call('scout:import', ['model' => Location::class]);
 });

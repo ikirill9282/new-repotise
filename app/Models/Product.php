@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Collapse;
+use App\Helpers\Slug;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use App\Traits\HasPrice;
@@ -20,14 +21,26 @@ class Product extends Model
 
       $array = $this->toArray();
 
-      $array['author'] = $this->author->toArray();
-      $array['categories'] = $this->categories->toArray();
-      $array['type'] = $this->type->toArray();
-      $array['location'] = $this->location->toArray();
+      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+      $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
+      $array['type'] = $this->type->only(['id', 'title']);
+      $array['location'] = $this->location->only(['id', 'title']);
       $array['preview'] = $this->preview?->image ?? '';
       $array['reviews_count'] = $this->reviews_count;
 
       return $array;
+  }
+
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    self::creating(function($model) {
+      if (empty($model->slug)) {
+        $model->slug = Slug::makeEn($model->title);
+      }
+    });
   }
 
   public function categories()

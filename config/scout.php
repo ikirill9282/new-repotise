@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Article;
+use App\Models\Category;
+use App\Models\Location;
 use App\Models\News;
 use App\Models\Product;
 use App\Models\User;
@@ -148,7 +150,7 @@ return [
             Article::class => [
               // 'filterableAttributes' => ['title'],
               'sortableAttributes' => ['id', 'created_at'],
-              // 'searchableAttributes' => ['title', 'subtitle', 'text', 'tags', 'author'],
+              'searchableAttributes' => ['title', 'slug', 'subtitle', 'annotation', 'tags', 'author', 'text'],
               'typoTolerance' => [
                 'enabled' => true,
                 'minWordSizeforTypos' => [
@@ -159,6 +161,8 @@ return [
             ],
             News::class => [
               // 'filterableAttributes' => ['title'],
+              'sortableAttributes' => ['id', 'created_at'],
+              'searchableAttributes' => ['title', 'slug', 'tags', 'author', 'text'],
               'typoTolerance' => [
                 'enabled' => true,
                 'minWordSizeforTypos' => [
@@ -168,7 +172,9 @@ return [
               ]
             ],
             Product::class => [
-              // 'filterableAttributes' => ['title'],
+              'filterableAttributes' => ['id', 'location', 'type'],
+              'sortableAttributes' => ['id'],
+              'searchableAttributes' => ['title', 'slug', 'categories', 'location', 'type', 'author', 'text'],
               'typoTolerance' => [
                 'enabled' => true,
                 'minWordSizeforTypos' => [
@@ -177,8 +183,20 @@ return [
                 ]
               ]
             ],
-            User::class => [
-              // 'filterableAttributes' => ['title'],
+            Category::class => [
+              'filterableAttributes' => ['parent_id'],
+              'searchableAttributes' => ['title', 'slug', 'id', 'parent_id'],
+              'typoTolerance' => [
+                'enabled' => true,
+                'minWordSizeforTypos' => [
+                  'oneTypo' => 1,
+                  'twoTypos' => 4,
+                ]
+              ]
+            ],
+            Location::class => [
+              'filterableAttributes' => ['id'],
+              'searchableAttributes' => ['title', 'slug', 'id'],
               'typoTolerance' => [
                 'enabled' => true,
                 'minWordSizeforTypos' => [

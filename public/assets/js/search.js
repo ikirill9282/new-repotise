@@ -13,6 +13,8 @@ window.addEventListener('DOMContentLoaded', function() {
         if (id) {
           const hits = $(`#${id}`);
           const items = response.data;
+          console.log(response.data);
+          
           const formatted = [...items]
             .map((item) => {
               const span = $('<span>', {
@@ -48,7 +50,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }, 200);
       });
     }
-
+    
     $(this).on('focus', function() {
       const id = $(this).data('hits');
       if (id && $(this).val().length) {

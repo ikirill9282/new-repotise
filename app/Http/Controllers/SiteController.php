@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Search\SearchClient;
 use App\Models\Admin\Page;
+use App\Models\Article;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Models\User;
@@ -22,7 +24,7 @@ class SiteController extends Controller
     }
 
 
-    // dd(User::find(3)->toSearchableArray());
+    dd(Article::find(3)->toSearchableArray());
 
     $response_data = [
       'page' => $page,

@@ -7,19 +7,36 @@ use App\Traits\HasGallery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Laravel\Scout\Searchable;
+use App\Helpers\Slug;
 
 class News extends Model
 {
   use HasAuthor, HasGallery, Searchable;
 
+  protected static function boot()
+  {
+    parent::boot();
+
+    self::creating(function($model) {
+      if (empty($model->slug)) {
+        $model->slug = Slug::makeEn($model->title);
+      }
+    });
+  }
 
   public function toSearchableArray(): array
   {
       $array = $this->toArray();
-
-      $array['author'] = $this->author->toArray();
+    
+      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+      $array['tags'] = $this->tags->select('id', 'title')->toArray();
 
       return $array;
+  }
+
+  public function tags()
+  {
+    return $this->belongsToMany(Tag::class, NewsTags::class, 'news_id', 'tag_id', 'id', 'id');
   }
 
   public static function getLastNews(int $maximum_models = 4)

@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
+use App\Traits\HasKeywords;
 
 class Article extends Model
 {
-  use HasAuthor, HasGallery, Searchable;
+  use HasAuthor, HasGallery, Searchable, HasKeywords;
 
   protected Collection|array $all_comments = [];
 
@@ -39,10 +40,11 @@ class Article extends Model
   {
       $array = $this->toArray();
 
-      $array['tags'] = $this->tags->toArray();
+      $array['tags'] = $this->tags->select(['id', 'title'])->toArray();
       $array['preview'] = $this->preview?->image ?? '';
-      $array['author'] = $this->author->toSearchableArray(false);
+      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
       $array['short'] = $this->short();
+      $array['keywords'] = $this->getKeywords();
 
       return $array;
   }
