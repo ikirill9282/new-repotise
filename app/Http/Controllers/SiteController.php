@@ -9,6 +9,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Models\User;
+use App\Models\SearchQueries;
 
 class SiteController extends Controller
 {
@@ -34,8 +35,12 @@ class SiteController extends Controller
       $query = ($request->has('q') && !empty($request->get('q'))) ? $request->get('q') : null;
       $response_data['search_results'] = is_null($query) ? [] : SearchClient::full($query);
       $response_data['tags'] = SearchClient::getTagsFromItem($response_data['search_results'][0] ?? []);
-
-      // dd($response_data);
+      if (!is_null($query)) {
+        SearchQueries::create([
+          'text' => $query,
+          'found' => count($response_data['search_results']),
+        ]);
+      }
     }
 
     return view("site.page", $response_data);
