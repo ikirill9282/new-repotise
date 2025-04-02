@@ -21,5 +21,19 @@ class LocationSeeder extends Seeder
           'slug' => Slug::makeEn('Japan'),
         ],
       );
+      Location::firstOrCreate(
+        ['title' => 'Vietnam'],
+        [
+          'title' => 'Vietnam',
+          'slug' => Slug::makeEn('Vietnam'),
+        ],
+      );
+      Location::firstOrCreate(
+        ['title' => 'China'],
+        [
+          'title' => 'China',
+          'slug' => Slug::makeEn('China'),
+        ],
+      );
     }
 }

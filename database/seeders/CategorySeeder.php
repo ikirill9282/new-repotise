@@ -21,5 +21,29 @@ class CategorySeeder extends Seeder
           'slug' => Slug::makeEn('Hyde'),
         ]
       );
+      Category::firstOrCreate(
+        ['title' => 'Bus Hyde'],
+        [
+          'title' => 'Bus Hyde',
+          'parent_id' => 1,
+          'slug' => Slug::makeEn('Bus Hyde'),
+        ]
+      );
+      Category::firstOrCreate(
+        ['title' => 'Bike Hyde'],
+        [
+          'title' => 'Bike Hyde',
+          'parent_id' => 1,
+          'slug' => Slug::makeEn('Bike Hyde'),
+        ]
+      );
+      Category::firstOrCreate(
+        ['title' => 'Walking Hyde'],
+        [
+          'title' => 'Walking Hyde',
+          'parent_id' => 1,
+          'slug' => Slug::makeEn('Walking Hyde'),
+        ]
+      );
     }
 }

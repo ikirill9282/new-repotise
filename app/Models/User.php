@@ -13,11 +13,12 @@ use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Filament\Panel;
+use Laravel\Scout\Searchable;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, Searchable;
 
     protected $guarded = ['id'];
 
@@ -29,7 +30,55 @@ class User extends Authenticatable implements HasName, FilamentUser
     public $appends = [
       'profile',
       'avatar',
+      'name',
     ];
+
+    public function toSearchableArray(bool $load_options = true): array
+    {
+        $array = $this->toArray();
+
+        if ($load_options) {
+          $array['options'] = $this->options->toArray();
+        }
+        $array['description'] = $this->description;
+        $array['followers_count'] = $this->loadCount('followers')->followers_count;
+        
+        $products = $this->products()
+        ->with([
+          'categories' => function ($query) {
+            $query->select(['categories.id', 'categories.title']);
+          },
+          'location' => function ($query) {
+            $query->select(['locations.id', 'locations.title']);
+          },
+          'type' => function ($query) {
+            $query->select(['types.id', 'types.title']);
+          },
+        ])
+        ->select(['id', 'title', 'type_id', 'location_id', 'user_id'])
+        ->get()
+        ->toArray();
+        
+        $array['products'] = collect($products)->select('id', 'title')->toArray();
+        $array['categories'] = collect($products)->pluck('categories')
+          ->flatten(1)
+          ->select(['id', 'title'])
+          ->unique('id')
+          ->toArray()
+        ;
+        $array['types'] = collect($products)->pluck('type')
+          ->unique('id')
+          ->toArray()
+        ;
+        
+        $array['locations'] = collect($products)->pluck('location')
+          ->unique('id')
+          ->toArray()
+        ;
+        
+        return $array;
+    }
+    
 
     protected static function boot()
     {
@@ -59,6 +108,11 @@ class User extends Authenticatable implements HasName, FilamentUser
         ];
     }
 
+    public function products()
+    {
+      return $this->hasMany(Product::class);
+    }
+
     public function followersCount(): Attribute
     {
       return Attribute::make(
@@ -73,6 +127,26 @@ class User extends Authenticatable implements HasName, FilamentUser
       );
     }
 
+    public function name(): Attribute
+    {
+      return Attribute::make(
+        get: fn() => ucfirst($this->username),
+      );
+    }
+
+    public function description(): Attribute
+    {
+      return Attribute::make(
+        get: fn($val) => $this->options()
+          ->where([
+            'type' => 'text',
+            'name' => 'description',
+          ])
+          ->first()
+          ?->pivot->value,
+      );
+    }
+
     public function avatar(): Attribute
     {
       return Attribute::make(
@@ -81,7 +155,6 @@ class User extends Authenticatable implements HasName, FilamentUser
             'type' => 'image',
             'name' => 'avatar',
           ])
-          ->where('name', 'avatar')
           ->first()
           ?->pivot->value,
       );
@@ -111,14 +184,4 @@ class User extends Authenticatable implements HasName, FilamentUser
     {
       return $this->belongsToMany(Options::class, 'user_options', 'user_id', 'option_id')->withPivot(['value']);
     }
-
-    // public function profile()
-    // {
-    //   return "@$this->username";
-    // }
-
-    // public function avatar()
-    // {
-    //   return $this->options()->where('type', 'image')->where('name', 'avatar');
-    // }
 }

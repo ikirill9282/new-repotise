@@ -7,6 +7,7 @@ use App\Models\ArticleLikes;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Meilisearch\Meilisearch;
 
 class DatabaseSeeder extends Seeder
 {
@@ -34,6 +35,8 @@ class DatabaseSeeder extends Seeder
         GallerySeeder::class,
         FaqSeeder::class,
         OptionSeeder::class,
+
+        MeilisearchSeeder::class,
       ]);
     }
 }

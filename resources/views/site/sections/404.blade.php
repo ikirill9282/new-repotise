@@ -10,7 +10,7 @@
         <div class="about_block">
             <img src="{{ asset('/assets/img/error.png') }}" alt="404" class="error_img">
             @include('site.components.heading')
-            <h3>{{ print_var('subtitle', $variables) }}</h3>
+            <h3>{!! print_var('subtitle', $variables) !!}</h3>
             @include('site.components.search')
             <div class="bottom_to_calatog">
                 <a href="{{ print_var('product_link', $variables) }}" class="product_all">

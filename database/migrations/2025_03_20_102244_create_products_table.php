@@ -21,10 +21,10 @@ return new class extends Migration
           $table->bigInteger('type_id')->unsigned()->index();
           $table->bigInteger('location_id')->unsigned()->index();
           $table->float('rating')->default(0);
-          $table->integer('reviews')->default(0);
           $table->longText('text');
           $table->timestamps();
 
+          $table->foreign('user_id')->references('id')->on('users');
           $table->foreign('type_id')->references('id')->on('types');
           $table->foreign('location_id')->references('id')->on('locations');
         });

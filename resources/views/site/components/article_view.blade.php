@@ -31,12 +31,10 @@
         <div class="share_group">
             @if ($article->likes_count > 0)
                 <div class="avatar">
-                  <div class="img_men">
                     @foreach ($article->likes as $k => $like)
-                        <img class="@if ($k > 0) last_img @endif"
-                            src="{{ $like->author->avatar }}" alt="Avatar">
+                      <img class="@if ($k > 0) last_img @endif"
+                          src="{{ $like->author->avatar }}" alt="Avatar">
                     @endforeach
-                  </div>
                 </div>
             @endif
             <div class="like">

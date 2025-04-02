@@ -140,6 +140,26 @@ class SectionSeeder extends Seeder
             'component' => 'auth',
           ],
         );
+        
+        $search_hero = Section::firstOrCreate(
+          ['slug' => 'search-hero'],
+          [
+            'title' => 'Search Hero',
+            'slug' => 'search-hero',
+            'type' => 'site',
+            'component' => 'search_hero',
+          ],
+        );
+        
+        $search_res = Section::firstOrCreate(
+          ['slug' => 'search-result'],
+          [
+            'title' => 'Search Result',
+            'slug' => 'search-result',
+            'type' => 'site',
+            'component' => 'search_result',
+          ],
+        );
 
         $this->build();
     }
@@ -248,7 +268,7 @@ class SectionSeeder extends Seeder
               'variables' => [
                 'heading' => 'h2',
                 'header' => 'Travel Insights',
-                'search_text' => 'Search by keywords and tags',
+                'search_placeholder' => 'Search by keywords and tags',
                 'last_news_heading' => 'h3',
                 'last_news_header' => 'Travel News'
               ],
@@ -296,13 +316,31 @@ class SectionSeeder extends Seeder
                 'heading' => 'h2',
                 'header' => 'Oops! Page Not Found',
                 'subtitle' => 'If you were looking for something specific, try using the search bar.<br>If you think you\'ve reached this page in error, please get in touch so we can help.',
-                'search_text' => 'Search for travel guides, maps, or articles...',
+                'search_placeholder' => 'Search for travel guides, maps, or articles...',
                 'product_link' => '/advantures',
                 'product_message' => 'All Products',
                 'report_link' => '/report',
                 'report_message' => 'Report a Problem',
               ]
             ],
+          ]
+        ],
+        [
+          'page' => Page::where('slug', 'search')->first(),
+          'sections' => [
+            [
+              'model' => Section::where('slug', 'search-hero')->first(),
+              'variables' => [
+                'heading' => 'h2',
+                'header' => 'Search Results',
+                'search_placeholder' => 'Search for travel guides, maps, or articles...',
+              ]
+            ],
+            [
+              'model' => Section::where('slug', 'search-result')->first(),
+              'variables' => [
+              ]
+            ]
           ]
         ],
         [

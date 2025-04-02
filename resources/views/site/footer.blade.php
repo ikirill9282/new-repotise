@@ -3,7 +3,7 @@
   <div class="container">
       <nav class="top_menu_group">
           <ul>
-              <h3>Explore <img src="{{ asset('assets/img/icon_footer.svg') }}" alt="Arrow"></h3>
+              <h3>Explore <img src="{{ asset('assets/img/arrow_footer.svg') }}" alt="Arrow"></h3>
               <li><a href="#">Home</a></li>
               <li><a href="#">All Products</a></li>
               <li><a href="#">Favourite</a></li>
@@ -11,7 +11,7 @@
               <li><a href="#">Travel Insights</a></li>
           </ul>
           <ul>
-              <h3>Partnerships <img src="{{ asset('assets/img/icon_footer.svg') }}" alt="Arrow"></h3>
+              <h3>Partnerships <img src="{{ asset('assets/img/arrow_footer.svg') }}" alt="Arrow"></h3>
               <li><a href="#">For Creators</a></li>
               <li><a href="#">For Investors & Partners</a></li>
               <li><a href="#">Referral Program</a></li>
@@ -25,7 +25,7 @@
               <li><a href="#">More Policies</a></li>
           </ul>
           <ul>
-              <h3>My Account <img src="{{ asset('assets/img/icon_footer.svg') }}" alt="Arrow"></h3>
+              <h3>My Account <img src="{{ asset('assets/img/arrow_footer.svg') }}" alt="Arrow"></h3>
               <li><a href="#">Join / Sign In</a></li>
               <li><a href="#">Forgot Password?</a></li>
           </ul>

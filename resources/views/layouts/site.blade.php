@@ -14,6 +14,19 @@
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/site.css') }}">
 
+  
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
+    <!-- Include only the reset -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@8.5.1/themes/reset-min.css" integrity="sha256-KvFgFCzgqSErAPu6y9gz/AhZAvzK48VJASu3DpNLCEQ=" crossorigin="anonymous">
+
+    <!-- or include the full Satellite theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@8.5.1/themes/satellite-min.css" integrity="sha256-woeV7a4SRDsjDc395qjBJ4+ZhDdFn8AqswN1rlTO64E=" crossorigin="anonymous">
+
+
+
     <link rel="icon" type="image/svg+xml" href="{{ asset('/favicon.svg') }}">
     <title>@yield('title', config('app.name'))</title>
 
@@ -35,8 +48,10 @@
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('/assets/js/swiper-bundle.min.js') }}"></script>
     <script src="{{ asset('/assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('/assets/js/search.js') }}"></script>
     <script src="{{ asset('/assets/js/main.js') }}"></script>
     @livewireScripts
+    @vite('resources/js/app.js')
 
     @stack('js')
 

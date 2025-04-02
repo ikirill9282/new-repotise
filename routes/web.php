@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
 use Illuminate\Http\Request;
 
 
+require __DIR__ . '/api.php';
 // Route::controller(SiteController::class)->group(function() {
 //   Route::get('/')->name('main');
 //   Route::get('/{slug}');

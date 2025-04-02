@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('search_queries', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('parent_id')->unsigned()->index()->nullable();
-            $table->string('title')->unique();
-            $table->string('slug');
+            $table->text('text');
+            $table->integer('found');
             $table->timestamps();
 
-            $table->foreign('parent_id')->references('id')->on('categories');
+            $table->index(['created_at']);
         });
     }
 
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('search_queries');
     }
 };

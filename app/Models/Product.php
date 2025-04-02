@@ -3,15 +3,45 @@
 namespace App\Models;
 
 use App\Helpers\Collapse;
+use App\Helpers\Slug;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use App\Traits\HasPrice;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-  use HasAuthor, HasGallery, HasPrice;
+  use HasAuthor, HasGallery, HasPrice, Searchable;
+
+  public function toSearchableArray(): array
+  {
+      $this->load('author', 'categories', 'type', 'location', 'preview')->loadCount('reviews');
+
+      $array = $this->toArray();
+
+      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+      $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
+      $array['type'] = $this->type->only(['id', 'title']);
+      $array['location'] = $this->location->only(['id', 'title']);
+      $array['preview'] = $this->preview?->image ?? '';
+      $array['reviews_count'] = $this->reviews_count;
+
+      return $array;
+  }
+
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    self::creating(function($model) {
+      if (empty($model->slug)) {
+        $model->slug = Slug::makeEn($model->title);
+      }
+    });
+  }
 
   public function categories()
   {
@@ -35,22 +65,7 @@ class Product extends Model
 
   public function prepareRatingImages()
   {
-    $result = [];
-    $rating_parts = explode('.', strval($this->rating));
-    
-    if (!isset($rating_parts[1])) {
-      $result = array_fill(0, $this->rating, asset('/assets/img/star1.svg'));
-    } else {
-      $result = array_fill(0, $rating_parts[0], asset('/assets/img/star1.svg'));
-      array_push($result, asset('/assets/img/star2.svg'));
-    }
-
-    if (count($result) < 5) {
-      $empty_stars = array_fill(count($result), (5 - count($result)), asset('/assets/img/star3.svg'));
-      $result = array_merge($result, $empty_stars);
-    }
-
-    return $result;
+    return rating_images($this->rating);
   }
 
   public function reviewsCount(): Attribute
