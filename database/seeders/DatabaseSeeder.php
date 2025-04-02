@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         CategorySeeder::class,
         
         MeilisearchSeeder::class,
-        
+
         ArticleSeeder::class,
         ProductSeeder::class,
         ReviewSeeder::class,
@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
         FaqSeeder::class,
         OptionSeeder::class,
 
+        MeilisearchSeeder::class,
       ]);
     }
 }
