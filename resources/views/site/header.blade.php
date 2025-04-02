@@ -25,16 +25,17 @@
                 
                 <div class="hamburger-menu">
                     <input id="menu__toggle" type="checkbox" class="w-0 h-0" />
-                    <label class="menu__btn md:!transform-none" for="menu__toggle">
+                    <label class="menu__btn" for="menu__toggle">
                         <span></span>
                     </label>
                     <ul class="menu__box">
-                        <div class="search">
+                        <form class="search relative" method="GET" action="{{ url('/search') }}">
                             <label for="search">
                                 @include('icons.search')
                             </label>
-                            <input type="search" id="search" placeholder="Search the site...">
-                        </div>
+                            <input type="search" name="q" class="search-input" id="search" data-hits="menu-search" autocomplete="off" placeholder="Search the site...">
+                            @include('site.components.hits', ['id' => 'menu-search'])
+                        </form>
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ url('/products') }}">All Products</a></li>
                         <li><a href="{{ url('/creators') }}">Creators</a></li>
@@ -76,7 +77,7 @@
                         </a>
                     </ul>
                 </div>
-                <a href="#" class="all_products col-span-2">
+                <a href="#" class="all_products">
                     @include('icons.burger')
                     All Products
                 </a>
@@ -88,7 +89,7 @@
                     </ul>
                 </nav>
                 @if (!auth()->check())
-                    <a href="#" class="login open_auth col-span-3 col-start-12 xl:col-span-3 lg:col-start-14 justify-end">
+                    <a href="#" class="login open_auth">
                         @include('icons.user')
                         <span>Join / Sign in</span>
                     </a>

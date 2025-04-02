@@ -71,7 +71,7 @@
             <section class="similar_materials">
                 <div class="container">
                     <div class="about_block">
-                        @include('site.components.heading', ['title' => 'subscribe'])
+                        @include('site.components.heading', ['title' => 'analog'])
                         <div class="materials_group">
                             <div class="swiper" id="analogs-swiper-{{ $article->id }}">
                                 <div class="swiper-wrapper">
