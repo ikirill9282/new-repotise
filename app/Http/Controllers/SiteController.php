@@ -24,7 +24,7 @@ class SiteController extends Controller
     }
 
 
-    dd(Article::find(3)->toSearchableArray());
+    // dd(Article::find(3)->toSearchableArray());
 
     $response_data = [
       'page' => $page,
