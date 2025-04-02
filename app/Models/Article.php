@@ -44,7 +44,7 @@ class Article extends Model
       $array['preview'] = $this->preview?->image ?? '';
       $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
       $array['short'] = $this->short();
-      // $array['keywords'] = $this->getKeywords();
+      $array['keywords'] = $this->getKeywords();
 
       return $array;
   }
