@@ -96,4 +96,7 @@ Artisan::command('rl_index', function() {
   Artisan::call('scout:import', ['model' => User::class]);
   Artisan::call('scout:import', ['model' => Category::class]);
   Artisan::call('scout:import', ['model' => Location::class]);
+
+  $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
+  $index = $client->index('articles')->updateSortableAttributes(['created_at']);
 });
