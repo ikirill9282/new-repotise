@@ -40,7 +40,7 @@ class ArticleSeeder extends Seeder
             $cnt++;
 
           } catch (\Exception $e) {
-            dd(User::all());
+            dd($e->getMessage());
           }
         }
       }
