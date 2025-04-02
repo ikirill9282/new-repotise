@@ -34,9 +34,9 @@ class ProductSeeder extends Seeder
         ]
       );
 
-      $product->categories()->sync([2]);
+      $product->categories()->sync([4]);
 
-      $product = Product::firstOrCreate(
+      $product2 = Product::firstOrCreate(
         [
           'user_id' => 3,
           'title' => 'Bus Travel on China',
@@ -54,8 +54,9 @@ class ProductSeeder extends Seeder
         ]
       );
 
-      $product->categories()->sync([3]);
-      $product = Product::firstOrCreate(
+      $product2->categories()->sync([2]);
+
+      $product3 = Product::firstOrCreate(
         [
           'user_id' => 3,
           'title' => 'Bike through Vietnam',
@@ -73,6 +74,6 @@ class ProductSeeder extends Seeder
         ]
       );
 
-      $product->categories()->sync([4]);
+      $product3->categories()->sync([3]);
     }
 }

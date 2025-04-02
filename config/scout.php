@@ -205,6 +205,17 @@ return [
                 ]
               ]
             ],
+            User::class => [
+              // 'filterableAttributes' => ['id'],
+              // 'searchableAttributes' => ['title', 'slug', 'id'],
+              'typoTolerance' => [
+                'enabled' => true,
+                'minWordSizeforTypos' => [
+                  'oneTypo' => 1,
+                  'twoTypos' => 4,
+                ]
+              ]
+            ],
             // 'users' => [
             //     'filterableAttributes'=> ['id', 'name', 'email'],
             // ],
