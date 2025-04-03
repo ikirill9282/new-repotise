@@ -9,11 +9,19 @@
                 <a href="#" class="editor_btn" data-target="editor-{{ $comment['id'] }}">
                   <img src="{{ asset('assets/img/options.svg') }}" alt="Options">
                 </a>
-                <div class="right_edit h-0 transition overflow-hidden" id="editor-{{ $comment['id'] }}" data-comment="{{ $comment['id'] }}">
-                  <a href="#">{{ print_var('comment_report_message', $variables) }}</a>
-                  <a href="#">{{ print_var('comment_edit_message', $variables) }}</a>
-                  <a href="#">{{ print_var('comment_delete_message', $variables) }}</a>
-                </div>
+                @if (auth()->check())
+                  <div class="right_edit h-0 transition overflow-hidden" id="editor-{{ $comment['id'] }}" data-comment="{{ $comment['id'] }}">
+                    <a href="#">{{ print_var('comment_report_message', $variables) }}</a>
+                    
+                    @if(auth()->user()->id === $comment['id'] || auth()->user()->hasRole('admin'))
+                      <a href="#">{{ print_var('comment_edit_message', $variables) }}</a>
+                    @endif
+
+                    @if (auth()->user()->hasRole('admin'))
+                      <a href="#">{{ print_var('comment_delete_message', $variables) }}</a>
+                    @endif
+                  </div>
+                @endif
             </div>
             <div class="date">
                 <span>{{ \Illuminate\Support\Carbon::parse($comment['created_at'])->format('d.m.Y') }}</span>
