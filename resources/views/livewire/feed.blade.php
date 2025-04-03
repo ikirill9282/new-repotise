@@ -41,19 +41,29 @@
                             <span>{{ $article->countComments() }}</span>
                         </div>
                         <div class="write_comment_group">
-                            <div class="write_comment">
-                                <h3>@talmaev1</h3>
-                                <input type="text" placeholder="{{ print_var('comment_add_message', $variables) }}">
+                            <div class="write_comment !items-start">
+                                <h3> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
+                                
+                                <textarea
+                                  class="outline-0 grow transition"
+                                  rows="1"
+                                  wrap="hard"
+                                  placeholder="{{ trim(print_var('comment_add_message', $variables)) }}"
+                                  {{ auth()->check() ? '' : 'disabled' }}></textarea>
+                                
                                 <div class="right_stickers">
-                                    <a href="#" class="numbers">0/1000</a>
-                                    <a href="#" class="first_stick">
-                                        @include('icons.smiles')
-                                    </a>
-                                    <a href="#" class="third_stick">
-                                        @include('icons.arrow_right')
-                                    </a>
+                                  <a href="#" class="numbers {{ auth()->check() ? '' : 'disabled' }}">0/1000</a>
+                                  <a href="#" class="first_stick {{ auth()->check() ? '' : 'disabled' }}">
+                                      @include('icons.smiles')
+                                  </a>
+                                  <a href="#" class="third_stick {{ auth()->check() ? '' : 'disabled' }}">
+                                      @include('icons.arrow_right')
+                                  </a>
                                 </div>
                             </div>
+                            @if(!auth()->check())
+                              <a href="#" class="go_comment open_auth">Login to comment</a>
+                            @endif
                         </div>
                         <div class="block_commends">
                             @foreach ($article->comments as $comment)
@@ -197,17 +207,18 @@
                       },
                   });
               });
-
-              console.log(sliders);
               
               return sliders;
             }
 
             let sli = init_sliders();
+            let writers = new CommentWriters();
+
             Livewire.hook('morphed', ({ el, component }) => {
-                console.log('morphed');
                 sli = init_sliders();
+                writers = new CommentWriters();
             });
+
         </script>
     @endscript
 </div>

@@ -94,7 +94,8 @@ class SearchClient
     $records = collect($records['results'])
       ->filter(fn($record) => isset($record['hits']) && !empty($record['hits']));
 
-    return static::compare($records);
+    return $records->toArray();
+    // return static::compare($records);
   }
 
 

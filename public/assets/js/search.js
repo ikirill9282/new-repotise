@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', function() {
   $('.search-input').on('input', function() {
-    console.log($(this).data('loading'));
+    // console.log($(this).data('loading'));
     
     if (!$(this).data('loading')) {
       $(this).data('loading', true);
@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', function() {
         if (id) {
           const hits = $(`#${id}`);
           const items = response.data;
-          console.log(response.data);
+          // console.log(response.data);
           
           const formatted = [...items]
             .map((item) => {

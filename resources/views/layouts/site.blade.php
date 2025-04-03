@@ -50,6 +50,8 @@
     <script src="{{ asset('/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('/assets/js/search.js') }}"></script>
     <script src="{{ asset('/assets/js/main.js') }}"></script>
+    <script src="{{ asset('/assets/js/custom.js') }}"></script>
+    
     @livewireScripts
     @vite('resources/js/app.js')
 
