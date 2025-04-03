@@ -6,7 +6,14 @@
                 <div class="left_text">
                     <a href="{{ url("/users/profile/" . $comment['author']['profile']) }}">{{ $comment['author']['profile'] }}</a>
                 </div>
-                <a href="#"><img src="{{ asset('assets/img/options.svg') }}" alt="Options"></a>
+                <a href="#" class="editor_btn" data-target="editor-{{ $comment['id'] }}">
+                  <img src="{{ asset('assets/img/options.svg') }}" alt="Options">
+                </a>
+                <div class="right_edit h-0 transition overflow-hidden" id="editor-{{ $comment['id'] }}" data-comment="{{ $comment['id'] }}">
+                  <a href="#">{{ print_var('comment_report_message', $variables) }}</a>
+                  <a href="#">{{ print_var('comment_edit_message', $variables) }}</a>
+                  <a href="#">{{ print_var('comment_delete_message', $variables) }}</a>
+                </div>
             </div>
             <div class="date">
                 <span>{{ \Illuminate\Support\Carbon::parse($comment['created_at'])->format('d.m.Y') }}</span>
@@ -40,11 +47,6 @@
                         <span>{{ $comment['likes_count'] }}</span>
                     </div>
                 </div>
-            </div>
-            <div class="right_edit">
-                <a href="#">{{ print_var('comment_report_message', $variables) }}</a>
-                <a href="#">{{ print_var('comment_edit_message', $variables) }}</a>
-                <a href="#">{{ print_var('comment_delete_message', $variables) }}</a>
             </div>
         </div>
     </div>

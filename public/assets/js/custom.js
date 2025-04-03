@@ -40,3 +40,24 @@ const CommentWriters = function() {
 
   return this.init();
 }
+
+
+const Editors = function() {
+  this.editors = [];
+
+  this.init = () => {
+    this.editors = [...$('.editor_btn')].map((editor) => {
+      $(editor).off('click');
+      $(editor).on('click', function(event) {
+        event.preventDefault();
+        const target = $(this).data('target');
+        $(`#${target}`).toggleClass('h-48');
+        console.log('ok');
+        
+      });
+    });
+    return this;
+  }
+
+  return this.init();
+}

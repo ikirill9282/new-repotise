@@ -213,10 +213,12 @@
 
             let sli = init_sliders();
             let writers = new CommentWriters();
-
+            let editors = new Editors();
+            
             Livewire.hook('morphed', ({ el, component }) => {
                 sli = init_sliders();
                 writers = new CommentWriters();
+                editors = new Editors();
             });
 
         </script>
