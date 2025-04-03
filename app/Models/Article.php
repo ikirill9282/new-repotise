@@ -23,7 +23,7 @@ class Article extends Model
 
   public static function selectShort()
   {
-    return static::query()->select(['id', 'title', 'user_id']);
+    return static::query()->select(['id', 'title', 'user_id', 'annotation']);
   }
   
   public function tags()

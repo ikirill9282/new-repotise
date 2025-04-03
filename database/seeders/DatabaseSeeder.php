@@ -25,9 +25,6 @@ class DatabaseSeeder extends Seeder
         TypeSeeder::class,
         LocationSeeder::class,
         CategorySeeder::class,
-        
-        MeilisearchSeeder::class,
-
         ArticleSeeder::class,
         ProductSeeder::class,
         ReviewSeeder::class,

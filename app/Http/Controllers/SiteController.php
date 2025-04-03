@@ -24,7 +24,6 @@ class SiteController extends Controller
       throw new NotFoundHttpException('Not found');
     }
 
-
     // dd(Article::find(3)->toSearchableArray());
 
     $response_data = [

@@ -3,6 +3,8 @@
 namespace App\Traits;
 
 use App\Helpers\AhoCorasick;
+use App\Models\Category;
+use App\Models\Location;
 use App\Search\SearchClient;
 use Meilisearch\Contracts\DocumentsQuery;
 use Meilisearch\Contracts\DocumentsResults;
@@ -29,27 +31,44 @@ trait HasKeywords
 
   protected function prepareKeywords(): array
   {
-    $result = [];
-    $client = SearchClient::make();
+    $result = collect([]);
+    $categories = Category::select('title')
+      ->distinct()
+      ->get()
+      ->pluck('title')
+      ->values()
+      ->toArray();
+    $locations = Location::select('title')
+      ->distinct()
+      ->get()
+      ->pluck('title')
+      ->values()
+      ->toArray();
 
-    $index = $client->index('categories');
-    $categories = $index->getDocuments(
-      (new DocumentsQuery())
-        ->setLimit(1000)
-    )
-      ->getResults();
+    $result = $result->merge($categories)->merge($locations);
+    return $result->unique()->toArray();
+
+    // $client = SearchClient::make();
+
+    // $index = $client->index('categories');
+    // $categories = $index->getDocuments(
+    //   (new DocumentsQuery())
+    //     ->setLimit(1000)
+    // )
+    //   ->getResults();
     
-    $result = array_merge($result, array_column($categories, 'title'));
+    // $result = array_merge($result, array_column($categories, 'title'));
 
-    $index = $client->index('locations');
-    $locations = $index->getDocuments(
-      (new DocumentsQuery())
-        ->setLimit(1000)
-    )
-      ->getResults();
+    // $index = $client->index('locations');
+    // $locations = $index->getDocuments(
+    //   (new DocumentsQuery())
+    //     ->setLimit(1000)
+    // )
+    //   ->getResults();
 
-    $result = array_merge($result, array_column($locations, 'title'));
+    // $result = array_merge($result, array_column($locations, 'title'));
+    
 
-    return array_unique($result);
+    // return array_unique($result);
   }
 }
