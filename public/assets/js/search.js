@@ -4,6 +4,11 @@ window.addEventListener('DOMContentLoaded', function() {
     
     if (!$(this).data('loading')) {
       $(this).data('loading', true);
+
+      setTimeout(() => {
+        $(this).data('loading', false);
+      }, 500);
+
       $.ajax({
         method: 'GET',
         url: '/api/search?q=' + $(this).val()
@@ -43,11 +48,6 @@ window.addEventListener('DOMContentLoaded', function() {
           hits.append(formatted);
           hits.fadeIn();
         }
-      })
-      .then(() => {
-        setTimeout(() => {
-          $(this).data('loading', false);
-        }, 200);
       });
     }
     

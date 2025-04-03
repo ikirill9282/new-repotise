@@ -94,7 +94,13 @@ class SearchClient
     $records = collect($records['results'])
       ->filter(fn($record) => isset($record['hits']) && !empty($record['hits']));
 
-    return $records->toArray();
+    return $records->flatMap(function($record) {
+      return array_map(function($row) use($record) {
+        $row['index'] = $record['indexUid'];
+        $row['label'] = (isset($row['title']) || isset($row['name'])) ? ($row['title'] ?? $row['name']) : 'null';
+        return $row;
+      }, $record['hits']);
+    })->toArray();
     // return static::compare($records);
   }
 
