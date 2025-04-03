@@ -16,14 +16,23 @@ class Location extends Model
       return $array;
     }
 
-    public static function boot()
-    {
-      parent::boot();
+    protected static function boot()
+  {
+    parent::boot();
 
-      self::creating(function($model) {
-        if (!isset($model->slug) || empty($model->slug)) {
-          $model->slug = Slug::makeEn($model->title);
+    self::creating(function ($model) {
+      $model->generateSlug();
+    });
+
+    self::updating(function ($model) {
+        if ($model->isDirty('title')) {
+            $model->generateSlug();
         }
-      });
-    }
+    });
+  }
+
+  private function generateSlug()
+  {
+    $this->slug = Slug::makeEn($this->title);
+  }
 }

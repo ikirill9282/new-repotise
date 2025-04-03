@@ -33,7 +33,6 @@
                     </div>
                 </div>
             </section>
-            {{-- <section class="comments_group" @if (array_key_last($articles) == $key && !$end) id="stopper" @endif> --}}
             <section class="comments_group">
                 <div class="container">
                     <div class="about_block">
@@ -151,63 +150,64 @@
     @script
         <script>
             const init_sliders = () => {
-                const items = document.querySelectorAll('div[id*="analogs-swiper-"]');
-                const sliders = [...items].forEach((elem) => {
-                    const selector = elem.getAttribute('id');
-                    new Swiper(`#${selector}`, {
-                        slidesPerView: 4,
-                        spaceBetween: 20,
-                        navigation: {
-                            nextEl: ".swiper-button-next",
-                            prevEl: ".swiper-button-prev",
-                        },
-                        breakpoints: {
-                            320: {
-                                slidesPerView: 1.2,
-                                spaceBetween: 10,
-                            },
-                            400: {
-                                slidesPerView: 1.4,
-                                spaceBetween: 10,
-                            },
-                            500: {
-                                slidesPerView: 1.7,
-                                spaceBetween: 10,
-                            },
-                            600: {
-                                slidesPerView: 1.9,
-                                spaceBetween: 10,
-                            },
-                            700: {
-                                slidesPerView: 2.2,
-                                spaceBetween: 10,
-                            },
-                            768: {
-                                slidesPerView: 2.2,
-                                spaceBetween: 15,
-                            },
-                            1024: {
-                                slidesPerView: 3,
-                                spaceBetween: 20,
-                            },
-                            1200: {
-                                slidesPerView: 4,
-                                spaceBetween: 20,
-                            },
-                        },
-                    });
-                })
+              const items = document.querySelectorAll('div[id*="analogs-swiper-"]');
+              
+              const sliders = [...items].map((elem) => {
+                  const selector = elem.getAttribute('id');
+                  return new Swiper(`#${selector}`, {
+                      slidesPerView: 4,
+                      spaceBetween: 20,
+                      navigation: {
+                          nextEl: `#${selector} .swiper-button-next`,
+                          prevEl: `#${selector} .swiper-button-prev`,
+                      },
+                      breakpoints: {
+                          320: {
+                              slidesPerView: 1.1,
+                              spaceBetween: 10,
+                          },
+                          400: {
+                              slidesPerView: 1.3,
+                              spaceBetween: 10,
+                          },
+                          500: {
+                              slidesPerView: 1.6,
+                              spaceBetween: 10,
+                          },
+                          600: {
+                              slidesPerView: 1.9,
+                              spaceBetween: 10,
+                          },
+                          700: {
+                              slidesPerView: 2.2,
+                              spaceBetween: 10,
+                          },
+                          768: {
+                              slidesPerView: 2.2,
+                              spaceBetween: 15,
+                          },
+                          1024: {
+                              slidesPerView: 3,
+                              spaceBetween: 20,
+                          },
+                          1200: {
+                              slidesPerView: 4,
+                              spaceBetween: 20,
+                          },
+                      },
+                  });
+              });
 
-                return sliders;
+              console.log(sliders);
+              
+              return sliders;
             }
+
             let sli = init_sliders();
-            Livewire.hook('morphed', ({
-                el,
-                component
-            }) => {
+            Livewire.hook('morphed', ({ el, component }) => {
                 console.log('morphed');
                 sli = init_sliders();
-            })
+            });
         </script>
     @endscript
 </div>

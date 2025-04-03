@@ -160,7 +160,7 @@ class SectionSeeder extends Seeder
             'component' => 'search_result',
           ],
         );
-
+        
         $this->build();
     }
 
@@ -339,6 +339,21 @@ class SectionSeeder extends Seeder
             [
               'model' => Section::where('slug', 'search-result')->first(),
               'variables' => [
+                'notfound_heading' => 'h3',
+                'notfound_header' => 'Oops! We couldn\'t find anything for "<span>guide to the <br> Caribbean islands</span>"',
+                'subtitle' => 'Maybe try searching for something else?',
+                'box1_heading' => 'h4',
+                'box1_header' => 'Discover Trending Articles',
+                'box1_button_label' => 'Travel Insights',
+                'box1_link' => '/insights',
+                'box2_heading' => 'h4',
+                'box2_header' => 'Discover Trending Articles',
+                'box2_button_label' => 'Travel Insights',
+                'box2_link' => '/insights',
+                'box3_heading' => 'h4',
+                'box3_header' => 'Discover Trending Articles',
+                'box3_button_label' => 'Travel Insights',
+                'box3_link' => '/insights',
               ]
             ]
           ]

@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
 use App\Traits\HasKeywords;
+use App\Helpers\Slug;
 
 class Article extends Model
 {
@@ -47,6 +48,26 @@ class Article extends Model
       $array['keywords'] = $this->getKeywords();
 
       return $array;
+  }
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    self::creating(function ($model) {
+      $model->generateSlug();
+    });
+
+    self::updating(function ($model) {
+        if ($model->isDirty('title')) {
+            $model->generateSlug();
+        }
+    });
+  }
+
+  private function generateSlug()
+  {
+    $this->slug = Slug::makeEn($this->title);
   }
 
   public function getFullComments(int $limit = 10): Article

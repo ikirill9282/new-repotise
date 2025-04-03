@@ -31,16 +31,24 @@ class Product extends Model
       return $array;
   }
 
-
   protected static function boot()
   {
     parent::boot();
 
-    self::creating(function($model) {
-      if (empty($model->slug)) {
-        $model->slug = Slug::makeEn($model->title);
-      }
+    self::creating(function ($model) {
+      $model->generateSlug();
     });
+
+    self::updating(function ($model) {
+        if ($model->isDirty('title')) {
+            $model->generateSlug();
+        }
+    });
+  }
+
+  private function generateSlug()
+  {
+    $this->slug = Slug::makeEn($this->title);
   }
 
   public function categories()

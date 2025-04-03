@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use App\Helpers\Slug;
 
 
 class Category extends Model
@@ -15,6 +16,26 @@ class Category extends Model
     $array = $this->only('id', 'title', 'slug', 'parent_id');
     
     return $array;
+  }
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    self::creating(function ($model) {
+      $model->generateSlug();
+    });
+
+    self::updating(function ($model) {
+        if ($model->isDirty('title')) {
+            $model->generateSlug();
+        }
+    });
+  }
+
+  private function generateSlug()
+  {
+    $this->slug = Slug::makeEn($this->title);
   }
 
   public function products()
