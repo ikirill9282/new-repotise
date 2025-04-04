@@ -35,7 +35,7 @@ class PageSeeder extends Seeder
       ]);
       $error_404 = Page::firstOrCreate([
         'title' => '404',
-        'slug' => 'error-404',
+        'slug' => '404',
       ]);
       $search = Page::firstOrCreate([
         'title' => 'Search Results',
@@ -63,7 +63,7 @@ class PageSeeder extends Seeder
       ]);
       $dpa = Page::firstOrCreate([
         'title' => 'Data Processing Agreement',
-        'slug' => 'cookie-policy',
+        'slug' => 'data-processing-agreement',
       ]);
       $payment_policy = Page::firstOrCreate([
         'title' => 'Payment Policy',
@@ -73,7 +73,7 @@ class PageSeeder extends Seeder
         'title' => 'Copyright Policy',
         'slug' => 'copyright-policy',
       ]);
-      $copyright_policy = Page::firstOrCreate([
+      $drp = Page::firstOrCreate([
         'title' => 'Dispute Resolution Policy',
         'slug' => 'dispute-resolution-policy',
       ]);

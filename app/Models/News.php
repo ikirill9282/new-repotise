@@ -12,19 +12,22 @@ use App\Helpers\Slug;
 class News extends Model
 {
   use HasAuthor, HasGallery, Searchable;
-  
+
   protected static function boot()
   {
     parent::boot();
 
     self::creating(function ($model) {
-      $model->generateSlug();
+
+      if (!isset($model->slug) || empty($model->slug)) {
+        $model->generateSlug();
+      }
     });
 
     self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
+      if ($model->isDirty('title')) {
+        $model->generateSlug();
+      }
     });
   }
 
@@ -35,12 +38,12 @@ class News extends Model
 
   public function toSearchableArray(): array
   {
-      $array = $this->toArray();
-    
-      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
-      $array['tags'] = $this->tags->select('id', 'title')->toArray();
+    $array = $this->toArray();
 
-      return $array;
+    $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+    $array['tags'] = $this->tags->select('id', 'title')->toArray();
+
+    return $array;
   }
 
   public function tags()
@@ -50,12 +53,12 @@ class News extends Model
 
   public static function getLastNews(int $maximum_models = 4)
   {
-    
+
     $last_news = News::orderByDesc('id')->limit($maximum_models)->get();
     while ($last_news->count() < $maximum_models) {
       $last_news = $last_news->collect()->merge($last_news)->slice(0, $maximum_models);
     }
-    
+
     return $last_news;
   }
 }

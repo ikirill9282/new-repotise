@@ -8,26 +8,29 @@ use Laravel\Scout\Searchable;
 
 class Location extends Model
 {
-    use Searchable;
+  use Searchable;
 
-    public function toSearchableArray(): array
-    {
-      $array = $this->only('id', 'title');
-      return $array;
-    }
+  public function toSearchableArray(): array
+  {
+    $array = $this->only('id', 'title');
+    return $array;
+  }
 
-    protected static function boot()
+  protected static function boot()
   {
     parent::boot();
 
     self::creating(function ($model) {
-      $model->generateSlug();
+
+      if (!isset($model->slug) || empty($model->slug)) {
+        $model->generateSlug();
+      }
     });
 
     self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
+      if ($model->isDirty('title')) {
+        $model->generateSlug();
+      }
     });
   }
 

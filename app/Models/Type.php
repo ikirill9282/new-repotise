@@ -7,19 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Type extends Model
 {
-    
+
   protected static function boot()
   {
     parent::boot();
 
     self::creating(function ($model) {
-      $model->generateSlug();
+
+      if (!isset($model->slug) || empty($model->slug)) {
+        $model->generateSlug();
+      }
     });
 
     self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
+      if ($model->isDirty('title')) {
+        $model->generateSlug();
+      }
     });
   }
 

@@ -17,18 +17,18 @@ class Product extends Model
 
   public function toSearchableArray(): array
   {
-      $this->load('author', 'categories', 'type', 'location', 'preview')->loadCount('reviews');
+    $this->load('author', 'categories', 'type', 'location', 'preview')->loadCount('reviews');
 
-      $array = $this->toArray();
+    $array = $this->toArray();
 
-      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
-      $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
-      $array['type'] = $this->type->only(['id', 'title']);
-      $array['location'] = $this->location->only(['id', 'title']);
-      $array['preview'] = $this->preview?->image ?? '';
-      $array['reviews_count'] = $this->reviews_count;
+    $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+    $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
+    $array['type'] = $this->type->only(['id', 'title']);
+    $array['location'] = $this->location->only(['id', 'title']);
+    $array['preview'] = $this->preview?->image ?? '';
+    $array['reviews_count'] = $this->reviews_count;
 
-      return $array;
+    return $array;
   }
 
   protected static function boot()
@@ -36,13 +36,16 @@ class Product extends Model
     parent::boot();
 
     self::creating(function ($model) {
-      $model->generateSlug();
+
+      if (!isset($model->slug) || empty($model->slug)) {
+        $model->generateSlug();
+      }
     });
 
     self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
+      if ($model->isDirty('title')) {
+        $model->generateSlug();
+      }
     });
   }
 

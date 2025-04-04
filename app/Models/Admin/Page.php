@@ -17,7 +17,9 @@ class Page extends Model
     parent::boot();
 
     self::creating(function ($model) {
-      $model->generateSlug();
+      if (!isset($model->slug) || empty($model->slug)) {
+        $model->generateSlug();
+      }
     });
 
     self::updating(function ($model) {

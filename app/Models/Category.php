@@ -14,7 +14,7 @@ class Category extends Model
   public function toSearchableArray(): array
   {
     $array = $this->only('id', 'title', 'slug', 'parent_id');
-    
+
     return $array;
   }
 
@@ -23,13 +23,16 @@ class Category extends Model
     parent::boot();
 
     self::creating(function ($model) {
-      $model->generateSlug();
+
+      if (!isset($model->slug) || empty($model->slug)) {
+        $model->generateSlug();
+      }
     });
 
     self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
+      if ($model->isDirty('title')) {
+        $model->generateSlug();
+      }
     });
   }
 

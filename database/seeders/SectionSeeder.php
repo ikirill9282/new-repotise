@@ -261,7 +261,7 @@ class SectionSeeder extends Seeder
         ]
       ],
       [
-        'page' => Page::where('slug', 'travel-insights')->first(),
+        'page' => Page::where('slug', 'insights')->first(),
         'sections' => [
           [
             'model' => Section::where('slug', 'insights')->first(),
@@ -326,7 +326,7 @@ class SectionSeeder extends Seeder
         ]
       ],
       [
-        'page' => Page::where('slug', 'search-results')->first(),
+        'page' => Page::where('slug', 'search')->first(),
         'sections' => [
           [
             'model' => Section::where('slug', 'search-hero')->first(),
@@ -462,7 +462,7 @@ class SectionSeeder extends Seeder
     foreach ($data as $item) {
       foreach ($item['sections'] as $section) {
         if ($item['page'] != '*') {
-          // try {
+          try {
             PageSection::firstOrCreate(
               [
                 'page_id' => $item['page']->id,
@@ -473,9 +473,9 @@ class SectionSeeder extends Seeder
                 'section_id' => $section['model']->id,
               ]
             );
-          // } catch (\Exception $e) {
-          //   dd($item, $section);
-          // }
+          } catch (\Exception $e) {
+            dd($item);
+          }
         }
 
         foreach ($section['variables'] as $name => $value) {
