@@ -8,7 +8,7 @@
               <li><a href="{{ url('/products') }}">All Products</a></li>
               <li><a href="{{ url('/profile/favorites') }}">Favourite</a></li>
               <li><a href="{{ url('/creators') }}">Creators</a></li>
-              <li><a href="{{ url('/insights') }}">Travel Insights</a></li>
+              <li><a href="{{ url('/travel-insights') }}">Travel Insights</a></li>
           </ul>
           <ul>
               <h3>Partnerships <img src="{{ asset('assets/img/arrow_footer.svg') }}" alt="Arrow"></h3>
