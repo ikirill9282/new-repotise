@@ -15,6 +15,7 @@ Route::prefix('api')->group(function() {
     $vars = SectionVariables::where('section_id', 7)->get()->keyBy('name');
     $news = News::getLastNews();
     $articles = Article::where('id', '<', $id)
+      ->when(request()->has('aid'), fn($q) => $q->where('id', '!=', request()->get('aid')))
       ->orderByDesc('id')
       ->limit(2)
       ->get()

@@ -90,8 +90,8 @@
                       $(this).detach();
                       if (id !== undefined) {
                         $.ajax({
-                          mehtod: 'GET',
-                          url: `/api/feed/content/${id}`,
+                          method: 'GET',
+                          url: `/api/feed/content/${id}?aid={{ request()->get('aid') }}`,
                         }).then(response => {
                           feed.append(clone);
                           feed.append(response);
