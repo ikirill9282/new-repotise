@@ -4,30 +4,30 @@
       <nav class="top_menu_group">
           <ul>
               <h3>Explore <img src="{{ asset('assets/img/arrow_footer.svg') }}" alt="Arrow"></h3>
-              <li><a href="#">Home</a></li>
-              <li><a href="#">All Products</a></li>
-              <li><a href="#">Favourite</a></li>
-              <li><a href="#">Creators</a></li>
-              <li><a href="#">Travel Insights</a></li>
+              <li><a href="{{ route('home') }}">Home</a></li>
+              <li><a href="{{ url('/products') }}">All Products</a></li>
+              <li><a href="{{ url('/profile/favorites') }}">Favourite</a></li>
+              <li><a href="{{ url('/creators') }}">Creators</a></li>
+              <li><a href="{{ url('/insights') }}">Travel Insights</a></li>
           </ul>
           <ul>
               <h3>Partnerships <img src="{{ asset('assets/img/arrow_footer.svg') }}" alt="Arrow"></h3>
-              <li><a href="#">For Creators</a></li>
-              <li><a href="#">For Investors & Partners</a></li>
-              <li><a href="#">Referral Program</a></li>
+              <li><a href="{{ url('/partner/creators') }}">For Creators</a></li>
+              <li><a href="{{ url('/partner/investors') }}">For Investors & Partners</a></li>
+              <li><a href="{{ url('/partner/referal') }}">Referral Program</a></li>
               <li><a href="{{ url('/help-center') }}">Help Center</a></li>
           </ul>
           <ul>
               <h3>Legal</h3>
-              <li><a href="#">Terms and Conditions</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Cookie Policy</a></li>
-              <li><a href="#">More Policies</a></li>
+              <li><a href="{{ url('/terms-and-conditions') }}">Terms and Conditions</a></li>
+              <li><a href="{{ url('/privacy-policy') }}">Privacy Policy</a></li>
+              <li><a href="{{ url('/cookie-policy') }}">Cookie Policy</a></li>
+              <li><a href="{{ url('/all-policies') }}">More Policies</a></li>
           </ul>
           <ul>
               <h3>My Account <img src="{{ asset('assets/img/arrow_footer.svg') }}" alt="Arrow"></h3>
-              <li><a href="#">Join / Sign In</a></li>
-              <li><a href="#">Forgot Password?</a></li>
+              <li><a href="#" class="open_auth">Join / Sign In</a></li>
+              <li><a href="#" class="">Forgot Password?</a></li>
           </ul>
       </nav>
       <div class="bottom_connecting_group">

@@ -4,11 +4,33 @@ namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use App\Helpers\Slug;
 
 class Page extends Model
 {
   
   protected $append = ['url'];
+
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    self::creating(function ($model) {
+      $model->generateSlug();
+    });
+
+    self::updating(function ($model) {
+        if ($model->isDirty('title')) {
+            $model->generateSlug();
+        }
+    });
+  }
+
+  private function generateSlug()
+  {
+    $this->slug = Slug::makeEn($this->title);
+  }
 
   public function sections()
   {

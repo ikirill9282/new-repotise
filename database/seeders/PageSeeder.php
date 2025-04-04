@@ -41,5 +41,41 @@ class PageSeeder extends Seeder
         'title' => 'Search Results',
         'slug' => 'search',
       ]);
+      $all_policies = Page::firstOrCreate([
+        'title' => 'All Policies',
+        'slug' => 'all-policies',
+      ]);
+      $terms = Page::firstOrCreate([
+        'title' => 'Terms And Conditions',
+        'slug' => 'terms-and-conditions',
+      ]);
+      $seller_agreenent = Page::firstOrCreate([
+        'title' => 'Seller Agreement',
+        'slug' => 'seller-agreement',
+      ]);
+      $privacy = Page::firstOrCreate([
+        'title' => 'Privacy Policy',
+        'slug' => 'privacy-policy',
+      ]);
+      $cookie = Page::firstOrCreate([
+        'title' => 'Cookie Policy',
+        'slug' => 'cookie-policy',
+      ]);
+      $dpa = Page::firstOrCreate([
+        'title' => 'Data Processing Agreement',
+        'slug' => 'cookie-policy',
+      ]);
+      $payment_policy = Page::firstOrCreate([
+        'title' => 'Payment Policy',
+        'slug' => 'payment-policy',
+      ]);
+      $copyright_policy = Page::firstOrCreate([
+        'title' => 'Copyright Policy',
+        'slug' => 'copyright-policy',
+      ]);
+      $copyright_policy = Page::firstOrCreate([
+        'title' => 'Dispute Resolution Policy',
+        'slug' => 'dispute-resolution-policy',
+      ]);
     }
 }

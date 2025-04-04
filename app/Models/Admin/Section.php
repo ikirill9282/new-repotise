@@ -32,15 +32,19 @@ class Section extends Model
           'type' => $this->type,
           'component' => $this->component,
         ]);
-        
-        $new_variables = $this->variables->map(fn($var) => [
-          'section_id' => $new_section->id,
-          'name' => $var->name,
-          'value' => $var->value,
-        ])
-          ->toArray();
 
-        SectionVariables::query()->upsert($new_variables, ['section_id', 'name'], ['value']);
+        $new_section->update(['slug' => "custom-{$new_section->id}", 'title' => "Custom {$new_section->id}"]);
+
+        if (!str_contains($new_section->slug, 'custom')) {
+          $new_variables = $this->variables->map(fn($var) => [
+            'section_id' => $new_section->id,
+            'name' => $var->name,
+            'value' => $var->value,
+          ])
+            ->toArray();
+  
+          SectionVariables::query()->upsert($new_variables, ['section_id', 'name'], ['value']);
+        }
       } catch (\Exception $e) {
         DB::rollBack();
         throw $e;

@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function(\Exception $e) {
           if ($e instanceof NotFoundHttpException) {
             return response()->view("site.page", [
-              'page' => Page::firstWhere('slug', 'error-404')
+              'page' => Page::firstWhere('slug', '404')
             ]);
           }
         });
