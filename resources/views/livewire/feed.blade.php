@@ -11,12 +11,12 @@
         @endphp
 
         @if ($perPage == 1)
-            <div x-intersect="$wire.loadNextArticle"></div>
-        @elseif ($key == $perPage - 3)
-            <div x-intersect="$wire.loadNextArticle"></div>
+            {{-- <div x-intersect="$wire.loadNextArticle"></div> --}}
+        @elseif ($key == array_key_last($articles))
+            {{-- <div x-intersect="$wire.loadNextArticle"></div> --}}
+            <div id="stopper" data-content="{{ $article->id }}"></div>
         @endif
         <div class="feed-item">
-
             <section class="name_articles">
                 <section class="breadcrumb_block">
                     <div class="container">
@@ -134,32 +134,9 @@
 
                 return elementBottom > viewportTop && elementTop < viewportBottom;
             };
-            $(window).scroll((event) => {
-                $('#stopper').each(function(i, el) {
-                    if ($(this).isInViewport()) {
-                        $(this).addClass('test');
-                        $(this).removeAttr('id');
-                        Livewire.dispatch('load-next-article');
-                    }
-                })
-            });
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                history.scrollRestoration = 'manual';
-                // scrollTo({top: 0, behavior: 'instant'});
-            });
-        </script>
-        <script>
-            window.addEventListener('refresh-page', event => {
-                window.location.reload(false);
-                //  scrollTo({top: 0, behavior: 'instant'});
-            })
-        </script>
-    @endpush
-    @script
-        <script>
-            const init_sliders = () => {
+
+
+            const InitSliders = function() {
               const items = document.querySelectorAll('div[id*="analogs-swiper-"]');
               
               const sliders = [...items].map((elem) => {
@@ -211,16 +188,41 @@
               return sliders;
             }
 
-            let sli = init_sliders();
+            let sli = InitSliders();
             let writers = new CommentWriters();
             let editors = new Editors();
-            
-            Livewire.hook('morphed', ({ el, component }) => {
-                sli = init_sliders();
-                writers = new CommentWriters();
-                editors = new Editors();
-            });
 
+            $(window).scroll((event) => {
+                $('#stopper').each(function(i, el) {
+                    if ($(this).isInViewport()) {
+                      const clone = $(this).clone();
+                      $(this).detach();
+                      $.ajax({
+                        mehtod: 'GET',
+                        url: '/api/feed/content/12',
+                      }).then(response => {
+                        $('#feed').append(clone);
+                        $('#feed').append(response);
+                        
+                        sli = InitSliders();
+                        writers = new CommentWriters();
+                        editors = new Editors();
+                      });
+                    }
+                })
+            });
         </script>
-    @endscript
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                history.scrollRestoration = 'manual';
+                // scrollTo({top: 0, behavior: 'instant'});
+            });
+        </script>
+        <script>
+            window.addEventListener('refresh-page', event => {
+                window.location.reload(false);
+                //  scrollTo({top: 0, behavior: 'instant'});
+            })
+        </script>
+    @endpush
 </div>

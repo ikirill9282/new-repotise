@@ -76,7 +76,7 @@ class SectionSeeder extends Seeder
       [
         'title' => 'Feed',
         'slug' => 'feed',
-        'type' => 'wire',
+        'type' => 'site',
         'component' => 'feed',
       ],
     );
