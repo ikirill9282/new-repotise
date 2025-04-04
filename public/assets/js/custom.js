@@ -52,8 +52,6 @@ const Editors = function() {
         event.preventDefault();
         const target = $(this).data('target');
         $(`#${target}`).toggleClass('h-48');
-        console.log('ok');
-        
       });
     });
     return this;

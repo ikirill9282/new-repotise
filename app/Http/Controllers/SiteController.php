@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Models\User;
 use App\Models\SearchQueries;
+use App\Models\News;
 
 class SiteController extends Controller
 {
@@ -39,6 +40,19 @@ class SiteController extends Controller
           'text' => $query,
           'found' => count($response_data['search_results']),
         ]);
+      }
+    }
+
+    if ($page->slug === 'feed') {
+      $id = ($request->has('aid') && filter_var($request->get('aid'), FILTER_VALIDATE_INT)) ? $request->get('aid') : null;
+      $response_data['articles'] = Article::when($id, fn($q) => $q->where('id', '!=', $id))->orderByDesc('id')->limit(3)->get()->all();
+      $response_data['last_news'] = News::getLastNews();
+
+      if ($request->has('aid') && filter_var($request->get('aid'), FILTER_VALIDATE_INT)) {
+        $id = intval($request->get('aid'));
+        $response_data['first_article'] = Article::find($id);
+      } else {
+        $response_datap['first_article'] = null;
       }
     }
 
