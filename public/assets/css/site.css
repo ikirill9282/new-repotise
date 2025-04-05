@@ -19,3 +19,27 @@ figcaption {
 .collapse.show {
   visibility: visible;
 }
+
+.print-content > * {
+  font-weight: normal !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  margin-top: 0 !important;
+}
+
+
+@media (max-width: 768px) {
+  .why_need_baby_monitor .about_block {
+    width: 100%;
+  }
+  .why_need_baby_monitor .img_main {
+    -o-object-fit: cover;
+       object-fit: cover;
+  }
+}
+
+@media (max-width: 576px) {
+  .articles .about_block .block_cards .item {
+    width: 290px;
+  }
+}

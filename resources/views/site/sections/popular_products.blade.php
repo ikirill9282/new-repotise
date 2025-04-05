@@ -15,9 +15,9 @@ $products = collect(array_fill(0, 10, $products->first()));
   <div class="container">
       <div class="about_block">
           @include('site.components.heading')
-          <div class="products_item">
+          <div class="products_item !items-stretch">
               @foreach($products as $product)
-                <div class="item">
+                <div class="item flex flex-col last:!mr-auto">
                     <div class="img_products">
                         <img src="{{ url($product->preview->image) }}" alt="Product {{ $product->id }} image" class="main_img">
                         <a href="{{ url('/user/favorite/add/product') }}" class="span_buy">
@@ -27,17 +27,19 @@ $products = collect(array_fill(0, 10, $products->first()));
                           {{ print_var('cart_button_text', $variables) }}
                         </a>
                     </div>
-                    <h3>{{ $product->title }}</h3>
+                    <h3 class="text-nowrap overflow-hidden text-ellipsis">{{ $product->title }}</h3>
                     <div class="cost">
                         <p>${{ $product->price }}</p>
                         <span>${{ $product->old_price }}</span>
                     </div>
-                    <div class="inf_cards">
-                        <a href="#">{{ $product->type->title }}</a>
-                        <a href="#">{{ $product->categories->first()->title }}</a>
-                        <a href="#">{{ $product->location->title }}</a>
+                    <div class="inf_cards flex flex-wrap">
+                        <a class="text-nowrap" href="{{ url("/search?q={$product->type->title}") }}">{{ $product->type->title }}</a>
+                        @foreach ($product->categories as $category)
+                          <a class="text-nowrap" href="{{ url("/search?q={$category->title}") }}">{{ $category->title }}</a>
+                        @endforeach
+                        <a class="text-nowrap" href="{{ url("/search?q={$product->location->title}") }}">{{ $product->location->title }}</a>
                     </div>
-                    <div class="stars_block">
+                    <div class="stars_block mt-auto">
                         <div class="stars">
                           @foreach ($product->prepareRatingImages() as $image)
                             <span><img src="{{ $image }}" alt="Star"></span>

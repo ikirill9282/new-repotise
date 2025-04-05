@@ -37,10 +37,10 @@
               </a>
           </div>
           <div class="connecting">
-              <a href="#" class="first_connect">
+              <a href="#" class="first_connect transition">
                 @include('icons.facebook')
               </a>
-              <a href="#" class="second_connect">
+              <a href="#" class="second_connect transition">
                 @include('icons.twitter')
               </a>
           </div>

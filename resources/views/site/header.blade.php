@@ -2,10 +2,10 @@
     <div class="container">
         <div class="about_block">
             <div class="logo">
-                <a href="{{ route('home') }}"><img src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
+                <a href="{{ route('home') }}"><img class="max-w-12 sm:!max-w-none" src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
             </div>
             <div class="right_group_block gap-2">
-                <form class="search relative" method="GET" action="{{ url('/search') }}">
+                <form class="search relative !w-full max-w-full" method="GET" action="{{ url('/search') }}">
                     <label for="search">
                         @include('icons.search')
                     </label>
@@ -36,11 +36,11 @@
                             <input type="search" name="q" class="search-input" id="search" data-hits="menu-search" autocomplete="off" placeholder="Search the site...">
                             @include('site.components.hits', ['id' => 'menu-search'])
                         </form>
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ url('/products') }}">All Products</a></li>
-                        <li><a href="{{ url('/creators') }}">Creators</a></li>
+                        <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
+                        <li><a class="text-nowrap" href="{{ url('/products') }}">All Products</a></li>
+                        <li><a class="text-nowrap" href="{{ url('/creators') }}">Creators</a></li>
                         <li class="last_menu">
-                            <a href="{{ url('/insights') }}">Travel Insights</a>
+                            <a class="text-nowrap" href="{{ url('/insights') }}">Travel Insights</a>
                         </li>
                         <a href="#" class="profile">
                             <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
@@ -79,19 +79,19 @@
                 </div>
                 <a href="#" class="all_products">
                     @include('icons.burger')
-                    All Products
+                    <span class="text-nowrap">All Products</span>
                 </a>
                 <nav class="menu">
                     <ul class="justify-end">
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ url('/creators') }}">Creators</a></li>
-                        <li><a href="{{ url('/insights') }}">Travel Insights</a></li>
+                        <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
+                        <li><a class="text-nowrap" href="{{ url('/creators') }}">Creators</a></li>
+                        <li><a class="text-nowrap" href="{{ url('/insights') }}">Travel Insights</a></li>
                     </ul>
                 </nav>
                 @if (!auth()->check())
                     <a href="#" class="login open_auth">
                         @include('icons.user')
-                        <span>Join / Sign in</span>
+                        <span class="text-nowrap">Join / Sign in</span>
                     </a>
                 @else
                     <a href="#" class="profile">

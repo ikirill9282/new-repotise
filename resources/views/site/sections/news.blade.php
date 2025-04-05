@@ -6,9 +6,9 @@ $news = \App\Models\News::getLastNews(5);
   <div class="container">
       <div class="about_block">
           @include('site.components.heading', ['variables' => $variables])
-          <div class="items_news">
+          <div class="items_news !items-stretch">
               @foreach ($news as $news_item)
-                <div class="item">
+                <div class="item justify-between">
                     <a href="{{ url("/news/$news_item->slug") }}">
                       <p>{{ $news_item->title }}</p>
                     </a>

@@ -34,7 +34,7 @@ class ProductSeeder extends Seeder
         ]
       );
 
-      $product->categories()->sync([4]);
+      $product->categories()->sync([1, 2, 3, 4]);
 
       $product2 = Product::firstOrCreate(
         [
@@ -54,7 +54,7 @@ class ProductSeeder extends Seeder
         ]
       );
 
-      $product2->categories()->sync([2]);
+      $product2->categories()->sync([2, 3, 5]);
 
       $product3 = Product::firstOrCreate(
         [
@@ -74,6 +74,6 @@ class ProductSeeder extends Seeder
         ]
       );
 
-      $product3->categories()->sync([3]);
+      $product3->categories()->sync([3, 4, 5]);
     }
 }

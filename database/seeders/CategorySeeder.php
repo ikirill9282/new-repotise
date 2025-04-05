@@ -45,5 +45,17 @@ class CategorySeeder extends Seeder
           'slug' => Slug::makeEn('Walking Hyde'),
         ]
       );
+      Category::firstOrCreate(
+        ['title' => 'Advanture'],
+        [
+          'title' => 'Advanture',
+        ]
+      );
+      Category::firstOrCreate(
+        ['title' => 'Travel'],
+        [
+          'title' => 'Travel',
+        ]
+      );
     }
 }
