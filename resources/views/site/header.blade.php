@@ -1,4 +1,4 @@
-<header class="@if (!auth()->check()) authorization_header @else authorized @endif w-full !z-[110] bg-white">
+<header class="@if (!auth()->check()) authorization_header @else authorized @endif w-full !z-[120] bg-white">
     <div class="container !mx-auto">
         <div class="about_block">
             <div class="logo">
@@ -132,11 +132,12 @@
     <script>
         const header = $('header');
         const headerHeight = header.outerHeight();
+        const start = (document.querySelector('.parallax').length) ? $('.parallax').outerHeight() : headerHeight;
         let lastPoint = 0;
 
         $(window).on('scroll', function(evt) {
             const point = $(this).scrollTop();
-            if (point > (headerHeight + 10)) {
+            if (point > (start + 10)) {
                 if (!header.hasClass('!sticky')) {
                     header.addClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
                 }
