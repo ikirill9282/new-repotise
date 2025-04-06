@@ -67,6 +67,11 @@ class Article extends Model
     });
   }
 
+  public function short(int $symbols = 200)
+  {
+    return trim(mb_substr($this->text, 0, $symbols) . '...');
+  }
+
   private function generateSlug()
   {
     $this->slug = Slug::makeEn($this->title);

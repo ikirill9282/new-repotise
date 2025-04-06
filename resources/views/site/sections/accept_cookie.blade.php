@@ -1,5 +1,5 @@
 <section class="file_cookie">
-  <div class="container">
+  <div class="container !mx-auto">
       <div class="about_block">
           <h3>Мы используем <a href="#">файлы cookie </a>, чтобы обеспечить максимальное удобство использования
               сайта</h3>

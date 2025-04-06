@@ -12,12 +12,12 @@ $products = collect(array_fill(0, 10, $products->first()));
 @endphp
 
 <section class="popular_products">
-  <div class="container">
+  <div class="container !mx-auto">
       <div class="about_block">
           @include('site.components.heading')
-          <div class="products_item !items-stretch">
+          <div class="products_item !grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               @foreach($products as $product)
-                <div class="item flex flex-col last:!mr-auto">
+                <div class="item h-full flex flex-col">
                     <div class="img_products">
                         <img src="{{ url($product->preview->image) }}" alt="Product {{ $product->id }} image" class="main_img">
                         <a href="{{ url('/user/favorite/add/product') }}" class="span_buy">
@@ -39,7 +39,7 @@ $products = collect(array_fill(0, 10, $products->first()));
                         @endforeach
                         <a class="text-nowrap" href="{{ url("/search?q={$product->location->title}") }}">{{ $product->location->title }}</a>
                     </div>
-                    <div class="stars_block mt-auto">
+                    <div class="stars_block !mt-auto">
                         <div class="stars">
                           @foreach ($product->prepareRatingImages() as $image)
                             <span><img src="{{ $image }}" alt="Star"></span>

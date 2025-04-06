@@ -43,13 +43,13 @@ li {
   background-color: #FFFFFF;
 }
 
-.container,
+/* .container,
 .container-lg,
 .container-md,
 .container-sm,
 .container-xl {
   max-width: 1264px;
-}
+} */
 
 input[type=number] {
   -moz-appearance: textfield;
@@ -228,6 +228,7 @@ header .about_block .right_group_block .login {
   line-height: 140%;
   transition: 5s all ease;
 }
+
 header .about_block .right_group_block .login:hover svg path {
   stroke: #212121;
 }
@@ -566,9 +567,9 @@ header .about_block .right_group_block .login svg {
   margin-bottom: 50px;
 }
 .news .about_block .items_news {
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; */
 }
 .news .about_block .items_news .item {
   max-width: 224px;
@@ -2868,63 +2869,6 @@ footer .bottom_by_des .by_to {
   header .about_block .right_group_block .hamburger-menu {
     height: 48px;
     display: block;
-  }
-  #menu__toggle:checked + .menu__btn {
-    position: absolute;
-    right: 0;
-    padding: 0;
-    background-color: transparent;
-    width: 36px;
-    height: 36px;
-    top: 44px;
-  }
-  #menu__toggle {
-    opacity: 0;
-  }
-  #menu__toggle:checked + .menu__btn > span {
-    transform: rotate(45deg);
-  }
-  #menu__toggle:checked + .menu__btn > span::before {
-    top: 0;
-    transform: rotate(deg);
-  }
-  #menu__toggle:checked + .menu__btn > span::after {
-    top: 0;
-    transform: rotate(90deg);
-  }
-  #menu__toggle:checked ~ .menu__box {
-    right: 0 !important;
-  }
-  .menu__btn {
-    position: static;
-    top: 24px;
-    right: 0;
-    width: 48px;
-    height: 48px;
-    cursor: pointer;
-    z-index: 200;
-    padding: 24px 12px;
-    border-radius: 6px;
-    background: var(--bg, #F9F9F9);
-    transform: translateY(-26px);
-  }
-  .menu__btn > span,
-  .menu__btn > span::before,
-  .menu__btn > span::after {
-    display: block;
-    position: absolute;
-    width: 24px;
-    height: 2px;
-    background-color: var(--gray, #A4A0A0);
-    transition-duration: 0.25s;
-  }
-  .menu__btn > span::before {
-    content: "";
-    top: -8px;
-  }
-  .menu__btn > span::after {
-    content: "";
-    top: 8px;
   }
   .menu__box {
     display: block;

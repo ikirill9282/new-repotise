@@ -1,6 +1,6 @@
 @if (isset($search_results) && is_array($search_results) && !empty($search_results))
   <section class="results_seach">
-      <div class="container">
+      <div class="container !mx-auto">
         <div class="about_block">
           <div class="right_select">
               <span>Sort by:</span>

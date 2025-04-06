@@ -4,7 +4,7 @@
 
 
 <section class="home_help">
-    <div class="container">
+    <div class="container !mx-auto">
         <div class="about_block">
             @include('site.components.heading', ['variables' => $variables])
             @include('site.components.breadcrumbs')
@@ -13,7 +13,7 @@
 </section>
 
 <section class="general_questions">
-    <div class="container">
+    <div class="container !mx-auto">
         <div class="about_block">
             <div class="questions_group">
                 <div class="accordion" id="accordionExample">

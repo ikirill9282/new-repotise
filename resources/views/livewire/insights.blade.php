@@ -10,8 +10,9 @@
     $items = $items->slice(0, 9);
 @endphp
 <div>
-    <section class="home_tips">
-        <div class="container">
+    <section class="home_tips relative">
+      <div class="parallax parallax-insights" data-img="{{ asset('assets/img/bg_home_tips.png') }}" data-open="false"></div>
+        <div class="container relative z-20">
             <div class="about_block">
                 @include('site.components.heading', ['variables' => $variables])
                 @include('site.components.breadcrumbs')

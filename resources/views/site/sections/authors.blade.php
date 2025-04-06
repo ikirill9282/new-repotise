@@ -9,7 +9,7 @@ if (!empty($authors)) {
 @endphp
 
 <section class="authors_blogers">
-  <div class="container">
+  <div class="container !mx-auto">
       <div class="about_block">
           @include('site.components.heading')
           <div class="group_authors">
@@ -20,7 +20,7 @@ if (!empty($authors)) {
                           <div class="swiper-slide">
                               <div class="cards_group">
                                   <div class="img_products">
-                                      <img src="{{ url($author->avatar) }}" alt="Autho {{ $author->getName() }}" class="main_img">
+                                      <img class="main_img !w-full !h-auto" src="{{ url($author->avatar) }}" alt="Autho {{ $author->getName() }}">
                                       <a href="{{ url('/user/favorite/add/author') }}" class="span_buy">
                                         @include('icons.favorite', ['stroke' => '#FF2C0C'])
                                       </a>

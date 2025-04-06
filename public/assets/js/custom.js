@@ -59,3 +59,46 @@ const Editors = function() {
 
   return this.init();
 }
+
+const makeParallax = function() {
+  this.root;
+  this.top;
+  this.height;
+  this.img;
+
+  this.createParallax = (obj) => {
+    this.root = $(obj);
+    this.top = Math.ceil($('header').outerHeight())
+    this.height =  Math.ceil(this.root.outerHeight());
+    this.img = this.root.data('img');
+    
+    this.setStyles();
+  }
+
+  this.setStyles = () => {
+    if (this.root.hasClass('parallax-home')) {
+      if ($(window).outerWidth() < 769) {
+        let h = this.height * 1.3;
+        let t = h / 100 * 10;
+        this.root.css({
+          'background-size': `auto ${h}px`,
+          'background-position': `center -${t}px`,
+        });
+        return;
+      }
+    }
+
+    this.root.css({
+      'background-image': `url(${this.img})`,
+      'background-position': `center top`,
+      'background-size': `auto ${(this.height + this.top)}px`,
+    })
+    // this.root.attr('style', `background-image: url(${this.img}); background-position: center ${this.top}px; background-size: auto ${this.height}px;`);
+  }
+
+  this.init = () => {
+    return [...document.querySelectorAll('.parallax')].map((elem) => this.createParallax(elem))
+  }
+
+  return this.init();
+}

@@ -1,5 +1,5 @@
 <section class="search_result_home">
-  <div class="container">
+  <div class="container !mx-auto">
       <div class="about_block">
           @include('site.components.heading')
           @include('site.components.breadcrumbs')

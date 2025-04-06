@@ -3,7 +3,7 @@
 @endpush
 
 
-<section class="container py-4 custom-section">
+<section class="container !mx-auto py-4 custom-section">
   @foreach ($variables->sortBy('id') as $variable)
     {!! $variable->value !!}
   @endforeach

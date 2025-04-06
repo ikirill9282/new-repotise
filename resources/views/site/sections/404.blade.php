@@ -6,7 +6,7 @@
 
 @section('content')
   <section class="error">
-    <div class="container">
+    <div class="container !mx-auto">
         <div class="about_block">
             <img src="{{ asset('/assets/img/error.png') }}" alt="404" class="error_img">
             @include('site.components.heading')
