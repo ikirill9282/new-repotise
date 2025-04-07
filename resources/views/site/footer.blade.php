@@ -59,10 +59,10 @@
         </div>
         <nav class="menu_bottom">
             <ul>
-                <li><a href="#">Terms and Conditions</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Cookie Policy</a></li>
-                <li><a href="#">More Policies</a></li>
+                <li><a href="{{ url('/terms-and-conditions') }}">Terms and Conditions</a></li>
+                <li><a href="{{ url('/privacy-policy') }}">Privacy Policy</a></li>
+                <li><a href="{{ url('/cookie-policy') }}">Cookie Policy</a></li>
+                <li><a href="{{ url('/all-policies') }}">More Policies</a></li>
             </ul>
         </nav>
         <div class="bottom_by_des">
