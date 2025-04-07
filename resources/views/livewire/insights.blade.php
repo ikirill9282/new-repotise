@@ -99,10 +99,5 @@
   }
 
   let slider = init_slider();
-  let resized = false;
-  let disabled = false;
-  $(window).on('resize', function() {
-    slider = init_slider();
-  });
 </script>
 @endscript

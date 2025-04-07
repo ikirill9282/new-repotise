@@ -1,18 +1,20 @@
-<section class="search_result_home">
-  <div class="container !mx-auto">
+<section class="search_result_home relative">
+  <div class="parallax parallax-search" data-img="{{ asset('assets/img/search_result_mobile.jpeg') }}" data-open="false"></div>
+  <div class="container !mx-auto relative z-50">
       <div class="about_block">
           @include('site.components.heading')
           @include('site.components.breadcrumbs')
-          <div class="input_group">
+          <div class="input_group flex-wrap !justify-start">
               @include('site.components.search')
+
+              @if(isset($tags) && !empty($tags))
+                <div div class="name_tags">
+                  @foreach($tags as $tag)
+                    <a href="{{ url("search?q={$tag['title']}") }}">{{ $tag['title'] }}</a>
+                    @endforeach
+                </div>
+              @endif
           </div>
-          @if(isset($tags) && !empty($tags))
-            <div div class="name_tags">
-              @foreach($tags as $tag)
-                <a href="{{ url("search?q={$tag['title']}") }}">{{ $tag['title'] }}</a>
-                @endforeach
-            </div>
-          @endif
       </div>
   </div>
 </section>

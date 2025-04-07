@@ -8,14 +8,22 @@ const CommentWriters = function() {
     const input = obj.find('textarea');
     
     if (input) {
-      input.on('input', function() {
+      input.on('input', function(event) {
         let length = $(this).val().length;
+        console.log($(this).val().length);
+        
+        if (length > 1000) {
+          $(this).val($(this).val().slice(0, 1000));
+          return;
+        }
+
         $(this).data('length', length);
         obj.find('a.numbers').text(`${length}/1000`);
       });
 
       input.on('focus', () => {
-        $(input).attr('rows', 5);
+        $(input).animate({ 'height': '240px' });
+        // $(input).attr('rows', 5);
         // $(input).slideToggle();
         $(input).data('open', true);
       });
@@ -24,7 +32,8 @@ const CommentWriters = function() {
 
       input.on('focusout', () => {
         if (!input.val().length) {
-          $(input).attr('rows', 1);
+          $(input).animate({ 'height': '20px' });
+          // $(input).attr('rows', 1);
           // $(input).slideToggle();
           $(input).data('open', false);
         }
