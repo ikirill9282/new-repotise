@@ -1,7 +1,7 @@
 <div>
   <div
     id="auth_modal"
-    class="fixed hidden top-0 left-0 z-10 w-screen min-h-screen bg-gray-100 flex items-center justify-center p-2 md:!p-4">
+    class="fixed hidden top-0 left-0 z-80 w-screen min-h-screen bg-gray-100 flex items-center justify-center p-2 md:!p-4">
     <div class="max-w-md w-full bg-white rounded-xl shadow-lg !p-4 md:!p-8 relative">
       <div class="close_auth absolute top-8 right-8 rotate-45 stroke-gray-400 transition hover:cursor-pointer hover:!stroke-black z-20">
         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">

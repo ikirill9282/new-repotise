@@ -1,6 +1,6 @@
 @if (isset($search_results) && is_array($search_results) && !empty($search_results))
   <section class="results_seach">
-      <div class="container">
+      <div class="container !mx-auto">
         <div class="about_block">
           <div class="right_select">
               <span>Sort by:</span>
@@ -20,12 +20,16 @@
                               <p>Product</p>
                           </div>
                           <div class="profile_commendor">
-                              <img src="{{ url(print_key('preview', $item)) }}" alt="" class="img_profile">
+                              <img src="{{ url(print_key('preview', $item)) }}" alt="" class="img_profile rounded-full">
                               <div class="right_text">
-                                  <h3>{!! print_key('title', $item) !!}</h3>
+                                  <h3><a class="!text-inherit" href="{{ url('/products/' . print_key('slug', $item) . '?pid=' . print_key('id', $item)) }}">{!! print_key('title', $item) !!}</a></h3>
                                   <div class="profile">
-                                      <img src="{{ print_key('avatar', $item['author']) }}" alt="Avatar {{ print_key('profile', $item['author']) }}">
-                                      <p>{{ print_key('profile', $item['author']) }}</p>
+                                      <img class="rounded-full" src="{{ print_key('avatar', $item['author']) }}" alt="Avatar {{ print_key('profile', $item['author']) }}">
+                                      <a 
+                                        href="{{ url('/users/profile/' . print_key('profile', $item['author'] ?? [])) }}" 
+                                        class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">
+                                          {{ print_key('profile', $item['author']) }}
+                                        </a>
                                   </div>
                               </div>
                           </div>
@@ -60,9 +64,9 @@
                               <p>Creator</p>
                           </div>
                           <div class="profile_commendor">
-                              <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile" class="img_profile">
+                              <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile" class="img_profile rounded-full">
                               <div class="right_text">
-                                  <h3>{{ print_key('profile', $item) }}</h3>
+                                  <h3 class=""><a class="!text-inherit" href="{{ url('/users/profile/' . print_key('profile', $item)) }}">{{ print_key('profile', $item) }}</a></h3>
                                   <div>
                                     {!! print_key('description', $item) !!}
                                   </div>
@@ -70,12 +74,12 @@
                           </div>
                           <div class="right_group_for_mob">
                               <div class="left_title mob">
-                                  <img src="{{ asset('assets/img/profile_search.svg') }}" alt="Profile icon">
+                                  <img class="" src="{{ asset('assets/img/profile_search.svg') }}" alt="Profile icon">
                                   <p>Creator</p>
                               </div>
                               <div class="right_reviews_group">
                                   <div class="reviews">
-                                      <h5>
+                                      <h5 class="text-nowrap">
                                         <img src="{{ asset('assets/img/followers.svg') }}" alt="Followers">
                                         {{ print_key('followers_count', $item) }} Followers
                                       </h5>
@@ -93,15 +97,15 @@
                                   Insight</p>
                           </div>
                           <div class="profile_commendor">
-                              <img src="{{ url(print_key('preview', $item)) }}" alt="Insight" class="img_profile">
+                              <img src="{{ url(print_key('preview', $item)) }}" alt="Insight" class="img_profile rounded-full">
                               <div class="right_text">
-                                  <h3>{{ print_key('title', $item) }}</h3>
-                                  <div>
+                                  <h3><a class="!text-inherit" href="{{ url("/insights/feed?aid=" . print_key('id', $item)) }}">{{ print_key('title', $item) }}</a></h3>
+                                  <div class="print-content hover:cursor-pointer hover-text-black transition">
                                     {!! print_key('short', $item) !!}
                                   </div>
                                   <div class="profile">
-                                      <img src="{{ url(print_key('avatar', $item['author'] ?? [])) }}" alt="Avatar">
-                                      <p>{{ print_key('profile', $item['author'] ?? []) }}</p>
+                                      <img class="rounded-full" src="{{ url(print_key('avatar', $item['author'] ?? [])) }}" alt="Avatar">
+                                      <a href="{{ url('/users/profile/' . print_key('profile', $item['author'] ?? [])) }}" class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">{{ print_key('profile', $item['author'] ?? []) }}</a>
                                   </div>
                               </div>
                           </div>

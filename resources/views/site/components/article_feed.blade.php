@@ -27,6 +27,7 @@
                     <span>{{ $article->countComments() }}</span>
                 </div>
                 <div class="write_comment_group">
+                    <h3 class="comment_mobile_header"> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
                     <div class="write_comment !items-start">
                         <h3> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
 
@@ -77,7 +78,7 @@
                                             <a href="{{ $analog->makeFeedUrl() }}">
                                                 <h3>{{ $analog->title }}</h3>
                                             </a>
-                                            <p>{!! $analog->short() !!}</p>
+                                            <div class="print-content text-[#A4A0A0]">{!! $analog->short() !!}</div>
                                             <div class="date">
                                                 <span>{{ \Illuminate\Support\Carbon::parse($analog->created_at)->format('d.m.Y') }}</span>
                                                 <div class="name_author">

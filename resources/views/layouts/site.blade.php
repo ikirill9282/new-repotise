@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/site.css') }}">
 
-  
+    
     
     
     <script src="https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js"></script>
@@ -33,24 +33,31 @@
     @livewireStyles
     @vite('resources/css/app.css')
     @stack('css')
+
+    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
 </head>
 
 <body>
-    <div class="wrapper">
-        @include('site.header')
+      @include('site.header')
 
+      <main class="" id="main">
         @yield('content')
+      </main>
 
-        @include('site.footer')
-    </div>
+      @include('site.footer')
 
     {{-- @include('site.sections.accept_cookie') --}}
-    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('/assets/js/custom.js') }}"></script>
+    <script>
+      let parallaxes = new makeParallax();
+      $(window).on('resize', function() {
+        parallaxes = new makeParallax();
+      });
+    </script>
     <script src="{{ asset('/assets/js/swiper-bundle.min.js') }}"></script>
     <script src="{{ asset('/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('/assets/js/search.js') }}"></script>
     <script src="{{ asset('/assets/js/main.js') }}"></script>
-    <script src="{{ asset('/assets/js/custom.js') }}"></script>
     
     @livewireScripts
     @vite('resources/js/app.js')

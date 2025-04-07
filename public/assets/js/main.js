@@ -2,8 +2,9 @@ const swiper = new Swiper(".mySwiper", {
     slidesPerView: 5,
     spaceBetween: 20,
     navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
+      enabled: true,
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
     },
     breakpoints: {
         320: {
@@ -23,16 +24,16 @@ const swiper = new Swiper(".mySwiper", {
             spaceBetween: 10,
         },
         700: {
-            slidesPerView: 3.2,
+            slidesPerView: 2.4,
             spaceBetween: 10,
         },
         768: {
             slidesPerView: 3.2,
             spaceBetween: 15,
         },
-        1024: {
+        800: {
             slidesPerView: 4,
-            spaceBetween: 20,
+            spaceBetween: 15,
         },
         1200: {
             slidesPerView: 5,
@@ -115,4 +116,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }))
   }
   
+});
+
+
+const swiperArticles = new Swiper('#swiper-articles', {
+  slidesPerView: 1.2,
+  spaceBetween: 10,
+  enabled: true,
+  breakpoints: {
+    568: {
+      slidesPerView: 2,
+    },
+    768: {
+      enabled: false,
+      slidesPerView: 3,
+      spaceBetween: 20,
+    },
+  }
+});
+
+const swiperNews = new Swiper('#swiper-news', {
+  slidesPerView: 1.4,
+  spaceBetween: 10,
+  enabled: true,
+  breakpoints: {
+    400: {
+      slidesPerView: 1.6,
+    },
+    500: {
+      slidesPerView: 2,
+    },
+    768: {
+      enabled: false,
+      slidesPerView: 4,
+      spaceBetween: 20,
+    },
+    1200: {
+      slidesPerView: 5,
+    },
+  }
 });

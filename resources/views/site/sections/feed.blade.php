@@ -72,6 +72,32 @@
                       },
                   });
               });
+
+              if ($(window).outerWidth() < 768) {
+                return new Swiper('#last_news_swiper', {
+                  slidesPerView: 1.2,
+                  spaceBetween: 20,
+                  enabled: true,
+                  breakpoints: {
+                    370: {
+                      slidesPerView: 1.4
+                    },
+                    400: {
+                      slidesPerView: 1.6,
+                    },
+                    500: {
+                      slidesPerView: 1.9,
+                    },
+                    768: {
+                      enabled: false,
+                      slidesPerView: 4,
+                    },
+                    1200: {
+                      slidesPerView: 5,
+                    },
+                  }
+                });
+              }
               
               return sliders;
             }

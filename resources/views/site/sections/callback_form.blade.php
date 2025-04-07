@@ -1,5 +1,5 @@
 <section class="get_touch">
-    <div class="container">
+    <div class="container !mx-auto">
         <div class="about_block">
             <div class="left_group">
                 @include('site.components.heading', ['variables' => $variables])

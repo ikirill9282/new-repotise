@@ -1,9 +1,4 @@
-@push('css')
-  <link rel="stylesheet" href="{{ asset('assets/css/site.css') }}">
-@endpush
-
-
-<section class="container py-4 custom-section">
+<section class="container !mx-auto py-4 custom-section {{ $page->slug }}">
   @foreach ($variables->sortBy('id') as $variable)
     {!! $variable->value !!}
   @endforeach
