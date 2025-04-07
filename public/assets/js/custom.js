@@ -16,6 +16,7 @@ const CommentWriters = function() {
 
       input.on('focus', () => {
         $(input).attr('rows', 5);
+        // $(input).slideToggle();
         $(input).data('open', true);
       });
       
@@ -24,6 +25,7 @@ const CommentWriters = function() {
       input.on('focusout', () => {
         if (!input.val().length) {
           $(input).attr('rows', 1);
+          // $(input).slideToggle();
           $(input).data('open', false);
         }
       });

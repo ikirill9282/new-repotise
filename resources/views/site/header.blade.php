@@ -65,11 +65,11 @@
     </div>
 </header>
 
-<aside class="fixed top-0 right-0 z-[110] w-screen h-screen bg-white transition duration-300 translate-x-full lg:hidden"
+<aside class="fixed top-0 right-0 z-[140] w-screen h-screen bg-white transition duration-300 translate-x-full lg:hidden"
     id="mobile_menu" data-open="false">
     <nav class="container">
         <div class="flex flex-col">
-            <div class="menu__btn self-end !static" id="close_menu">
+            <div class="menu__btn self-end !static menu_open" id="close_menu">
                 <span></span>
             </div>
             <form class="search relative" method="GET" action="{{ url('/search') }}">
@@ -132,29 +132,33 @@
     <script>
         const header = $('header');
         const headerHeight = header.outerHeight();
-        const start = (document.querySelector('.parallax').length) ? $('.parallax').outerHeight() : headerHeight;
+        // const start = (document.querySelector('.parallax')) ? $('.parallax').outerHeight() : headerHeight;
+        
         let lastPoint = 0;
 
         $(window).on('scroll', function(evt) {
             const point = $(this).scrollTop();
-            if (point > (start + 10)) {
+            if (point > (headerHeight + 10)) {
                 if (!header.hasClass('!sticky')) {
                     header.addClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
                 }
-
-                console.log(lastPoint + ' >= ' + point);
                 if (point <= lastPoint) {
                     header.addClass('transition !translate-y-0');
                 } else if (!$('#mobile_menu').data('open')) {
                     header.removeClass('!translate-y-0');
                 }
-            } else {
-                console.log('ne ok');
+            } else if (document.querySelector('.parallax')) {
+                // header.removeClass('!translate-y-0');
+                // setTimeout(() => {
+                //     header.removeClass('!sticky transition top-0 left-0 translate-y-[-100%] shadow-md');
+                // }, 100);
+                // header.removeClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
+                // header.removeClass('transition');
             }
 
             if (point == 0) {
-                header.removeClass('!sticky top-0 left-0 translate-y-[-100%]');
-                header.removeClass('transition shadow-md');
+                header.removeClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
+                header.removeClass('transition');
             }
 
             lastPoint = point;
@@ -167,7 +171,7 @@
             menu.removeClass('translate-x-full');
             menu.data('open', true);
             $(button).toggleClass('menu_open');
-            $('#close_menu').toggleClass('menu_open');
+            // $('#close_menu').toggleClass('menu_open');
 
             if (menu.data('open')) {
                 $('body').addClass('overflow-hidden');
@@ -179,11 +183,11 @@
         $('#close_menu').on('click', function(evt) {
             const menu = $('#mobile_menu');
             const button = $('.hamburger-menu').find('.menu__btn');
+            menu.data('open', false);
 
             menu.addClass('translate-x-full');
-            menu.data('open', false);
             $(button).toggleClass('menu_open');
-            $('#close_menu').toggleClass('menu_open');
+            // $('#close_menu').toggleClass('menu_open');
 
             if (menu.data('open')) {
                 $('body').addClass('overflow-hidden');

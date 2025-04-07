@@ -48,7 +48,7 @@
                                   <a href="{{ $item->makeFeedUrl() }}">
                                       <h3>{{ $item->title }}</h3>
                                   </a>
-                                  <p>{!! $item->short() !!}</p>
+                                  <div class="print-content text-[#A4A0A0]">{!! $item->short() !!}</div>
                                   <div class="date">
                                       <span>{{ \Illuminate\Support\Carbon::parse($item->created_at)->format('d.m.Y') }}</span>
                                       <div class="name_author">
@@ -67,3 +67,42 @@
     </section>
 </div>
 
+
+@script
+<script>
+  const init_slider = () => {
+    if ($(window).outerWidth() < 768) {
+      return new Swiper('#last_news_swiper', {
+        slidesPerView: 1.4,
+        spaceBetween: 10,
+        enabled: true,
+        breakpoints: {
+          400: {
+            slidesPerView: 1.6,
+          },
+          500: {
+            slidesPerView: 2.2,
+            spaceBetween: 15,
+          },
+          768: {
+            enabled: false,
+            slidesPerView: 4,
+            spaceBetween: 20,
+          },
+          1200: {
+            slidesPerView: 5,
+          },
+        }
+      });
+    }
+    return null;
+  }
+
+  let slider = init_slider();
+  let resized = false;
+  let disabled = false;
+  $(window).on('resize', function() {
+    slider = init_slider();
+  });
+</script>
+@endscript
