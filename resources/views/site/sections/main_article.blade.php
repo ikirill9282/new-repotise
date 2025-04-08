@@ -12,8 +12,10 @@ $article = \App\Models\Article::find($variables->firstWhere('name', 'article_id'
               ])
               <div class="print-content text-[#A4A0A0]">{!! $article->short(600) !!}</div>
               <div class="name_author">
+                <a class="group w-full flex items-center justify-start gap-2" href="{{ $article->author->makeProfileUrl() }}" class="author-image">
                   <img src="{{ url($article->author->avatar) }}" alt="Article {{ $article->id }}">
-                  <p>Author {{ $article->author->getName() }}</p>
+                  <p>Author <span class="group-hover:!text-black transition">{{ $article->author->name }}</span></p>
+                </a>
               </div>
           </div>
           <div class="ma-main-img">

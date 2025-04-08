@@ -26,10 +26,10 @@ if (!empty($authors)) {
                                       </a>
                                   </div>
                                   <div class="name">
-                                      <p>{{ $author->getName() }}</p>
+                                      <p>{{ $author->name }}</p>
                                       <img src="{{ asset('/assets/img/icon_verif.svg') }}" alt="Verify">
                                   </div>
-                                  <h3>{{ $author->getName() }}</h3>
+                                  <h3><a class="author-link" href="{{ $author->makeProfileUrl() }}">{{ $author->profile }}</a></h3>
                                   <div class="followers">
                                       <img src="{{ asset('/assets/img/followers.svg') }}" alt="Followers">
                                       <p>{{ $author->followers_count }} Followers</p>

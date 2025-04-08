@@ -15,8 +15,8 @@ if (!isset($news) || empty($news)) {
         @foreach ($news as $news_item)
           <div class="swiper-slide">
             <div class="news_group">
-                <a href="{{ $news_item->makeFeedUrl() }}">
-                    <p>{{ $news_item->title }}</p>
+                <a class="group" href="{{ $news_item->makeFeedUrl() }}">
+                    <p class="transition hover:!text-black">{{ $news_item->title }}</p>
                 </a>
                 <a href="{{ $news_item->makeFeedUrl() }}">
                   <img src="{{ $news_item->preview?->image }}" alt="News preview {{ $news_item->id }}">

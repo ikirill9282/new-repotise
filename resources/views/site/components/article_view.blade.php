@@ -4,8 +4,9 @@
       <div class="talmaev">
         <div class="profile">
             <img src="{{ $article->author->avatar }}" alt="Avatar">
-            <p>{{ $article->author->getName() }} <a
-                    href="{{ url("/creators/{$article->author->profile}") }}">{{ $article->author->profile }}</a>
+            <p>
+              <span>{{ $article->author->name }}</span>
+              <a class="author-link !text-md" href="{{ $article->author->makeProfileUrl() }}">{{ $article->author->profile }}</a>
             </p>
         </div>
         <a href="{{ url("/creators/subscribe/{$article->author->profile}") }}" class="follow">{{ print_var('subscribe_button', $variables) }}</a>
@@ -24,7 +25,7 @@
         <div class="tegs">
           @if (isset($article->tags) && $article->tags->isNotEmpty())
             @foreach ($article->tags as $tag)
-                <a href="{{ url("/articles/tag/$tag->id") }}">{{ $tag->title }}</a>
+                <a href="{{ url("/search?q=$tag->title") }}">{{ $tag->title }}</a>
             @endforeach
           @endif
         </div>

@@ -52,8 +52,10 @@
                                   <div class="date">
                                       <span>{{ \Illuminate\Support\Carbon::parse($item->created_at)->format('d.m.Y') }}</span>
                                       <div class="name_author">
-                                          <img src="{{ url($item->author->avatar) }}" alt="Avatar {{ $item->author->getName() }}">
-                                          <p>{{$item->author->profile }}</p>
+                                        <a class="group w-full flex items-center justify-start gap-2" href="{{ $item->author->makeProfileUrl() }}">
+                                          <img src="{{ url($item->author->avatar) }}" alt="Avatar {{ $item->author->name }}">
+                                          <p class="group-hover:!text-black transition">{{$item->author->profile }}</p>
+                                        </a>
                                       </div>
                                   </div>
                               </div>

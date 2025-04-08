@@ -172,7 +172,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileUrl(): string
     {
-      return url("/profiles/" . $this->profile());
+      return url("/users/profile/" . $this->profile);
     }
 
     public function getName(): string

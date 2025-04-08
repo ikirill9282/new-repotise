@@ -13,11 +13,11 @@
             <div class="block_cards !block">
             {{-- <div class="card-wrap "> --}}
                     <div class="swiper" id="swiper-articles">
-                        <div class="swiper-wrapper">
+                        <div class="swiper-wrapper items-stretch">
                             @foreach ($articles as $article)
-                                <div class="swiper-slide">
-                                    <div class="item !w-full text-[#A4A0A0]">
-                                        <a class="" href="{{ url($article->makeFeedUrl()) }}">
+                                <div class="swiper-slide h-auto">
+                                    <div class="item h-full flex flex-col items-stretch justify-start !w-full text-[#A4A0A0]">
+                                        <a class="article-preview" href="{{ url($article->makeFeedUrl()) }}">
                                             <img src="{{ url($article->preview->image) }}"
                                                 alt="Article {{ $article->id }}" />
                                         </a>
@@ -26,9 +26,11 @@
                                         </a>
                                         <div class="print-content">{!! $article->short() !!}</div>
                                         <div class="name_author">
+                                          <a class="group w-full flex items-center justify-start gap-2" href="{{ $article->author->makeProfileUrl() }}" class="author-link">
                                             <img class="rounded-full" src="{{ $article->author->avatar }}"
                                                 alt="Avatar">
-                                            <p>Автор {{ $article->author->getName() }}</p>
+                                            <p class="">Author <span class="group-hover:!text-black transition">{{ $article->author->name }}</span></p>
+                                          </a>
                                         </div>
                                     </div>
                                 </div>
