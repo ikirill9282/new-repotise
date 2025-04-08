@@ -475,6 +475,11 @@ aside .login svg {
   line-height: 140%;
 }
 
+.news .about_block .items_news .item img {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
 @media (min-width: 768px) and (max-width: 1279px) {
   .popular_products .about_block .products_item .item:last-child,
   .popular_products .about_block .products_item .item:nth-child(9) {
