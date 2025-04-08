@@ -20,7 +20,9 @@
                               <p>Product</p>
                           </div>
                           <div class="profile_commendor">
-                              <img src="{{ url(print_key('preview', $item)) }}" alt="" class="img_profile rounded-full">
+                              <div class="img-wrap">
+                                <img src="{{ url(print_key('preview', $item)) }}" alt="" class="img_profile rounded-full">
+                              </div>
                               <div class="right_text">
                                   <h3><a class="!text-inherit" href="{{ url('/products/' . print_key('slug', $item) . '?pid=' . print_key('id', $item)) }}">{!! print_key('title', $item) !!}</a></h3>
                                   <div class="profile">
@@ -50,7 +52,7 @@
                                           <span><img src="{{ $star }}" alt=""></span>
                                         @endforeach
                                       </div>
-                                      <h5>{{ print_key('reviews_count', $item) }} Reviews</h5>
+                                      <h5 class="text-nowrap">{{ print_key('reviews_count', $item) }} Reviews</h5>
                                   </div>
                               </div>
                           </div>
@@ -64,7 +66,9 @@
                               <p>Creator</p>
                           </div>
                           <div class="profile_commendor">
-                              <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile" class="img_profile rounded-full">
+                              <div class="img-wrap">
+                                <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile" class="img_profile rounded-full">
+                              </div>
                               <div class="right_text">
                                   <h3 class=""><a class="!text-inherit" href="{{ url('/users/profile/' . print_key('profile', $item)) }}">{{ print_key('profile', $item) }}</a></h3>
                                   <div>
@@ -74,8 +78,8 @@
                           </div>
                           <div class="right_group_for_mob">
                               <div class="left_title mob">
-                                  <img class="" src="{{ asset('assets/img/profile_search.svg') }}" alt="Profile icon">
-                                  <p>Creator</p>
+                                <img class="" src="{{ asset('assets/img/profile_search.svg') }}" alt="Profile icon">
+                                <p>Creator</p>
                               </div>
                               <div class="right_reviews_group">
                                   <div class="reviews">
@@ -97,7 +101,9 @@
                                   Insight</p>
                           </div>
                           <div class="profile_commendor">
-                              <img src="{{ url(print_key('preview', $item)) }}" alt="Insight" class="img_profile rounded-full">
+                              <div class="img-wrap">
+                                <img src="{{ url(print_key('preview', $item)) }}" alt="Insight" class="img_profile rounded-full">
+                              </div>
                               <div class="right_text">
                                   <h3><a class="!text-inherit" href="{{ url("/insights/feed?aid=" . print_key('id', $item)) }}">{{ print_key('title', $item) }}</a></h3>
                                   <div class="print-content hover:cursor-pointer hover-text-black transition">

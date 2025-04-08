@@ -13,6 +13,11 @@
     @endforeach
 
     @push('js')
+        <script src="{{ asset('assets/js/jquery.emojiarea.min.js') }}"></script>
+        <script>
+          console.log('hello');
+          
+        </script>
         <script>
             $.fn.isInViewport = function() {
                 let elementTop = $(this).offset().top;

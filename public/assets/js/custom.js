@@ -10,7 +10,6 @@ const CommentWriters = function() {
     if (input) {
       input.on('input', function(event) {
         let length = $(this).val().length;
-        console.log($(this).val().length);
         
         if (length > 1000) {
           $(this).val($(this).val().slice(0, 1000));

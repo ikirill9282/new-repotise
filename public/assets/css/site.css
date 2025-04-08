@@ -347,6 +347,10 @@ aside .login svg {
      object-fit: cover;
 }
 
+.feed-item textarea {
+  min-height: 24px;
+}
+
 .comment_mobile_header {
   display: none;
   font-size: 16px;
@@ -395,6 +399,18 @@ aside .login svg {
 
 .search_result_home .about_block .name_tags a {
   padding: 6px 12px;
+}
+
+.results_seach .about_block .result_cards .card_group .profile_commendor {
+  flex-basis: 77%;
+}
+
+.result_cards .right_group_for_mob {
+  flex-basis: 14%;
+}
+
+.results_seach .result_cards .img_profile {
+  max-width: none;
 }
 
 @media (min-width: 768px) and (max-width: 1279px) {
@@ -508,6 +524,14 @@ aside .login svg {
 
   header .about_block .right_group_block .profile .right_text .name h3 {
     display: none;
+  }
+
+  .results_seach .about_block .result_cards .card_group .profile_commendor {
+    flex-basis: 70%;
+  }
+
+  .result_cards .right_group_for_mob {
+    flex-basis: 20%;
   }
 }
 
@@ -806,6 +830,38 @@ aside .login svg {
     .results_seach .about_block .result_cards .card_group .profile_commendor {
       align-items: flex-start;
     }
+
+
+    .results_seach .about_block .result_cards .card_group .profile_commendor {
+      flex-basis: auto;
+    }
+
+    .result_cards .right_group_for_mob {
+      flex-basis: auto;
+    }
+
+    .results_seach .about_block .result_cards .card_group .right_group_for_mob .mob {
+      flex-basis: 71.5px;
+    }
+
+    .results_seach .about_block .result_cards .card_group .right_group_for_mob .right_reviews_group {
+      width: auto;
+      flex-grow: 1;
+    }
+
+    .name_articles .about_block .last_news .block_news_items .news_group img {
+      width: 100%;
+      -o-object-fit: cover;
+         object-fit: cover;
+    }
+
+    .name_articles #last_news_swiper .swiper-slide .news_group {
+      width: 100%;
+    }
+
+    .popular_products .about_block .products_item .item .img_products .main_img {
+      height: 260px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -815,6 +871,14 @@ aside .login svg {
 
     .tips_news_group .about_block .last_news .block_news_items .news_group {
       max-width: 270px;
+    }
+
+    .authors_blogers .about_block .group_authors .cards_group .img_products .main_img {
+      width: 100%;
+    }
+
+    .popular_products .about_block .products_item .item .img_products .main_img {
+      height: 60vw;
     }
 }
 

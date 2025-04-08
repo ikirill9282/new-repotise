@@ -31,11 +31,14 @@
                     <div class="write_comment !items-start">
                         <h3> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
 
-                        <textarea class="outline-0 grow transition" rows="1" wrap="hard"
+                        <textarea 
+                            class="outline-0 grow transition" 
+                            rows="1" 
+                            wrap="hard"
                             placeholder="{{ trim(print_var('comment_add_message', $variables)) }}" {{ auth()->check() ? '' : 'disabled' }}></textarea>
 
                         <div class="right_stickers">
-                            <a href="#" class="numbers {{ auth()->check() ? '' : 'disabled' }}">0/1000</a>
+                            <a href="#" class="numbers pointer-events-none {{ auth()->check() ? '' : 'disabled' }}">0/1000</a>
                             <a href="#" class="first_stick {{ auth()->check() ? '' : 'disabled' }}">
                                 @include('icons.smiles')
                             </a>
@@ -103,3 +106,7 @@
         </div>
     </section>
 </div>
+
+@push('css')
+  <link rel="stylesheet" href="{{ asset('assets/css/jquery.emojiarea.css') }}">
+@endpush
