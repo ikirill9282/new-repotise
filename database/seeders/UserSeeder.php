@@ -73,8 +73,8 @@ class UserSeeder extends Seeder
       );
 
       if (!$buyer->hasRole('customer')) $buyer->assignRole(Role::findByName('customer'));
-      if (!$buyer2->hasRole('customer')) $buyer->assignRole(Role::findByName('customer'));
+      if (!$buyer2->hasRole('customer')) $buyer2->assignRole(Role::findByName('customer'));
       if (!$seller->hasRole('creator')) $seller->assignRole(Role::findByName('creator'));
-      if (!$seller2->hasRole('creator')) $seller->assignRole(Role::findByName('creator'));
+      if (!$seller2->hasRole('creator')) $seller2->assignRole(Role::findByName('creator'));
     }
 }

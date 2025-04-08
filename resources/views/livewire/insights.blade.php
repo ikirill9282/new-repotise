@@ -61,7 +61,7 @@
                         @endforeach
                     </div>
                 </div>
-                @include('site.components.last_news', ['news' => $last_news ?? []])
+                @include('site.components.last_news', ['count' => '*'])
             </div>
         </div>
     </section>

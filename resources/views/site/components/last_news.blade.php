@@ -1,3 +1,11 @@
+@php
+if (!isset($news) || empty($news)) {
+  $news = (isset($count)) 
+      ? \App\Models\Article::getLastNews($count)
+      : \App\Models\Article::getLastNews();
+}
+@endphp
+
 <div class="last_news">
   @include('site.components.heading', ['title' => 'last_news'])
   <div class="block_news_items">

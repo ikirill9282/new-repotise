@@ -140,7 +140,6 @@ class Article extends Model
     $tags = $this->tags->pluck('id')->values()->toArray();
     if (empty($tags)) {
       $query = Article::query()
-        ->orderByDesc('id')
         ->limit($this->amountAnalogs)
       ;
     } else {
@@ -150,7 +149,12 @@ class Article extends Model
       ;
     }
 
-    $analogs = $query->get()->collect();
+    $analogs = $query->whereHas('author.roles', fn($q) => $q->where('name', ['creator', 'customer']))
+      ->where('id', '!=', $this->id)
+      ->orderByDesc('id')
+      ->get()
+      ->collect();
+
     while ($analogs->count() < $this->amountAnalogs) {
       $analogs = $analogs->merge($analogs->all());
     }
@@ -181,13 +185,12 @@ class Article extends Model
     $this->amountAnalogs = $amount;
   }
 
-  public static function getLastNews(int $maximum_models = 4)
+  public static function getLastNews(int|string $maximum_models = 4)
   {
-
     $last_news = static::query()
       ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'admin')))
+      ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
       ->orderByDesc('id')
-      ->limit($maximum_models)
       ->get();
     
     while ($last_news->count() < $maximum_models) {

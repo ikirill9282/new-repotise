@@ -15,7 +15,7 @@
         <div class="container">
             <div class="about_block">
                 @include('site.components.article_view', ['article' => $article])
-                @include('site.components.last_news', ['news' => $last_news])
+                @include('site.components.last_news')
             </div>
         </div>
     </section>

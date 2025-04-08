@@ -42,7 +42,7 @@
                     @endforeach
                 </div>
             </div>
-            @include('site.components.last_news', ['news' => \App\Models\News::getLastNews()])
+            @include('site.components.last_news')
         </div>
     </div>
 </section>
