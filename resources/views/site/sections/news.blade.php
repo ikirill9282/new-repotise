@@ -1,5 +1,5 @@
 @php
-$news = \App\Models\News::getLastNews(5);
+$news = \App\Models\Article::getLastNews(5);
 @endphp
 
 <section class="news">
@@ -14,10 +14,10 @@ $news = \App\Models\News::getLastNews(5);
                     @foreach ($news as $news_item)
                       <div class="swiper-slide !h-auto">
                         <div class="item !h-full !w-full flex flex-col justify-between !max-w-none">
-                            <a href="{{ url("/news/$news_item->slug") }}">
+                            <a href="{{ $news_item->makeFeedUrl() }}">
                               <p>{{ $news_item->title }}</p>
                             </a>
-                            <a href="{{ url("/news/$news_item->slug") }}">
+                            <a href="{{ $news_item->makeFeedUrl() }}">
                               <img class="!w-full" src="{{ $news_item->preview->image }}" alt="News image {{ $news_item->id }}">
                             </a>
                         </div>

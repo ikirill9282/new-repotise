@@ -180,4 +180,20 @@ class Article extends Model
   {
     $this->amountAnalogs = $amount;
   }
+
+  public static function getLastNews(int $maximum_models = 4)
+  {
+
+    $last_news = static::query()
+      ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'admin')))
+      ->orderByDesc('id')
+      ->limit($maximum_models)
+      ->get();
+    
+    while ($last_news->count() < $maximum_models) {
+      $last_news = $last_news->collect()->merge($last_news)->slice(0, $maximum_models);
+    }
+
+    return $last_news;
+  }
 }

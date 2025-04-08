@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
         UserSeeder::class,
         PageSeeder::class,
         SectionSeeder::class,
-        NewsSeeder::class,
         TypeSeeder::class,
         LocationSeeder::class,
         CategorySeeder::class,

@@ -33,13 +33,13 @@ class TagSeeder extends Seeder
         }
       }
 
-      foreach (News::all() as $news_item) {
-        foreach ($tags as $tag) {
-          NewsTags::firstOrCreate([
-            'news_id' => $news_item->id,
-            'tag_id' => $tag->id,
-          ]);
-        }
-      }
+      // foreach (News::all() as $news_item) {
+      //   foreach ($tags as $tag) {
+      //     NewsTags::firstOrCreate([
+      //       'news_id' => $news_item->id,
+      //       'tag_id' => $tag->id,
+      //     ]);
+      //   }
+      // }
     }
 }

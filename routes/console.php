@@ -85,14 +85,12 @@ Artisan::command('tt2', function() {
 Artisan::command('rl_index', function() {
   Artisan::call('scout:flush', ['model' => Product::class]);
   Artisan::call('scout:flush', ['model' => Article::class]);
-  Artisan::call('scout:flush', ['model' => News::class]);
   Artisan::call('scout:flush', ['model' => User::class]);
   Artisan::call('scout:flush', ['model' => Category::class]);
   Artisan::call('scout:flush', ['model' => Location::class]);
 
   Artisan::call('scout:import', ['model' => Product::class]);
   Artisan::call('scout:import', ['model' => Article::class]);
-  Artisan::call('scout:import', ['model' => News::class]);
   Artisan::call('scout:import', ['model' => User::class]);
   Artisan::call('scout:import', ['model' => Category::class]);
   Artisan::call('scout:import', ['model' => Location::class]);

@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\Article;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Arrayable;
 use App\Models\News;
@@ -14,6 +15,6 @@ trait HasLastNews
 
   public function appendLastNews(): void
   {
-    $this->last_news = News::getLastNews($this->maximum_models);
+    $this->last_news = Article::getLastNews($this->maximum_models);
   }
 }

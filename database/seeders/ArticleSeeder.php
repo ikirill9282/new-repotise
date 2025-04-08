@@ -20,11 +20,12 @@ class ArticleSeeder extends Seeder
       for ($x = 0; $x < 6; $x++) {
         for ($i = 1; $i <= 5; $i++) {
           // try {
+          $title = ($i == 1) ? "Why do you need a Baby Monitor? We'll tell you in our article $cnt" : "Article Title $cnt";
           $article = Article::firstOrCreate(
-            ['user_id' => $i, 'title' => "Article Title $cnt"],
+            ['user_id' => $i, 'title' => $title],
             [
               'user_id' => $i,
-              'title' => "Article Title $cnt",
+              'title' => $title,
               'subtitle' => null,
               'slug' => Slug::make("Article Title"),
               'views' => 0,

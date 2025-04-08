@@ -7,10 +7,10 @@
         @foreach ($news as $news_item)
           <div class="swiper-slide">
             <div class="news_group">
-                <a href="{{ url("$news_item->slug?nid=$news_item->id") }}">
+                <a href="{{ $news_item->makeFeedUrl() }}">
                     <p>{{ $news_item->title }}</p>
                 </a>
-                <a href="{{ url("$news_item->slug?nid=$news_item->id") }}">
+                <a href="{{ $news_item->makeFeedUrl() }}">
                   <img src="{{ $news_item->preview?->image }}" alt="News preview {{ $news_item->id }}">
                 </a>
             </div>
