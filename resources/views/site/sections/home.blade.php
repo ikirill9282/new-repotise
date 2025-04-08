@@ -1,5 +1,5 @@
 <section class="home ">
-  <div class="parallax parallax-home" data-img="{{ asset('assets/img/bg_home.png') }}" data-open="false"></div>
+  <div class="parallax parallax-home"></div>
   <div class="container relative z-40 !mx-auto">
       <div class="about_block">
           @include('site.components.heading', ['variables' => $variables])

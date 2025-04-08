@@ -1,5 +1,5 @@
 <section class="search_result_home relative">
-  <div class="parallax parallax-search" data-img="{{ asset('assets/img/search_result_mobile.jpeg') }}" data-open="false"></div>
+  <div class="parallax parallax-search"></div>
   <div class="container !mx-auto relative z-50">
       <div class="about_block">
           @include('site.components.heading')

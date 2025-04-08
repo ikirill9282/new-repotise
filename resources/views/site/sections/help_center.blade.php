@@ -4,7 +4,7 @@
 
 
 <section class="home_help relative">
-    <div class="parallax parallax-help" data-img="{{ asset('assets/img/bg_help_center.png') }}" data-open="false"></div>
+    <div class="parallax parallax-help"></div>
     <div class="container !mx-auto relative z-40">
         <div class="about_block">
             @include('site.components.heading', ['variables' => $variables])

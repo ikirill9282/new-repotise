@@ -99,7 +99,7 @@ const makeParallax = function() {
     }
 
     this.root.css({
-      'background-image': `url(${this.img})`,
+      // 'background-image': `url(${this.img})`,
       'background-position': `center top`,
       'background-size': `auto ${(this.height + this.top)}px`,
     })

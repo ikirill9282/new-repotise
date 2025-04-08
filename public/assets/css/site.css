@@ -77,6 +77,15 @@ header {
 
 .parallax-home {
   opacity: 0.9;
+  background-image: url(../img/bg_home.png);
+}
+
+.parallax-help {
+  background-image: url(../img/bg_help_center.png);
+}
+
+.parallax-insights {
+  background-image: url(../img/bg_home_tips.png);
 }
 
 .popular_products .about_block .products_item .item {
@@ -390,6 +399,7 @@ aside .login svg {
 .parallax-search {
   opacity: 0.6;
   background-color: #000;
+  background-image: url(../img/search_result_mobile.jpeg);
 }
 
 .search_result_home .about_block .input_group {
