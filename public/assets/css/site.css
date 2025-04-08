@@ -94,7 +94,8 @@ header {
 
 .popular_products .about_block .products_item .item .img_products .main_img {
   width: 100%;
-  height: auto;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .popular_products .about_block .products_item .item .img_products .to_basket {
@@ -771,8 +772,6 @@ aside .login svg {
 
     .popular_products .about_block .products_item .item .img_products .main_img {
       min-height: 204px;
-      -o-object-fit: cover;
-         object-fit: cover;
     }
     
     .news .about_block .items_news .item img {
