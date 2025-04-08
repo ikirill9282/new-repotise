@@ -46,7 +46,7 @@ class SiteController extends Controller
     if ($page->slug === 'feed') {
       $id = ($request->has('aid') && filter_var($request->get('aid'), FILTER_VALIDATE_INT)) ? $request->get('aid') : null;
       $response_data['articles'] = Article::when($id, fn($q) => $q->where('id', '!=', $id))->orderByDesc('id')->limit(3)->get()->all();
-      $response_data['last_news'] = News::getLastNews();
+      $response_data['last_news'] = Article::getLastNews();
 
       if ($request->has('aid') && filter_var($request->get('aid'), FILTER_VALIDATE_INT)) {
         $id = intval($request->get('aid'));

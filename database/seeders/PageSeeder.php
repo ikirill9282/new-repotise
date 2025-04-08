@@ -21,10 +21,10 @@ class PageSeeder extends Seeder
         'title' => 'Travel Insights',
         'slug' => 'insights',
       ]);
-      $news_page = Page::firstOrCreate([
-        'title' => 'news',
-        'slug' => 'news',
-      ]);
+      // $news_page = Page::firstOrCreate([
+      //   'title' => 'news',
+      //   'slug' => 'news',
+      // ]);
       $feed_page = Page::firstOrCreate([
         'title' => 'Feed',
         'slug' => 'feed',

@@ -159,18 +159,6 @@ return [
                 ]
               ]
             ],
-            News::class => [
-              // 'filterableAttributes' => ['title'],
-              'sortableAttributes' => ['id', 'created_at'],
-              'searchableAttributes' => ['title', 'slug', 'tags', 'author', 'text'],
-              'typoTolerance' => [
-                'enabled' => true,
-                'minWordSizeforTypos' => [
-                  'oneTypo' => 1,
-                  'twoTypos' => 4,
-                ]
-              ]
-            ],
             Product::class => [
               'filterableAttributes' => ['id', 'location', 'type'],
               'sortableAttributes' => ['id'],
