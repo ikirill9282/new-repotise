@@ -137,7 +137,7 @@
   <section class="caribbean_islands">
     <div class="container">
         <div class="about_block">
-            @include('site.components.heading', ['title' => 'notfound'])
+            @include('site.components.heading', ['title' => 'notfound', 'append' => '"<span>'.request()->get('q').'</span>"'])
             <p>{{ print_var('subtitle', $variables) }}</p>
             <div class="block_cards">
                 <div class="row">

@@ -423,6 +423,27 @@ aside .login svg {
   max-width: none;
 }
 
+.comment-link {
+  color: var(--gray, #A4A0A0);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  border-bottom: 1px dashed var(--gray, #A4A0A0);
+  transition: 0.5s all ease; 
+}
+
+.comment-link:hover {
+  border-bottom: 1px dashed var(--main, #FC7361);
+  color: var(--main, #FC7361);
+  cursor: pointer;
+}
+
+.comments_group .about_block .block_commends .commends_group .commend .right_text_group .likes {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
 @media (min-width: 768px) and (max-width: 1279px) {
   .popular_products .about_block .products_item .item:last-child,
   .popular_products .about_block .products_item .item:nth-child(9) {

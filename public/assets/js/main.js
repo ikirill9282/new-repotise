@@ -95,7 +95,7 @@ function toggleText() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+function initAuth() {
   const open_auth_items = [...document.querySelectorAll('.open_auth')];
   if (open_auth_items.length) {
     open_auth_items.map((item) => item.addEventListener('click', (evt) => {
@@ -111,7 +111,10 @@ document.addEventListener('DOMContentLoaded', function() {
       $('#auth_modal').fadeOut();
     }))
   }
-  
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initAuth();
 });
 
 

@@ -340,7 +340,7 @@ class SectionSeeder extends Seeder
             'model' => Section::where('slug', 'search-result')->first(),
             'variables' => [
               'notfound_heading' => 'h3',
-              'notfound_header' => 'Oops! We couldn\'t find anything for "<span>guide to the <br> Caribbean islands</span>"',
+              'notfound_header' => 'Oops! We couldn\'t find anything for',
               'subtitle' => 'Maybe try searching for something else?',
               'box1_heading' => 'h4',
               'box1_header' => 'Discover Trending Articles',

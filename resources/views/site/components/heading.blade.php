@@ -7,9 +7,9 @@ $header = (isset($variables) && isset($title)) ? $variables->firstWhere(fn($var)
   <{{ print_var($heading, $variables) }}>
         
     @if(isset($header_text) && !empty($header_text)) 
-      {!! $header_text !!}
+      {!! $header_text . (isset($append) ? " $append" : '') !!}
     @else
-      {!! print_var($header, $variables) !!}
+      {!! print_var($header, $variables) . (isset($append) ? " $append" : '') !!}
     @endif
     
   </{{ print_var($heading, $variables) }}>
@@ -17,9 +17,9 @@ $header = (isset($variables) && isset($title)) ? $variables->firstWhere(fn($var)
   <{{ print_var('heading', $variables) }}>
 
     @if(isset($header_text) && !empty($header_text)) 
-      {!! $header_text !!}
+      {!! $header_text . (isset($append) ? " $append" : '') !!}
     @else
-      {!! print_var('header', $variables) !!}
+      {!! print_var('header', $variables) . (isset($append) ? " $append" : '') !!}
     @endif
   
     </{{ print_var('heading', $variables) }}>

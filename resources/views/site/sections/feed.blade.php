@@ -130,6 +130,7 @@
                           sli = InitSliders();
                           writers = new CommentWriters();
                           editors = new Editors();
+                          initAuth();
                         });
                       }
                     }

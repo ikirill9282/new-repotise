@@ -30,13 +30,13 @@
                 <p>
                   {!! $comment['text'] !!}
                 </p>
-                <span class="show-more" onclick="toggleText()">
-                  {{ print_var('comment_more_message', $variables) }}
-                </span>
             </div>
             <div class="likes">
+                <span class="comment-link show-more">
+                  {{ print_var('comment_more_message', $variables) }}
+                </span>
                 <div class="left_groups_like">
-                  <a href="#" class="for_answer">
+                  <a href="#" class="comment-link for_answer">
                     {{ print_var('comment_reply_message', $variables) }}
                   </a>
                   @if (isset($comment['likes']) && !empty($comment['likes']))
