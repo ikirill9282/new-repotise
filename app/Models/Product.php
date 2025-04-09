@@ -85,4 +85,9 @@ class Product extends Model
       get: fn($value) => Collapse::make($value),
     );
   }
+
+  public function makeUrl()
+  {
+    return url("/products/$this->slug?pid=$this->id");
+  }
 }

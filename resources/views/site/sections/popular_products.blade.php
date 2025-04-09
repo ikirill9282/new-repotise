@@ -27,7 +27,9 @@ $products = collect(array_fill(0, 10, $products->first()));
                           {{ print_var('cart_button_text', $variables) }}
                         </a>
                     </div>
-                    <h3 class="text-nowrap overflow-hidden text-ellipsis">{{ $product->title }}</h3>
+                    <h3 class="text-nowrap overflow-hidden text-ellipsis">
+                      <a class="transition !text-inherit hover:!text-black" href="{{ $product->makeUrl() }}">{{ $product->title }}</a>
+                    </h3>
                     <div class="cost">
                         <p>${{ $product->price }}</p>
                         <span>${{ $product->old_price }}</span>
