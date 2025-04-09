@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('slug');
             $table->timestamps();
 
-            $table->foreign('parent_id')->references('id')->on('categories');
+            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 

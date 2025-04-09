@@ -55,7 +55,7 @@ class ListSectionVariables extends ListRecords
         TextColumn::make('section.pages.title')->searchable(),
         TextColumn::make('section.title')->searchable(),
         TextColumn::make('name')->label('Variable name')->searchable(),
-        TextColumn::make('value')->label('Variable value')->searchable()->extraAttributes(['class' => 'text-wrap']),
+        TextColumn::make('value')->label('Variable value')->searchable()->limit(500)->extraAttributes(['class' => 'text-wrap']),
       ])
       ->filters([
         //
