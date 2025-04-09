@@ -148,7 +148,7 @@ class SectionVariablesWidget extends BaseWidget
       TextColumn::make('section.pages.title'),
       TextColumn::make('section.title'),
       TextColumn::make('name')->label('Variable name'),
-      TextColumn::make('value')->label('Variable value')->extraAttributes(['class' => 'text-wrap']),
+      TextColumn::make('value')->label('Variable value')->limit(200)->extraAttributes(['class' => 'text-wrap']),
     ];
     if ($this->config['search']) $cols = array_map(
       fn($col) => in_array($col->getName(), $this->searchableTableColumns)

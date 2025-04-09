@@ -21,6 +21,8 @@ class EditSectionVariables extends EditRecord
 
     protected function mutateFormDataBeforeSave($data): array
     {
+      if (is_array($data)) return $data;
+      
       if (str_contains($data['value'], 'figure')) {
         preg_match_all('/<figure.*?<\/figure>/i', $data['value'], $figure);
         if (isset($figure[0])) {
