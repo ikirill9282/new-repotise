@@ -6,38 +6,57 @@ const CommentWriters = function() {
   this.prepareOjbect = (object) => {
     const obj = $(object);
     const input = obj.find('textarea');
-    
+    const container = input.data('emojibtn');
+    const btn = obj.find(container);
+
     if (input) {
-      input.on('input', function(event) {
-        let length = $(this).val().length;
-        
-        if (length > 1000) {
-          $(this).val($(this).val().slice(0, 1000));
-          return;
-        }
-
-        $(this).data('length', length);
-        obj.find('a.numbers').text(`${length}/1000`);
-      });
-
-      input.on('focus', () => {
-        $(input).animate({ 'height': '240px' });
-        // $(input).attr('rows', 5);
-        // $(input).slideToggle();
-        $(input).data('open', true);
-      });
-      
-      if (input.data('open')) $(input).attr('rows', 5);
-
-      input.on('focusout', () => {
-        if (!input.val().length) {
-          $(input).animate({ 'height': '20px' });
-          // $(input).attr('rows', 1);
-          // $(input).slideToggle();
-          $(input).data('open', false);
-        }
+      this.setInputListeners(input);
+      input.emojiPicker({
+        width: ($(window).outerWidth() > 576) ? '300px' : '200px',
+        height: ($(window).outerWidth() > 576) ? '200px' : '100px',
+        button: false,
+        recentCount: 10,
+        container: container,
       });
     }
+
+    if (btn) {
+      btn.off('click');
+      btn.on('click', (event) => {
+        event.preventDefault();
+        input.emojiPicker('toggle');
+      })
+    }
+
+    return obj;
+  }
+
+  this.setInputListeners = (input) => {
+    input.on('input', function(event) {
+      let length = $(this).val().length;
+      
+      if (length > 1000) {
+        $(this).val($(this).val().slice(0, 1000));
+        return;
+      }
+
+      $(this).data('length', length);
+      input.prevObject.find('a.numbers').text(`${length}/1000`);
+    });
+
+    input.on('focus', () => {
+      $(input).animate({ 'height': '240px' });
+      $(input).data('open', true);
+    });
+
+    input.on('focusout', (evt) => {
+      setTimeout(() => {
+        if (!input.val().length && !input.is(':focus')) {
+          $(input).animate({ 'height': '20px' });
+          $(input).data('open', false);
+        }
+      }, 500);
+    });
   }
 
   this.init = () => {

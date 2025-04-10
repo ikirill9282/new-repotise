@@ -28,21 +28,26 @@
                 </div>
                 <div class="write_comment_group">
                     <h3 class="comment_mobile_header"> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
-                    <div class="write_comment !items-start">
+                    <div class="write_comment !items-start" id="ta-ct-{{ $article->id }}">
                         <h3> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
-
-                        <textarea 
-                            class="outline-0 grow transition" 
+                        {{-- <form action="" class="grow"> --}}
+                          <textarea 
+                            class="outline-0 transition comment-input w-full" 
                             rows="1" 
                             wrap="hard"
+                            data-emojibtn="#emoji-btn-{{ $article->id }}"
                             placeholder="{{ trim(print_var('comment_add_message', $variables)) }}" {{ auth()->check() ? '' : 'disabled' }}></textarea>
-
+                        
+                        {{-- </form> --}}
                         <div class="right_stickers">
-                            <a href="#" class="numbers pointer-events-none {{ auth()->check() ? '' : 'disabled' }}">0/1000</a>
-                            <a href="#" class="first_stick {{ auth()->check() ? '' : 'disabled' }}">
+                            <a href="#" class="numbers pointer-events-none {{ auth()->check() ? '' : 'unlinked' }}">0/1000</a>
+                            <button 
+                              class="relative bg-white rounded !p-[4px] transition emoji-btn first_stick {{ auth()->check() ? '' : 'disabled' }}" 
+                              id="emoji-btn-{{ $article->id }}"
+                            >
                                 @include('icons.smiles')
-                            </a>
-                            <a href="#" class="third_stick {{ auth()->check() ? '' : 'disabled' }}">
+                            </button>
+                            <a href="#" class="third_stick {{ auth()->check() ? '' : 'disabled' }}" onclick="event.preventDefault()">
                                 @include('icons.arrow_right')
                             </a>
                         </div>
@@ -85,8 +90,10 @@
                                             <div class="date">
                                                 <span>{{ \Illuminate\Support\Carbon::parse($analog->created_at)->format('d.m.Y') }}</span>
                                                 <div class="name_author">
+                                                  <a class="group flex justify-start items-center gap-2" href="{{ $analog->author->makeProfileUrl() }}">
                                                     <img src="{{ url($analog->author->avatar) }}" alt="Avatar">
-                                                    <p>{{ $analog->author->profile }}</p>
+                                                    <p class="transition group-hover:!text-black">{{ $analog->author->profile }}</p>
+                                                  </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -106,7 +113,3 @@
         </div>
     </section>
 </div>
-
-@push('css')
-  <link rel="stylesheet" href="{{ asset('assets/css/jquery.emojiarea.css') }}">
-@endpush

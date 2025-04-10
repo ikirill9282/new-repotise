@@ -8,7 +8,9 @@ $products = \App\Models\Product::query()
   }])
   ->get();
 
-$products = collect(array_fill(0, 10, $products->first()));
+while($products->count() < 10) {
+  $products = $products->collect()->merge($products)->slice(0, 10);
+}
 @endphp
 
 <section class="popular_products">

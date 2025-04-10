@@ -28,7 +28,7 @@
             </div>
             <div class="review">
                 <p>
-                  {!! $comment['text'] !!}
+                  {{ $comment['text'] }}
                 </p>
             </div>
             <div class="likes">

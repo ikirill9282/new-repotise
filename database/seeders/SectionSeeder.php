@@ -213,7 +213,7 @@ class SectionSeeder extends Seeder
             'variables' => [
               'heading' => 'h2',
               'header' => 'Trending Products',
-              'product_ids' => [1],
+              'product_ids' => [1,2,3],
               'more_text' => 'Discover Now',
               'more_link' => '/advantures',
               'cart_button_text' => 'Add to cart'

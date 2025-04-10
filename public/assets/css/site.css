@@ -481,6 +481,20 @@ aside .login svg {
      object-fit: cover;
 }
 
+
+.emoji-button:hover path {
+  fill: black;
+  transition: 0.3s;
+}
+
+.emojiPickerIconWrap {
+  flex-grow: 1;
+}
+
+.emojiPickerIconWrap textarea {
+  width: 100% !important;
+}
+
 @media (min-width: 768px) and (max-width: 1279px) {
   .popular_products .about_block .products_item .item:last-child,
   .popular_products .about_block .products_item .item:nth-child(9) {
@@ -549,6 +563,10 @@ aside .login svg {
   #last_news_swiper .swiper-slide {
     width: 100% !important;
   }
+
+  .authors_blogers .about_block .group_authors .cards_group .img_products .main_img {
+    width: 100%;
+  }
 }
 
 @media (min-width: 550px) and (max-width: 768px) {
@@ -582,6 +600,10 @@ aside .login svg {
 
   .feed-item .last_news {
     flex-basis: 25%;
+  }
+
+  .authorization_header .about_block .right_group_block .search {
+    width: 100%;
   }
 }
 
@@ -629,7 +651,6 @@ aside .login svg {
     min-width: 48px;
     min-height: 48px;
   }
-
   #mobile_menu {
     padding: 10px 20px;
   }

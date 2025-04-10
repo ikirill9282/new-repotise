@@ -14,7 +14,11 @@
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/site.css') }}">
 
-    
+
+    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ asset('/assets/css/jquery.emojipicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('/assets/css/jquery.emojipicker.a.css') }}">
     
     
     <script src="https://cdn.jsdelivr.net/npm/@meilisearch/instant-meilisearch/dist/instant-meilisearch.umd.min.js"></script>
@@ -33,8 +37,6 @@
     @livewireStyles
     @vite('resources/css/app.css')
     @stack('css')
-
-    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
 </head>
 
 <body>
@@ -58,7 +60,10 @@
     <script src="{{ asset('/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('/assets/js/search.js') }}"></script>
     <script src="{{ asset('/assets/js/main.js') }}"></script>
-    
+
+    <script src="{{ asset('/assets/js/jquery.emojipicker.a.js') }}"></script>
+    <script src="{{ asset('/assets/js/jquery.emojipicker.js') }}"></script>
+
     @livewireScripts
     @vite('resources/js/app.js')
 
