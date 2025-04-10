@@ -70,7 +70,6 @@ const CommentWriters = function() {
   return this.init();
 }
 
-
 const Editors = function() {
   this.editors = [];
 

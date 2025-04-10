@@ -9,7 +9,12 @@
               <a class="author-link !text-md" href="{{ $article->author->makeProfileUrl() }}">{{ $article->author->profile }}</a>
             </p>
         </div>
-        <a href="{{ url("/creators/subscribe/{$article->author->profile}") }}" class="follow">{{ print_var('subscribe_button', $variables) }}</a>
+        <a 
+          href="{{ $article->author->makeSubscribeUrl() }}" 
+          class="follow {{ auth()->check() ? '' : 'open_auth' }}"
+        >
+          {{ print_var('subscribe_button', $variables) }}
+        </a>
       </div>
       <div class="block_date">
           <span>{{ \Illuminate\Support\Carbon::parse($article->created_at)->format('d.m.Y') }}</span>
@@ -19,7 +24,12 @@
     </div>
     <div class="follow_to_canal">
         @include('site.components.heading', ['title' => 'subscribe'])
-        <a href="{{ url("/creators/subscribe/{$article->author->profile}") }}">{{ print_var('subscribe_button', $variables) }}</a>
+        <a 
+          href="{{ $article->author->makeSubscribeUrl() }}"
+          class="{{ auth()->check() ? '' : 'open_auth' }}"
+        >
+          {{ print_var('subscribe_button', $variables) }}
+        </a>
     </div>
     <div class="bottom_group">
         <div class="tegs">
@@ -39,7 +49,10 @@
                 </div>
             @endif
             <div class="like">
-                <a href="{{ url("/articles/like/{$article->id}") }}">
+                <a 
+                  href="{{ url("/feedback/like") }}"
+                  class="feedback_button {{ auth()->check() ? '' : 'open_auth' }}"
+                >
                   @include('icons.like')
                 </a>
                 <p>Like</p>

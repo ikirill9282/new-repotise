@@ -123,7 +123,7 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function profile(): Attribute
     {
       return Attribute::make(
-        get: fn() => "@" . $this->username,
+        get: fn() => "@" . strtolower($this->username),
       );
     }
 
@@ -173,6 +173,11 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function makeProfileUrl(): string
     {
       return url("/users/profile/" . $this->profile);
+    }
+
+    public function makeSubscribeUrl(): string
+    {
+      return url("/users/subscribe/$this->profile");
     }
 
     public function getName(): string
