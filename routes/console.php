@@ -23,10 +23,6 @@ use App\Models\Tag;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('tt', function() {
-  dd(Product::find(1)->categories->toArray());
-});
-
 Artisan::command('tt_mail', function() {
   $m = new VerifyMail([
     'name' => 'Demo',

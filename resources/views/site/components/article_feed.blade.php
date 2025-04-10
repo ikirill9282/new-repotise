@@ -27,18 +27,19 @@
                     <span>{{ $article->countComments() }}</span>
                 </div>
                 <div class="write_comment_group">
-                    <h3 class="comment_mobile_header"> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
+                    @if (!auth()->check())
+                        <a href="#" class="go_comment open_auth">Login to comment</a>
+                    @else
+
+                    <h3 class="comment_mobile_header">{{ auth()->user()->profile }}</h3>
                     <div class="write_comment !items-start" id="ta-ct-{{ $article->id }}">
-                        <h3> {{ auth()->check() ? auth()->user()->profile : '' }}</h3>
-                        {{-- <form action="" class="grow"> --}}
-                          <textarea 
+                        <h3>{{ auth()->user()->profile }}</h3>
+                          <textarea
                             class="outline-0 transition comment-input w-full" 
                             rows="1" 
                             wrap="hard"
                             data-emojibtn="#emoji-btn-{{ $article->id }}"
                             placeholder="{{ trim(print_var('comment_add_message', $variables)) }}" {{ auth()->check() ? '' : 'disabled' }}></textarea>
-                        
-                        {{-- </form> --}}
                         <div class="right_stickers">
                             <a href="#" class="numbers pointer-events-none {{ auth()->check() ? '' : 'unlinked' }}">0/1000</a>
                             <button 
@@ -52,8 +53,6 @@
                             </a>
                         </div>
                     </div>
-                    @if (!auth()->check())
-                        <a href="#" class="go_comment open_auth">Login to comment</a>
                     @endif
                 </div>
                 <div class="block_commends">
