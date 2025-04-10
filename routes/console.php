@@ -20,6 +20,13 @@ use Meilisearch\Client;
 use Meilisearch\Contracts\SearchQuery;
 use Meilisearch\Contracts\MultiSearchFederation;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::call(function() {
+  Log::debug('Schedule command');
+})->everyMinute();
+
 
 Artisan::command('tt', function() {
   dd(Product::find(1)->categories->toArray());
