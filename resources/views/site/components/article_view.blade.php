@@ -49,14 +49,21 @@
                 </div>
             @endif
             <div class="like">
+                @php
+                  $hash_id = \App\Helpers\CustomEncrypt::encrypt([$article->id]);
+                @endphp
                 <a 
-                  href="{{ url("/feedback/like") }}"
-                  class="feedback_button {{ auth()->check() ? '' : 'open_auth' }}"
+                  href="/feedback/likes"
+                  class="feedback_button {{ auth()->check() ? '' : 'open_auth' }} {{ is_liked('article', $article->id) ? 'liked' : '' }}"
+                  data-item="{{ hash_item('article', $article->id) }}"
+                  data-id="{{ $hash_id }}"
                 >
                   @include('icons.like')
                 </a>
                 <p>Like</p>
-                <span>{{ $article->likes_count }}</span>
+                <span data-counter="{{ $hash_id }}">
+                  {{ $article->likes_count }}
+                </span>
             </div>
             <div class="connects">
                 <a href="#" class="first_connect">

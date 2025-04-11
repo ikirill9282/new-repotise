@@ -94,6 +94,7 @@ $(document).ready(function() {
   let sli = InitSliders();
   let writers = new CommentWriters();
   let editors = new Editors();
+  const likers = new LikeButtons('.feed-item');
 
   $(window).scroll((event) => {
     $('#stopper').each(function(i, el) {
@@ -115,6 +116,8 @@ $(document).ready(function() {
                     sli = InitSliders();
                     writers = new CommentWriters();
                     editors = new Editors();
+                    
+                    likers.discover('.feed-item');
                     initAuth();
                 });
             }

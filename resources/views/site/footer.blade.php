@@ -71,12 +71,3 @@
         </div>
     </div>
 </footer>
-
-@push('js')
-    <script>
-        $('.group > h3').on('click', function() {
-            $(this).children().last().toggleClass('!rotate-0 !stroke-white');
-            $(this).siblings('ul').slideToggle();
-        });
-    </script>
-@endpush

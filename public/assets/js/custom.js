@@ -1,5 +1,13 @@
 $('a.disabled').on('click', (evt) => evt.preventDefault());
 
+const getCSRF = () => $('meta[name="csrf"]').attr('content');
+
+
+$('footer .group > h3').on('click', function() {
+  $(this).children().last().toggleClass('!rotate-0 !stroke-white');
+  $(this).siblings('ul').slideToggle();
+});
+
 const CommentWriters = function() {
   this.writers = [];
   
@@ -130,3 +138,158 @@ const makeParallax = function() {
 
   return this.init();
 }
+
+const LikeButtons = function(container) {
+  this.buttons = [];
+
+  this.setListeners = (item) => {
+    item.elem.on('click', function(evt) {
+      evt.preventDefault();
+
+      if ($(this).hasClass('open_auth')) {
+        return;
+      }
+
+      let path = $(this).attr('href') || $(this).data('path');
+      if (path !== undefined && path !== null && path.length) {
+        path = (path[0] === '/') ? path : `/${path}`
+        
+        $.ajax({
+          url: `/api${path}`,
+          method: 'POST',
+          data: {
+            _token: getCSRF(),
+            item: item.hash, 
+          }
+        }).then(response => {
+          if (Object.keys(item).includes('counter')) {
+            item.counter.each((k, counter) => {
+              const content = Number($(counter).text());
+              const new_content = response.status ? (content + 1) : (content - 1)
+              $(counter).text(new_content);
+              
+              if (response.status) {
+                $(this).addClass('liked');
+              } else {
+                $(this).removeClass('liked')
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  this.prepareElement = (element) => {
+    const result = {
+      elem: $(element),
+      id: $(element).data('id'),
+    }
+    
+    if (result.id !== undefined && result.id !== null && result.id.length > 0) {
+      result.hash = $(element).data('item');
+
+      if (
+          result.hash === undefined || 
+          result.hash === null || 
+          typeof result.hash !== 'string' || 
+          result.hash.length === 0
+        ) {
+        return null;
+      }
+
+      const counter = $(`*[data-counter="${result.id}"]`);
+      if (counter.length) { 
+        result.counter = counter;
+      }
+      
+      return result;
+    }
+
+    return null;
+  }
+
+  this.discover = (container) => {
+    $(container).each((key, item) => {
+      const buttons = $(item).find('a.feedback_button');
+      buttons.each((key, element) => {
+        const button = this.prepareElement(element);
+        if (this.buttons.find(btn => btn.id == button.id) !== undefined) {
+          return;
+        }
+
+        if (button !== null) {
+          this.setListeners(button);
+          this.buttons.push(button);
+        }
+        
+      })
+    });
+
+    console.log(this.buttons);
+    
+
+    return this;
+  }
+
+  return this.discover(container);
+}
+
+const header = $('header');
+const headerHeight = header.outerHeight();
+// const start = (document.querySelector('.parallax')) ? $('.parallax').outerHeight() : headerHeight;
+
+let lastPoint = 0;
+
+$(window).on('scroll', function(evt) {
+    const point = $(this).scrollTop();
+    if (point > (headerHeight + 10)) {
+        if (!header.hasClass('!sticky')) {
+            header.addClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
+        }
+        if (point <= lastPoint) {
+            header.addClass('transition !translate-y-0');
+        } else if (!$('#mobile_menu').data('open')) {
+            header.removeClass('!translate-y-0');
+        }
+    }
+
+    if (point == 0) {
+        header.removeClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
+        header.removeClass('transition');
+    }
+
+    lastPoint = point;
+});
+
+$('.hamburger-menu').on('click', function(evt) {
+    const menu = $('#mobile_menu');
+    const button = $(this).find('.menu__btn');
+
+    menu.removeClass('translate-x-full');
+    menu.data('open', true);
+    $(button).toggleClass('menu_open');
+    // $('#close_menu').toggleClass('menu_open');
+
+    if (menu.data('open')) {
+        $('body').addClass('overflow-hidden');
+    } else {
+        $('body').removeClass('overflow-hidden');
+    }
+});
+
+$('#close_menu').on('click', function(evt) {
+    const menu = $('#mobile_menu');
+    const button = $('.hamburger-menu').find('.menu__btn');
+    menu.data('open', false);
+
+    menu.addClass('translate-x-full');
+    $(button).toggleClass('menu_open');
+    // $('#close_menu').toggleClass('menu_open');
+
+    if (menu.data('open')) {
+        $('body').addClass('overflow-hidden');
+    } else {
+        $('body').removeClass('overflow-hidden');
+    }
+});

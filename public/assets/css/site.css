@@ -14,6 +14,18 @@ body {
   background-color: #fff;
 }
 
+.liked svg {
+  fill: #FF2C0C;
+}
+
+.liked .liked-success {
+  display: block !important;
+}
+
+.liked .liked-fail {
+  display: none !important;
+}
+
 .custom-section p {
     padding: 10px 0;
     margin-bottom: 10px;

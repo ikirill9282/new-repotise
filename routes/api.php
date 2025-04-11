@@ -14,8 +14,9 @@ Route::prefix('api')->group(function() {
   });
 
 
-  Route::prefix('/feedback')->middleware('auth:sanctum')->controller(FeedbackController::class)->group(function() {
+  Route::prefix('/feedback')->middleware('auth:web')->controller(FeedbackController::class)->group(function() {
     Route::get('/views', 'views');
+    Route::post('/likes', 'likes');
   });
 
   Route::get('/feed/content/{id}', function($id) {

@@ -54,11 +54,19 @@
                         </div>
                     @endif
 
+                    @php
+                      $hash_id = \App\Helpers\CustomEncrypt::encrypt([$comment['id']]);
+                    @endphp
                     <div class="like_commend {{ auth()->check() ? '' : 'open_auth' }}">
-                        <a href="#" class="like_to_commend">
-                            @include('icons.like_comment')
+                        <a 
+                          href="/feedback/likes" 
+                          class="like_to_commend feedback_button {{ is_liked('comment', $comment['id']) ? 'liked' : '' }}" 
+                          data-item="{{ hash_item('comment', $comment['id']) }}" 
+                          data-id="{{ $hash_id }}"
+                        >
+                          @include('icons.like_comment')
                         </a>
-                        <span>{{ $comment['likes_count'] }}</span>
+                        <span data-counter="{{ $hash_id }}">{{ $comment['likes_count'] }}</span>
                     </div>
                 </div>
             </div>

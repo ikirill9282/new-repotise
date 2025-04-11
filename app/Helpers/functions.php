@@ -1,5 +1,9 @@
-<?php 
+<?php
+
+use App\Helpers\CustomEncrypt;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Likes;
 
 if (! function_exists('print_var')) {
   function print_var($name, Collection|array|null $resource = null)
@@ -47,5 +51,24 @@ if (! function_exists('rating_images')) {
     }
 
     return $result;
+  }
+}
+
+if (! function_exists('hash_item')) {
+  function hash_item(string $type, int $id): string
+  {
+    return CustomEncrypt::encrypt([
+      'user_id' => Auth::user()?->id ?? null,
+      'type' => $type,
+      'model_id' => $id,
+    ]);
+  }
+}
+
+if (! function_exists('is_liked')) {
+  function is_liked(string $type, int $id): string
+  {
+    if (!Auth::check()) return false;
+    return Likes::where(['type' => $type, 'model_id' => $id, 'user_id' => Auth::user()?->id])->exists();
   }
 }
