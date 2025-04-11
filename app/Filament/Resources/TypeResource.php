@@ -22,7 +22,7 @@ class TypeResource extends Resource
     protected static ?string $navigationGroup = 'Products';
 
     // protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationIcon = 'heroicon-o-rocket-launch';
+    protected static ?string $navigationIcon = 'heroicon-o-hashtag';
 
     public static function form(Form $form): Form
     {
@@ -47,7 +47,7 @@ class TypeResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->modal(),
                 Tables\Actions\DeleteAction::make(),
             ])
             // ->bulkActions([
@@ -69,8 +69,8 @@ class TypeResource extends Resource
     {
         return [
             'index' => Pages\ListTypes::route('/'),
-            'create' => Pages\CreateType::route('/create'),
-            'edit' => Pages\EditType::route('/{record}/edit'),
+            // 'create' => Pages\CreateType::route('/create'),
+            // 'edit' => Pages\EditType::route('/{record}/edit'),
         ];
     }
 }

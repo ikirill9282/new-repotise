@@ -22,7 +22,7 @@ class LocationResource extends Resource
     protected static ?string $navigationGroup = 'Products';
 
     // protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationIcon = 'heroicon-o-rocket-launch';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-europe-africa';
 
     public static function form(Form $form): Form
     {
@@ -47,7 +47,7 @@ class LocationResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->modal(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -68,8 +68,8 @@ class LocationResource extends Resource
     {
         return [
             'index' => Pages\ListLocations::route('/'),
-            'create' => Pages\CreateLocation::route('/create'),
-            'edit' => Pages\EditLocation::route('/{record}/edit'),
+            // 'create' => Pages\CreateLocation::route('/create'),
+            // 'edit' => Pages\EditLocation::route('/{record}/edit'),
         ];
     }
 }

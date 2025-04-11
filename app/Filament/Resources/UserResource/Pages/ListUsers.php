@@ -14,7 +14,9 @@ class ListUsers extends ListRecords
   protected function getHeaderActions(): array
   {
     return [
-      Actions\CreateAction::make(),
+      Actions\CreateAction::make()
+        ->slideOver()
+        ->icon('heroicon-o-plus'),
     ];
   }
 }

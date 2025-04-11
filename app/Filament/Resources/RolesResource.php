@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TagResource\Pages;
-use App\Filament\Resources\TagResource\RelationManagers;
-use App\Models\Tag;
+use App\Filament\Resources\RolesResource\Pages;
+use App\Filament\Resources\RolesResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -14,14 +13,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Spatie\Permission\Models\Role;
 
-class TagResource extends Resource
+class RolesResource extends Resource
 {
-    protected static ?string $model = Tag::class;
+    protected static ?string $model = Role::class;
 
-    protected static ?string $navigationGroup = 'Articles';
+    protected static ?string $navigationGroup = 'Users';
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationIcon = 'heroicon-o-at-symbol';
 
     public static function form(Form $form): Form
     {
@@ -36,9 +36,9 @@ class TagResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title'),
-                TextColumn::make('created_at'),
-                TextColumn::make('updated_at'),
+              TextColumn::make('title'),
+              TextColumn::make('created_at')->since(),
+              TextColumn::make('updated_at')->since(),
             ])
             ->filters([
                 //
@@ -46,12 +46,11 @@ class TagResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                   ->modal(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
@@ -65,9 +64,9 @@ class TagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTags::route('/'),
-            // 'create' => Pages\CreateTag::route('/create'),
-            // 'edit' => Pages\EditTag::route('/{record}/edit'),
+            'index' => Pages\ListRoles::route('/'),
+            // 'create' => Pages\CreateRoles::route('/create'),
+            // 'edit' => Pages\EditRoles::route('/{record}/edit'),
         ];
     }
 }
