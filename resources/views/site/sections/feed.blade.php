@@ -7,10 +7,14 @@
     @endphp
     @foreach ($articles as $key => $article)
         @if ($key == array_key_last($articles) - 1)
-            <div id="stopper"></div>
+            <div class="stopper"></div>
         @endif
         @include('site.components.article_feed', ['article' => $article])
     @endforeach
+    
+    @if ($key == array_key_last($articles))
+      <div class="stopper"></div>
+    @endif
 
     @push('js')
         <script src="{{ asset('/assets/js/feed.js') }}"></script>

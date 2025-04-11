@@ -97,14 +97,16 @@ $(document).ready(function() {
   const likers = new LikeButtons('.feed-item');
 
   $(window).scroll((event) => {
-    $('#stopper').each(function(i, el) {
+    $('.stopper').each(function(i, el) {
         if ($(this).isInViewport()) {
             const params = new URLSearchParams(document.location.search);
             const clone = $(this).clone();
             const feed = $('#feed');
-            const last_child = feed.children().last();
+            const last_child = feed.find('.feed-item').last();
             const id = last_child.data('content');
+            
             $(this).detach();
+            
             if (id !== undefined) {
                 $.ajax({
                     method: 'GET',
