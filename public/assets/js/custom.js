@@ -150,6 +150,12 @@ const LikeButtons = function(container) {
         return;
       }
 
+      if (item.elem.requested) {
+        return;
+      }
+
+      item.elem.requested = true;
+
       let path = $(this).attr('href') || $(this).data('path');
       if (path !== undefined && path !== null && path.length) {
         path = (path[0] === '/') ? path : `/${path}`
@@ -174,6 +180,7 @@ const LikeButtons = function(container) {
                 $(this).removeClass('liked')
               }
             });
+            item.elem.requested = false;
           }
         });
       }

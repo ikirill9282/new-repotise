@@ -8,7 +8,7 @@
                     <ul class="overflow-hidden">
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ url('/products') }}">All Products</a></li>
-                        <li><a href="{{ url('/profile/favorites') }}">Favourite</a></li>
+                        <li><a href="{{ url('/profile/favorites') }}">Favorite</a></li>
                         <li><a href="{{ url('/creators') }}">Creators</a></li>
                         <li><a href="{{ url('/insights') }}">Travel Insights</a></li>
                     </ul>

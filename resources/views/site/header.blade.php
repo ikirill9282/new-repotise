@@ -23,7 +23,7 @@
                         <span></span>
                     </div>
                 </div>
-                <a href="#" class="all_products">
+                <a href="{{ url('/products') }}" class="all_products">
                     @include('icons.burger')
                     <span class="text-nowrap">All Products</span>
                 </a>
@@ -51,11 +51,11 @@
                         </div>
                     </a>
 
-                    <a href="#" class="like rection_groups">
+                    <a href="{{ url('/profile/favorites') }}" class="like rection_groups">
                         @include('icons.favorite')
                         <span>10</span>
                     </a>
-                    <a href="#" class="basket rection_groups">
+                    <a href="{{ url('/profile/cart') }}" class="basket rection_groups">
                         @include('icons.cart')
                         <span>10</span>
                     </a>
