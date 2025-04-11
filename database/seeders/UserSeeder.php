@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UserSeeder extends Seeder
 {
@@ -14,7 +15,20 @@ class UserSeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void
-    {
+    { 
+      $admin = Role::firstOrCreate(['name' => 'admin'], ['name' => 'admin', 'title' => 'Admin']);
+      $buyer = Role::firstOrCreate(['name' => 'customer'], ['name' => 'customer', 'title' => 'Customer']);
+      $seller = Role::firstOrCreate(['name' => 'creator'], ['name' => 'creator', 'title' => 'Creator']);
+
+      $write_comment_premission = Permission::firstOrCreate(
+        ['name' => 'write_comment'],
+        ['name' => 'write_comment', 'title' => 'Write Comments'],
+      );
+
+      $admin->givePermissionTo($write_comment_premission);
+      $buyer->givePermissionTo($write_comment_premission);
+      $seller->givePermissionTo($write_comment_premission);
+
       if (!empty(env('ADMIN_MAIL')) && !empty(env('ADMIN_PASS'))) {
         $admin = User::firstOrCreate(
           ['email' => env('ADMIN_MAIL')],

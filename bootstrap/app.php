@@ -13,15 +13,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+      // $middleware->appendToGroup('web', [
+      //   \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
+      //   \Illuminate\Session\Middleware\StartSession::class,
+      //   \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+      // ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function(\Exception $e) {
-          if ($e instanceof NotFoundHttpException) {
-            return response()->view("site.page", [
-              'page' => Page::firstWhere('slug', '404')
-            ]);
-          }
-        });
+        // $exceptions->render(function(\Exception $e) {
+        //   if ($e instanceof NotFoundHttpException) {
+        //     return response()->view("site.page", [
+        //       'page' => Page::firstWhere('slug', '404')
+        //     ]);
+        //   }
+        // });
     })
     ->create();

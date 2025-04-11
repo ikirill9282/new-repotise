@@ -25,11 +25,9 @@ class SiteController extends Controller
       ->first();
 
     if (is_null($page)) {
-      throw new NotFoundHttpException('Not found');
+      return (new FallbackController())($request);
     }
-
-    // dd(Article::find(3)->toSearchableArray());
-
+    
     $response_data = [
       'page' => $page,
     ];

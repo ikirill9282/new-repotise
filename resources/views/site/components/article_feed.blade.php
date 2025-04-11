@@ -29,30 +29,28 @@
                 <div class="write_comment_group">
                     @if (!auth()->check())
                         <a href="#" class="go_comment open_auth">Login to comment</a>
-                    @else
+                    @elseif (auth()->user()->can('write_comment'))
+                        <h3 class="comment_mobile_header">{{ auth()->user()->profile }}</h3>
+                        <div class="write_comment !items-start" id="ta-ct-{{ $article->id }}">
+                            <h3>{{ auth()->user()->profile }}</h3>
+                            <textarea class="outline-0 transition comment-input w-full" rows="1" wrap="hard"
+                                data-emojibtn="#emoji-btn-{{ $article->id }}"
+                                placeholder="{{ trim(print_var('comment_add_message', $variables)) }}" {{ auth()->check() ? '' : 'disabled' }}></textarea>
 
-                    <h3 class="comment_mobile_header">{{ auth()->user()->profile }}</h3>
-                    <div class="write_comment !items-start" id="ta-ct-{{ $article->id }}">
-                        <h3>{{ auth()->user()->profile }}</h3>
-                          <textarea
-                            class="outline-0 transition comment-input w-full" 
-                            rows="1" 
-                            wrap="hard"
-                            data-emojibtn="#emoji-btn-{{ $article->id }}"
-                            placeholder="{{ trim(print_var('comment_add_message', $variables)) }}" {{ auth()->check() ? '' : 'disabled' }}></textarea>
-                        <div class="right_stickers">
-                            <a href="#" class="numbers pointer-events-none {{ auth()->check() ? '' : 'unlinked' }}">0/1000</a>
-                            <button 
-                              class="relative bg-white rounded !p-[4px] transition emoji-btn first_stick {{ auth()->check() ? '' : 'disabled' }}" 
-                              id="emoji-btn-{{ $article->id }}"
-                            >
-                                @include('icons.smiles')
-                            </button>
-                            <a href="#" class="third_stick {{ auth()->check() ? '' : 'disabled' }}" onclick="event.preventDefault()">
-                                @include('icons.arrow_right')
-                            </a>
+                            <div class="right_stickers">
+                                <a href="#"
+                                    class="numbers pointer-events-none {{ auth()->check() ? '' : 'unlinked' }}">0/1000</a>
+                                <button
+                                    class="relative bg-white rounded !p-[4px] transition emoji-btn first_stick {{ auth()->check() ? '' : 'disabled' }}"
+                                    id="emoji-btn-{{ $article->id }}">
+                                    @include('icons.smiles')
+                                </button>
+                                <a href="#" class="third_stick {{ auth()->check() ? '' : 'disabled' }}"
+                                    onclick="event.preventDefault()">
+                                    @include('icons.arrow_right')
+                                </a>
+                            </div>
                         </div>
-                    </div>
                     @endif
                 </div>
                 <div class="block_commends">
@@ -89,10 +87,12 @@
                                             <div class="date">
                                                 <span>{{ \Illuminate\Support\Carbon::parse($analog->created_at)->format('d.m.Y') }}</span>
                                                 <div class="name_author">
-                                                  <a class="group flex justify-start items-center gap-2" href="{{ $analog->author->makeProfileUrl() }}">
-                                                    <img src="{{ url($analog->author->avatar) }}" alt="Avatar">
-                                                    <p class="transition group-hover:!text-black">{{ $analog->author->profile }}</p>
-                                                  </a>
+                                                    <a class="group flex justify-start items-center gap-2"
+                                                        href="{{ $analog->author->makeProfileUrl() }}">
+                                                        <img src="{{ url($analog->author->avatar) }}" alt="Avatar">
+                                                        <p class="transition group-hover:!text-black">
+                                                            {{ $analog->author->profile }}</p>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>

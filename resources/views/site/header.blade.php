@@ -40,14 +40,14 @@
                         <span class="text-nowrap">Join / Sign in</span>
                     </a>
                 @else
-                    <a href="#" class="profile">
+                    <a href="{{ auth()->user()->makeProfileUrl() }}" class="profile">
                         <img src="{{ url(auth()->user()?->avatar) }}" alt="avatar"
                             class="profile_img">{{-- rounded-full w-8 --}}
                         <div class="right_text">
                             <div class="name">
                                 <h3>{{ auth()->user()?->profile }}</h3>
                             </div>
-                            <img src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
+                            <img class="hidden" src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
                         </div>
                     </a>
 
@@ -64,7 +64,6 @@
         </div>
     </div>
 </header>
-
 <aside class="fixed top-0 right-0 z-[140] w-screen h-screen bg-white transition duration-300 translate-x-full lg:hidden"
     id="mobile_menu" data-open="false">
     <nav class="container">
@@ -89,40 +88,44 @@
                 </li>
             </ul>
             @if (auth()->check())
-            <a href="#" class="profile flex items-center gap-2">
-                <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
-                <div class="right_text">
-                    <div class="name">
-                        <h3>{{ auth()->user()?->profile }}</h3>
-                    </div>
-                </div>
-            </a>
-            <div class="bottom_connect_group">
-                <a href="#" class="bottom_profile"><svg xmlns="http://www.w3.org/2000/svg" width="14"
-                        height="14" viewBox="0 0 14 14" fill="none">
-                        <path
-                            d="M6.99897 8.64455C8.89852 8.63969 10.5136 9.51187 11.1073 11.3893C9.91069 12.1188 8.50215 12.3998 6.99897 12.3961C5.4958 12.3998 4.08725 12.1188 2.89062 11.3893C3.48499 9.50984 5.09739 8.63969 6.99897 8.64455Z"
-                            stroke="#FC7361" stroke-linecap="square"></path>
-                        <circle cx="7.00005" cy="4.18169" r="2.57818" stroke="#FC7361" stroke-linecap="square">
-                        </circle>
-                    </svg>My Account</a>
-                <a href="#" class="bottom_profile"><svg xmlns="http://www.w3.org/2000/svg" width="14"
-                        height="14" viewBox="0 0 14 14" fill="none">
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M4.4659 11.3711C4.63506 11.3711 4.77164 11.5082 4.77164 11.6768C4.77164 11.846 4.63506 11.9831 4.4659 11.9831C4.29673 11.9831 4.16016 11.846 4.16016 11.6768C4.16016 11.5082 4.29673 11.3711 4.4659 11.3711Z"
-                            fill="#FC7361" stroke="#FC7361" stroke-linecap="square"></path>
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M10.8057 11.3711C10.9749 11.3711 11.112 11.5082 11.112 11.6768C11.112 11.846 10.9749 11.9831 10.8057 11.9831C10.6366 11.9831 10.5 11.846 10.5 11.6768C10.5 11.5082 10.6366 11.3711 10.8057 11.3711Z"
-                            fill="#FC7361" stroke="#FC7361" stroke-linecap="square"></path>
-                        <path d="M3.28265 3.8027H12.3971L11.6567 9.42291H3.78921L3.04427 2.01758H1.60547"
-                            stroke="#FC7361" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </svg>My Purchases</a>
-            </div>
+              <a href="{{ auth()->user()->makeProfileUrl() }}" class="profile flex items-center gap-2">
+                  <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
+                  <div class="right_text">
+                      <div class="name">
+                          <h3>{{ auth()->user()?->profile }}</h3>
+                      </div>
+                  </div>
+              </a>
+              <div class="bottom_connect_group">
+                  <a href="{{ auth()->user()->makeProfileUrl() }}" class="bottom_profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14"
+                          height="14" viewBox="0 0 14 14" fill="none">
+                          <path
+                              d="M6.99897 8.64455C8.89852 8.63969 10.5136 9.51187 11.1073 11.3893C9.91069 12.1188 8.50215 12.3998 6.99897 12.3961C5.4958 12.3998 4.08725 12.1188 2.89062 11.3893C3.48499 9.50984 5.09739 8.63969 6.99897 8.64455Z"
+                              stroke="#FC7361" stroke-linecap="square"></path>
+                          <circle cx="7.00005" cy="4.18169" r="2.57818" stroke="#FC7361" stroke-linecap="square">
+                          </circle>
+                    </svg>My Account
+                  </a>
+
+                  <a href="{{ url('/profile/puchases') }}" class="bottom_profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14"
+                          height="14" viewBox="0 0 14 14" fill="none">
+                          <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M4.4659 11.3711C4.63506 11.3711 4.77164 11.5082 4.77164 11.6768C4.77164 11.846 4.63506 11.9831 4.4659 11.9831C4.29673 11.9831 4.16016 11.846 4.16016 11.6768C4.16016 11.5082 4.29673 11.3711 4.4659 11.3711Z"
+                              fill="#FC7361" stroke="#FC7361" stroke-linecap="square"></path>
+                          <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M10.8057 11.3711C10.9749 11.3711 11.112 11.5082 11.112 11.6768C11.112 11.846 10.9749 11.9831 10.8057 11.9831C10.6366 11.9831 10.5 11.846 10.5 11.6768C10.5 11.5082 10.6366 11.3711 10.8057 11.3711Z"
+                              fill="#FC7361" stroke="#FC7361" stroke-linecap="square"></path>
+                          <path d="M3.28265 3.8027H12.3971L11.6567 9.42291H3.78921L3.04427 2.01758H1.60547"
+                              stroke="#FC7361" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>My Purchases</a>
+              </div>
             @else
-            <a href="#" class="login flex gap-2 items-center">
-                @include('icons.user')
-                Join / Sign in
-            </a>
+              <a href="#" class="login flex gap-2 items-center open_auth">
+                  @include('icons.user')
+                  Join / Sign in
+              </a>
             @endif
         </div>
     </nav>

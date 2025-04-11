@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FallbackController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
-use Illuminate\Http\Request;
+use App\Models\Admin\Page;
 
 
 require __DIR__ . '/api.php';
@@ -25,3 +26,5 @@ Route::get('/', SiteController::class)->name('home');
 Route::get('/{slug}', SiteController::class);
 Route::get('/insights/{slug}', SiteController::class);
 Route::get('/insights/{slug}/{article}', SiteController::class);
+
+Route::fallback(FallbackController::class);
