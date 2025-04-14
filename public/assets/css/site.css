@@ -18,6 +18,14 @@ body {
   fill: #FF2C0C;
 }
 
+.like_to_commend .liked-success {
+  display: none !important;
+}
+
+.like_to_commend .liked-fail {
+  display: block !important;
+}
+
 .liked .liked-success {
   display: block !important;
 }
@@ -965,10 +973,10 @@ aside .login svg {
     }
 
     .comments_group .about_block .block_commends .commends_group .commend .right_text_group .likes .left_groups_like .like_commend a:hover svg:last-child {
-      display: none;
+      display: initial;
     }
     .comments_group .about_block .block_commends .commends_group .commend .right_text_group .likes .left_groups_like .like_commend a:hover svg:first-child {
-      display: none;
+      display: initial;
     }
 }
 
