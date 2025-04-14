@@ -77,10 +77,11 @@ class Article extends Model
     $this->slug = Slug::makeEn($this->title);
   }
 
-  public function getFullComments(int $limit = 10): Article
+  public function getFullComments(?int $limit = null): Article
   {
     $this->comments_limit = $limit;
     $this->comments_loading = true;
+    $this->level = 0;
 
     $this->comments = Comment::query()
       ->where('article_id', $this->id)
@@ -89,6 +90,7 @@ class Article extends Model
         $query->with('author')->orderByDesc('id')->limit(4);
       })
       // ->with('likes.author')
+      ->when(!is_null($limit), fn($q) => $q->limit($limit))
       ->withCount('likes')
       ->with('author')
       ->get();
@@ -100,22 +102,36 @@ class Article extends Model
     }
 
     $this->comments = $this->comments->toArray();
-    // dd($this->comments, $this->countComments());
+    // dd($this->comments);
     return $this;
   }
 
-  public function getChildren($comment)
+  public function getChildren($comment, int $max_level = 1)
   {
-    if ($this->countComments() > $this->comments_limit) {
-      $this->comments_loading = false;
+    $this->level++;
+    $comment->load('likes.author', 'author');
+    $comment->loadCount('likes', 'children');
+
+    // if (!is_null($this->comments_limit) && $this->countComments() > $this->comments_limit) {
+    //   $this->comments_loading = false;
+    //   return;
+    // }
+
+    if ($this->level > $max_level) {
+      $this->level = 0;
       return;
     }
 
-    $comment->load('children', 'likes.author', 'author');
-    $comment->loadCount('likes');
+    $comment->load('children');
 
     foreach ($comment->children as &$child) {
-        $this->getChildren($child);
+        if ($child->children()->exists()) {
+          $this->getChildren($child);
+        } else {
+          $child->load('likes.author', 'author');
+          $child->loadCount('likes');
+          $this->level = 0;
+        }
     }
   }
 

@@ -1,3 +1,8 @@
+@if(isset($commnet['children_count']) && $comment['children_count'] == 0)
+@endif
+
+{{-- @dump($comment) --}}
+
 <div class="commends_group @if (isset($class)) {{ $class }} @endif">
     <div class="commend">
         <img src="{{ $comment['author']['avatar'] }}" alt="Avatar" class="img_commendor">
