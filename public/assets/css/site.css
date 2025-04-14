@@ -14,8 +14,13 @@ body {
   background-color: #fff;
 }
 
+
+.feedback_button svg {
+  fill: transparent !important;
+}
+
 .liked svg {
-  fill: #FF2C0C;
+  fill: #FF2C0C !important;
 }
 
 .like_to_commend .liked-success {
