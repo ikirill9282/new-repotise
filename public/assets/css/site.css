@@ -14,21 +14,8 @@ body {
   background-color: #fff;
 }
 
-
-.feedback_button svg {
-  fill: transparent !important;
-}
-
 .liked svg {
   fill: #FF2C0C !important;
-}
-
-.like_to_commend .liked-success {
-  display: none !important;
-}
-
-.like_to_commend .liked-fail {
-  display: block !important;
 }
 
 .liked .liked-success {
@@ -982,6 +969,30 @@ aside .login svg {
     }
     .comments_group .about_block .block_commends .commends_group .commend .right_text_group .likes .left_groups_like .like_commend a:hover svg:first-child {
       display: initial;
+    }
+
+    .feedback_button svg {
+      fill: transparent !important;
+    }
+
+    .like_to_commend .liked-success {
+      display: none !important;
+    }
+
+    .like_to_commend .liked-fail {
+      display: block !important;
+    }
+
+    .liked svg {
+      fill: #FF2C0C !important;
+    }
+
+    .liked .liked-success {
+      display: block !important;
+    }
+
+    .liked .liked-fail {
+      display: none !important;
     }
 }
 
