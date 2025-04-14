@@ -72,3 +72,22 @@ if (! function_exists('is_liked')) {
     return Likes::where(['type' => $type, 'model_id' => $id, 'user_id' => Auth::user()?->id])->exists();
   }
 }
+
+if (! function_exists('enable_more')) {
+  function enable_more(array $comment): string
+  {
+    if (!isset($comment['children_count'])) {
+      return false;
+    }
+
+    if (!isset($comment['children'])) {
+      return true;
+    }
+
+    if ($comment['children_count'] == count($comment['children'])) {
+      return false;
+    }
+
+    return true;
+  }
+}

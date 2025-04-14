@@ -1,8 +1,3 @@
-@if(isset($commnet['children_count']) && $comment['children_count'] == 0)
-@endif
-
-{{-- @dump($comment) --}}
-
 <div class="commends_group @if (isset($class)) {{ $class }} @endif">
     <div class="commend">
         <img src="{{ $comment['author']['avatar'] }}" alt="Avatar" class="img_commendor">
@@ -40,8 +35,8 @@
             </div>
             <div class="likes">
                 <div class="left_groups_like">
-                    <span class="comment-link show-more">
-                        {{ print_var('comment_more_message', $variables) }}
+                    <span class="comment-link show-more hidden">
+                      {{ print_var('comment_more_message', $variables) }}
                     </span>
                     <a 
                       href="#" 
@@ -75,6 +70,14 @@
                     </div>
                 </div>
             </div>
+
+            @if (enable_more($comment))
+              <div class="more_answers mt-4">
+                  <a href="#" class="replies-button">
+                    {{ print_var('comment_show_replies', $variables) }} ({{ ($comment['children_count'] < 50) ? $comment['children_count'] : 50 }} of {{ $comment['children_count'] }})
+                  </a>
+              </div>
+            @endif
         </div>
     </div>
 
@@ -86,11 +89,5 @@
                 'replies' => false,
             ])
         @endforeach
-    @endif
-
-    @if (!isset($replies))
-        <div class="more_answers">
-            <a href="#">{{ print_var('comment_show_replies', $variables) }} (50 of 248)</a>
-        </div>
     @endif
 </div>

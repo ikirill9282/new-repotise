@@ -54,6 +54,7 @@
                     @endif
                 </div>
                 <div class="block_commends">
+                    {{-- @dump($article->comments) --}}
                     @foreach ($article->comments as $comment)
                         @include('site.components.comment', ['comment' => $comment])
                     @endforeach

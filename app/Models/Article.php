@@ -102,7 +102,6 @@ class Article extends Model
     }
 
     $this->comments = $this->comments->toArray();
-    // dd($this->comments);
     return $this;
   }
 
