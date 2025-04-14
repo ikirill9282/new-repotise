@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PermissionResource\Pages;
 use App\Filament\Resources\PermissionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use App\Helpers\Slug;
 
 class ListPermissions extends ListRecords
 {
@@ -15,7 +16,12 @@ class ListPermissions extends ListRecords
         return [
             Actions\CreateAction::make()
               ->modal()
-              ->icon('heroicon-o-plus'),
+              ->icon('heroicon-o-plus')
+              ->mutateFormDataUsing(function ($data) {
+                $data['name'] = str_ireplace('-', '_', Slug::makeEn($data['title']));
+                return $data;
+              })
+              ,
         ];
     }
 }

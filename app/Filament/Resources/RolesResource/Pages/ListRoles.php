@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\RolesResource\Pages;
 
+use App\Filament\Resources\PermissionResource\Widgets\PermissionList;
 use App\Filament\Resources\RolesResource;
+use App\Filament\Resources\RolesResource\Widgets\AssignedPermissions;
+use App\Filament\Resources\RolesResource\Widgets\RoleSelection;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -17,5 +20,13 @@ class ListRoles extends ListRecords
               ->modal()
               ->icon('heroicon-o-plus'),
         ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+      return [
+        RoleSelection::class,
+        AssignedPermissions::class,
+      ];
     }
 }

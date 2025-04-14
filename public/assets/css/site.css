@@ -963,6 +963,13 @@ aside .login svg {
     .popular_products .about_block .products_item .item .img_products .main_img {
       height: 260px;
     }
+
+    .comments_group .about_block .block_commends .commends_group .commend .right_text_group .likes .left_groups_like .like_commend a:hover svg:last-child {
+      display: none;
+    }
+    .comments_group .about_block .block_commends .commends_group .commend .right_text_group .likes .left_groups_like .like_commend a:hover svg:first-child {
+      display: none;
+    }
 }
 
 @media (max-width: 576px) {

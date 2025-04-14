@@ -103,7 +103,6 @@ class SectionVariablesWidget extends BaseWidget
 
   public function table(Table $table): Table
   {
-
     // dump($this->selected_section, $this->selected_page);
     
     $query = SectionVariablesModel::query();
