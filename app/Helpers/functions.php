@@ -54,8 +54,8 @@ if (! function_exists('rating_images')) {
   }
 }
 
-if (! function_exists('hash_item')) {
-  function hash_item(string $type, int $id): string
+if (! function_exists('hash_like')) {
+  function hash_like(string $type, int $id): string
   {
     return CustomEncrypt::encrypt([
       'user_id' => Auth::user()?->id ?? null,
@@ -65,10 +65,40 @@ if (! function_exists('hash_item')) {
   }
 }
 
+if (! function_exists('hash_more')) {
+  function hash_more(array $comment): string
+  {
+    return CustomEncrypt::encrypt([
+      'id' => $comment['id'],
+    ]);
+  }
+}
+
 if (! function_exists('is_liked')) {
   function is_liked(string $type, int $id): string
   {
     if (!Auth::check()) return false;
     return Likes::where(['type' => $type, 'model_id' => $id, 'user_id' => Auth::user()?->id])->exists();
+  }
+}
+
+if (! function_exists('enable_more')) {
+  function enable_more(array $comment): string
+  {
+    if (!isset($comment['children_count'])) {
+      return false;
+    } elseif ($comment['children_count'] == 0) {
+      return false;
+    }
+
+    if (!isset($comment['children'])) {
+      return true;
+    }
+
+    if ($comment['children_count'] == count($comment['children'])) {
+      return false;
+    }
+
+    return true;
   }
 }

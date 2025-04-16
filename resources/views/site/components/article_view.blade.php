@@ -55,7 +55,7 @@
                 <a 
                   href="/feedback/likes"
                   class="feedback_button {{ auth()->check() ? '' : 'open_auth' }} {{ is_liked('article', $article->id) ? 'liked' : '' }}"
-                  data-item="{{ hash_item('article', $article->id) }}"
+                  data-item="{{ hash_like('article', $article->id) }}"
                   data-id="{{ $hash_id }}"
                 >
                   @include('icons.like')

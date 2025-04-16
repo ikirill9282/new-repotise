@@ -232,11 +232,67 @@ const LikeButtons = function(container) {
         
       })
     });
-
-    console.log(this.buttons);
-    
-
     return this;
+  }
+
+  return this.discover(container);
+}
+
+const RepliesButtons = function(container) {
+  this.group = '.commends_group';
+  this.buttons = [];
+  this.afterDiscover = null;
+
+  this.addListeners = (button) => {
+    const elem = button.item;
+    
+    elem.on('click', (evt) => {
+      evt.preventDefault();
+      $.ajax({
+        url: '/api/data/comments',
+        method: 'POST',
+        data: {
+          _token: getCSRF(),
+          hash: button.hash,
+        }
+      }).then(response => {
+        // elem.closest(this.group).html(response);
+        elem.parents(this.group).eq(0).append(response);
+        elem.detach();
+        
+        this.discover('.commend');
+        if (this.afterDiscover !== null) {
+          this.afterDiscover();
+        }
+      });
+    });
+  }
+
+  this.onAfterDiscover = (callback) => this.afterDiscover = callback;
+
+  this.format = function(button) {    
+    const result = {
+      hash: button.data('item'),
+      item: button,
+    }
+    return result;
+  }
+
+  this.button_exists = (button) => this.buttons.find((btn) => btn.hash === button.data('item')) !== undefined;
+
+  this.discover = (container, callback = null) => {
+    $(container).each((key, item) => {
+      const buttons = $(item).find('.replies-button');
+      
+      buttons.each((key, btn) => {
+        const button = $(btn);
+        if (!this.button_exists(button)) {
+          const formatted = this.format(button);
+          this.addListeners(formatted, callback);
+          this.buttons.push(formatted);
+        }
+      });
+    });
   }
 
   return this.discover(container);

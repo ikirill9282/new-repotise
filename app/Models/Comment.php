@@ -32,4 +32,19 @@ class Comment extends Model
       get: fn($value) => Collapse::make($value),
     );
   }
+
+  public function getChildren()
+  {
+    $this->load('children', 'likes.author', 'author');
+    $this->loadCount('likes', 'children');
+
+    foreach ($this->children as &$child) {
+      // if ($child->children()->exists()) {
+      //   $child->getChildren();
+      // } else {
+        $child->load('likes.author', 'author');
+        $child->loadCount('likes', 'children');
+      // }
+    }
+  }
 }
