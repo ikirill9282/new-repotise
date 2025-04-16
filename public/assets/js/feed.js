@@ -95,7 +95,9 @@ $(document).ready(function() {
   let writers = new CommentWriters();
   let editors = new Editors();
   const likers = new LikeButtons('.feed-item');
-
+  const repliers = new RepliesButtons('.commend');
+  
+  repliers.onAfterDiscover(() => likers.discover('.feed-item'));
   $(window).scroll((event) => {
     $('.stopper').each(function(i, el) {
         if ($(this).isInViewport()) {
@@ -120,6 +122,7 @@ $(document).ready(function() {
                     editors = new Editors();
                     
                     likers.discover('.feed-item');
+                    repliers.discover('.commend');
                     initAuth();
                 });
             }

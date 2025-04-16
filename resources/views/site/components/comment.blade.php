@@ -1,5 +1,5 @@
 <div class="commends_group @if (isset($class)) {{ $class }} @endif">
-    <div class="commend">
+    {{-- <div class="commend">
         <img src="{{ $comment['author']['avatar'] }}" alt="Avatar" class="img_commendor">
         <div class="right_text_group">
             <div class="name_commendor">
@@ -61,7 +61,7 @@
                         <a 
                           href="/feedback/likes" 
                           class="like_to_commend feedback_button {{ is_liked('comment', $comment['id']) ? 'liked' : '' }}" 
-                          data-item="{{ hash_item('comment', $comment['id']) }}" 
+                          data-item="{{ hash_like('comment', $comment['id']) }}" 
                           data-id="{{ $hash_id }}"
                         >
                           @include('icons.like_comment')
@@ -73,13 +73,15 @@
 
             @if (enable_more($comment))
               <div class="more_answers mt-4">
-                  <a href="#" class="replies-button">
+                  <a href="#" class="replies-button" data-item="{{ hash_more($comment) }}">
                     {{ print_var('comment_show_replies', $variables) }} ({{ ($comment['children_count'] < 50) ? $comment['children_count'] : 50 }} of {{ $comment['children_count'] }})
                   </a>
               </div>
             @endif
         </div>
-    </div>
+    </div> --}}
+
+    @include('site.components.comment_view')
 
     @if (array_key_exists('children', $comment) && is_array($comment['children']))
         @foreach ($comment['children'] as $child)

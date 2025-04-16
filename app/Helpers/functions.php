@@ -54,13 +54,22 @@ if (! function_exists('rating_images')) {
   }
 }
 
-if (! function_exists('hash_item')) {
-  function hash_item(string $type, int $id): string
+if (! function_exists('hash_like')) {
+  function hash_like(string $type, int $id): string
   {
     return CustomEncrypt::encrypt([
       'user_id' => Auth::user()?->id ?? null,
       'type' => $type,
       'model_id' => $id,
+    ]);
+  }
+}
+
+if (! function_exists('hash_more')) {
+  function hash_more(array $comment): string
+  {
+    return CustomEncrypt::encrypt([
+      'id' => $comment['id'],
     ]);
   }
 }
@@ -77,6 +86,8 @@ if (! function_exists('enable_more')) {
   function enable_more(array $comment): string
   {
     if (!isset($comment['children_count'])) {
+      return false;
+    } elseif ($comment['children_count'] == 0) {
       return false;
     }
 
