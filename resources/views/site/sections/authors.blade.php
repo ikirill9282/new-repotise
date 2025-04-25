@@ -21,9 +21,12 @@ if (!empty($authors)) {
                               <div class="cards_group">
                                   <div class="img_products">
                                       <img class="main_img" src="{{ url($author->avatar) }}" alt="Autho {{ $author->getName() }}">
-                                      <a href="{{ url('/user/favorite/add/author') }}" class="span_buy">
-                                        @include('icons.favorite', ['stroke' => '#FF2C0C'])
-                                      </a>
+                                      
+                                      @include('site.components.favorite.button', [
+                                        'stroke' => '#FF2C0C',
+                                        'type' => 'author',
+                                        'item_id' => $author->id,
+                                      ])
                                   </div>
                                   <div class="name">
                                       <p>{{ $author->name }}</p>

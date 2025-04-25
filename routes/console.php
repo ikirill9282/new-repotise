@@ -23,6 +23,13 @@ use App\Models\Tag;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 
+
+Artisan::command('tt', function() {
+  $user = User::find(1);
+
+  dd($user->favorite_products);
+});
+
 Artisan::command('tt_mail', function() {
   $m = new VerifyMail([
     'name' => 'Demo',

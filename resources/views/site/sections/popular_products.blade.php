@@ -22,10 +22,14 @@ while($products->count() < 10) {
                 <div class="item h-full flex flex-col">
                     <div class="img_products">
                         <img src="{{ url($product->preview->image) }}" alt="Product {{ $product->id }} image" class="main_img">
-                        <a href="{{ url('/user/favorite/add/product') }}" class="span_buy">
-                          @include('icons.favorite', ['stroke' => '#FF2C0C'])
-                        </a>
-                        <a href="{{ url('/user/cart/add') }}" class="to_basket">
+
+                        @include('site.components.favorite.button', [
+                          'stroke' => '#FF2C0C',
+                          'type' => 'product',
+                          'item_id' => $product->id,
+                        ])
+
+                        <a href="{{ url('/cart') }}" class="to_basket">
                           {{ print_var('cart_button_text', $variables) }}
                         </a>
                     </div>

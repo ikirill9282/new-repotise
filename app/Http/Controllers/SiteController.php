@@ -40,10 +40,14 @@ class SiteController extends Controller
       $response_data = array_merge($response_data, $this->getFeedData($request));
     }
 
+    if ($page->slug === 'favorite') {
+      $response_data = array_merge($response_data, $this->getFavoriteData($request));
+    }
+
     return view("site.page", $response_data);
   }
 
-  public function getFeedData(Request $request)
+  public function getFeedData(Request $request): array
   {
     $id = ($request->has('aid') && filter_var($request->get('aid'), FILTER_VALIDATE_INT)) ? $request->get('aid') : null;
     $response_data = [];
@@ -51,12 +55,12 @@ class SiteController extends Controller
     $response_data['last_news'] = Article::getLastNews();
     $response_data['first_article'] = ($id) ? Article::find($id) : null;
 
-    $this->updateViews($response_data['first_article'] ?? $response_data['articles'][0]);
-
+    if ($response_data['first_article']) $response_data['first_article']->updateViews();
+    
     return $response_data;
   }
 
-  public function getSearchData(Request $request)
+  public function getSearchData(Request $request): array
   {
     $query = ($request->has('q') && !empty($request->get('q'))) ? $request->get('q') : null;
     $response_data = [];
@@ -72,25 +76,8 @@ class SiteController extends Controller
     return $response_data;
   }
 
-  public function updateViews(Article $article) {
-    $session_key = "v_article:" . $article->id;
-    SessionExpire::check($session_key, function($key) use($article) {
-      $article->increment('views');
-    });
+  public function getFavoriteData(Request $request): array
+  {
+    // $products = 
   }
-
-  // public function main(Request $request)
-  // {
-  //   return view('main');
-  // }
-
-  // public function articles(Request $request)
-  // {
-  //   return view('site.pages.articles');
-  // }
-
-  // public function news(Request $request)
-  // {
-  //   return view('site.pages.news');
-  // }
 }

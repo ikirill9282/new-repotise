@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
 use App\Traits\HasKeywords;
 use App\Helpers\Slug;
+use App\Helpers\SessionExpire;
 
 class Article extends Model
 {
@@ -198,6 +199,14 @@ class Article extends Model
   public function setAmountAnalogs(int $amount)
   {
     $this->amountAnalogs = $amount;
+  }
+
+  public function updateViews()
+  {
+    $session_key = "v_article:" . $this->id;
+    SessionExpire::check($session_key, function($key) {
+      $this->increment('views');
+    });
   }
 
   public static function getLastNews(int|string $maximum_models = 4)

@@ -1,5 +1,5 @@
 <div class="input_group">
-  <form class="search_block relative" method="GET" action="{{ url('/search') }}">
+  <form class="search_block relative search-form" method="GET" action="{{ url('/search') }}">
       <label for="search">
         @include('icons.search')
       </label>
@@ -19,7 +19,7 @@
   @if(isset($icon) && !$icon)
   @else
     <div class="search_icon">
-        <a href="#">
+        <a href="#" class="search-button">
           @include('icons.search', ['stroke' => '#FFFFFF'])
         </a>
     </div>

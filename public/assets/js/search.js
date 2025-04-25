@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
       setTimeout(() => {
         $(this).data('loading', false);
-      }, 500);
+      }, 300);
 
       $.ajax({
         method: 'GET',

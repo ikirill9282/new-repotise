@@ -161,6 +161,26 @@ class SectionSeeder extends Seeder
       ],
     );
 
+    $favorite_hero = Section::firstOrCreate(
+      ['slug' => 'favorite-hero'],
+      [
+        'title' => 'Favorite Hero',
+        'slug' => 'favorite-hero',
+        'type' => 'site',
+        'component' => 'favorite_hero',
+      ]
+    );
+
+    $favorite_content = Section::firstOrCreate(
+      ['slug' => 'favorite-content'],
+      [
+        'title' => 'Favorite Content',
+        'slug' => 'favorite-content',
+        'type' => 'site',
+        'component' => 'favorite_content',
+      ]
+    );
+
     $this->build();
   }
 
@@ -205,7 +225,7 @@ class SectionSeeder extends Seeder
               'heading' => 'h2',
               'header' => 'Travel News',
               'more_text' => 'Latest Updates',
-              'more_link' => '/news',
+              'more_link' => '/insights',
             ]
           ],
           [
@@ -457,6 +477,25 @@ class SectionSeeder extends Seeder
           ]
         ]
       ],
+      [
+        'page' => Page::where('slug', 'favorites')->first(),
+        'sections' => [
+          [
+            'model' => Section::where('slug', 'favorite-hero')->first(),
+            'variables' => [
+              'heading' => 'h1',
+              'header' => 'Favorites',
+            ],
+          ],
+          [
+            'model' => Section::where('slug', 'favorite-content')->first(),
+            'variables' => [
+              'show_products_message' => 'Saved Products',
+              'show_authors_message' => 'Followed Creators',
+            ],
+          ],
+        ],
+      ]
     ];
 
     foreach ($data as $item) {

@@ -82,7 +82,7 @@ class Product extends Model
   public function reviewsCount(): Attribute
   {
     return Attribute::make(
-      get: fn($value) => Collapse::make($value),
+      get: fn($value) => ($value == 0) ? 0 : Collapse::make($value),
     );
   }
 

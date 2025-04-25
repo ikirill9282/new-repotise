@@ -77,5 +77,9 @@ class PageSeeder extends Seeder
         'title' => 'Dispute Resolution Policy',
         'slug' => 'dispute-resolution-policy',
       ]);
+      $favorites = Page::firstOrCreate([
+        'title' => 'Favorites',
+        'slug' => 'favorites',
+      ]);
     }
 }

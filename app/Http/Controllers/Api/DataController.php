@@ -8,9 +8,29 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\SectionVariables;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Blade;
+use App\Models\Article;
 
 class DataController extends Controller
 {
+
+  public function feed(Request $request, $id)
+  {
+    $vars = SectionVariables::where('section_id', 7)->get()->keyBy('name');
+    $news = Article::getLastNews();
+    $articles = Article::where('id', '<', $id)
+      ->when(request()->has('aid'), fn($q) => $q->where('id', '!=', request()->get('aid')))
+      ->orderByDesc('id')
+      ->limit(2)
+      ->get()
+      ->map(fn($article) => Blade::render('site.components.article_feed', [
+        'variables' => $vars,
+        'last_news' => $news,
+        'article' => $article,
+      ]));
+    
+    return $articles->implode("\n");
+  }
+
   public function comments(Request $request)
   {
     $result = [];

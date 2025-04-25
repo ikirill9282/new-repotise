@@ -14,6 +14,7 @@ use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Filament\Panel;
 use Laravel\Scout\Searchable;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -32,6 +33,28 @@ class User extends Authenticatable implements HasName, FilamentUser
       'avatar',
       'name',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    protected static function boot()
+    {
+      parent::boot();
+
+      self::creating(function($model) {
+        $username = preg_replace("/^(.*?)@.*$/is", "$1", $model->email);
+        while (static::where('username', $username)->exists()) {
+          $username = "$username" . random_int(0, 100);
+        }
+
+        $model->username = $username;
+      });
+    }
 
     public function toSearchableArray(bool $load_options = true): array
     {
@@ -78,39 +101,47 @@ class User extends Authenticatable implements HasName, FilamentUser
         
         return $array;
     }
-    
-
-    protected static function boot()
-    {
-      parent::boot();
-
-      self::creating(function($model) {
-        $username = preg_replace("/^(.*?)@.*$/is", "$1", $model->email);
-        while (static::where('username', $username)->exists()) {
-          $username = "$username" . random_int(0, 100);
-        }
-
-        $model->username = $username;
-      });
-    }
-
 
     public function canAccessPanel(Panel $panel): bool
     {
       return $this->hasRole('admin');
     }
 
-    protected function casts(): array
+    public function getFilamentName(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+      return $this->username;
+    }
+
+    public function options()
+    {
+      return $this->belongsToMany(Options::class, 'user_options', 'user_id', 'option_id')->withPivot(['value']);
     }
 
     public function products()
     {
       return $this->hasMany(Product::class);
+    }
+
+    public function favorite_products()
+    {
+      return $this->hasManyThrough(Product::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')->where('type', 'product');
+    }
+
+    public function followers()
+    {
+      return $this->belongsToMany(User::class, 'followers', 'author_id', 'subscriber_id', 'id', 'id');
+    }
+
+    public function favorite_authors()
+    {
+      return $this->hasManyThrough(User::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')->where('type', 'author');
+    }
+
+    public function favoriteCount(): Attribute
+    {
+      return Attribute::make(
+        get: fn() => $this->favorite_products()->count() + $this->favorite_authors()->count(),
+      );
     }
 
     public function followersCount(): Attribute
@@ -160,16 +191,6 @@ class User extends Authenticatable implements HasName, FilamentUser
       );
     }
 
-    public function followers()
-    {
-      return $this->belongsToMany(User::class, 'followers', 'author_id', 'subscriber_id', 'id', 'id');
-    }
-
-    public function getFilamentName(): string
-    {
-      return $this->username;
-    }
-
     public function makeProfileUrl(): string
     {
       return url("/profile/" . $this->profile);
@@ -185,8 +206,8 @@ class User extends Authenticatable implements HasName, FilamentUser
       return ucfirst($this->username);
     }
 
-    public function options()
+    public function hasFavorite(int $id, string $type)
     {
-      return $this->belongsToMany(Options::class, 'user_options', 'user_id', 'option_id')->withPivot(['value']);
+      return UserFavorite::where(['user_id' => Auth::user()->id, 'type' => $type, 'item_id' => $id])->exists();
     }
 }

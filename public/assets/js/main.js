@@ -81,8 +81,6 @@ const swiper1 = new Swiper(".mySwiper1", {
     },
 });
 
-
-
 function toggleText() {
     let hiddenText = document.querySelector(".hidden-text");
     let dots = document.querySelector(".dots");

@@ -67,6 +67,10 @@ header {
   position: sticky;
 }
 
+header .about_block .right_group_block .rection_groups span {
+  min-width: 21px;
+}
+
 .home {
   position: relative;
   background: none;
@@ -74,6 +78,10 @@ header {
   background-color: #000;
   /* background-position: top center; */
   /* background-size: auto 100%; */
+}
+
+.search_icon {
+  line-height: 0;
 }
 
 .parallax {
@@ -90,6 +98,10 @@ header {
 .parallax-home {
   opacity: 0.9;
   background-image: url(../img/bg_home.png);
+}
+
+.parallax-favorite {
+  background-image: url(../img/home_favorites.png);
 }
 
 .parallax-help {
@@ -507,6 +519,13 @@ aside .login svg {
   width: 100% !important;
 }
 
+.favorite-active {
+  background: var(--bg, #F9F9F9) !important;
+}
+
+.favorite-active svg {
+  fill: #FF2C0C;
+}
 
 
 @media (min-width: 768px) and (max-width: 1279px) {

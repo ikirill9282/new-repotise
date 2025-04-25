@@ -112,7 +112,7 @@ $(document).ready(function() {
             if (id !== undefined) {
                 $.ajax({
                     method: 'GET',
-                    url: `/api/feed/content/${id}?aid=${params.get('aid') ?? 0}`,
+                    url: `/api/data/feed/${id}?aid=${params.get('aid') ?? 0}`,
                 }).then(response => {
                     feed.append(clone);
                     feed.append(response);
