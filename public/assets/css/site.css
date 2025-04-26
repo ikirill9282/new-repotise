@@ -126,7 +126,6 @@ header .about_block .right_group_block .rection_groups span {
   max-width: 204px;
   width: 90%;
   left: 50%;
-  transform: translate(-50%, 0);
 }
 
 .why_need_baby_monitor .about_block .left_text {
@@ -791,6 +790,10 @@ aside .login svg {
 
   .results_seach .result_cards .card_group {
     width: 100% !important;
+  }
+
+  .popular_products .about_block .products_item {
+    align-items: stretch;
   }
 }
 
