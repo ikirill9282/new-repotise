@@ -382,7 +382,7 @@ $('.favorite-button').on('click', function(evt) {
       }
       
       const counters = $('.favorite-counter');
-      counters.each(function(key, counter) {
+      counters.each((key, counter) => {
         if (response.count > 0 && $(counter).hasClass('hidden')) {
           $(counter).fadeIn();
         }
@@ -392,6 +392,7 @@ $('.favorite-button').on('click', function(evt) {
         }
         
         $(counter).html(response.count);
+        $(window).trigger('favoriteUpdated', {result: response, element: this});
       });
     }
   });

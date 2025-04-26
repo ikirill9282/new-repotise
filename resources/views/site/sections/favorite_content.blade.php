@@ -69,3 +69,15 @@
         </div>
     </div>
 </section>
+
+@push('js')
+  <script>
+    $(window).on('favoriteUpdated', function(evt, data) {
+      if (!data.result.value) {
+        $(data.element).parents('.item').fadeOut(function() {
+          $(this).detach();
+        })
+      }
+    })
+  </script>
+@endpush

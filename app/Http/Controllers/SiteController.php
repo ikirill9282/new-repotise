@@ -14,6 +14,7 @@ use App\Models\SearchQueries;
 use App\Models\News;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 
 class SiteController extends Controller
 {
@@ -40,7 +41,8 @@ class SiteController extends Controller
       $response_data = array_merge($response_data, $this->getFeedData($request));
     }
 
-    if ($page->slug === 'favorite') {
+    if ($page->slug === 'favorites') {
+      if (!Auth::check()) return redirect('/');
       $response_data = array_merge($response_data, $this->getFavoriteData($request));
     }
 
@@ -78,6 +80,6 @@ class SiteController extends Controller
 
   public function getFavoriteData(Request $request): array
   {
-    // $products = 
+    return [];
   }
 }
