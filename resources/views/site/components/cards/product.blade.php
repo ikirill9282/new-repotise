@@ -1,5 +1,5 @@
 <div class="item flex flex-col {{ isset($class) ? $class : '' }}">
-  <div class="img_products">
+  <div class="img_products relative">
       <img class="main_img object-cover" src="{{ url($model->preview->image) }}" alt="model {{ $model->id }} image">
 
       @include('site.components.favorite.button', [
