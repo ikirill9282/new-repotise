@@ -377,8 +377,10 @@ $('.favorite-button').on('click', function(evt) {
     if (response.status) {
       if (response.value) {
         $(this).addClass('favorite-active');
+        $(".favorite-button[data-key='"+ $(this).data('key') +"']").addClass('favorite-active');
       } else {
         $(this).removeClass('favorite-active');
+        $(".favorite-button[data-key='"+ $(this).data('key') +"']").removeClass('favorite-active');
       }
       
       const counters = $('.favorite-counter');

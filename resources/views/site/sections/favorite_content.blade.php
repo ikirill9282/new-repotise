@@ -19,48 +19,47 @@
             <div class="sections_menu">
                 <div class="tab-content" id="pills-tabContent">
                   <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                      @if (!empty(auth()->user()->favorite_products))
-                        <div class="top_group_fav favorites_second">
-                            <div class="right_select">
-                                <span>Sort by:</span>
-                                <select>
-                                    <option>Top Rated</option>
-                                    <option>Top Rated1</option>
-                                    <option>Top Rated2</option>
-                                </select>
-                            </div>
-                            <div class="favorite_cards_group">
-                                @foreach (auth()->user()->favorite_products as $product)
-                                  @include('site.components.favorite.product', ['product' => $product])
-                                @endforeach
-                            </div>
-                        </div>
-                      @else
-                        @include('site.components.favorite.empty')
-                      @endif
+                      <div class="top_group_fav favorites_second">
+                          <div class="right_select">
+                              <span>Sort by:</span>
+                              <select>
+                                  <option>Top Rated</option>
+                                  <option>Top Rated1</option>
+                                  <option>Top Rated2</option>
+                              </select>
+                          </div>
+                          <div class="favorite_cards_group">
+                              @foreach (auth()->user()->favorite_products as $product)
+                                @include('site.components.favorite.product', ['product' => $product])
+                              @endforeach
+                          </div>
+                      </div>
+                      @include('site.components.favorite.empty', [
+                        'class' => (auth()->user()->favorite_products->isEmpty() ? '' : 'hidden'),
+                      ])
                       
                       @include('site.components.recomend.wrapper')
                   </div>
                   <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                      @if (!empty(auth()->user()->favorite_authors))
-                        <div class="top_group_fav favorites_second">
-                            <div class="right_select">
-                                <span>Sort by:</span>
-                                <select>
-                                    <option>Newest First</option>
-                                    <option>Newest First1</option>
-                                    <option>Newest First2</option>
-                                </select>
-                            </div>
-                            <div class="cards_why_need">
-                                @foreach (auth()->user()->favorite_authors as $author)
-                                  @include('site.components.favorite.author', ['author' => $author])
-                                @endforeach
-                            </div>
-                        </div>
-                      @else
-                        @include('site.components.favorite.empty')
-                      @endif
+                      <div class="top_group_fav favorites_second">
+                          <div class="right_select">
+                              <span>Sort by:</span>
+                              <select>
+                                  <option>Newest First</option>
+                                  <option>Newest First1</option>
+                                  <option>Newest First2</option>
+                              </select>
+                          </div>
+                          <div class="cards_why_need">
+                              @foreach (auth()->user()->favorite_authors as $author)
+                                @include('site.components.favorite.author', ['author' => $author])
+                              @endforeach
+                          </div>
+                      </div>
+
+                      @include('site.components.favorite.empty', [
+                        'class' => auth()->user()->favorite_authors->isEmpty() ? '' : 'hidden',
+                      ])
                       
                       @include('site.components.recomend.wrapper')
                   </div>
@@ -75,8 +74,12 @@
     $(window).on('favoriteUpdated', function(evt, data) {
       if (!data.result.value) {
         $(data.element).parents('.item').fadeOut(function() {
+          const parent = $(this).parents('.tab-pane');
           $(this).detach();
-        })
+          if (!parent.find('.favorite-button').length) {
+            parent.find('.empty-block').fadeIn();
+          }
+        });
       }
     })
   </script>
