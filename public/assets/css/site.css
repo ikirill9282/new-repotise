@@ -527,6 +527,13 @@ aside .login svg {
   fill: #FF2C0C;
 }
 
+@media (min-width: 1140px) {
+  .favorite-button:hover svg {
+    transition: 0.3s;
+    fill: #FF2C0C;
+  }
+}
+
 
 @media (min-width: 768px) and (max-width: 1279px) {
   .popular_products .about_block .products_item .item:last-child,

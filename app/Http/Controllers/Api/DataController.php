@@ -9,6 +9,7 @@ use App\Models\Admin\SectionVariables;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Blade;
 use App\Models\Article;
+use App\Models\User;
 
 class DataController extends Controller
 {
@@ -53,5 +54,12 @@ class DataController extends Controller
     }
 
     return response(implode("\n", $result));
+  }
+
+  public function favorite_author(Request $request)
+  {
+    $valid = $request->validate(['id' => 'required|integer']);
+    $model = User::find($valid['id']);
+    return response()->json(['status' => true, 'content' => Blade::render('site.components.favorite.author', ['author' => $model])]);
   }
 }

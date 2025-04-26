@@ -18,51 +18,64 @@
             </div>
             <div class="sections_menu">
                 <div class="tab-content" id="pills-tabContent">
-                  <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                      <div class="top_group_fav favorites_second">
-                          <div class="right_select">
-                              <span>Sort by:</span>
-                              <select>
-                                  <option>Top Rated</option>
-                                  <option>Top Rated1</option>
-                                  <option>Top Rated2</option>
-                              </select>
-                          </div>
-                          <div class="favorite_cards_group">
-                              @foreach (auth()->user()->favorite_products as $product)
-                                @include('site.components.favorite.product', ['product' => $product])
-                              @endforeach
-                          </div>
-                      </div>
-                      @include('site.components.favorite.empty', [
-                        'class' => (auth()->user()->favorite_products->isEmpty() ? '' : 'hidden'),
-                      ])
-                      
-                      @include('site.components.recomend.wrapper')
-                  </div>
-                  <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                      <div class="top_group_fav favorites_second">
-                          <div class="right_select">
-                              <span>Sort by:</span>
-                              <select>
-                                  <option>Newest First</option>
-                                  <option>Newest First1</option>
-                                  <option>Newest First2</option>
-                              </select>
-                          </div>
-                          <div class="cards_why_need">
-                              @foreach (auth()->user()->favorite_authors as $author)
-                                @include('site.components.favorite.author', ['author' => $author])
-                              @endforeach
-                          </div>
-                      </div>
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                        aria-labelledby="pills-home-tab">
+                        <div class="top_group_fav favorites_second">
+                            <div class="right_select">
+                                <span>Sort by:</span>
+                                <select>
+                                    <option>Top Rated</option>
+                                    <option>Top Rated1</option>
+                                    <option>Top Rated2</option>
+                                </select>
+                            </div>
+                            <div class="favorite_cards_group">
+                                @foreach (auth()->user()->favorite_products as $product)
+                                    @include('site.components.cards.product', [
+                                        'model' => $product,
+                                        'class' => 'removable',
+                                    ])
+                                @endforeach
+                            </div>
+                        </div>
+                        @include('site.components.favorite.empty', [
+                            'class' => auth()->user()->favorite_products->isEmpty() ? '' : 'hidden',
+                        ])
 
-                      @include('site.components.favorite.empty', [
-                        'class' => auth()->user()->favorite_authors->isEmpty() ? '' : 'hidden',
-                      ])
-                      
-                      @include('site.components.recomend.wrapper')
-                  </div>
+                        @include('site.components.recomend.wrapper', [
+                            'models' => auth()->user()->getRecomendProducts(),
+                            'card' => 'product',
+                        ])
+                    </div>
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                        <div class="top_group_fav favorites_second">
+                            <div class="right_select">
+                                <span>Sort by:</span>
+                                <select>
+                                    <option>Newest First</option>
+                                    <option>Newest First1</option>
+                                    <option>Newest First2</option>
+                                </select>
+                            </div>
+                            <div class="cards_why_need">
+                                @foreach (auth()->user()->favorite_authors as $author)
+                                    @include('site.components.favorite.author', [
+                                      'author' => $author,
+                                      'class' => 'removable',
+                                    ])
+                                @endforeach
+                            </div>
+                        </div>
+
+                        @include('site.components.favorite.empty', [
+                            'class' => auth()->user()->favorite_authors->isEmpty() ? '' : 'hidden',
+                        ])
+
+                        @include('site.components.recomend.wrapper', [
+                            'models' => auth()->user()->getRecomendAuthors(),
+                            'card' => 'author',
+                        ])
+                    </div>
                 </div>
             </div>
         </div>
@@ -70,17 +83,79 @@
 </section>
 
 @push('js')
-  <script>
-    $(window).on('favoriteUpdated', function(evt, data) {
-      if (!data.result.value) {
-        $(data.element).parents('.item').fadeOut(function() {
-          const parent = $(this).parents('.tab-pane');
-          $(this).detach();
-          if (!parent.find('.favorite-button').length) {
-            parent.find('.empty-block').fadeIn();
-          }
+    <script>
+        const favoriteCallback = () => {
+
+        }
+        $(window).on('favoriteUpdated', function(evt, data) {
+            const elem = $(data.element);
+            const block = elem.parents('.item');
+            const parent = block.parents('.tab-pane');
+            const wrap = parent.find('.favorites_second');
+            const empty = parent.find('.empty-block');
+            const analogs = $('.favorite-button[data-key="' + elem.data('key') + '"]')
+
+
+            const toggleEmpty = () => {
+              const items = wrap.find('.item');
+              if (!items.length) {
+                  empty.fadeIn();
+                  empty.removeClass('hidden')
+              } else {
+                  empty.hasClass('hidden') ? true : empty.fadeOut(() => empty.addClass('hidden'));
+              }
+            }
+
+            const hideElement = (elemet) => {
+              elemet.fadeOut(() => {
+                  elemet.detach();
+                  toggleEmpty();
+              });
+            }
+
+            if (!data.result.value) {
+                if (block.hasClass('removable')) {
+                    hideElement(block);
+                    toggleEmpty();
+                }
+
+                if (analogs.length) {
+                    analogs.each((key, item) => {
+                        const analog = $(item).parents('.item');
+                        if (analog.hasClass('removable')) {
+                            hideElement(analog);
+                        }
+                    })
+                }
+            } else {
+
+                if (data.result.type === 'author') {
+                  $.ajax({
+                    method: 'POST',
+                    url: '/api/data/favorite-author',
+                    data: {
+                      _token: getCSRF(),
+                      id: data.result.model_id,
+                    }
+                  }).then(response => {
+                    if (response.status) {
+                      const new_block = $(response.content);
+                      new_block.addClass('removable');
+                      FavoriteButtons().discover(new_block);
+                      parent.find('.cards_why_need').prepend(new_block);
+                      toggleEmpty();
+                    }
+                  })
+                }
+
+                if (data.result.type === 'product') {
+                  const clone = block.clone();
+                  clone.addClass('removable');
+                  FavoriteButtons().discover(clone);
+                  wrap.find('.favorite_cards_group').prepend(clone);
+                  toggleEmpty();
+                }
+            }
         });
-      }
-    })
-  </script>
+    </script>
 @endpush

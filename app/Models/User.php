@@ -13,6 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Filament\Panel;
+use Illuminate\Support\Collection;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Facades\Auth;
 
@@ -147,7 +148,7 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function followersCount(): Attribute
     {
       return Attribute::make(
-        get: fn($value) => Collapse::make($value),
+        get: fn($value) => Collapse::make($value ?? 0),
       );
     }
 
@@ -209,5 +210,15 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function hasFavorite(int $id, string $type)
     {
       return UserFavorite::where(['user_id' => Auth::user()->id, 'type' => $type, 'item_id' => $id])->exists();
+    }
+
+    public function getRecomendProducts(): Collection
+    {
+      return Product::limit(6)->orderByDesc('id')->get();
+    }
+
+    public function getRecomendAuthors(): Collection
+    {
+      return User::role('creator')->limit(6)->orderByDesc('id')->get();
     }
 }

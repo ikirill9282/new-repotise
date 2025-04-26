@@ -15,8 +15,9 @@ Route::prefix('api')->group(function() {
   });
 
   Route::prefix('/data')->controller(DataController::class)->group(function() {
-    Route::post('/comments', 'comments');
     Route::get('/feed/{id}', 'feed');
+    Route::post('/comments', 'comments');
+    Route::post('/favorite-author', 'favorite_author');
   });
 
   Route::prefix('/feedback')->middleware('auth:web')->controller(FeedbackController::class)->group(function() {

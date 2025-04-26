@@ -18,7 +18,10 @@ if (!empty($authors)) {
                       @if(!empty($authors))
                         @foreach ($authors as $author)
                           <div class="swiper-slide">
-                              <div class="cards_group">
+                              @include('site.components.cards.author', [
+                                'model' => $author,
+                              ])
+                              {{-- <div class="cards_group">
                                   <div class="img_products">
                                       <img class="main_img" src="{{ url($author->avatar) }}" alt="Autho {{ $author->getName() }}">
                                       
@@ -37,7 +40,7 @@ if (!empty($authors)) {
                                       <img src="{{ asset('/assets/img/followers.svg') }}" alt="Followers">
                                       <p>{{ $author->followers_count }} Followers</p>
                                   </div>
-                              </div>
+                              </div> --}}
                           </div>
                         @endforeach
                       @endif

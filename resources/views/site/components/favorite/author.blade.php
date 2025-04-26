@@ -1,4 +1,4 @@
-<div class="item relative">
+<div class="item relative {{ isset($class) ? $class : '' }}">
     @include('site.components.favorite.button', [
         'stroke' => '#FF2C0C',
         'type' => 'author',
@@ -9,7 +9,7 @@
         <img src="{{ $author->avatar }}" alt="Avatar" class="img_profile rounded-full">
         <div class="right_text">
             <div class="to_block_mob">
-                <img src="{{ $author->avatar }}" alt="Avatar" class="img_profile">
+                <img src="{{ $author->avatar }}" alt="Avatar" class="img_profile rounded-full">
                 <div class="mini_text">
                     {{-- <span>22.01.2025</span> --}}
                     <h3>{{ $author->name }}</h3>

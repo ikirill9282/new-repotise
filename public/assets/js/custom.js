@@ -298,9 +298,58 @@ const RepliesButtons = function(container) {
   return this.discover(container);
 }
 
+const FavoriteButtons = function() {
+
+  this.discover = (container) => {
+    $(container).find('.favorite-button').each((key, btn) => {
+      $(btn).on('click', function(evt) {
+        evt.preventDefault();
+      
+        $.ajax({
+          url: '/api/user/favorite',
+          method: 'POST',
+          data: {
+            _token: getCSRF(),
+            hash: $(this).data('item'),
+          },
+        }).then(response => {
+          if (response.status) {
+            if (response.value) {
+              $(this).addClass('favorite-active');
+              $(".favorite-button[data-key='"+ $(this).data('key') +"']").addClass('favorite-active');
+            } else {
+              $(this).removeClass('favorite-active');
+              $(".favorite-button[data-key='"+ $(this).data('key') +"']").removeClass('favorite-active');
+            }
+            
+            const counters = $('.favorite-counter');
+            counters.each((key, counter) => {
+              if (response.count > 0 && $(counter).hasClass('hidden')) {
+                $(counter).fadeIn();
+              }
+              if (response.count == 0) {
+                $(counter).fadeOut();
+                $(counter).addClass('hidden');
+              }
+              
+              $(counter).html(response.count);
+              $(window).trigger('favoriteUpdated', {result: response, element: this});
+            });
+          }
+        });
+      });
+    })
+  }
+
+  return {
+    discover: this.discover,
+  };
+}
+
 const header = $('header');
 const headerHeight = header.outerHeight();
 // const start = (document.querySelector('.parallax')) ? $('.parallax').outerHeight() : headerHeight;
+FavoriteButtons().discover('body');
 
 let lastPoint = 0;
 
@@ -360,42 +409,4 @@ $('#close_menu').on('click', function(evt) {
 $('.search-button').on('click', function(evt) {
   evt.preventDefault();
   $('.search-form').submit();
-});
-
-
-$('.favorite-button').on('click', function(evt) {
-  evt.preventDefault();
-
-  $.ajax({
-    url: '/api/user/favorite',
-    method: 'POST',
-    data: {
-      _token: getCSRF(),
-      hash: $(this).data('item'),
-    },
-  }).then(response => {
-    if (response.status) {
-      if (response.value) {
-        $(this).addClass('favorite-active');
-        $(".favorite-button[data-key='"+ $(this).data('key') +"']").addClass('favorite-active');
-      } else {
-        $(this).removeClass('favorite-active');
-        $(".favorite-button[data-key='"+ $(this).data('key') +"']").removeClass('favorite-active');
-      }
-      
-      const counters = $('.favorite-counter');
-      counters.each((key, counter) => {
-        if (response.count > 0 && $(counter).hasClass('hidden')) {
-          $(counter).fadeIn();
-        }
-        if (response.count == 0) {
-          $(counter).fadeOut();
-          $(counter).addClass('hidden');
-        }
-        
-        $(counter).html(response.count);
-        $(window).trigger('favoriteUpdated', {result: response, element: this});
-      });
-    }
-  });
 });

@@ -9,11 +9,12 @@ if (! function_exists('print_var')) {
   function print_var($name, Collection|array|null $resource = null)
   {
     if (empty($resource)) {
-      return 'null';
+      return null;
     }
     try {
-      return ($resource->has($name) ? $resource->get($name)?->value ?? '' : '');
+      return ($resource->has($name) ? $resource->get($name)?->value ?? null : null);
     } catch (\Error $e) {
+      return null;
     }
   }
 }

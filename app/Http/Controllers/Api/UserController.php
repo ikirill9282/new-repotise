@@ -32,7 +32,9 @@ class UserController extends Controller
         'message' => 'Success!', 
         'status' => true, 
         'value' => $value,
-        'count' => Auth::user()->favorite_count
+        'count' => Auth::user()->favorite_count,
+        'type' => $data['type'],
+        'model_id' => $model->item_id,
       ]);
     }
 }
