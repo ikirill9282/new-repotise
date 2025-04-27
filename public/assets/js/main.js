@@ -155,3 +155,81 @@ const swiperNews = new Swiper('#swiper-news', {
     },
   }
 });
+
+
+
+const stars = document.querySelectorAll('.stars span');
+
+stars.forEach((star, index) => {
+  star.addEventListener('click', () => {
+    stars.forEach(s => s.classList.remove('active'));
+
+    for (let i = 0; i <= index; i++) {
+      stars[i].classList.add('active');
+    }
+  });
+});
+
+
+
+
+
+
+
+function updateMaxPrice(value, sliderNumber) {
+    const slider = document.getElementById(`range-slider-${sliderNumber}`);
+    const percentage = ((value - slider.min) / (slider.max - slider.min)) * 100;
+  
+    slider.style.background = `linear-gradient(to right, #FC7361 ${percentage}%, #F3F2F2 ${percentage}%)`;
+  
+    const formattedValue = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(value);
+  
+    document.getElementById(`max-price-${sliderNumber}`).textContent = formattedValue;
+}
+  
+document.addEventListener("DOMContentLoaded", function () {
+    const sliders = document.querySelectorAll('.slider');
+
+    sliders.forEach((slider, index) => {
+        const sliderNumber = slider.id.replace(/^.*?(\d+)$/is, "$1");
+        
+        const initialPercentage = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+        slider.style.background = `linear-gradient(to right, #FC7361 ${initialPercentage}%, #F3F2F2 ${initialPercentage}%)`;
+
+        const formattedValue = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        }).format(slider.value);
+
+        document.getElementById(`max-price-${sliderNumber}`).textContent = formattedValue;
+});
+});
+
+
+
+
+
+
+
+document.querySelectorAll('.counter').forEach(counter => {
+    const minusBtn = counter.querySelector('.minus');
+    const plusBtn = counter.querySelector('.plus');
+    const countEl = counter.querySelector('.count');
+  
+    let count = parseInt(countEl.textContent);
+  
+    plusBtn.addEventListener('click', () => {
+      count++;
+      countEl.textContent = count;
+    });
+  
+    minusBtn.addEventListener('click', () => {
+      if (count > 1) {
+        count--;
+        countEl.textContent = count;
+      }
+    });
+});

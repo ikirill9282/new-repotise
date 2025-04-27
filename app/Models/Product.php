@@ -9,6 +9,7 @@ use App\Traits\HasGallery;
 use App\Traits\HasPrice;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Collection;
 use Laravel\Scout\Searchable;
 
 class Product extends Model
@@ -38,12 +39,6 @@ class Product extends Model
     self::creating(function ($model) {
 
       if (!isset($model->slug) || empty($model->slug)) {
-        $model->generateSlug();
-      }
-    });
-
-    self::updating(function ($model) {
-      if ($model->isDirty('title')) {
         $model->generateSlug();
       }
     });
@@ -89,5 +84,26 @@ class Product extends Model
   public function makeUrl()
   {
     return url("/products/$this->slug?pid=$this->id");
+  }
+
+  public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
+  {
+    $products = \App\Models\Product::query()
+      ->when(
+        !empty($includes),
+        fn($query) => $query->whereIn('id', $includes)->orWhere('id', '>', 0),
+      )
+      ->with('preview', 'location', 'categories', 'type')
+      ->withCount(['reviews' => function($query) {
+        $query->whereNull('parent_id');
+      }])
+      ->limit($limit)
+      ->get();
+
+    while($products->count() < $limit) {
+      $products = $products->collect()->merge($products)->slice(0, $limit);
+    }
+
+    return $products;
   }
 }

@@ -81,5 +81,11 @@ class PageSeeder extends Seeder
         'title' => 'Favorites',
         'slug' => 'favorites',
       ]);
+      $advantures = Page::firstOrCreate([
+        'title' => 'All Products',
+        'slug' => 'products',
+      ]);
+      
+
     }
 }

@@ -112,6 +112,10 @@ header .about_block .right_group_block .rection_groups span {
   background-image: url(../img/bg_home_tips.png);
 }
 
+.parallax-products {
+  background-image: url(../img/home_discover.png);
+}
+
 .popular_products .about_block .products_item .item {
   max-width: none;
 }
@@ -525,6 +529,15 @@ aside .login svg {
 .favorite-active svg {
   fill: #FF2C0C;
 }
+
+.search_results a {
+  color: var(--gray);
+}
+
+.search_results span:hover a {
+  color: #fff;
+}
+
 
 @media (min-width: 1140px) {
   .favorite-button:hover svg {

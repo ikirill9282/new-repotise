@@ -22,11 +22,11 @@ class CreatePage extends CreateRecord
     ]);
   }
 
-  protected function mutateFormDataBeforeCreate(array $data): array
-  {
-    $data['slug'] = Slug::makeEn($data['title']);
-    return $data;
-  }
+  // protected function mutateFormDataBeforeCreate(array $data): array
+  // {
+  //   $data['slug'] = Slug::makeEn($data['title']);
+  //   return $data;
+  // }
 
   public function getFooterWidgetsColumns(): int|string|array
   {

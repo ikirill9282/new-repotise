@@ -1,16 +1,5 @@
 @php
-$products = $variables->get('product_ids')->value;
-$products = \App\Models\Product::query()
-  ->whereIn('id', $products)
-  ->with('preview', 'location', 'categories', 'type')
-  ->withCount(['reviews' => function($query) {
-    $query->whereNull('parent_id');
-  }])
-  ->get();
-
-while($products->count() < 10) {
-  $products = $products->collect()->merge($products)->slice(0, 10);
-}
+$products = \App\Models\Product::getTrendingProducts(includes: $variables->get('product_ids')?->value ?? []);
 @endphp
 
 <section class="popular_products">

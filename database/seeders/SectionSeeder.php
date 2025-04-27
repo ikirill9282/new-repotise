@@ -180,6 +180,25 @@ class SectionSeeder extends Seeder
         'component' => 'favorite_content',
       ]
     );
+    $products_hero = Section::firstOrCreate(
+      ['slug' => 'products-hero'],
+      [
+        'title' => 'Products Hero',
+        'slug' => 'products-hero',
+        'type' => 'site',
+        'component' => 'products_hero',
+      ]
+    );
+    $products_content = Section::firstOrCreate(
+      ['slug' => 'products-content'],
+      [
+        'title' => 'Products Content',
+        'slug' => 'products-content',
+        'type' => 'site',
+        'component' => 'products_content',
+      ]
+    );
+
 
     $this->build();
   }
@@ -337,7 +356,7 @@ class SectionSeeder extends Seeder
               'header' => 'Oops! Page Not Found',
               'subtitle' => 'If you were looking for something specific, try using the search bar.<br>If you think you\'ve reached this page in error, please get in touch so we can help.',
               'search_placeholder' => 'Search for travel guides, maps, or articles...',
-              'product_link' => '/advantures',
+              'product_link' => '/products',
               'product_message' => 'All Products',
               'report_link' => '/report',
               'report_message' => 'Report a Problem',
@@ -495,6 +514,36 @@ class SectionSeeder extends Seeder
             ],
           ],
         ],
+      ],
+      [
+        'page' => Page::where('slug', 'products')->first(),
+        'sections' => [
+          [
+            'model' => Section::where('slug', 'products-hero')->first(),
+            'variables' => [
+              'heading' => 'h2',
+              'header' => 'Discover Products',
+            ],
+          ],
+          [
+            'model' => Section::where('slug', 'products-content')->first(),
+            'variables' => [
+              'trending_heading' => 'h2',
+              'trending_header' => 'Trending Now',
+              'search_placeholder' => 'Search by products, destinations, and creators',
+              'filter_title' => 'Filter & Refine',
+              'filter_rating' => 'Customer Rating',
+              'filter_type' => 'Product Type',
+              'filter_category' => 'Categories',
+              'filter_location' => 'Location',
+              'filter_sale' => 'On Sale',
+              'filter_button' => 'Apply',
+              'filter_clear' => 'Clear Filters',
+              'search_filter_category_placeholder' => 'Find activities...',
+              'search_filter_location_placeholder' => 'Find activities...',
+            ],
+          ]
+        ],
       ]
     ];
 
@@ -513,7 +562,7 @@ class SectionSeeder extends Seeder
               ]
             );
           } catch (\Exception $e) {
-            dd($item);
+            dd($item, $e->getMessage());
           }
         }
 

@@ -15,6 +15,7 @@ use App\Models\News;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
 
 class SiteController extends Controller
 {
@@ -44,6 +45,10 @@ class SiteController extends Controller
     if ($page->slug === 'favorites') {
       if (!Auth::check()) return redirect('/');
       $response_data = array_merge($response_data, $this->getFavoriteData($request));
+    }
+
+    if ($page->slug === 'products') {
+      $response_data = array_merge($response_data, $this->getProductsData($request));
     }
 
     return view("site.page", $response_data);
@@ -81,5 +86,19 @@ class SiteController extends Controller
   public function getFavoriteData(Request $request): array
   {
     return [];
+  }
+
+  public function getProductsData(Request $request): array
+  {
+    
+    $paginator = Product::paginate(20);
+    
+    // FOR TEST
+    $paginator = Product::all();
+    while($paginator->count() < 20) {
+      $paginator = $paginator->collect()->merge($paginator)->slice(0, 20);
+    }
+
+    return ['paginator' => $paginator];
   }
 }

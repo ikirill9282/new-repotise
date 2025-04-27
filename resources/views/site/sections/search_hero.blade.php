@@ -1,11 +1,11 @@
 <section class="search_result_home relative">
-  <div class="parallax parallax-search"></div>
+  @include('site.components.parallax', ['class' => 'parallax-search'])
   <div class="container !mx-auto relative z-50">
       <div class="about_block">
           @include('site.components.heading')
           @include('site.components.breadcrumbs')
           <div class="input_group flex-wrap !justify-start">
-              @include('site.components.search')
+              @include('site.components.search', ['placeholder' => print_var('search_placeholder', $variables ?? null)])
 
               @if(isset($tags) && !empty($tags))
                 <div div class="name_tags">

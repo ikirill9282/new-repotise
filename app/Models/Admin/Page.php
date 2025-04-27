@@ -22,11 +22,11 @@ class Page extends Model
       }
     });
 
-    self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
-    });
+    // self::updating(function ($model) {
+    //     if ($model->isDirty('title')) {
+    //         $model->generateSlug();
+    //     }
+    // });
   }
 
   private function generateSlug()

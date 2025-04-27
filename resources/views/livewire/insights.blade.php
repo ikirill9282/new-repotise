@@ -11,7 +11,7 @@
 @endphp
 <div>
     <section class="home_tips relative">
-      <div class="parallax parallax-insights"></div>
+        @include('site.components.parallax', ['class' => 'parallax-insights'])
         <div class="container relative z-20">
             <div class="about_block">
                 @include('site.components.heading', ['variables' => $variables])

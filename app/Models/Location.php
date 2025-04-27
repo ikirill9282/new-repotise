@@ -12,7 +12,7 @@ class Location extends Model
 
   public function toSearchableArray(): array
   {
-    $array = $this->only('id', 'title');
+    $array = $this->only('id', 'title', 'slug');
     return $array;
   }
 

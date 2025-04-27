@@ -3,10 +3,12 @@ $('a.disabled').on('click', (evt) => evt.preventDefault());
 const getCSRF = () => $('meta[name="csrf"]').attr('content');
 
 
-$('footer .group > h3').on('click', function() {
-  $(this).children().last().toggleClass('!rotate-0 !stroke-white');
-  $(this).siblings('ul').slideToggle();
-});
+if (window.outerWidth <= 768) {
+  $('footer .group > h3').on('click', function() {
+    $(this).children().last().toggleClass('!rotate-0 !stroke-white');
+    $(this).siblings('ul').slideToggle();
+  });
+}
 
 const CommentWriters = function() {
   this.writers = [];

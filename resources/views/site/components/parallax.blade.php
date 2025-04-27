@@ -1,0 +1,1 @@
+<div class="parallax {{ isset($class) ? $class : '' }}"></div>

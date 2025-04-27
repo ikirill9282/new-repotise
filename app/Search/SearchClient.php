@@ -94,16 +94,37 @@ class SearchClient
     $records = collect($records['results'])
       ->filter(fn($record) => isset($record['hits']) && !empty($record['hits']));
 
+    
     return $records->flatMap(function($record) {
       return array_map(function($row) use($record) {
         $row['index'] = $record['indexUid'];
-        $row['label'] = (isset($row['title']) || isset($row['name'])) ? ($row['title'] ?? $row['name']) : 'null';
+        $row['label'] = static::getHitLabel($row);
         return $row;
       }, $record['hits']);
     })->toArray();
-    // return static::compare($records);
+    return static::compare($records);
   }
 
+
+  public static function findIn(string $query, string $source): array
+  {
+    $client = static::getClient();
+    $result = $client->index($source)
+      ->search($query, ['limit' => 50])
+      ->toArray();
+
+    if (!isset($result['hits'])|| empty($result['hits'])) return [];
+    $result = array_map(function($hit) {
+      return ['label' => static::getHitLabel($hit), 'slug' => $hit['slug']];
+    }, $result['hits']);
+
+    return $result;
+  }
+
+  protected static function getHitLabel(array $hit)
+  {
+    return (isset($hit['title']) || isset($hit['name'])) ? ($hit['title'] ?? $hit['name']) : 'null';
+  }
 
   protected static function compare(Collection|array $records): array
   {

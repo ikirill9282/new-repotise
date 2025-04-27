@@ -1,27 +1,89 @@
 <div class="input_group">
   <form class="search_block relative search-form" method="GET" action="{{ url('/search') }}">
-      <label for="search">
-        @include('icons.search')
-      </label>
-      <input 
-        type="search"
-        name="q"
-        class="search-input"
-        autocomplete="off"
-        data-hits="search-hits"
-        placeholder="{{ print_var('search_placeholder', $variables ?? null) }}"
-        @if(request()->has('q'))
-          value="{{ request()->get('q') }}"
+      @if (!isset($template))
+        <label for="search">
+          @include('icons.search')
+        </label>
+        <input 
+          type="search"
+          name="q"
+          class="search-input"
+          autocomplete="off"
+          data-hits="{{ isset($hits) ? $hits : 'search-hits' }}"
+          placeholder="{{ isset($placeholder) ? $placeholder : '' }}"
+          @if (isset($attributes) && is_array($attributes))
+            @foreach ($attributes as $key => $val)
+              {{ $key }}="{{ $val }}"
+            @endforeach
+          @endif
+          @if(request()->has('q'))
+            value="{{ request()->get('q') }}"
+          @endif
+        >
+        @include('site.components.hits', ['id' => (isset($hits) ? $hits : 'search-hits')])
+
+        @if(isset($icon) && !$icon)
+        @else
+          <div class="search_icon">
+              <a href="#" class="search-button">
+                @include('icons.search', ['stroke' => '#FFFFFF'])
+              </a>
+          </div>
         @endif
-      >
-      @include('site.components.hits', ['id' => 'search-hits'])
+      @elseif ($template == 'products')
+        <div class="search_top">
+          <div class="search_input">
+              <label for="search">
+                @include('icons.search', ['stroke' => '#FC7361'])
+              </label>
+              <input 
+                name="q"
+                class="search-input"
+                autocomplete="off"
+                data-hits="search-hits"
+                placeholder="{{ isset($placeholder) ? $placeholder : '' }}"
+                @if (isset($attributes) && is_array($attributes))
+                  @foreach ($attributes as $key => $val)
+                    {{ $key }}="{{ $val }}"
+                  @endforeach
+                @endif
+                @if(request()->has('q'))
+                  value="{{ request()->get('q') }}"
+                @endif
+              >
+          </div>
+          <div class="search_icon">
+              <a href="#" class="search-button">
+                @include('icons.search', ['stroke' => '#FFFFFF'])
+              </a>
+          </div>
+        </div>
+    
+        @include('site.components.hits', ['id' => 'search-hits'])
+
+      @elseif($template === 'filters')
+        <div class="search_input">
+          <label for="search">
+            @include('icons.search')
+          </label>
+          <input 
+            type="search"
+            name="q"
+            class="search-input"
+            autocomplete="off"
+            data-hits="{{ isset($hits) ? $hits : 'search-hits' }}"
+            placeholder="{{ isset($placeholder) ? $placeholder : '' }}"
+            @if (isset($attributes) && is_array($attributes))
+              @foreach ($attributes as $key => $val)
+                {{ $key }}="{{ $val }}"
+              @endforeach
+            @endif
+            @if(request()->has('q'))
+              value="{{ request()->get('q') }}"
+            @endif
+          >
+          @include('site.components.hits', ['id' => (isset($hits) ? $hits : 'search-hits')])
+        </div>
+      @endif
   </form>
-  @if(isset($icon) && !$icon)
-  @else
-    <div class="search_icon">
-        <a href="#" class="search-button">
-          @include('icons.search', ['stroke' => '#FFFFFF'])
-        </a>
-    </div>
-  @endif
 </div>

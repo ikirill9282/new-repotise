@@ -1,5 +1,5 @@
 <section class="home ">
-  <div class="parallax parallax-home"></div>
+  @include('site.components.parallax', ['class' => 'parallax-home'])
   <div class="container relative z-40 !mx-auto">
       <div class="about_block">
           @include('site.components.heading', ['variables' => $variables])

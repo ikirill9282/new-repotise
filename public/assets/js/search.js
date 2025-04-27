@@ -1,7 +1,6 @@
 window.addEventListener('DOMContentLoaded', function() {
   $('.search-input').on('input', function() {
-    // console.log($(this).data('loading'));
-    
+
     if (!$(this).data('loading')) {
       $(this).data('loading', true);
 
@@ -11,7 +10,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
       $.ajax({
         method: 'GET',
-        url: '/api/search?q=' + $(this).val()
+        url: '/api/search?q=' + $(this).val() + ($(this).data('source')?.length ? "&source=" + $(this).data('source') : '')
       })
       .then((response) => {
         const id = $(this).data('hits');
@@ -30,6 +29,7 @@ window.addEventListener('DOMContentLoaded', function() {
               span.on('click', (evt) => {
                 $(this).val($(span).text());
                 $(this).focus();
+                $(this).trigger('searchItemSelected', item);
               });
   
               const row = $('<div>', {
