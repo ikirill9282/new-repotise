@@ -7,7 +7,7 @@
                             class="stroke-[#A4A0A0] rotate-180 transition md:hidden">@include('icons.arrow_footer')</span></h3>
                     <ul class="overflow-hidden">
                         <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ url('/products') }}">All Products</a></li>
+                        <li><a href="{{ url('/advantures') }}">All Products</a></li>
                         <li><a href="{{ url('/favorites') }}" class="{{ auth()->check() ? '' : 'open_auth' }}">Favorite</a></li>
                         <li><a href="{{ url('/creators') }}">Creators</a></li>
                         <li><a href="{{ url('/insights') }}">Travel Insights</a></li>

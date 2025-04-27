@@ -22,7 +22,7 @@
                         <span></span>
                     </div>
                 </div>
-                <a href="{{ url('/products') }}" class="all_products">
+                <a href="{{ url('/advantures') }}" class="all_products">
                     @include('icons.burger')
                     <span class="text-nowrap">All Products</span>
                 </a>
@@ -80,7 +80,7 @@
             </form>
             <ul class="mob_menu">
                 <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
-                <li><a class="text-nowrap" href="{{ url('/products') }}">All Products</a></li>
+                <li><a class="text-nowrap" href="{{ url('/advantures') }}">All Products</a></li>
                 <li><a class="text-nowrap" href="{{ url('/creators') }}">Creators</a></li>
                 <li class="last_menu">
                     <a class="text-nowrap" href="{{ url('/insights') }}">Travel Insights</a>
