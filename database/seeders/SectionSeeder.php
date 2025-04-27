@@ -216,7 +216,7 @@ class SectionSeeder extends Seeder
               'header' => 'TrekGuider <span>— Travel Content, Reimagined.</span>',
               'subtitle' => 'Join a global community of travel creators and explorers. Unlock new revenue streams by sharing your knowledge and discover hidden gems. Your adventure, your expertise - all in one place.',
               'catalog_button_text' => 'Explore Your Adventure',
-              'catalog_button_link' => '/advantures',
+              'catalog_button_link' => '/products',
               'catalog_register_text' => 'Become a Creator',
               'catalog_register_link' => '#',
             ]
@@ -254,7 +254,7 @@ class SectionSeeder extends Seeder
               'header' => 'Trending Products',
               'product_ids' => [1,2,3],
               'more_text' => 'Discover Now',
-              'more_link' => '/advantures',
+              'more_link' => '/products',
               'cart_button_text' => 'Add to cart'
             ]
           ],
