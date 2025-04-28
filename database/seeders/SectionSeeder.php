@@ -265,7 +265,7 @@ class SectionSeeder extends Seeder
               'header' => 'Featured Creators',
               'author_ids' => [1, 2, 3],
               'more_text' => 'Connect with Creators',
-              'more_link' => '/authors',
+              'more_link' => '/creators',
             ]
           ],
         ]

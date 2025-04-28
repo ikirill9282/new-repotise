@@ -56,13 +56,7 @@
                         <span>
                           <a class="px-2" href="{{ url("/products?" . $getQueryString(['categories' => $category->slug])) }}">
                             {{ $category->title }}
-                                {{-- <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15"
-                                    viewBox="0 0 14 15" fill="none">
-                                    <path
-                                        d="M3.5 4C6.23367 6.73367 7.76633 8.26633 10.5 11M3.5 11C6.23367 8.26633 7.76633 6.73367 10.5 4"
-                                        stroke="white" stroke-width="0.5" stroke-linecap="round" />
-                                </svg> --}}
-                            </a>
+                          </a>
                         </span>
                     @endforeach
                 </div>
@@ -222,7 +216,7 @@
 																											])
 																											<div class="input-group">
 																												<div class="search_block">
-																													<div class="search_results">
+																													<div class="search_results categories-results">
 																														</div>
 																												</div>
 																											</div>
@@ -244,7 +238,8 @@
 																												'icon' => false,
 																												'placeholder' => print_var(
 																														'search_filter_category_placeholder',
-																														$variables ?? null),
+																														$variables ?? null
+                                                        ),
 																												'template' => 'filters',
 																												'hits' => 'filter-location',
 																												'attributes' => [
@@ -253,7 +248,7 @@
 																											])
 																											<div class="input-group">
 																												<div class="search_block">
-																													<div class="search_results">
+																													<div class="search_results locations-results">
 																														</div>
 																												</div>
 																											</div>
@@ -267,7 +262,7 @@
                                                     <span class="text">{{ print_var('filter_sale', $variables) }}</span>
                                                 </label>
                                             </div>
-                                            <div class="buttons">
+                                            <div class="buttons" id="filter_button">
                                                 <button>{{ print_var('filter_button', $variables) }}</button>
                                                 <a href="#">{{ print_var('filter_clear', $variables) }}</a>
                                             </div>
@@ -326,6 +321,21 @@
         }
       });
       
+      $('.filter_button').on('click', function(evt) {
+        evt.preventDefault();
+        const filter_wrap = $(this).closest('.filter');
+        const stars_wrap = filter_wrap.find('.stars');
+        const types_wrap = filter_wrap.find('.type_products');
+        const categories_wrap = filter_wrap.find('.categories-result');
+        const locations_wrap = filter_wrap.find('.locations-results');
+        const price = filter_wrap.find('#range-slider-7');
+
+        const data = {};
+
+        
+        
+      });
+
     });
   </script>
 @endpush
