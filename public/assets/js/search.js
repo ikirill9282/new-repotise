@@ -28,8 +28,11 @@ window.addEventListener('DOMContentLoaded', function() {
   
               span.on('click', (evt) => {
                 $(this).val($(span).text());
-                $(this).focus();
+                // $(this).focus();
                 $(this).trigger('searchItemSelected', item);
+                if ($(this).data('autosubmit')) {
+                  $(this).closest('form').submit();
+                }
               });
   
               const row = $('<div>', {

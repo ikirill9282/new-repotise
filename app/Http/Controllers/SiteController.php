@@ -90,12 +90,64 @@ class SiteController extends Controller
 
   public function getProductsData(Request $request): array
   {
+    $valid = $request->validate([
+      'rating' => 'sometimes|nullable|integer',
+      'price' => 'sometimes|nullable|array',
+      'price.min' => 'integer',
+      'price.max' => 'integer',
+      'categories' => 'sometimes|nullable|string',
+      'locations' => 'sometimes|nullable|string',
+      'sale' => 'sometimes|nullable|integer',
+      'q' => 'sometimes|nullable|string',
+    ]);
+
+    if (isset($valid['categories'])) {
+      $valid['categories'] = is_null($valid['categories']) ? null : explode(',', $valid['categories']);
+    }
+    if (isset($valid['locations'])) {
+      $valid['locations'] = is_null($valid['locations']) ? null : explode(',', $valid['locations']);
+    }
     
-    $paginator = Product::paginate(20);
+    $valid = array_filter($valid, fn($item) => !is_null($item));
+
+    $query = Product::query()
+      ->when(
+        isset($valid['rating']),
+        fn($q) => $q->where('rating', '>=', $valid['rating']),
+      )
+      ->when(
+        isset($valid['price']['min']),
+        fn($q) => $q->where('price', '>=', $valid['price']['min']),
+      )
+      ->when(
+        isset($valid['price']['max']),
+        fn($q) => $q->where('price', '<=', $valid['price']['max']),
+      )
+      ->when(
+        isset($valid['categories']),
+        fn($q) => $q->whereHas('categories', fn($sq) => $sq->whereIn('categories.slug', $valid['categories'])),
+      )
+      ->when(
+        isset($valid['locations']),
+        fn($q) => $q->whereHas('location', fn($sq) => $sq->whereIn('locations.slug', $valid['locations'])),
+      )
+      ->when(
+        isset($valid['q']),
+        function($q) use ($valid) {
+          $client = new SearchClient();
+          $products = $client->findIn($valid['q'], 'products', 5000);
+          $product_ids = array_column($products, 'id');
+
+          $q->whereIn('id', $product_ids);
+        },
+      )
+    ;
+
+    $paginator = $query->paginate(20);
     
     // FOR TEST
-    $paginator = Product::all();
-    while($paginator->count() < 20) {
+    $paginator = $query->get();
+    while($paginator->count() < 20 && $paginator->isNotEmpty()) {
       $paginator = $paginator->collect()->merge($paginator)->slice(0, 20);
     }
 

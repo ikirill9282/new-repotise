@@ -11,7 +11,7 @@
                         @include('icons.search')
                     </label>
                     <input type="search" name="q" placeholder="Search the site..." class="search-input"
-                        autocomplete="off" data-hits="header_hits"
+                        autocomplete="off" data-hits="header_hits" data-autosubmit="true"
                         @if (request()->has('q') && (!isset(request()->route()->parameters['slug']) || request()->route()->parameters['slug'] != 'search')) value="{{ request()->get('q') }}" @endif>
                     @include('site.components.hits', ['id' => 'header_hits'])
                 </form>

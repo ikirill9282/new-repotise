@@ -39,7 +39,7 @@ class SearchClient
       (new SearchQuery())
         ->setIndexUid('products')
         ->setQuery($query)
-        ->setLimit(20)
+        ->setLimit(1000)
         ->setAttributesToRetrieve([
           'id', 
           'name', 
@@ -77,7 +77,7 @@ class SearchClient
           (new SearchQuery())
           ->setIndexUid('users')
           ->setQuery($query)
-          ->setLimit(20)
+          ->setLimit(1000)
           ->setAttributesToRetrieve([
             'id', 
             'name', 
@@ -106,16 +106,26 @@ class SearchClient
   }
 
 
-  public static function findIn(string $query, string $source): array
+  public static function findIn(string $query, string|array $source, int $limit = 1000): array
   {
     $client = static::getClient();
-    $result = $client->index($source)
-      ->search($query, ['limit' => 50])
-      ->toArray();
+    $result = [];
+
+    if (is_array($source)) {
+      foreach ($source as $item) {
+        $result = array_merge($result, $client->index($item)
+          ->search($query, ['limit' => $limit])
+          ->toArray());
+      }
+    } else {
+      $result = $client->index($source)
+        ->search($query, ['limit' => $limit])
+        ->toArray();
+    }
 
     if (!isset($result['hits'])|| empty($result['hits'])) return [];
     $result = array_map(function($hit) {
-      return ['label' => static::getHitLabel($hit), 'slug' => $hit['slug']];
+      return ['label' => static::getHitLabel($hit), 'slug' => $hit['slug'], 'id' => $hit['id']];
     }, $result['hits']);
 
     return $result;

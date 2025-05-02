@@ -1,5 +1,5 @@
 <div class="input_group">
-  <form class="search_block relative search-form" method="GET" action="{{ url('/search') }}">
+  <form class="search_block relative search-form {{ isset($form_class) ? $form_class : '' }}" {{ isset($form_id) ? " id=$form_id" : '' }} method="GET" action="{{ url('/search') }}">
       @if (!isset($template))
         <label for="search">
           @include('icons.search')
@@ -77,9 +77,6 @@
               @foreach ($attributes as $key => $val)
                 {{ $key }}="{{ $val }}"
               @endforeach
-            @endif
-            @if(request()->has('q'))
-              value="{{ request()->get('q') }}"
             @endif
           >
           @include('site.components.hits', ['id' => (isset($hits) ? $hits : 'search-hits')])

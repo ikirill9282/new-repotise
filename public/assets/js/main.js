@@ -158,17 +158,17 @@ const swiperNews = new Swiper('#swiper-news', {
 
 
 
-const stars = document.querySelectorAll('.stars span');
+// const stars = document.querySelectorAll('.stars span');
 
-stars.forEach((star, index) => {
-  star.addEventListener('click', () => {
-    stars.forEach(s => s.classList.remove('active'));
+// stars.forEach((star, index) => {
+//   star.addEventListener('click', () => {
+//     stars.forEach(s => s.classList.remove('active'));
 
-    for (let i = 0; i <= index; i++) {
-      stars[i].classList.add('active');
-    }
-  });
-});
+//     for (let i = 0; i <= index; i++) {
+//       stars[i].classList.add('active');
+//     }
+//   });
+// });
 
 
 

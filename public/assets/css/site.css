@@ -31,6 +31,12 @@ body {
     margin-bottom: 10px;
 }
 
+.price-input {
+  outline: 0;
+  width: 100%;
+  color: var(--gray, #A4A0A0);
+}
+
 .custom-section h1,
 .custom-section h2,
 .custom-section h3,
@@ -537,7 +543,23 @@ aside .login svg {
 .search_results span:hover a {
   color: #fff;
 }
+.filter_products .about_block .filter_products_group .filter .accordion-body .accordion-flush .accordion-body .price p {
+  margin-bottom: 15px;
+}
+.filter_products .about_block .filter_products_group .filter .accordion-body .accordion-flush .accordion-body .price .slider-container .block_input {
+  margin-bottom: 15px;
+}
 
+.filter_products .about_block .filter_products_group .filter .accordion-body .accordion-flush .accordion-body .stars_filter .stars span.hover svg path {
+  fill: #FFDB0C;
+}
+
+.filter_products .about_block .filter_products_group .filter .accordion-body .accordion-flush .accordion-body .stars_filter .stars {
+  gap: 0 !important;
+}
+.filter_products .about_block .filter_products_group .filter .accordion-body .accordion-flush .accordion-body .stars_filter .stars span {
+  padding: 0 10px;
+}
 
 @media (min-width: 1140px) {
   .favorite-button:hover svg {
@@ -808,6 +830,11 @@ aside .login svg {
   .popular_products .about_block .products_item {
     align-items: stretch;
   }
+
+  .filter_products .about_block .filter_products_group .filter .accordion-body .accordion-flush .accordion-body .stars_filter .stars span {
+    padding: 0 2px;
+  }
+
 }
 
 @media (max-width: 992px) {

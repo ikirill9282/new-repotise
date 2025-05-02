@@ -1,7 +1,118 @@
 @php
     $trending_products = \App\Models\Product::getTrendingProducts();
-    $getQueryString = fn(array $query) => http_build_query(array_merge(request()->query(), $query))
+    $getQueryString = fn(array $query) => http_build_query(array_merge(request()->query(), $query));
 @endphp
+
+@push('css')
+
+<style>
+  input[type="range"] {
+      -webkit-appearance: none; 
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 100%;
+      outline: none;
+      position: absolute;
+      margin: auto;
+      top: 0;
+      bottom: -5px;
+      background-color: transparent;
+      pointer-events: none;
+      font-size: 10px;
+  }
+
+  .slider-track {
+      width: 100%;
+      height: 5px;
+      position: absolute;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+      border-radius: 5px;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+      -webkit-appearance: none;
+      height: 5px;
+  }
+
+  input[type="range"]::-moz-range-track {
+      -moz-appearance: none;
+      height: 5px;
+  }
+
+  input[type="range"]::-ms-track {
+      appearance: none;
+      height: 5px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 1.7em;
+      width: 1.7em;
+      background-color: #FC7361;
+      cursor: pointer;
+      margin-top: -9px;
+      pointer-events: auto;
+      border-radius: 50%;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+      -webkit-appearance: none;
+      height: 1.7em;
+      width: 1.7em;
+      cursor: pointer;
+      border-radius: 50%;
+      background-color: #FC7361;
+      pointer-events: auto;
+      border: none;
+  }
+
+  input[type="range"]::-ms-thumb {
+      appearance: none;
+      height: 1.7em;
+      width: 1.7em;
+      cursor: pointer;
+      border-radius: 50%;
+      background-color: #FC7361;
+      pointer-events: auto;
+  }
+
+  input[type="range"]:active::-webkit-slider-thumb {
+      background-color: #FC7361;
+      border: 1px solid #FC7361;
+  }
+
+  .values {
+      background-color: #FC7361;
+      width: 32%;
+      position: relative;
+      margin: auto;
+      padding: 10px 0;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: 500;
+      font-size: 25px;
+      color: #ffffff;
+  }
+
+  .values:before {
+      content: "";
+      position: absolute;
+      height: 0;
+      width: 0;
+      border-top: 15px solid #FC7361;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      margin: auto;
+      bottom: -14px;
+      left: 0;
+      right: 0;
+  }
+</style>
+@endpush
+
 <section class="filter_products">
     <div class="container">
         <div class="about_block">
@@ -47,16 +158,20 @@
                 @include('site.components.search', [
                     'template' => 'products',
                     'placeholder' => print_var('search_placeholder', $variables ?? null),
-										'attributes' => [
-											'data-source' => 'products',
-										],
+                    'attributes' => [
+                        'id' => 'search-filter',
+                        'value' => request()->has('q') ? request()->get('q') : '',
+                    ],
+                    'form_class' => 'search-product',
+                    'form_id' => 'search-product',
                 ])
                 <div class="search_results">
                     @foreach (\App\Models\Category::limit(10)->get() as $category)
                         <span>
-                          <a class="px-2" href="{{ url("/products?" . $getQueryString(['categories' => $category->slug])) }}">
-                            {{ $category->title }}
-                          </a>
+                            <a class="px-2"
+                                href="{{ url('/products?' . $getQueryString(['categories' => $category->slug])) }}">
+                                {{ $category->title }}
+                            </a>
                         </span>
                     @endforeach
                 </div>
@@ -151,16 +266,27 @@
                                                         <div class="price">
                                                             <p>Price</p>
                                                             <div class="slider-container">
-                                                                <div class="block_input">
-                                                                    <span></span>
-                                                                    <input id="range-slider-7" class="slider"
-                                                                        type="range" min="0" max="9999999"
-                                                                        step="1000" value="5000000"
-                                                                        oninput="updateMaxPrice(this.value, 7)">
+                                                                <div class="block_input relative w-full">
+                                                                    {{-- <span></span>
+                                                                    <input 
+                                                                      id="range-slider-7" 
+                                                                      class="slider"
+                                                                      type="range" min="0" max="9999999"
+                                                                      step="1000" value="5000000"
+                                                                      multiple="multiple"
+                                                                      oninput="updateMaxPrice(this.value, 7)"
+                                                                    > --}}
+                                                                    <div class="slider-track"></div>
+                                                                    <input type="range" min="0"
+                                                                        max="50000" value="0" id="slider-1"
+                                                                        oninput="slideOne()">
+                                                                    <input type="range" min="0"
+                                                                        max="50000" value="30000" id="slider-2"
+                                                                        oninput="slideTwo()">
                                                                 </div>
                                                                 <div class="price-range">
-                                                                    <span id="min-price-7">$0</span>
-                                                                    <span id="max-price-7">$9,999,999</span>
+                                                                    <input type="text" class="price-input !text-sm" id="min-price-7" value="0">
+                                                                    <input type="text" class="price-input !text-sm" id="max-price-7" value="20000">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -180,10 +306,8 @@
                                                     <div class="accordion-body">
                                                         <div class="type_products">
                                                             @foreach (\App\Models\Type::all() as $type)
-                                                                <a 
-                                                                  href="{{ url('/products?' . $getQueryString(['type' => $type->slug])) }}"
-                                                                  class="{{ request()->has('type') && request()->get('type') == $type->slug ? 'active' : '' }}"
-                                                                  >
+                                                                <a href="{{ url('/products?' . $getQueryString(['type' => $type->slug])) }}"
+                                                                    class="{{ request()->has('type') && request()->get('type') == $type->slug ? 'active' : '' }}">
                                                                     {{ $type->title }}
                                                                 </a>
                                                             @endforeach
@@ -203,23 +327,23 @@
                                                 <div id="flush-collapseThree" class="accordion-collapse collapse"
                                                     data-bs-parent="#accordionFlushExample">
                                                     <div class="accordion-body">
-																											@include('site.components.search', [
-																													'icon' => false,
-																													'placeholder' => print_var(
-																															'search_filter_category_placeholder',
-																															$variables ?? null),
-																													'template' => 'filters',
-																													'hits' => 'filter-category',
-																													'attributes' => [
-																														'data-source' => 'categories',
-																													]
-																											])
-																											<div class="input-group">
-																												<div class="search_block">
-																													<div class="search_results categories-results">
-																														</div>
-																												</div>
-																											</div>
+                                                        @include('site.components.search', [
+                                                            'icon' => false,
+                                                            'placeholder' => print_var(
+                                                                'search_filter_category_placeholder',
+                                                                $variables ?? null),
+                                                            'template' => 'filters',
+                                                            'hits' => 'filter-category',
+                                                            'attributes' => [
+                                                                'data-source' => 'categories',
+                                                            ],
+                                                        ])
+                                                        <div class="input-group">
+                                                            <div class="search_block">
+                                                                <div class="search_results categories-results">
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -228,43 +352,43 @@
                                                     <button class="accordion-button collapsed" type="button"
                                                         data-bs-toggle="collapse" data-bs-target="#flush-collapse1"
                                                         aria-expanded="false" aria-controls="flush-collapse1">
-																												{{ print_var('filter_location', $variables) }}
+                                                        {{ print_var('filter_location', $variables) }}
                                                     </button>
                                                 </h2>
                                                 <div id="flush-collapse1" class="accordion-collapse collapse"
                                                     data-bs-parent="#accordionFlushExample">
                                                     <div class="accordion-body">
-																											@include('site.components.search', [
-																												'icon' => false,
-																												'placeholder' => print_var(
-																														'search_filter_category_placeholder',
-																														$variables ?? null
-                                                        ),
-																												'template' => 'filters',
-																												'hits' => 'filter-location',
-																												'attributes' => [
-																													'data-source' => 'locations'
-																												]
-																											])
-																											<div class="input-group">
-																												<div class="search_block">
-																													<div class="search_results locations-results">
-																														</div>
-																												</div>
-																											</div>
+                                                        @include('site.components.search', [
+                                                            'icon' => false,
+                                                            'placeholder' => print_var(
+                                                                'search_filter_category_placeholder',
+                                                                $variables ?? null),
+                                                            'template' => 'filters',
+                                                            'hits' => 'filter-location',
+                                                            'attributes' => [
+                                                                'data-source' => 'locations',
+                                                            ],
+                                                        ])
+                                                        <div class="input-group">
+                                                            <div class="search_block">
+                                                                <div class="search_results locations-results">
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="on_sale">
                                                 <label class="custom-checkbox">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" name="sale" id="sale">
                                                     <span class="checkmark"></span>
-                                                    <span class="text">{{ print_var('filter_sale', $variables) }}</span>
+                                                    <span
+                                                        class="text">{{ print_var('filter_sale', $variables) }}</span>
                                                 </label>
                                             </div>
                                             <div class="buttons" id="filter_button">
                                                 <button>{{ print_var('filter_button', $variables) }}</button>
-                                                <a href="#">{{ print_var('filter_clear', $variables) }}</a>
+                                                <a href="/products">{{ print_var('filter_clear', $variables) }}</a>
                                             </div>
                                         </div>
                                     </div>
@@ -283,9 +407,16 @@
                         </select>
                     </div>
                     <div class="filter_cards_group">
-                        @foreach ($paginator->all() as $item)
-                            @include('site.components.cards.product', ['model' => $item])
-                        @endforeach
+                        @if(!empty($paginator->all()))
+                          @foreach ($paginator->all() as $item)
+                              @include('site.components.cards.product', ['model' => $item])
+                          @endforeach
+                        @else
+                          <div class="not_found_products">
+                            <h3>Great journeys start here! Exciting travel products <br> arriving soon.</h3>
+                            <img src="{{ asset('/assets/img/women_img.png') }}" alt="" class="women_img">
+                          </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -294,48 +425,242 @@
 </section>
 
 @push('js')
-  <script>
-    $(document).ready(function() {
-      $('.accordion').find('.search-input').on('searchItemSelected', function(evt, data) {
-        const block = $(this).closest('.accordion-body');
-        const result = block.find('.search_results');
-        
-        const item = $('<span>');
-        const remove = $('<a>', {
-          href: '#',
-          class: 'disabled',
+    <script>
+        function getFiltersData(container) {
+          const stars_wrap = container.find('.stars');
+          const types_wrap = container.find('.type_products');
+          const categories_wrap = container.find('.categories-results');
+          const locations_wrap = container.find('.locations-results');
+          const price = container.find('.price');
+          const sale = container.find('.on_sale');
+          const search = $('#search-filter');
+
+          return {
+            rating: stars_wrap.find('.active').length,
+            price: {
+              min: price.find('#slider-1').val(),
+              max: price.find('#slider-2').val(),
+            },
+            categories: [...categories_wrap.find('span').map((key, item) => $(item).data('value'))].join(','),
+            locations: [...locations_wrap.find('span').map((key, item) => $(item).data('value'))].join(','),
+            sale: +sale.find('input').is(":checked"),
+            q: search.val() ?? '',
+          };
+        }
+
+        function getUrlParams() {
+          const params = {};
+          const queryString = window.location.search.substring(1);
+          if (queryString) {
+            const pairs = queryString.split('&');
+            $.each(pairs, function(i, pair) {
+              const parts = pair.split('=');
+              const key = decodeURIComponent(parts[0]);
+              const value = decodeURIComponent(parts[1] || '');
+              params[key] = value;
+            });
+          }
+          return params;
+        }
+
+        function makeSearchableItem(data) {
+          const item = $('<span>');
+          const remove = $('<a>', {
+              href: '#',
+              class: 'disabled',
+          });
+
+          remove.on('click', function(evt) {
+              evt.preventDefault();
+              $(this).parents('span').detach();
+          });
+
+          remove.html(
+              '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none"><path d="M3 3.5C5.34315 5.84315 6.65686 7.15685 9 9.5M3 9.5C5.34315 7.15685 6.65686 5.84315 9 3.5" stroke="#A4A0A0" stroke-width="0.5" stroke-linecap="round" /> </svg>'
+              );
+
+          item.attr('data-value', data.slug);
+          item.text(data.label);
+          item.append(remove);
+
+          return item;
+        }
+        function capitalizeWords(str) {
+          const replaced = str.replace(/-/g, ' ');
+          const capitalized = replaced.split(' ').map(function(word) {
+            if (word.length === 0) return word;
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+          }).join(' ');
+          
+          return capitalized;
+        }
+
+        $(document).ready(function() {
+            // Init filters page
+            const queryParams = getUrlParams();
+            
+            if (Object.keys(queryParams).length) {
+              for (const key in queryParams) {
+                const value = queryParams[key];
+
+                if (key === 'rating') {
+                  [...$('.filter').find('.stars').find('span')].map((elem) => {
+                    if (+$(elem).data('value') <= value) $(elem).addClass('active');
+                  })
+                }
+
+                if (key === 'price[min]') {
+                  $('.filter').find('#slider-1').val(value)
+                }
+                if (key === 'price[max]') {
+                  $('.filter').find('#slider-2').val(value)
+                }
+
+                if (key === 'categories') {
+                  value.split(',').map(elem => {
+                    if (elem.length) {
+                      const item = makeSearchableItem({label: capitalizeWords(elem), slug: elem});
+                      $('.filter').find('.categories-results').append(item);
+                    }
+                  })
+                }
+
+                if (key === 'locations') {
+                  value.split(',').map(elem => {
+                    if (elem.length) {
+                      const item = makeSearchableItem({label: capitalizeWords(elem), slug: elem});
+                      $('.filter').find('.locations-results').append(item);
+                    }
+                  })
+                }
+
+                if (key === 'sale') {
+                  if (+value) $('#sale').prop('checked', true);
+                }
+              }
+            }
+            
+
+            // Categories & Location
+            $('.accordion').find('.search-input').on('searchItemSelected', function(evt, data) {
+                const block = $(this).closest('.accordion-body');
+                const result = block.find('.search_results');
+                const item = makeSearchableItem(data);
+
+                if (!result.find('span[data-value="' + data.slug + '"]').length) {
+                  result.append(item);
+                }
+            });
+
+            // Submit control
+            $('#filter_button').find('button').on('click', function(evt) {
+                evt.preventDefault();
+                const data = getFiltersData($(this).closest('.filter'));                
+                const queryString = $.param(data);
+
+                window.location.href = `/products?${queryString}`
+            });
+
+            // Start config
+            $('.filter').find('.stars').find('span').each((key, elem) => {
+              $(elem).off('click');
+              $(elem).on('click', function() {
+                $(this).addClass('active');
+                const key = +$(this).data('value');
+                $(this).siblings().each((k, sibling) => {     
+                  if (+$(sibling).data('value') <= key) {
+                    $(sibling).addClass('active');
+                  } else {
+                    $(sibling).removeClass('active');
+                  }
+                })
+              })
+              $(elem).mouseenter(function() {
+                const key = +$(this).data('value');
+                $(this).siblings().each((k, sibling) => {     
+                  if (+$(sibling).data('value') <= key) {
+                    $(sibling).addClass('hover');
+                  }
+                })
+              });
+              $(elem).mouseleave(function() {
+                $(this).closest('.stars').find('span').removeClass('hover');
+              });
+            });
+
+
+            // Search button
+            $('#search-product').find('.search-button').off('click');
+            $('#search-product').find('.search-button').on('click', function(evt) {
+              evt.preventDefault();
+              const queryData = getFiltersData($('.filter'));
+              const q = $(this).closest('.search_top').find('.search-input').val();
+              queryData.q = q;
+              const queryString = $.param(queryData);
+
+              window.location.href = `/products?${queryString}`
+            });
+            
+            // Price value control
+            $('#min-price-7').on('input', function() {
+              const value = $(this).val().replace(/[^0-9]+/g, '').replace(/^[0]+/is, '');
+              const val = value.length ? value : '0';
+
+              $(this).val('$' + val);
+            });
+
+            $('#min-price-7').on('change', function() {
+              const value = $(this).val().replace(/[^0-9]/g, '');
+              $('#slider-1').val(value);
+              slideOne();
+            });
+
+            $('#max-price-7').on('input', function() {
+              const value = $(this).val().replace(/[^0-9]+/g, '').replace(/^[0]+/is, '');
+              const val = value.length ? value : '0';
+
+              $(this).val('$' + val);
+            });
+
+
+            $('#max-price-7').on('change', function() {
+              const value = $(this).val().replace(/[^0-9]/g, '');
+              $('#slider-2').val(value);
+              slideTwo();
+            });
         });
 
-        remove.on('click', function(evt) {
-          evt.preventDefault();
-          $(this).parents('span').detach();
-        })
+        window.onload = function () {
+          slideOne();
+          slideTwo();
+        };
 
-        remove.html('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none"><path d="M3 3.5C5.34315 5.84315 6.65686 7.15685 9 9.5M3 9.5C5.34315 7.15685 6.65686 5.84315 9 3.5" stroke="#A4A0A0" stroke-width="0.5" stroke-linecap="round" /> </svg>')
+        let sliderOne = document.getElementById("slider-1");
+        let sliderTwo = document.getElementById("slider-2");
+        let minGap = 0;
+        let sliderTrack = document.querySelector(".slider-track");
+        let sliderMaxValue = document.getElementById("slider-1").max;
 
-        item.attr('data-value', data.slug);
-        item.text(data.label);
-        item.append(remove);
-        if (!result.find('span[data-value="'+ data.slug +'"]').length) {
-          result.append(item);
+        function slideOne() {
+          if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
+            sliderOne.value = parseInt(sliderTwo.value) - minGap;
+          }
+          fillColor();
         }
-      });
-      
-      $('.filter_button').on('click', function(evt) {
-        evt.preventDefault();
-        const filter_wrap = $(this).closest('.filter');
-        const stars_wrap = filter_wrap.find('.stars');
-        const types_wrap = filter_wrap.find('.type_products');
-        const categories_wrap = filter_wrap.find('.categories-result');
-        const locations_wrap = filter_wrap.find('.locations-results');
-        const price = filter_wrap.find('#range-slider-7');
+        function slideTwo() {
+          if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {            
+            sliderTwo.value = parseInt(sliderOne.value) + minGap;
+          }
+          fillColor();
+        }
+        function fillColor() {
+          $('#min-price-7').val(`$${sliderOne.value}`);
+          $('#max-price-7').val(`$${sliderTwo.value}`);
 
-        const data = {};
-
-        
-        
-      });
-
-    });
-  </script>
+          percent1 = (sliderOne.value / sliderMaxValue) * 100;
+          percent2 = (sliderTwo.value / sliderMaxValue) * 100;
+          sliderTrack.style.background = `linear-gradient(to right, #dadae5 ${percent1}% , rgb(252, 115, 97) ${percent1}% , rgb(252, 115, 97) ${percent2}%, #dadae5 ${percent2}%)`;
+          // sliderTrack.style.background = `linear-gradient(to right, rgb(252, 115, 97) 48.56%, rgb(243, 242, 242) 48.56%);`;
+        }
+    </script>
 @endpush
