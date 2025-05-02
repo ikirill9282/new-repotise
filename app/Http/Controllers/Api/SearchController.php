@@ -21,7 +21,8 @@ class SearchController extends Controller
     }
     
     if (isset($valid['source'])) {
-      $data = SearchClient::findIn($valid['q'], $valid['source']);
+      $source = explode(',', $valid['source']);
+      $data = SearchClient::findIn($valid['q'], $source);
     } else {
       $data = SearchClient::full($valid['q']);
     }

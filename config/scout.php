@@ -194,8 +194,8 @@ return [
               ]
             ],
             User::class => [
-              // 'filterableAttributes' => ['id'],
-              // 'searchableAttributes' => ['title', 'slug', 'id'],
+              'filterableAttributes' => ['id'],
+              'searchableAttributes' => ['username', 'name', 'email'],
               'typoTolerance' => [
                 'enabled' => true,
                 'minWordSizeforTypos' => [

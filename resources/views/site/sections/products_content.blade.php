@@ -160,6 +160,7 @@
                     'placeholder' => print_var('search_placeholder', $variables ?? null),
                     'attributes' => [
                         'id' => 'search-filter',
+                        'data-source' => 'products',
                         'value' => request()->has('q') ? request()->get('q') : '',
                     ],
                     'form_class' => 'search-product',

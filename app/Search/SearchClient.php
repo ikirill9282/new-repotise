@@ -106,27 +106,41 @@ class SearchClient
   }
 
 
-  public static function findIn(string $query, string|array $source, int $limit = 1000): array
+  public static function findIn(string $query, string|array $sources, int $limit = 1000): array
   {
     $client = static::getClient();
     $result = [];
 
-    if (is_array($source)) {
-      foreach ($source as $item) {
-        $result = array_merge($result, $client->index($item)
+    if (is_array($sources)) {
+      foreach ($sources as $source) {
+        $part = $client->index($source)
           ->search($query, ['limit' => $limit])
-          ->toArray());
+          ->toArray();
+
+        $part = array_map(function($elem) use ($source) {
+          $elem['source'] = $source;
+          return $elem;
+        }, $part['hits'] ?? []);
+
+        $result = array_merge($result, $part);
       }
     } else {
-      $result = $client->index($source)
+      $result = $client->index($sources)
         ->search($query, ['limit' => $limit])
         ->toArray();
+      
+      if (!isset($result['hits'])|| empty($result['hits'])) return [];
+      $result = $result['hits'] ?? [];
     }
 
-    if (!isset($result['hits'])|| empty($result['hits'])) return [];
     $result = array_map(function($hit) {
-      return ['label' => static::getHitLabel($hit), 'slug' => $hit['slug'], 'id' => $hit['id']];
-    }, $result['hits']);
+      return [
+        'id' => $hit['id'],
+        'label' => static::getHitLabel($hit), 
+        'slug' => $hit['slug'] ?? null, 
+        'source' => $hit['source'] ?? null,
+      ];
+    }, $result);
 
     return $result;
   }
