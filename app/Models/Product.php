@@ -9,12 +9,13 @@ use App\Traits\HasGallery;
 use App\Traits\HasPrice;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-  use HasAuthor, HasGallery, HasPrice, Searchable;
+  use HasAuthor, HasGallery, HasPrice, Searchable, HasFactory;
 
   public function toSearchableArray(): array
   {

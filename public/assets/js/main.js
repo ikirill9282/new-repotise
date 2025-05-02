@@ -1,6 +1,7 @@
 const swiper = new Swiper(".mySwiper", {
     slidesPerView: 5,
     spaceBetween: 20,
+    autoHeight: true,
     navigation: {
       enabled: true,
       nextEl: ".swiper-button-next",

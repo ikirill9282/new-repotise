@@ -166,12 +166,12 @@
                     'form_class' => 'search-product',
                     'form_id' => 'search-product',
                 ])
-                <div class="search_results">
-                    @foreach (\App\Models\Category::limit(10)->get() as $category)
+                <div class="search_results flex-wrap">
+                    @foreach (\App\Models\Location::whereHas('product')->limit(20)->orderByDesc('id')->get() as $item)
                         <span>
                             <a class="px-2"
-                                href="{{ url('/products?' . $getQueryString(['categories' => $category->slug])) }}">
-                                {{ $category->title }}
+                                href="{{ url("/products/$item->slug?" . $getQueryString([])) }}">
+                                {{ $item->title }}
                             </a>
                         </span>
                     @endforeach
@@ -407,7 +407,7 @@
                             <option>Top Rated2</option>
                         </select>
                     </div>
-                    <div class="filter_cards_group">
+                    <div class="filter_cards_group !items-stretch">
                         @if(!empty($paginator->all()))
                           @foreach ($paginator->all() as $item)
                               @include('site.components.cards.product', ['model' => $item])
@@ -498,6 +498,7 @@
 
         $(document).ready(function() {
             // Init filters page
+            const baseUrl = '{{ url()->current() }}';
             const queryParams = getUrlParams();
             
             if (Object.keys(queryParams).length) {
@@ -559,7 +560,7 @@
                 const data = getFiltersData($(this).closest('.filter'));                
                 const queryString = $.param(data);
 
-                window.location.href = `/products?${queryString}`
+                window.location.href = `${baseUrl}?${queryString}`
             });
 
             // Start config
@@ -599,7 +600,17 @@
               queryData.q = q;
               const queryString = $.param(queryData);
 
-              window.location.href = `/products?${queryString}`
+              window.location.href = `${baseUrl}?${queryString}`
+            });
+
+            $('#search-product').on('submit', function(evt) {
+              evt.preventDefault();
+              const queryData = getFiltersData($('.filter'));
+              const q = $('#search-filter').val();
+              queryData.q = q;
+              const queryString = $.param(queryData);
+
+              window.location.href = `${baseUrl}?${queryString}`
             });
             
             // Price value control

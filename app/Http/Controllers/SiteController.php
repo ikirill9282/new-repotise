@@ -20,9 +20,13 @@ use App\Models\Product;
 class SiteController extends Controller
 {
 
-  public function __invoke(Request $request, string $title = 'home', ?string $article = null)
+  public function __invoke(Request $request, string $slug = 'home')
   {
-    $page = Page::where('slug', $title)
+    if ($request->route()->uri() === 'products/{country}') {
+      $slug = 'products';
+    }
+
+    $page = Page::where('slug', $slug)
       ->with('sections.variables')
       ->first();
 

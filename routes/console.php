@@ -23,11 +23,9 @@ use App\Models\Tag;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 
-
 Artisan::command('tt', function() {
-  $user = User::find(1);
-
-  dd($user->favorite_products);
+  $t = Product::factory(10)->create();
+  dd($t);
 });
 
 Artisan::command('tt_mail', function() {

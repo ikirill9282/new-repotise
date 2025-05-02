@@ -23,9 +23,23 @@ class GallerySeeder extends Seeder
         ]);
       }
 
+      $proucts = [
+        'popular_proucts.png',
+        'product_1.jpg',
+        'product_2.jpg',
+        'product_3.jpg',
+        'product_4.webp',
+        'product_5.webp',
+        'product_6.jpg',
+        'product_7.jpg',
+        'product_8.webp',
+        'product_9.webp',
+        'product_19.webp',
+      ];
       foreach (Product::all() as $product) {
+        shuffle($proucts);
         $product->gallery()->firstOrCreate([
-          'image' => '/storage/images/popular_proucts.png',
+          'image' => "/storage/images/{$proucts[0]}",
           'preview' => 1,
           'type' => 'products',
         ]);

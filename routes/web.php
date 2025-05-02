@@ -24,7 +24,7 @@ Route::prefix('/auth')
 
 Route::get('/', SiteController::class)->name('home');
 Route::get('/{slug}', SiteController::class);
-Route::get('/insights/{slug}', SiteController::class);
+Route::get('/products/{country}', SiteController::class);
 Route::get('/insights/{slug}/{article}', SiteController::class);
 
 Route::fallback(FallbackController::class);

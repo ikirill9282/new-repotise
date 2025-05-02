@@ -38,4 +38,9 @@ class Location extends Model
   {
     $this->slug = Slug::makeEn($this->title);
   }
+
+  public function product()
+  {
+    return $this->hasOne(Product::class);
+  }
 }
