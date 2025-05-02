@@ -20,6 +20,7 @@
       <span>${{ $model->old_price }}</span>
   </div>
   <div class="inf_cards flex flex-wrap">
+      {{-- @dd($model->type->title) --}}
       <a class="text-nowrap" href="{{ url("/search?q={$model->type->title}") }}">{{ $model->type->title }}</a>
       @foreach ($model->categories as $category)
         <a class="text-nowrap" href="{{ url("/search?q={$category->title}") }}">{{ $category->title }}</a>

@@ -102,6 +102,7 @@ class SiteController extends Controller
       'categories' => 'sometimes|nullable|string',
       'locations' => 'sometimes|nullable|string',
       'sale' => 'sometimes|nullable|integer',
+      'type' => 'sometimes|nullable|string',
       'q' => 'sometimes|nullable|string',
     ]);
 
@@ -130,6 +131,10 @@ class SiteController extends Controller
       ->when(
         isset($valid['categories']),
         fn($q) => $q->whereHas('categories', fn($sq) => $sq->whereIn('categories.slug', $valid['categories'])),
+      )
+      ->when(
+        isset($valid['type']),
+        fn($q) => $q->whereHas('type', fn($sq) => $sq->where('slug', $valid['type'])),
       )
       ->when(
         isset($valid['locations']),
