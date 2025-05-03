@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomEncrypt;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use Illuminate\Database\Eloquent\Model;
@@ -193,7 +194,7 @@ class Article extends Model
 
   public function makeFeedUrl()
   {
-    return url("insights/feed/$this->slug?aid=$this->id");
+    return url("insights/feed/$this->slug?aid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
   }
 
   public function setAmountAnalogs(int $amount)

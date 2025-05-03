@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Collapse;
+use App\Helpers\CustomEncrypt;
 use App\Helpers\Slug;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
@@ -84,7 +85,7 @@ class Product extends Model
 
   public function makeUrl()
   {
-    return url("/products/$this->slug?pid=$this->id");
+    return url("/products/{$this->location->slug}/$this->slug?pid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
   }
 
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection

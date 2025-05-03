@@ -121,7 +121,7 @@
                 @include('site.components.heading', ['title' => 'trending'])
                 <div class="products_item">
                     @if ($trending_products->isNotEmpty())
-                        <div class="swiper mySwiper">
+                        <div class="swiper mySwiperTrending">
                             <div class="swiper-wrapper">
                                 @foreach ($trending_products as $product)
                                     <div class="swiper-slide">

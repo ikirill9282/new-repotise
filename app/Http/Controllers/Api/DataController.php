@@ -18,8 +18,15 @@ class DataController extends Controller
   {
     $vars = SectionVariables::where('section_id', 7)->get()->keyBy('name');
     $news = Article::getLastNews();
+    $aid = null;
+
+    if (request()->has('aid')) {
+      $rdata = CustomEncrypt::decodeUrlHash(request()->get('aid'));
+      if (isset($rdata['id'])) $aid = $rdata['id'];
+    }
+
     $articles = Article::where('id', '<', $id)
-      ->when(request()->has('aid'), fn($q) => $q->where('id', '!=', request()->get('aid')))
+      ->when(!is_null($aid), fn($q) => $q->where('id', '!=', $aid))
       ->orderByDesc('id')
       ->limit(2)
       ->get()

@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
+use App\Helpers\CustomEncrypt;
 
 class SiteController extends Controller
 {
@@ -56,7 +57,13 @@ class SiteController extends Controller
 
   public function getFeedData(Request $request): array
   {
-    $id = ($request->has('aid') && filter_var($request->get('aid'), FILTER_VALIDATE_INT)) ? $request->get('aid') : null;
+    
+    $id = null;
+    if (request()->has('aid')) {
+      $rdata = CustomEncrypt::decodeUrlHash(request()->get('aid'));
+      if (isset($rdata['id'])) $id = $rdata['id'];
+    }
+
     $response_data = [];
     $response_data['articles'] = Article::when($id, fn($q) => $q->where('id', '!=', $id))->orderByDesc('id')->limit(3)->get()->all();
     $response_data['last_news'] = Article::getLastNews();
@@ -156,10 +163,10 @@ class SiteController extends Controller
     $paginator = $query->paginate(20);
     
     // FOR TEST
-    $paginator = $query->get();
-    while($paginator->count() < 20 && $paginator->isNotEmpty()) {
-      $paginator = $paginator->collect()->merge($paginator)->slice(0, 20);
-    }
+    // $paginator = $query->get();
+    // while($paginator->count() < 20 && $paginator->isNotEmpty()) {
+    //   $paginator = $paginator->collect()->merge($paginator)->slice(0, 20);
+    // }
 
     return ['paginator' => $paginator];
   }
