@@ -567,7 +567,7 @@
             $('#filter_button').find('button').on('click', function(evt) {
                 evt.preventDefault();
                 const data = getFiltersData($(this).closest('.filter'));                
-                const queryString = $.param(Object.assign({}, data, queryParams));
+                const queryString = $.param(Object.assign({}, queryParams, data));
 
                 window.location.href = `${baseUrl}?${queryString}`
             });
