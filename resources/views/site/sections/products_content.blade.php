@@ -421,6 +421,7 @@
                           @foreach ($paginator->all() as $item)
                               @include('site.components.cards.product', ['model' => $item])
                           @endforeach
+                          @include('site.components.paginator', ['paginator' => $paginator])
                         @else
                           <div class="not_found_products">
                             <h3>Great journeys start here! Exciting travel products <br> arriving soon.</h3>
