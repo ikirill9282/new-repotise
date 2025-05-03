@@ -195,6 +195,44 @@ const swiperTrending = new Swiper(".mySwiperTrending", {
   },
 });
 
+const swiperRecomend = new Swiper(".mySwiperRecomend", {
+  slidesPerView: 5,
+  spaceBetween: 20,
+  autoHeight: true,
+  navigation: {
+    enabled: true,
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
+  },
+  breakpoints: {
+      320: {
+          slidesPerView: 1.6,
+          spaceBetween: 10,
+      },
+      430: {
+          slidesPerView: 2.2,
+          spaceBetween: 10,
+      },
+      600: {
+          slidesPerView: 2.4,
+          spaceBetween: 10,
+      },
+      700: {
+          slidesPerView: 2.4,
+          spaceBetween: 10,
+      },
+      768: {
+          slidesPerView: 3.2,
+          spaceBetween: 15,
+      },
+      1200: {
+          slidesPerView: 5,
+          spaceBetween: 20,
+      },
+  },
+});
+
+
 
 // const stars = document.querySelectorAll('.stars span');
 
@@ -207,11 +245,6 @@ const swiperTrending = new Swiper(".mySwiperTrending", {
 //     }
 //   });
 // });
-
-
-
-
-
 
 
 function updateMaxPrice(value, sliderNumber) {

@@ -7,7 +7,7 @@ while($models->count() < $max) {
 <div class="favorite_products">
   <h2>Recommended for you</h2>
   <div class="products_item">
-      <div class="swiper mySwiper">
+      <div class="swiper mySwiperRecomend">
           <div class="swiper-wrapper">
               @foreach($models as $model)
               <div class="swiper-slide">                
