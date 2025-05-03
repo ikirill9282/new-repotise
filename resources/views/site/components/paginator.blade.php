@@ -1,5 +1,5 @@
 @if (isset($paginator))
-  <div class="paginator">
-    {{ $paginator->links() }}
+  <div class="paginator w-full">
+    {{ $paginator->links('vendor.pagination.tailwind') }}
   </div>
 @endif

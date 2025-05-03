@@ -1,14 +1,3 @@
-@php
-    $items = collect($articles->items());
-    $steps = intval(floor(9 / $items->count()));
-    $step = 0;
-
-    while ($step <= $steps) {
-        $items = $items->merge(collect($articles->items()));
-        $step++;
-    }
-    $items = $items->slice(0, 9);
-@endphp
 <div>
     <section class="home_tips relative">
         @include('site.components.parallax', ['class' => 'parallax-insights'])
@@ -17,19 +6,6 @@
                 @include('site.components.heading', ['variables' => $variables])
                 @include('site.components.breadcrumbs')
                 @include('site.components.search')
-                {{-- <div class="input_group">
-                    <div class="search_block">
-                        <label for="search">
-                            @include('icons.search')
-                        </label>
-                        <input type="search" placeholder="{{ $variables->get('search_text')?->value ?? '' }}">
-                    </div>
-                    <div class="search_icon">
-                        <a href="#">
-                            @include('icons.search', ['stroke' => '#ffffff'])
-                        </a>
-                    </div>
-                </div> --}}
             </div>
         </div>
     </section>
@@ -39,7 +15,7 @@
                 <div class="item_group">
                     <h3>Travel Insights</h3>
                     <div class="row">
-                        @foreach($items as $item)
+                        @foreach($articles as $item)
                           <div class="col-lg-4 col-md-6">
                               <div class="cards_group">
                                   <a href="{{ $item->makeFeedUrl() }}">
@@ -62,6 +38,7 @@
                           </div>
                         @endforeach
                     </div>
+                    @include('site.components.paginator', ['paginator' => $articles])
                 </div>
                 @include('site.components.last_news', ['count' => '*'])
             </div>
