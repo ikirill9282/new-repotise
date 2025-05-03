@@ -453,7 +453,7 @@
             },
             categories: [...categories_wrap.find('span').map((key, item) => $(item).data('value'))].join(','),
             locations: [...locations_wrap.find('span').map((key, item) => $(item).data('value'))].join(','),
-            sale: +sale.find('input').is(":checked"),
+            sale: +('#sale').is(":checked"),
             q: search.val() ?? '',
           };
         }
