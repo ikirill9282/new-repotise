@@ -43,6 +43,14 @@ class GallerySeeder extends Seeder
           'preview' => 1,
           'type' => 'products',
         ]);
+
+        foreach (array_slice($proucts, 1, 5) as $img) {
+          $product->gallery()->firstOrCreate([
+            'image' => "/storage/images/$img",
+            'preview' => 0,
+            'type' => 'products',
+          ]);
+        }
       }
 
       // foreach (News::all() as $news_item) {

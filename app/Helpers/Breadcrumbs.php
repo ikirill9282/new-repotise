@@ -11,6 +11,7 @@ class Breadcrumbs
 {
   public static function make(Route $route, ?string $current_name = null, ?array $exclude = null)
   {
+    $request_params = $route->parameters();
     $steps = ['home'];
     $uri = $route->uri;
 
@@ -32,6 +33,13 @@ class Breadcrumbs
       $steps = array_filter($steps, fn($step) => !in_array($step, $exclude));
     }
 
+
+    if (isset($request_params['slug']) && $request_params['slug'] == 'products') {
+      if (isset($request_params['country']) && !empty($request_params['country'])) {
+        $steps[] = $request_params['slug'];
+      }
+    }
+
     $steps = array_flip($steps);
     $pages = Page::select('title', 'slug')->whereIn('slug', array_keys($steps))->get();
 
@@ -44,6 +52,7 @@ class Breadcrumbs
     if (!is_null($current_name)) {
       $steps[$current_name] = URL::full();
     }
+
     return $steps;
   }
 }

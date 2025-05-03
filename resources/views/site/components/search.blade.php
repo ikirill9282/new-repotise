@@ -30,6 +30,7 @@
               </a>
           </div>
         @endif
+        
       @elseif ($template == 'products')
         <div class="search_top">
           <div class="search_input">
@@ -57,6 +58,7 @@
                 @include('icons.search', ['stroke' => '#FFFFFF'])
               </a>
           </div>
+          {{ $buttons ?? '' }}
         </div>
     
         @include('site.components.hits', ['id' => 'search-hits'])

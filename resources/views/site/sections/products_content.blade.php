@@ -1,6 +1,7 @@
 @php
     $trending_products = \App\Models\Product::getTrendingProducts();
     $getQueryString = fn(array $query) => http_build_query(array_merge(request()->query(), $query));
+    $getCurrentUrl = fn() => request()->url();
 @endphp
 
 @push('css')
@@ -155,7 +156,7 @@
                 </div>
             </div>
             <div class="search_filter">
-                @include('site.components.search', [
+                @component('site.components.search', [
                     'template' => 'products',
                     'placeholder' => print_var('search_placeholder', $variables ?? null),
                     'attributes' => [
@@ -166,6 +167,14 @@
                     'form_class' => 'search-product',
                     'form_id' => 'search-product',
                 ])
+                @if(auth()->check() && auth()->user()->can('create-products'))
+                  <x-slot name="buttons">
+                    <div class="add_products">
+                      <a href="{{ auth()->user()->makeProfileUrl() . '/products/create' }}">Add product</a>
+                    </div>
+                  </x-slot>
+                @endif
+                @endcomponent
                 <div class="search_results flex-wrap">
                     @foreach (\App\Models\Location::whereHas('product')->limit(20)->orderByDesc('id')->get() as $item)
                         <span>
@@ -306,8 +315,8 @@
                                                     data-bs-parent="#accordionFlushExample">
                                                     <div class="accordion-body">
                                                         <div class="type_products">
-                                                            @foreach (\App\Models\Type::all() as $type)
-                                                                <a href="{{ url('/products?' . $getQueryString(['type' => $type->slug])) }}"
+                                                            @foreach (\App\Models\Type::orderBy('title')->get() as $type)
+                                                                <a href="{{ url("{$getCurrentUrl()}/?" . $getQueryString(['type' => $type->slug])) }}"
                                                                     class="{{ request()->has('type') && request()->get('type') == $type->slug ? 'active' : '' }}">
                                                                     {{ $type->title }}
                                                                 </a>
@@ -389,7 +398,7 @@
                                             </div>
                                             <div class="buttons" id="filter_button">
                                                 <button>{{ print_var('filter_button', $variables) }}</button>
-                                                <a href="/products">{{ print_var('filter_clear', $variables) }}</a>
+                                                <a href="{{ $getCurrentUrl() }}">{{ print_var('filter_clear', $variables) }}</a>
                                             </div>
                                         </div>
                                     </div>
@@ -558,7 +567,7 @@
             $('#filter_button').find('button').on('click', function(evt) {
                 evt.preventDefault();
                 const data = getFiltersData($(this).closest('.filter'));                
-                const queryString = $.param(data);
+                const queryString = $.param(Object.assign({}, data, queryParams));
 
                 window.location.href = `${baseUrl}?${queryString}`
             });

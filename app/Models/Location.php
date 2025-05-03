@@ -43,4 +43,9 @@ class Location extends Model
   {
     return $this->hasOne(Product::class);
   }
+
+  public function hasPoster(): bool
+  {
+    return !is_null($this->poster) && strlen($this->poster);
+  }
 }

@@ -25,9 +25,17 @@ class UserSeeder extends Seeder
         ['name' => 'write_comment', 'title' => 'Write Comments'],
       );
 
+      $create_products = Permission::firstOrCreate(
+        ['name' => 'create-products'],
+        ['name' => 'create-products', 'title' => 'Create Products'],
+      );
+
       $admin->givePermissionTo($write_comment_premission);
       $buyer->givePermissionTo($write_comment_premission);
       $seller->givePermissionTo($write_comment_premission);
+
+      $admin->givePermissionTo($create_products);
+      $seller->givePermissionTo($create_products);
 
       if (!empty(env('ADMIN_MAIL')) && !empty(env('ADMIN_PASS'))) {
         $admin = User::firstOrCreate(

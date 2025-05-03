@@ -22,10 +22,6 @@ class SiteController extends Controller
 
   public function __invoke(Request $request, string $slug = 'home')
   {
-    if ($request->route()->uri() === 'products/{country}') {
-      $slug = 'products';
-    }
-
     $page = Page::where('slug', $slug)
       ->with('sections.variables')
       ->first();
@@ -94,6 +90,7 @@ class SiteController extends Controller
 
   public function getProductsData(Request $request): array
   {
+    $params = $request->route()->parameters();
     $valid = $request->validate([
       'rating' => 'sometimes|nullable|integer',
       'price' => 'sometimes|nullable|array',
@@ -149,6 +146,10 @@ class SiteController extends Controller
 
           $q->whereIn('id', $product_ids);
         },
+      )
+      ->when(
+        array_key_exists('country', $params),
+        fn($q) => $q->whereHas('location', fn($sq) => $sq->where('locations.slug', $params['country'])),
       )
     ;
 

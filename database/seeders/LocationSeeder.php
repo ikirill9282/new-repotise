@@ -6,6 +6,7 @@ use App\Helpers\Slug;
 use App\Models\Location;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class LocationSeeder extends Seeder
 {
@@ -111,7 +112,12 @@ class LocationSeeder extends Seeder
     ];
 
     foreach ($countries as $country) {
-      Location::firstOrCreate(['title' => $country], ['title' =>$country]);
+      Location::firstOrCreate(
+        ['title' => $country], 
+        [
+          'title' => $country,
+          'poster' => "/storage/images/home_filter.png",
+        ]);
     }
     // Location::firstOrCreate(
     //   ['title' => 'Japan'],

@@ -125,13 +125,17 @@ const makeParallax = function() {
         return;
       }
     }
-
-    this.root.css({
-      // 'background-image': `url(${this.img})`,
+    
+    const styles = {
       'background-position': `center top`,
       'background-size': `auto ${(this.height + this.top)}px`,
-    })
-    // this.root.attr('style', `background-image: url(${this.img}); background-position: center ${this.top}px; background-size: auto ${this.height}px;`);
+    }
+
+    if (this.root.data('url') && this.root.data('url').length) {
+      styles['background-image'] = `url(${this.root.data('url')})`;
+    }
+
+    this.root.css(styles);
   }
 
   this.init = () => {

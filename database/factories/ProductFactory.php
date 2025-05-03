@@ -28,8 +28,8 @@ class ProductFactory extends Factory
    */
   public function definition(): array
   {
-    $users = User::whereHas('roles', fn($q) => $q->where('name', 'creator'))
-      ->get()
+    $users = User::all()
+      ->filter(fn($user) => $user->can('create-products'))
       ->pluck('id')
       ->shuffle()
       ->toArray();
