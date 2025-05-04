@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Routing\Route;
 use App\Models\Admin\Page;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route as FacadesRoute;
 use Illuminate\Support\Facades\URL;
 
@@ -34,7 +35,7 @@ class Breadcrumbs
     }
 
 
-    if (isset($request_params['slug']) && $request_params['slug'] == 'products') {
+    if (isset($request_params['slug']) && ($request_params['slug'] == 'products')) {
       if (isset($request_params['country']) && !empty($request_params['country'])) {
         $steps[] = $request_params['slug'];
       }
@@ -48,6 +49,15 @@ class Breadcrumbs
       unset($steps[$name]);
       if ($page) $steps[$page->title] = $page->url;
     };
+
+
+
+    if (isset($request_params['slug']) && ($request_params['slug'] == 'products')) {
+      if (isset($request_params['product']) && request()->has('pid')) {
+        $product = Product::findByPid(request()->get('pid'));
+        $steps[$product->location->title] = $product->location->makeUrl();
+      }
+    }
 
     if (!is_null($current_name)) {
       $steps[$current_name] = URL::full();

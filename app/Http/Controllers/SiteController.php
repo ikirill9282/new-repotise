@@ -17,12 +17,14 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Helpers\CustomEncrypt;
+use Illuminate\Support\ItemNotFoundException;
 
 class SiteController extends Controller
 {
 
   public function __invoke(Request $request, string $slug = 'home')
   {
+    $params = $request->route()->parameters();
     $page = Page::where('slug', $slug)
       ->with('sections.variables')
       ->first();
@@ -49,7 +51,12 @@ class SiteController extends Controller
     }
 
     if ($page->slug === 'products') {
-      $response_data = array_merge($response_data, $this->getProductsData($request));
+      try {
+        $response_data = array_merge($response_data, $this->getProductsData($request));
+        
+      } catch (ItemNotFoundException $e) {
+        return (new FallbackController())->__invoke($request);
+      }
     }
 
     return view("site.page", $response_data);
@@ -98,6 +105,19 @@ class SiteController extends Controller
   public function getProductsData(Request $request): array
   {
     $params = $request->route()->parameters();
+
+    if (array_key_exists('product', $params) && $request->has('pid')) {
+      $response_data['page'] = Page::where('slug', 'product')->with('sections.variables')->first();
+      $response_data['product'] = Product::findByPid(request()->get('pid'));
+
+      if (!$response_data['product']) {
+        throw new ItemNotFoundException('Product Undefined');
+      }
+      
+      return $response_data;
+    }
+
+
     $valid = $request->validate([
       'rating' => 'sometimes|nullable|integer',
       'price' => 'sometimes|nullable|array',

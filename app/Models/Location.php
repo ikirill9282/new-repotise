@@ -48,4 +48,9 @@ class Location extends Model
   {
     return !is_null($this->poster) && strlen($this->poster);
   }
+
+  public function makeUrl(): string
+  {
+    return url("/products/$this->slug");
+  }
 }

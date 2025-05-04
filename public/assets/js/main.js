@@ -232,6 +232,76 @@ const swiperRecomend = new Swiper(".mySwiperRecomend", {
   },
 });
 
+const swiperTogether = new Swiper(".swiperTogether", {
+  slidesPerView: 5,
+  spaceBetween: 20,
+  autoHeight: true,
+  navigation: {
+    enabled: true,
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
+  },
+  breakpoints: {
+      320: {
+          slidesPerView: 1.6,
+          spaceBetween: 10,
+      },
+      430: {
+          slidesPerView: 2.2,
+          spaceBetween: 10,
+      },
+      600: {
+          slidesPerView: 2.4,
+          spaceBetween: 10,
+      },
+      700: {
+          slidesPerView: 2.4,
+          spaceBetween: 10,
+      },
+      768: {
+          slidesPerView: 3.2,
+          spaceBetween: 15,
+      },
+      1200: {
+          slidesPerView: 5,
+          spaceBetween: 20,
+      },
+  },
+});
+
+const swiper13 = new Swiper(".mySwiper13", {
+  slidesPerView: 4,
+  spaceBetween: 6,
+  navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+  },
+  breakpoints: {
+      320: {
+          slidesPerView: 4,
+          spaceBetween: 6,
+      },
+      768: {
+          slidesPerView: 5,
+          spaceBetween: 6,
+      },
+      1024: {
+          slidesPerView: 4,
+          spaceBetween: 6,
+      },
+      1200: {
+          slidesPerView: 4,
+          spaceBetween: 6,
+      },
+  },
+});
+
+const swiper14 = new Swiper(".mySwiper14", {
+  spaceBetween: 10,
+  thumbs: {
+      swiper: swiper13, 
+  },
+});
 
 
 // const stars = document.querySelectorAll('.stars span');

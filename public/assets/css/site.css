@@ -121,6 +121,10 @@ header .about_block .right_group_block .rection_groups span {
     color: #fff !important;
 }
 
+.product_page_home .breadcrumb-item:hover a {
+  color: #000 !important;
+}
+
 .parallax {
     position: absolute;
     top: 0;
@@ -695,6 +699,14 @@ aside .login svg {
   width: 100% !important;
 }
 
+.frequently_bought .about_block .frequently_cards .products_item .item .img_products .to_basket {
+  max-width: 90%;
+}
+
+.frequently_cards .swiper-wrapper {
+  align-items: stretch;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -865,6 +877,14 @@ aside .login svg {
 
     .result_cards .right_group_for_mob {
         flex-basis: 20%;
+    }
+
+    .frequently_bought .about_block .frequently_cards .products_item .item {
+      max-width: none !important;
+    }
+
+    .frequently_bought .about_block .frequently_cards .products_item .item .img_products .main_img {
+      width: 100%;
     }
 }
 

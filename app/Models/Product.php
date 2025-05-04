@@ -83,9 +83,40 @@ class Product extends Model
     );
   }
 
+  public function price(): Attribute
+  {
+    return Attribute::make(
+      get: fn($val) => number_format($val),
+    );
+  }
+
+  public function oldPrice(): Attribute
+  {
+    return Attribute::make(
+      get: fn($val) => number_format($val),
+    );
+  }
+
   public function makeUrl()
   {
     return url("/products/{$this->location->slug}/$this->slug?pid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
+  }
+
+
+  public function getTogetherProducts(int $limit = 10, array $includes = []): Collection
+  {
+    $products = $this->query()
+      ->where('id', '!=', $this->id)
+      ->whereHas('location', fn($q) => $q->where('slug', $this->location->slug))
+      ->orWhereHas('type', fn($q) => $q->where('slug', $this->type->slug))
+      ->limit($limit)
+      ->get();
+
+    while($products->count() < $limit) {
+      $products = $products->collect()->merge($products)->slice(0, $limit);
+    }
+
+    return $products;
   }
 
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
@@ -107,5 +138,13 @@ class Product extends Model
     }
 
     return $products;
+  }
+
+  public static function findByPid(string $pid): ?Product
+  {
+    $rdata = CustomEncrypt::decodeUrlHash($pid);
+    $id = isset($rdata['id']) ? $rdata['id'] : null;
+
+    return static::find($id);
   }
 }

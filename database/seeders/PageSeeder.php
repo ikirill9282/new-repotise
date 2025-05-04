@@ -85,7 +85,9 @@ class PageSeeder extends Seeder
         'title' => 'All Products',
         'slug' => 'products',
       ]);
-      
-
+      $product = Page::firstOrCreate([
+        'title' => 'Product Page',
+        'slug' => 'product',
+      ]);
     }
 }

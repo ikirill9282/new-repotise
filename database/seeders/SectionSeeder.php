@@ -198,6 +198,15 @@ class SectionSeeder extends Seeder
         'component' => 'products_content',
       ]
     );
+    $product_content = Section::firstOrCreate(
+      ['slug' => 'product-content'],
+      [
+        'title' => 'Product Page Content',
+        'slug' => 'product-content',
+        'type' => 'site',
+        'component' => 'product_content',
+      ]
+    );
 
 
     $this->build();
@@ -544,6 +553,15 @@ class SectionSeeder extends Seeder
             ],
           ]
         ],
+      ],
+      [
+        'page' => Page::where('slug', 'product')->first(),
+        'sections' => [
+          [
+            'model' => Section::where('slug', 'product-content')->first(),
+            'variables' => [],
+          ]
+        ]
       ]
     ];
 
