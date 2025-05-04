@@ -707,6 +707,12 @@ aside .login svg {
   align-items: stretch;
 }
 
+.commends_product_page .about_block .block_commends .commends_group:first-child::after {
+  height: 55%;
+  top: 34%;
+  left: 33px;
+}
+
 @media (min-width: 1140px) {
 }
 

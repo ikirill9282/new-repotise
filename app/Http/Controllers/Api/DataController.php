@@ -52,7 +52,7 @@ class DataController extends Controller
     $variables = SectionVariables::whereHas('section', fn($q) => $q->where('sections.component', 'feed'))->get();
 
     foreach ($comment->children as $child) {
-      $view = Blade::render('site.components.comment', [
+      $view = Blade::render('site.components.comments.comment', [
         'comment' => $child->toArray(), 
         'variables' => $variables->keyBy('name'),
         'class' => 'answers border_none_block',

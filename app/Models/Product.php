@@ -102,6 +102,60 @@ class Product extends Model
     return url("/products/{$this->location->slug}/$this->slug?pid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
   }
 
+  public function getAllReviews(?int $limit = 10)
+  {
+    $this->limit = $limit;
+    $this->comments_loading = true;
+    $this->level = 0;
+
+    $this->comments = Review::query()
+      ->where('product_id', $this->id)
+      ->whereNull('parent_id')
+      ->with('likes', function($query) {
+        $query->with('author')->orderByDesc('id')->limit(4);
+      })
+      // ->with('likes.author')
+      ->when(!is_null($limit), fn($q) => $q->limit($limit))
+      ->withCount('likes')
+      ->with('author')
+      ->get(); 
+
+    
+    foreach ($this->comments as $key => &$comment) {
+      if ($this->comments_loading && $comment->children()->exists()) {
+        $comment->children = $this->getChildren($comment);
+      }
+    }
+
+    $this->comments = $this->comments->toArray();
+    return $this;
+  }
+
+
+  public function getChildren($review, int $max_level = 1)
+  {
+    $this->level++;
+    $review->load('likes.author', 'author');
+    $review->loadCount('likes', 'children');
+
+    if ($this->level > $max_level) {
+      $this->level = 0;
+      return;
+    }
+
+    $review->load('children');
+
+    foreach ($review->children as &$child) {
+        if ($child->children()->exists()) {
+          $this->getChildren($child);
+        } else {
+          $child->load('likes.author', 'author');
+          $child->loadCount('likes');
+          $this->level = 0;
+        }
+    }
+  }
+
 
   public function getTogetherProducts(int $limit = 10, array $includes = []): Collection
   {
@@ -145,6 +199,6 @@ class Product extends Model
     $rdata = CustomEncrypt::decodeUrlHash($pid);
     $id = isset($rdata['id']) ? $rdata['id'] : null;
 
-    return static::find($id);
+    return static::where('id', $id)->with('author')->withCount('reviews')->first();
   }
 }

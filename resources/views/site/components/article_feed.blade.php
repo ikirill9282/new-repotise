@@ -56,7 +56,7 @@
                 <div class="block_commends">
                     {{-- @dump($article->comments) --}}
                     @foreach ($article->comments as $comment)
-                        @include('site.components.comment', ['comment' => $comment])
+                        @include('site.components.comments.comment', ['comment' => $comment])
                     @endforeach
 
                     <div class="more_commends_group">

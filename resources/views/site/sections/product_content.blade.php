@@ -1,4 +1,7 @@
 @if (isset($product))
+  @php
+    $product = $product->getAllReviews();    
+  @endphp
   <section class="product_page_home">
     <section class="breadcrumb_block">
         <div class="container">
@@ -179,13 +182,13 @@
         <div class="about_block">
             <div class="title_block">
                 <h2>Reviews</h2>
-                <span>8</span>
+                <span>{{ $product->reviews_count }}</span>
             </div>
             <div class="login_to_review">
                 <a href="#">Login to Review</a>
             </div>
             <div class="block_commends">
-                <div class="commends_group">
+                {{-- <div class="commends_group">
                     <div class="commend">
                         <img src="img/women.png" alt="" class="img_commendor">
                         <div class="right_text_group">
@@ -376,7 +379,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
+                
+                @foreach ($product->comments as $comment)
+                  @include('site.components.comments.comment', ['comment' => $comment])
+                @endforeach
+
                 <div class="more_commends_group">
                     <a href="#">Load More Comments (50 of 248)</a>
                 </div>
@@ -416,4 +424,7 @@
         </div>
     </div>
   </section>
+  @push('js')
+    <script src="{{ asset('assets/js/product.js') }}"></script>
+  @endpush
 @endif

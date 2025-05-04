@@ -48,7 +48,7 @@
                   <div class="img_men">
                       @foreach ($comment['likes'] as $key => $like)
                           <img src="{{ isset($like['author']['avatar']) ? url($like['author']['avatar']) : '' }}"
-                              class="@if ($key > 0) last_img @endif" alt="Avatar">
+                              class="@if ($key > 0) last_img @endif rounded-full" alt="Avatar">
                       @endforeach
                   </div>
               @endif

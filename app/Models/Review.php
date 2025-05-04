@@ -13,4 +13,9 @@ class Review extends Model
   {
     return $this->hasMany(Likes::class, 'model_id')->where('type', 'review');
   }
+
+  public function children()
+  {
+    return $this->hasMany(static::class, 'parent_id');
+  }
 }
