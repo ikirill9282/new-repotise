@@ -21,7 +21,7 @@
     </section>
     <section class="comments_group">
         <div class="container">
-            <div class="about_block">
+            {{-- <div class="about_block">
                 <div class="title_block">
                     @include('site.components.heading', ['title' => 'comment'])
                     <span>{{ $article->countComments() }}</span>
@@ -54,7 +54,6 @@
                     @endif
                 </div>
                 <div class="block_commends">
-                    {{-- @dump($article->comments) --}}
                     @foreach ($article->comments as $comment)
                         @include('site.components.comments.comment', ['comment' => $comment])
                     @endforeach
@@ -63,7 +62,8 @@
                         <a href="#">{{ print_var('comment_more_comments', $variables) }} (50 of 248)</a>
                     </div>
                 </div>
-            </div>
+            </div> --}}
+            @include('site.components.comments.wrap', ['model' => $article])
         </div>
     </section>
     <section class="similar_materials">

@@ -559,7 +559,11 @@ class SectionSeeder extends Seeder
         'sections' => [
           [
             'model' => Section::where('slug', 'product-content')->first(),
-            'variables' => [],
+            'variables' => [
+              'comment_heading' => 'h2',
+              'comment_header' => 'Reviews',
+              'comment_more_comments' => 'Load More Comments',
+            ],
           ]
         ]
       ]

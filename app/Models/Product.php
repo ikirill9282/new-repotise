@@ -82,6 +82,10 @@ class Product extends Model
       get: fn($value) => ($value == 0) ? 0 : Collapse::make($value),
     );
   }
+  public function countComments(): int
+  {
+    return $this->reviews_count ?? 0;
+  }
 
   public function price(): Attribute
   {
