@@ -817,6 +817,15 @@ aside .login svg {
   color: inherit !important;
 }
 
+.product_page_home .about_block .information_product .bottom_informations .text_inf h4 {
+  flex-basis: 50%;
+}
+
+.product_page_home .about_block .information_product .bottom_informations .text_inf p {
+  flex-basis: 50%;
+  text-align: right;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -1205,6 +1214,9 @@ aside .login svg {
 
     .placing_order .about_block {
       flex-direction: row;
+    }
+    .product_page_home {
+      padding: 50px 0;
     }
 }
 
