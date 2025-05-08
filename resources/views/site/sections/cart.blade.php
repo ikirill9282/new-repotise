@@ -203,5 +203,6 @@
 <div class="container empty-container !pt-10 !pb-10 {{ (isset($cart['products']) && !empty($cart['products'])) ? 'hidden' : '' }}">
   @include('site.components.favorite.empty', [
     'text' => 'Cart',
+    'class' => 'empty-cart'
   ])
 </div>

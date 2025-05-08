@@ -1,4 +1,3 @@
-
 <div class="{{ isset($class) ? $class : '' }}  empty-block" role="tabpanel" aria-labelledby="pills-home-tab">
   <div class="top_group_fav">
       <div class="left_text">

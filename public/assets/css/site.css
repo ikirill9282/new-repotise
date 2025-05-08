@@ -808,8 +808,9 @@ aside .login svg {
   transition: 0.5s all ease;
 }
 
-.placing_order .empty-block {
+.empty-cart {
   max-width: 1000px;
+  margin: 0 auto;
 }
 
 .placing_order .about_block .left_form {
