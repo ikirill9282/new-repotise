@@ -18,13 +18,12 @@ class CustomEncrypt
     $ivLength = openssl_cipher_iv_length(static::$cipher); // Длина IV
     $iv = openssl_random_pseudo_bytes($ivLength); // Генерация случайного IV
 
-    $encrypted = openssl_encrypt($data, static::$cipher, static::getKey(), OPENSSL_RAW_DATA, $iv); // Шифрование данных
+    $encrypted = openssl_encrypt($data, static::$cipher, static::getKey(), OPENSSL_RAW_DATA, $iv);
 
     if ($encrypted === false) {
       throw new \Exception("Error encryption.");
     }
 
-    // Возвращаем зашифрованные данные в виде base64 (совмещая IV и зашифрованные данные)
     return base64_encode($iv . $encrypted);
   }
 
@@ -35,16 +34,16 @@ class CustomEncrypt
    */
   public static function decrypt(string $encrypted): array
   {
-    $decodedData = base64_decode($encrypted); // Декодируем из base64
+    $decodedData = base64_decode($encrypted);
 
     $ivLength = openssl_cipher_iv_length(static::$cipher); // Длина IV
     $iv = substr($decodedData, 0, $ivLength); // Извлекаем IV из зашифрованных данных
     $encrypted = substr($decodedData, $ivLength); // Получаем зашифрованную часть
 
-    $decrypted = openssl_decrypt($encrypted, static::$cipher, static::getKey(), OPENSSL_RAW_DATA, $iv); // Расшифровка данных
+    $decrypted = openssl_decrypt($encrypted, static::$cipher, static::getKey(), OPENSSL_RAW_DATA, $iv);
 
     if ($decrypted === false) {
-      throw new \Exception("Ошибка расшифровки данных.");
+      throw new \Exception("Decode error");
     }
 
     return json_decode($decrypted, true);
@@ -60,32 +59,20 @@ class CustomEncrypt
     ksort($data);
     $queryString = http_build_query($data);
     
-    return rtrim(strtr(base64_encode($queryString), '+/', '-_'), '=');
+    return static::generateRandomString(5) . rtrim(strtr(base64_encode($queryString), '+/', '-_'), '=');
   }
 
   
   public static function decodeUrlHash(string $hash): array
   {
     $base64 = strtr($hash, '-_', '+/') . str_repeat('=', 3 - (3 + strlen($hash)) % 4);
-    $queryString = base64_decode($base64);
+    $queryString = base64_decode(substr($base64, 5));
     $result = [];
     parse_str($queryString, $result);
     return $result;
   }
-}
 
-// Пример использования
-// try {
-//     $encryptor = new CustomEncrypt();
-    
-//     $originalText = "Привет, мир!";
-//     echo "Оригинальный текст: " . $originalText . PHP_EOL;
-    
-//     $encryptedText = $encryptor->encrypt($originalText);
-//     echo "Зашифрованный текст: " . $encryptedText . PHP_EOL;
-    
-//     $decryptedText = $encryptor->decrypt($encryptedText);
-//     echo "Расшифрованный текст: " . $decryptedText . PHP_EOL;
-// } catch (\Exception $e) {
-//     echo "Ошибка: " . $e->getMessage();
-// }
+  protected static function generateRandomString($length = 10) {
+    return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
+  }
+}

@@ -52,7 +52,7 @@ class ProductFactory extends Factory
       'type_id' => $types[0],
       'location_id' => $locations[0],
       'rating' => fake()->numberBetween(0, 5),
-      'text' => collect(fake()->paragraphs(3))->map(fn($paragraph) => ucfirst($paragraph))->join("\n"),
+      'text' => collect(fake()->paragraphs(20))->map(fn($paragraph) => ucfirst($paragraph))->join("\n"),
     ];
   }
 

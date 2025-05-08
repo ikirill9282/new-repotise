@@ -25,4 +25,38 @@ class SessionExpire
 
     return null;
   }
+
+  public static function saveCart(string $session_key, array $data): void
+  {
+    $current = Session::get($session_key);
+    $expires = isset($current['expires']) ? Carbon::now()->greaterThanOrEqualTo(Carbon::parse($current['expires'])) : true;
+    if ($expires) {
+      Session::forget($session_key);
+    }
+
+    Session::put($session_key, ['value' => json_encode($data), 'expires' => Carbon::now()->addWeek()]);
+  }
+
+  public static function getCart(string $session_key): array
+  {
+    $res = Session::exists($session_key) ? json_decode(Session::get($session_key)['value'], true) : [];
+    return $res ?? [];
+  }
+
+  public static function setCartItemCount(string $session_key, int $id, int $count)
+  {
+    if (Session::exists($session_key)) {
+      $session_data = static::getCart($session_key);
+      if (isset($session_data['products'])) {
+
+        foreach ($session_data['products'] as &$product) {
+          if ($product['id'] == $id) {
+            $product['count'] = $count;
+          }
+        }
+
+        static::saveCart('cart', $session_data);
+      }
+    }
+  }
 }

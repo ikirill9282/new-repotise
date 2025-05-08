@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\DataController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\SearchController;
@@ -27,5 +28,11 @@ Route::prefix('api')->group(function() {
 
   Route::prefix('/user')->middleware('auth:web')->controller(UserController::class)->group(function() {
     Route::post('/favorite', 'favorite');
+  });
+
+  Route::prefix('/cart')->middleware('auth:web')->controller(CartController::class)->group(function() {
+    Route::post('/push', 'push');
+    Route::post('/count', 'count');
+    Route::post('/remove', 'remove');
   });
 });

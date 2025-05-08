@@ -54,9 +54,9 @@
                         @include('icons.favorite')
                         <span class="favorite-counter @if (!auth()->user()->favorite_count) hidden @endif" >{{ auth()->user()->favorite_count }}</span>
                     </a>
-                    <a href="{{ url('/profile/cart') }}" class="basket rection_groups">
+                    <a href="{{ url('/cart') }}" class="basket rection_groups">
                         @include('icons.cart')
-                        <span>10</span>
+                        <span class="cart-counter @if (!auth()->user()->getCartCount()) hidden @endif">{{ auth()->user()->getCartCount() }}</span>
                     </a>
                 @endif
             </div>

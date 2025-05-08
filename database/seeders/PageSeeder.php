@@ -89,5 +89,9 @@ class PageSeeder extends Seeder
         'title' => 'Product Page',
         'slug' => 'product',
       ]);
+      $cart = Page::firstOrCreate([
+        'title' => 'Cart',
+        'slug' => 'cart',
+      ]);
     }
 }

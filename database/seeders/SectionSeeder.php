@@ -207,6 +207,15 @@ class SectionSeeder extends Seeder
         'component' => 'product_content',
       ]
     );
+    $cart_content = Section::firstOrCreate(
+      ['slug' => 'cart'],
+      [
+        'title' => 'Cart Page',
+        'slug' => 'cart',
+        'type' => 'site',
+        'component' => 'cart',
+      ]
+    );
 
 
     $this->build();
@@ -563,6 +572,16 @@ class SectionSeeder extends Seeder
               'comment_heading' => 'h2',
               'comment_header' => 'Reviews',
               'comment_more_comments' => 'Load More Comments',
+            ],
+          ]
+        ]
+      ],
+      [
+        'page' => Page::where('slug', 'cart')->first(),
+        'sections' => [
+          [
+            'model' => Section::where('slug', 'cart')->first(),
+            'variables' => [
             ],
           ]
         ]

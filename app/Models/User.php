@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Helpers\Collapse;
+use App\Helpers\SessionExpire;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,11 +17,14 @@ use Filament\Panel;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, Searchable;
+
+    public array $cart = [];
 
     protected $guarded = ['id'];
 
@@ -220,5 +224,87 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function getRecomendAuthors(): Collection
     {
       return User::role('creator')->limit(6)->orderByDesc('id')->get();
+    }
+
+    public function getCart()
+    {
+      if (empty($this->cart)) {
+        $this->loadCart();
+      }
+
+      return $this->cart;
+    }
+
+    public function loadCart()
+    {
+      $this->cart = SessionExpire::getCart('cart') ?? [];
+    }
+
+    public function inCart(int $id)
+    {
+      $cart = $this->getCart();
+      return $this->hasProducts($cart) ? collect($cart['products'])->where('id', $id)->isNotEmpty() : false;
+    }
+
+    public function getCartCount(): int
+    {
+      $cart = $this->getCart();
+      if ($this->hasProducts($cart)) {
+        return collect($cart['products'])->sum('count');
+      }
+      return 0;
+    }
+
+    public function getCartAmount(): int
+    {
+      $cart = $this->getCart();
+      if ($this->hasProducts($cart)) {
+        $result = 0;
+        $products = $this->getCartProducts();
+
+        foreach ($cart['products'] as $product) {
+          $model = $products->where('id', $product['id'])->first();
+          if ($product) {
+            $result += ($model->price * $product['count']);
+          }
+        }
+        return $result;
+      }
+      return 0;
+    }
+
+    public function getCartProducts(): ?Collection
+    {
+      $cart = $this->getCart();
+      return $this->hasProducts($cart) ? Product::whereIn('id', $this->getCartProductsIds())->get() : collect([]);
+    }
+
+    public function getCartProductsIds(): array
+    {
+      $cart = $this->getCart();
+      return ($this->hasProducts($cart)) ? array_column($cart['products'], 'id') : [];
+    }
+
+    public function removeFromCart(int $id): bool
+    {
+      $cart = $this->getCart();
+      if ($this->hasProducts($cart)) {
+        foreach ($cart['products'] as $key => $product) {
+          if ($product['id'] == $id) {
+            unset($cart['products'][$key]);
+            break;
+          }
+        }
+        
+        SessionExpire::saveCart('cart', $cart);
+        $this->loadCart();
+        return true;
+      }
+      return false;
+    }
+
+    protected function hasProducts(array $cart)
+    {
+      return !empty($cart) && isset($cart['products']);
     }
 }

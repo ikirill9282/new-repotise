@@ -16,7 +16,7 @@ use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-  use HasAuthor, HasGallery, HasPrice, Searchable, HasFactory;
+  use HasAuthor, HasGallery, Searchable, HasFactory;
 
   public function toSearchableArray(): array
   {
@@ -87,19 +87,19 @@ class Product extends Model
     return $this->reviews_count ?? 0;
   }
 
-  public function price(): Attribute
-  {
-    return Attribute::make(
-      get: fn($val) => number_format($val),
-    );
-  }
+  // public function price(): Attribute
+  // {
+  //   return Attribute::make(
+  //     get: fn($val) => number_format($val),
+  //   );
+  // }
 
-  public function oldPrice(): Attribute
-  {
-    return Attribute::make(
-      get: fn($val) => number_format($val),
-    );
-  }
+  // public function oldPrice(): Attribute
+  // {
+  //   return Attribute::make(
+  //     get: fn($val) => number_format($val),
+  //   );
+  // }
 
   public function makeUrl()
   {

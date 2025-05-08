@@ -21,9 +21,10 @@ use Illuminate\Support\ItemNotFoundException;
 
 class SiteController extends Controller
 {
-
   public function __invoke(Request $request, string $slug = 'home')
   {
+    // Session::forget('cart');
+    // dd(SessionExpire::getCart('cart'));
     $params = $request->route()->parameters();
     $page = Page::where('slug', $slug)
       ->with('sections.variables')

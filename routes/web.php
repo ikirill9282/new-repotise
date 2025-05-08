@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\UserController as BaseUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FallbackController;
 use App\Http\Controllers\PageController;
@@ -21,6 +23,10 @@ Route::prefix('/auth')
     Route::post('signin', 'signin')->name('signin');
     Route::match(['get', 'post'], 'signout', 'signout')->name('signout');
   });
+
+Route::middleware('auth:web')->group(function() {
+  Route::get('/cart', [BaseUserController::class, 'cart']);
+});
 
 Route::get('/', SiteController::class)->name('home');
 Route::get('/{slug}', SiteController::class);

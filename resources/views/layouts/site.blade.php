@@ -40,6 +40,8 @@
 </head>
 
 <body>
+      @stack('before_header')
+      
       @include('site.header')
 
       <main class="" id="main">

@@ -101,6 +101,24 @@ header .about_block .right_group_block .rection_groups span {
     min-width: 21px;
 }
 
+.in-cart {
+  background: #A4A0A0 !important;
+}
+
+.in-cart:hover {
+  box-shadow: none !important;
+  cursor: auto !important;
+}
+
+.cart-drop {
+  color: #A4A0A0;
+  transition: color 0.3s;
+}
+
+.cart-drop:hover {
+  color: #FC7361;
+}
+
 .home {
     position: relative;
     background: none;
@@ -122,6 +140,10 @@ header .about_block .right_group_block .rection_groups span {
 }
 
 .product_page_home .breadcrumb-item:hover a {
+  color: #000 !important;
+}
+
+.placing_order .breadcrumb-item:hover a {
   color: #000 !important;
 }
 
@@ -713,6 +735,88 @@ aside .login svg {
   left: 33px;
 }
 
+.placing_order .about_block .right_orders .items_group .item .order_img {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.placing_order .about_block .right_orders .items_group .item .description_orders .title_description h4 a {
+  color: #000;
+  transition: color 0.3s;
+}
+
+.placing_order .about_block .right_orders .items_group .item .description_orders .title_description h4 a:hover {
+  color: #fc7361;
+}
+
+.empty-block h2 {
+  color: var(--black, #212121);
+  text-align: center;
+  font-size: 26px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+  margin-bottom: 40px;
+}
+
+.empty-block .bottom_text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.empty-block .bottom_text .discover {
+  color: var(--white, #FFF);
+  border-radius: 4px;
+  background: var(--main, #FC7361);
+}
+
+.empty-block .bottom_text .connect {
+  color: var(--black, #212121);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  padding: 8px 20px;
+  border-radius: 4px;
+  border: 1px solid var(--main, #FC7361);
+  background: var(--white, #FFF);
+  transition: 0.5s all ease;
+}
+
+.empty-block .top_group_fav {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
+
+.empty-block .bottom_text a {
+  color: var(--black, #212121);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  padding: 8px 20px;
+  border-radius: 4px;
+  border: 1px solid var(--main, #FC7361);
+  background: var(--white, #FFF);
+  transition: 0.5s all ease;
+}
+
+.placing_order .about_block .left_form {
+  min-width: auto !important;
+  width: 100%;
+}
+
+.text_cost span {
+  color: inherit !important;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -1098,6 +1202,10 @@ aside .login svg {
     .products_favorite .about_block .sections_menu .top_group_fav .favorite_cards_group .item .img_products .main_img {
       width: 100%;
     }
+
+    .placing_order .about_block {
+      flex-direction: row;
+    }
 }
 
 @media (max-width: 992px) {
@@ -1107,6 +1215,26 @@ aside .login svg {
 
     header.authorized .about_block .right_group_block .search {
         max-width: none;
+    }
+
+    .empty-block .top_group_fav {
+      flex-direction: column;
+    }
+
+    .placing_order .about_block {
+      flex-direction: column;
+    }
+    .placing_order .about_block .left_form,
+    .placing_order .about_block .right_orders {
+      max-width: none;
+    }
+
+    .placing_order {
+      padding: 50px 0;
+    }
+
+    .placing_order .about_block .right_orders {
+      height: auto;
     }
 }
 
@@ -1387,6 +1515,11 @@ aside .login svg {
     .filter_products .about_block .filter_products_group .filter {
         width: 100%;
     }
+
+    .placing_order .container {
+      padding-right: calc(var(--bs-gutter-x) * .5);
+      padding-left: calc(var(--bs-gutter-x) * .5);
+    }
 }
 
 @media (max-width: 576px) {
@@ -1469,6 +1602,10 @@ aside .login svg {
     .popular_products .about_block .products_item {
         gap: 10px;
     }
+
+    .empty-block .bottom_text {
+      flex-direction: column;
+    }
 }
 
 @media (max-width: 375px) {
@@ -1488,5 +1625,12 @@ aside .login svg {
     .popular_products .about_block .products_item {
       -ms-grid-columns: 1fr !important;
       grid-template-columns: 1fr !important;
+    }
+
+    .placing_order .about_block .right_orders .items_group .item {
+      flex-direction: column;
+    }
+    .placing_order .about_block .right_orders .items_group .item .order_img {
+      width: 100%;
     }
 }

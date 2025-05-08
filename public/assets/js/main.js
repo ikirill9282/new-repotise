@@ -331,29 +331,47 @@ function updateMaxPrice(value, sliderNumber) {
     document.getElementById(`max-price-${sliderNumber}`).textContent = formattedValue;
 }
   
-document.addEventListener("DOMContentLoaded", function () {
-    const sliders = document.querySelectorAll('.slider');
+// document.addEventListener("DOMContentLoaded", function () {
+//     const sliders = document.querySelectorAll('.slider');
 
-    sliders.forEach((slider, index) => {
-        const sliderNumber = slider.id.replace(/^.*?(\d+)$/is, "$1");
+//     sliders.forEach((slider, index) => {
+//         const sliderNumber = slider.id.replace(/^.*?(\d+)$/is, "$1");
         
-        const initialPercentage = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
-        slider.style.background = `linear-gradient(to right, #FC7361 ${initialPercentage}%, #F3F2F2 ${initialPercentage}%)`;
+//         const initialPercentage = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+//         slider.style.background = `linear-gradient(to right, #FC7361 ${initialPercentage}%, #F3F2F2 ${initialPercentage}%)`;
 
-        const formattedValue = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        }).format(slider.value);
+//         const formattedValue = new Intl.NumberFormat('en-US', {
+//         style: 'currency',
+//         currency: 'USD',
+//         }).format(slider.value);
 
-        document.getElementById(`max-price-${sliderNumber}`).textContent = formattedValue;
-});
-});
-
-
+//         document.getElementById(`max-price-${sliderNumber}`).textContent = formattedValue;
+// });
+// });
 
 
 
 
+
+const counterChanged = (elem, count) => {
+  const item = $(elem).data('item');
+  
+  $.ajax({
+    method: 'POST',
+    url: '/api/cart/count',
+    data: {
+      _token: getCSRF(),
+      item: item,
+      count: count,
+    }
+  }).then(response => {
+    if (response.status === 'success') {
+      $('.cart-counter').html(response.count);
+      $('.cart-counter').removeClass('hidden');
+      setCosts(response.costs);
+    }
+  })
+}
 
 document.querySelectorAll('.counter').forEach(counter => {
     const minusBtn = counter.querySelector('.minus');
@@ -362,15 +380,17 @@ document.querySelectorAll('.counter').forEach(counter => {
   
     let count = parseInt(countEl.textContent);
   
-    plusBtn.addEventListener('click', () => {
+    plusBtn.addEventListener('click', function() {
       count++;
       countEl.textContent = count;
+      counterChanged(this.closest('.counter'), count);
     });
   
-    minusBtn.addEventListener('click', () => {
+    minusBtn.addEventListener('click', function() {
       if (count > 1) {
         count--;
         countEl.textContent = count;
+        counterChanged(this.closest('.counter'), count);
       }
     });
 });
