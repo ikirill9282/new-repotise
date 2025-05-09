@@ -20,7 +20,8 @@
                 <div class="tab-content" id="pills-tabContent">
                     <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
                         aria-labelledby="pills-home-tab">
-                        <div class="top_group_fav favorites_second">
+                        <div class="favorites-content">
+                          <div class="top_group_fav favorites_second">
                             <div class="right_select">
                                 <span>Sort by:</span>
                                 <select>
@@ -41,6 +42,7 @@
                         @include('site.components.favorite.empty', [
                             'class' => auth()->user()->favorite_products->isEmpty() ? '' : 'hidden',
                         ])
+                        </div>
 
                         @include('site.components.recomend.wrapper', [
                             'models' => auth()->user()->getRecomendProducts(),
@@ -48,7 +50,8 @@
                         ])
                     </div>
                     <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                        <div class="top_group_fav favorites_second">
+                        <div class="favorites-content">
+                          <div class="top_group_fav favorites_second">
                             <div class="right_select">
                                 <span>Sort by:</span>
                                 <select>
@@ -60,8 +63,8 @@
                             <div class="cards_why_need">
                                 @foreach (auth()->user()->favorite_authors as $author)
                                     @include('site.components.favorite.author', [
-                                      'author' => $author,
-                                      'class' => 'removable',
+                                        'author' => $author,
+                                        'class' => 'removable',
                                     ])
                                 @endforeach
                             </div>
@@ -70,6 +73,7 @@
                         @include('site.components.favorite.empty', [
                             'class' => auth()->user()->favorite_authors->isEmpty() ? '' : 'hidden',
                         ])
+                        </div>
 
                         @include('site.components.recomend.wrapper', [
                             'models' => auth()->user()->getRecomendAuthors(),
@@ -97,29 +101,32 @@
 
 
             const toggleEmpty = (callback = null) => {
-              const items = wrap.find('.item');
-              if (!items.length) {
-                  empty.fadeIn();
-                  empty.removeClass('hidden')
-              } else {
-                  empty.hasClass('hidden') ? (callback === null ? true : callback()) : empty.fadeOut(() => {
-                    empty.addClass('hidden')
-                    callback()
-                  });
-              }
+                const items = wrap.find('.item');
+
+                if (!items.length) {
+                    empty.fadeIn();
+                    empty.removeClass('hidden')
+                } else {
+                    empty.hasClass('hidden') ? (callback === null ? true : callback()) : empty.fadeOut(() => {
+                        empty.addClass('hidden')
+                        callback()
+                    });
+                }
             }
 
-            const hideElement = (elemet) => {
-              elemet.fadeOut(() => {
-                  elemet.detach();
-                  toggleEmpty();
-              });
+            const hideElement = (obj, byHeight = false) => {
+                if (byHeight) {
+                    obj.animate({ opacity: 0 });
+                    obj.animate({ height: 'toggle' }, 400, 'swing', () => obj.detach() && toggleEmpty());
+                } else {
+                    obj.animate({ opacity: 0 }, 400, 'swing', () => obj.css({ height: '0px' }));
+                    obj.animate({ width: 'toggle', 'flex-basis': '0%', }, 400, 'swing', () => obj.detach() && toggleEmpty());
+                }
             }
 
             if (!data.result.value) {
                 if (block.hasClass('removable')) {
-                    hideElement(block);
-                    toggleEmpty();
+                    hideElement(block, (data.result.type === 'author'));
                 }
 
                 if (analogs.length) {
@@ -131,38 +138,37 @@
                     })
                 }
             } else {
-
                 if (data.result.type === 'author') {
-                  $.ajax({
-                    method: 'POST',
-                    url: '/api/data/favorite-author',
-                    data: {
-                      _token: getCSRF(),
-                      id: data.result.model_id,
-                    }
-                  }).then(response => {
-                    if (response.status) {
-                      const new_block = $(response.content);
-                      new_block.addClass('removable');
-                      new_block.addClass('hidden');
-                      FavoriteButtons().discover(new_block);
-                      parent.find('.cards_why_need').prepend(new_block)
-                      toggleEmpty(() => {
-                        new_block.fadeOut(() => new_block.removeClass('hidden'));
-                      });
-                    }
-                  })
+                    $.ajax({
+                        method: 'POST',
+                        url: '/api/data/favorite-author',
+                        data: {
+                            _token: getCSRF(),
+                            id: data.result.model_id,
+                        }
+                    }).then(response => {
+                        if (response.status) {
+                            const new_block = $(response.content);
+                            new_block.addClass('removable');
+                            new_block.addClass('hidden');
+                            FavoriteButtons().discover(new_block);
+                            parent.find('.cards_why_need').prepend(new_block)
+                            toggleEmpty(() => {
+                                new_block.fadeOut(() => new_block.removeClass('hidden'));
+                            });
+                        }
+                    })
                 }
 
                 if (data.result.type === 'product') {
-                  const clone = block.clone();
-                  clone.addClass('removable');
-                  clone.addClass('hidden');
-                  FavoriteButtons().discover(clone);
-                  wrap.find('.favorite_cards_group').prepend(clone)
-                  toggleEmpty(() => {
-                    clone.fadeOut(() => clone.removeClass('hidden'));
-                  });
+                    const clone = block.clone();
+                    clone.addClass('removable');
+                    clone.addClass('hidden');
+                    FavoriteButtons().discover(clone);
+                    wrap.find('.favorite_cards_group').prepend(clone)
+                    toggleEmpty(() => {
+                        clone.fadeOut(() => clone.removeClass('hidden'));
+                    });
                 }
             }
         });
