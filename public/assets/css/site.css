@@ -444,6 +444,10 @@ aside .login svg {
     border-radius: 50%;
 }
 
+.feed-item .breadcrumb-item:hover a {
+  color: #000 !important;
+}
+
 #feed .feed-item .similar_materials .cards_group {
     width: 100%;
 }
