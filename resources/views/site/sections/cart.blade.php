@@ -1,8 +1,6 @@
 @php
-    $amount = auth()->user()->getCartAmount();
-    // dd($amount);
 @endphp
-@if (isset($cart['products']) && !empty($cart['products']))
+@if ($order?->products && $order->products->isNotEmpty())
   <section class="placing_order">
       @include('site.components.breadcrumbs', [
           'current_name' => 'Checkout',
@@ -10,9 +8,9 @@
       <div class="container">
           <div class="about_block">
               <div class="left_form">
-                  <form>
+                  <form action="/cart/order" >
                       <div class="input_block">
-                          <input type="text" placeholder="Your Full Name">
+                          <input type="text" name="fullname" placeholder="Your Full Name">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
                               fill="none">
                               <g clip-path="url(#clip0_2620_22679)">
@@ -28,7 +26,7 @@
                           </svg>
                       </div>
                       <div class="input_block">
-                          <input type="email" placeholder="Your Email">
+                          <input type="email" name="email" placeholder="Your Email">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
                               fill="none">
                               <g clip-path="url(#clip0_2620_22679)">
@@ -44,16 +42,17 @@
                           </svg>
                       </div>
                       <div class="menu_block">
+                          <input type="hidden" name="is-gift" class="is-gift" value="0">
                           <ul class="nav nav-pills" id="pills-tab" role="tablist">
                               <li class="nav-item" role="presentation">
-                                  <button class="nav-link text-primary fw-semibold active position-relative"
-                                      id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home"
+                                  <button class="nav-link text-primary fw-semibold active position-relative is-gift-button"
+                                      id="pills-home-tab" data-value="1" data-bs-toggle="pill" data-bs-target="#pills-home"
                                       type="button" role="tab" aria-controls="pills-home"
                                       aria-selected="true">For Myself</button>
                               </li>
                               <li class="nav-item" role="presentation">
-                                  <button class="nav-link text-primary fw-semibold position-relative"
-                                      id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile"
+                                  <button class="nav-link text-primary fw-semibold position-relative is-gift-button"
+                                      id="pills-profile-tab" data-value="0" data-bs-toggle="pill" data-bs-target="#pills-profile"
                                       type="button" role="tab" aria-controls="pills-profile"
                                       aria-selected="false">Send as Gift</button>
                               </li>
@@ -68,7 +67,7 @@
                               <div class="tab-pane fade" id="pills-profile" role="tabpanel"
                                   aria-labelledby="pills-profile-tab">
                                   <div class="input_block gift_input">
-                                      <input type="text" placeholder="Gift Recipient Email">
+                                      <input type="email" placeholder="Gift Recipient Email">
                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                           viewBox="0 0 16 16" fill="none">
                                           <g clip-path="url(#clip0_2620_22679)">
@@ -84,7 +83,7 @@
                                       </svg>
                                   </div>
                                   <div class="textarea_block">
-                                      <textarea placeholder="Add a Gift Message (Optional)"></textarea>
+                                      <textarea class="text-area-gift" placeholder="Add a Gift Message (Optional)"></textarea>
                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                           viewBox="0 0 16 16" fill="none">
                                           <g clip-path="url(#clip0_2620_22679)">
@@ -98,14 +97,14 @@
                                               </clipPath>
                                           </defs>
                                       </svg>
-                                      <span>0/150</span>
+                                      <span class="text-area-gift-counter"><span class="text-area-counter">0</span>/150</span>
                                   </div>
                               </div>
                           </div>
                       </div>
                       <div class="promo_cod">
                           <div class="input_block">
-                              <input type="number" placeholder="Promo Code">
+                              <input type="text" class="promocode-input" placeholder="Promo Code" value="{{ $order?->promocode->code  ?? ''}}">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                   viewBox="0 0 16 16" fill="none">
                                   <g clip-path="url(#clip0_2620_22679)">
@@ -126,7 +125,7 @@
                           <h3>Choose Payment Method</h3>
                           <label class="card-option">
                               <div class="left_text">
-                                  <input type="radio" name="pay" class="custom-radio" checked>
+                                  <input type="radio" class="custom-radio" checked>
                                   <span class="label-text">Bank cards</span>
                               </div>
                               <div class="card-icons">
@@ -137,7 +136,7 @@
                           </label>
                           <label class="card-option">
                               <div class="left_text">
-                                  <input type="radio" name="pay" class="custom-radio" checked>
+                                  <input type="radio" class="custom-radio" checked>
                                   <span class="label-text">Bank cards</span>
                               </div>
                               <div class="card-icons">
@@ -150,23 +149,23 @@
                       <div class="costs">
                           <div class="text_cost">
                               <span>Subtotal</span>
-                              <h4>$<span class="cart-subtotal">{{ number_format(auth()->user()->getCartAmount()) }}</span></h4>
+                              <h4>$<span class="cart-subtotal">{{ number_format($order->getAmount()) }}</span></h4>
                           </div>
                           <div class="text_cost">
                               <span>Discount</span>
-                              <h4 class="color_red">-$<span class="cart-discount">200</span></h4>
+                              <h4 class="color_red">-$<span class="cart-discount">{{ number_format($order->getDiscount()) }}</span></h4>
                           </div>
                           <div class="text_cost">
                               <span>Tax</span>
-                              <h4 class="color_red">-$<span class="cart-tax">2</span></h4>
+                              <h4 class="color_red">-$<span class="cart-tax">{{ number_format($order->getTax()) }}</span></h4>
                           </div>
                           <div class="text_cost">
                               <h5>Total</h5>
-                              <h6>$<span class="cart-total">5000</span></h6>
+                              <h6>$<span class="cart-total">{{ number_format($order->getTotal()) }}</span></h6>
                           </div>
                       </div>
                       <button class="place_button">Place Order</button>
-                      <p class="terms_service">By placing your order, you agree to our <a href="#">Terms of
+                      <p class="terms_service">By placing your order, you agree to our <a href="{{ url('/all-policies') }}">Terms of
                               Service & Privacy Policy.</a></p>
                       <div class="bottom_back_block">
                           <a href="#" class="back_cart">
@@ -176,21 +175,20 @@
                               </svg>
                               Back to Cart
                           </a>
-                          <a href="#" class="need_help">Need Help?</a>
+                          <a href="{{ url('/help-center') }}" class="need_help">Need Help?</a>
                       </div>
                   </form>
               </div>
               <div class="right_orders">
                   <div class="title_block">
                       <h3>Your order</h3>
-                      <p>Items <span>(<span class="cart-counter">{{ auth()->user()->getCartCount() }}</span>)</span></p>
+                      <p>Items <span>(<span class="cart-counter">{{ $order->getCount() }}</span>)</span></p>
                   </div>
                   <div class="items_group">
-                      @foreach ($cart['products'] as $product)
+                      @foreach ($order->products as $product)
                           @include('site.components.cards.product', [
                             'template' => 'cart',
-                            'model' => $product['model'],
-                            'count' => $product['count'],
+                            'model' => $product,
                           ])
                       @endforeach
                   </div>
@@ -200,9 +198,34 @@
   </section>
 @endif
 
-<div class="container empty-container !pt-10 !pb-10 {{ (isset($cart['products']) && !empty($cart['products'])) ? 'hidden' : '' }}">
+<div class="container empty-container !pt-10 !pb-10 {{ ($order?->products && $order->products->isNotEmpty()) ? 'hidden' : '' }}">
   @include('site.components.favorite.empty', [
     'text' => 'Cart',
-    'class' => 'empty-cart'
+    'class' => 'empty-cart',
   ])
 </div>
+
+@push('js')
+  <script>
+    $('.text-area-gift').on('input', function(evt) {
+      $('.text-area-gift-counter').find('.text-area-counter').html(evt.target.value.length);
+    });
+
+    $('.promocode-input').on('input', function(evt) {
+      $(this).val(evt.target.value.replace(' ', '').toUpperCase());
+    });
+
+    $('.promocode-input').on('change', function(evt) {
+      $(this).val(evt.target.value.replace(' ', '').toUpperCase());
+    });
+
+    $('.apply').on('click', function(evt) {
+      evt.preventDefault();
+      applyPromocode($(this).siblings('.input_block').find('input').val());
+    });
+
+    $('.is-gift-button').on('click', function() {
+      $('.is-gift').val($(this).data('value'));
+    });
+  </script>
+@endpush

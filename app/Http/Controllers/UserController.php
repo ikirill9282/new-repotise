@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Admin\Page;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
+use App\Models\Order;
 use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
@@ -17,20 +18,48 @@ class UserController extends Controller
     $page = $this->getPage('cart');
 
     $cart = Auth::user()->getCart();
-    $products = Auth::user()->getCartProducts();
+    $order = Order::prepare($cart);
     
-    if (isset($cart['products']) && !empty($cart['products'])) {
-      $cart['products'] = array_map(function($item) use($products) {
-        $product = $products->where('id', $item['id'])->first();
+    // $products = Auth::user()->getCartProducts();
+    
+    // if ($order?->products && !empty($order->products)) {
+    //   $order->products = array_map(function($item) use($products) {
+    //     $product = $products->where('id', $item['id'])->first();
         
-        if (is_null($product)) return null;
+    //     if (is_null($product)) return null;
   
-        $item['model'] = $product;
+    //     $item['model'] = $product;
   
+    //     return $item;
+    //   }, $order->products);
+    // }
+
+    return view("site.page", ['page' => $page, 'order' => $order]);
+  }
+
+  public function order(Request $request)
+  {
+    $cart = Auth::user()->getCart();
+    if (isset($cart['products']) && !empty($cart['products'])) {
+      $prepared = Order::prepare($cart);
+      $order = Order::create([
+        'user_id' => Auth::user()->id,
+        'price' => $prepared->getTotal(),
+        'tax' => $prepared->getTax(),
+        'price_without_discount' => $prepared->getAmount(),
+        'promocode' => $prepared->promocode?->id,
+        'recipient' => ($request->has('is-gift') && $request->get('is-gift')) ? $request->get('recipient') : null,
+        'recipient_message' => ($request->has('is-gift') && $request->get('is-gift')) ? $request->get('recipient_message') : null,
+      ]);
+
+      $order->products()->sync(array_map(function($item) {
+        $item['product_id'] = $item['id'];
+        unset($item['id']);
         return $item;
-      }, $cart['products']);
+      }, $cart['products']));
+
+      Auth::user()->flushCart();
     }
-    return view("site.page", ['page' => $page, 'cart' => $cart]);
   }
 
   protected function getPage(string $name)

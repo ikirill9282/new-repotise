@@ -59,4 +59,13 @@ class SessionExpire
       }
     }
   }
+
+  public static function addPromocode(string $session_key, int $id)
+  {
+    if (Session::exists($session_key)) {
+      $session_data = static::getCart($session_key);
+      $session_data['promocode'] = $id;
+      static::saveCart($session_key, $session_data);
+    }
+  }
 }

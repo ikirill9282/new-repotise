@@ -205,4 +205,9 @@ class Product extends Model
 
     return static::where('id', $id)->with('author')->withCount('reviews')->first();
   }
+
+  public static function getAnalogs(int $product_id = null)
+  {
+    return static::latest()->limit(10)->get();
+  }
 }

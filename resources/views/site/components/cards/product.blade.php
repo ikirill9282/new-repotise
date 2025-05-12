@@ -11,15 +11,19 @@
             <h4><a
                     href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
             </h4>
-            <h5>{{ number_format($model->price) }}
-                <span>{{ number_format($model->price) }}</span></h5>
+            <h5>
+              {{ number_format($model->price) }}
+              @if (isset($model->old_price))
+                <span>${{ number_format($model->old_price) }}</span>
+              @endif
+            </h5>
         </div>
         <p>{{ $model->categories->pluck('title')->join(', ') }}</p>
         <div class="w-full flex justify-between items-center">
           <div class="counter"
             data-item="{{ $hash }}">
             <button class="btn minus">−</button>
-            <span class="count">{{ $count ?? '' }}</span>
+            <span class="count">{{ $model->pivot->count ?? $model->pivot['count'] }}</span>
             <button class="btn plus">+</button>
         </div>
         <div class="drop cart-drop hover:cursor-pointer"  data-item="{{ $hash }}">
@@ -63,7 +67,7 @@
       @foreach ($model->categories as $category)
         <a class="text-nowrap" href="{{ url("/search?q={$category->title}") }}">{{ $category->title }}</a>
       @endforeach
-      <a class="text-nowrap" href="{{ url("/search?q={$model->location->title}") }}">{{ $model->location->title }}</a>
+      <a class="text-nowrap" href="{{ url("/products/{$model->location->slug}") }}">{{ $model->location->title }}</a>
   </div>
   <div class="stars_block !mt-auto">
       <div class="stars">

@@ -4,8 +4,8 @@ while($models->count() < $max) {
   $models = $models->collect()->merge($models)->slice(0, $max);
 }
 @endphp
-<div class="favorite_products">
-  <h2>Recommended for you</h2>
+<div class="favorite_products {{ isset($wrap_class) ? $wrap_class : '' }}">
+  <h2>{{ isset($header) ? $header : 'Recommended for you' }}</h2>
   <div class="products_item">
       <div class="swiper mySwiperRecomend">
           <div class="swiper-wrapper">

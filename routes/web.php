@@ -26,6 +26,7 @@ Route::prefix('/auth')
 
 Route::middleware('auth:web')->group(function() {
   Route::get('/cart', [BaseUserController::class, 'cart']);
+  Route::get('/cart/order', [BaseUserController::class, 'order']);
 });
 
 Route::get('/', SiteController::class)->name('home');

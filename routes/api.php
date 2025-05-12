@@ -34,5 +34,6 @@ Route::prefix('api')->group(function() {
     Route::post('/push', 'push');
     Route::post('/count', 'count');
     Route::post('/remove', 'remove');
+    Route::post('/promocode', 'promocode');
   });
 });

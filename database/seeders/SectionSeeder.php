@@ -216,6 +216,24 @@ class SectionSeeder extends Seeder
         'component' => 'cart',
       ]
     );
+    $payment_success = Section::firstOrCreate(
+      ['slug' => 'payment-success'],
+      [
+        'title' => 'Payment Success',
+        'slug' => 'payment-success',
+        'type' => 'site',
+        'component' => 'payment_success',
+      ]
+    );
+    $payment_error = Section::firstOrCreate(
+      ['slug' => 'payment-error'],
+      [
+        'title' => 'Payment Error',
+        'slug' => 'payment-error',
+        'type' => 'site',
+        'component' => 'payment_error',
+      ]
+    );
 
 
     $this->build();
@@ -585,7 +603,27 @@ class SectionSeeder extends Seeder
             ],
           ]
         ]
-      ]
+      ],
+      [
+        'page' => Page::where('slug', 'payment-success')->first(),
+        'sections' => [
+          [
+            'model' => Section::where('slug', 'payment-success')->first(),
+            'variables' => [
+            ],
+          ]
+        ]
+      ],
+      [
+        'page' => Page::where('slug', 'payment-error')->first(),
+        'sections' => [
+          [
+            'model' => Section::where('slug', 'payment-error')->first(),
+            'variables' => [
+            ],
+          ]
+        ]
+      ],
     ];
 
     foreach ($data as $item) {

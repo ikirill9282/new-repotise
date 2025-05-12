@@ -152,9 +152,7 @@ header .about_block .right_group_block .all_products:hover {
   background: var(--main, #FC7361);
   color: var(--white, #FFF);
 }
-header .about_block .right_group_block .all_products:hover svg path {
-  fill: var(--white, #FFF);
-}
+
 header .about_block .right_group_block .menu ul {
   display: flex;
   align-items: center;
@@ -6223,13 +6221,13 @@ header .about_block .right_group_block .login svg {
   padding: 50px 0;
   background: #F9F9F9;
 }
-.also_like .about_block {
+.also_like {
   padding: 30px;
   border-radius: 10px;
   background: var(--white, #FFF);
   margin-bottom: 50px;
 }
-.also_like .about_block h2 {
+.also_like h2 {
   color: var(--black, #212121);
   font-size: 26px;
   font-style: normal;
@@ -6237,13 +6235,13 @@ header .about_block .right_group_block .login svg {
   line-height: 140%;
   margin-bottom: 40px;
 }
-.also_like .about_block .products_item .item {
+.also_like .products_item .item {
   max-width: 224px;
 }
-.also_like .about_block .products_item .item .img_products {
+.also_like .products_item .item .img_products {
   position: relative;
 }
-.also_like .about_block .products_item .item .img_products .span_buy {
+.also_like .products_item .item .img_products .span_buy {
   position: absolute;
   right: 10px;
   top: 10px;
@@ -6252,18 +6250,18 @@ header .about_block .right_group_block .login svg {
   background: rgba(249, 249, 249, 0.5);
   transition: 0.5s all ease;
 }
-.also_like .about_block .products_item .item .img_products .span_buy:hover {
+.also_like .products_item .item .img_products .span_buy:hover {
   background: var(--bg, #F9F9F9);
 }
-.also_like .about_block .products_item .item .img_products .span_buy:hover svg {
+.also_like .products_item .item .img_products .span_buy:hover svg {
   fill: #FF2C0C;
 }
-.also_like .about_block .products_item .item .img_products .main_img {
+.also_like .products_item .item .img_products .main_img {
   width: 224px;
   height: 238px;
   border-radius: 5px;
 }
-.also_like .about_block .products_item .item .img_products .to_basket {
+.also_like .products_item .item .img_products .to_basket {
   display: flex;
   height: 45px;
   padding: 8px 20px;
@@ -6286,11 +6284,11 @@ header .about_block .right_group_block .login svg {
   left: 10px;
   transition: 0.5s all ease;
 }
-.also_like .about_block .products_item .item .img_products .to_basket:hover {
+.also_like .products_item .item .img_products .to_basket:hover {
   background: var(--main2, #484134);
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
-.also_like .about_block .products_item .item h3 {
+.also_like .products_item .item h3 {
   color: var(--gray, #A4A0A0);
   font-size: 16px;
   font-style: normal;
@@ -6298,20 +6296,20 @@ header .about_block .right_group_block .login svg {
   line-height: 140%;
   margin: 10px 0 5px 0;
 }
-.also_like .about_block .products_item .item .cost {
+.also_like .products_item .item .cost {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 5px;
 }
-.also_like .about_block .products_item .item .cost p {
+.also_like .products_item .item .cost p {
   color: var(--black, #212121);
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
   line-height: 140%;
 }
-.also_like .about_block .products_item .item .cost span {
+.also_like .products_item .item .cost span {
   color: var(--gray, #A4A0A0);
   font-size: 14px;
   font-style: normal;
@@ -6319,13 +6317,13 @@ header .about_block .right_group_block .login svg {
   line-height: 140%;
   text-decoration: line-through;
 }
-.also_like .about_block .products_item .item .inf_cards {
+.also_like .products_item .item .inf_cards {
   display: flex;
   align-items: center;
   gap: 5px;
   margin-bottom: 5px;
 }
-.also_like .about_block .products_item .item .inf_cards a {
+.also_like .products_item .item .inf_cards a {
   color: var(--gray, #A4A0A0);
   font-size: 12px;
   font-style: normal;
@@ -6336,31 +6334,31 @@ header .about_block .right_group_block .login svg {
   background: var(--bg, #F9F9F9);
   transition: 0.5s all ease;
 }
-.also_like .about_block .products_item .item .inf_cards a:hover {
+.also_like .products_item .item .inf_cards a:hover {
   background: var(--main2, #484134);
   color: var(--white, #FFF);
 }
-.also_like .about_block .products_item .item .stars_block {
+.also_like .products_item .item .stars_block {
   display: flex;
   align-items: center;
   gap: 12px;
   transition: 0.5s all ease;
 }
-.also_like .about_block .products_item .item .stars_block:hover {
+.also_like .products_item .item .stars_block:hover {
   cursor: pointer;
 }
-.also_like .about_block .products_item .item .stars_block:hover .stars span svg path {
+.also_like .products_item .item .stars_block:hover .stars span svg path {
   fill: #FFDB0C;
 }
-.also_like .about_block .products_item .item .stars_block:hover .commends span {
+.also_like .products_item .item .stars_block:hover .commends span {
   color: var(--black, #000);
 }
-.also_like .about_block .products_item .item .stars_block .stars {
+.also_like .products_item .item .stars_block .stars {
   display: flex;
   align-items: center;
   gap: 2px;
 }
-.also_like .about_block .products_item .item .stars_block span {
+.also_like .products_item .item .stars_block span {
   color: var(--gray, #A4A0A0);
   font-size: 14px;
   font-style: normal;
@@ -7505,16 +7503,16 @@ footer .bottom_by_des .by_to {
     min-width: 0;
     width: 100%;
   }
-  .also_like .about_block {
+  .also_like {
     margin-bottom: 0;
   }
-  .also_like .about_block .products_item .item .img_products .main_img {
+  .also_like .products_item .item .img_products .main_img {
     width: 190px;
   }
-  .also_like .about_block .products_item .item {
+  .also_like .products_item .item {
     max-width: 190px;
   }
-  .also_like .about_block .products_item .item .img_products .to_basket {
+  .also_like .products_item .item .img_products .to_basket {
     width: 170px;
   }
   .success_pay_block .about_block .failed_pay .text_left {
@@ -8622,17 +8620,17 @@ footer .bottom_by_des .by_to {
   .also_like .container {
     padding: 0;
   }
-  .also_like .about_block {
+  .also_like {
     padding: 20px;
   }
-  .also_like .about_block .products_item .item .img_products .main_img {
+  .also_like .products_item .item .img_products .main_img {
     width: 200px;
     height: 204px;
   }
-  .also_like .about_block .products_item .item {
+  .also_like .products_item .item {
     max-width: 200px;
   }
-  .also_like .about_block .products_item .item .img_products .to_basket {
+  .also_like .products_item .item .img_products .to_basket {
     width: 190px;
     left: 5px;
   }

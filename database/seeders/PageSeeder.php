@@ -93,5 +93,13 @@ class PageSeeder extends Seeder
         'title' => 'Cart',
         'slug' => 'cart',
       ]);
+      $payment_success = Page::firstOrCreate([
+        'title' => 'Payment Success',
+        'slug' => 'payment-success',
+      ]);
+      $payment_error = Page::firstOrCreate([
+        'title' => 'Payment Error',
+        'slug' => 'payment-error',
+      ]);
     }
 }

@@ -413,6 +413,22 @@ function setCosts(data)
   })
 }
 
+function applyPromocode(promocode)
+{
+  $.ajax({
+    method: 'POST',
+    url: '/api/cart/promocode',
+    data: {
+      _token: getCSRF(),
+      promocode: promocode
+    }
+  }).then(response => {
+    if (response.status === 'success') {
+      setCosts(response.costs);
+    }
+  });
+}
+
 $(window).on('scroll', function(evt) {
     const point = $(this).scrollTop();
     if (point > (headerHeight + 10)) {
@@ -504,4 +520,4 @@ $('.cart-drop').on('click', function(evt) {
       setCosts(response.costs);
     }
   })
-})
+});

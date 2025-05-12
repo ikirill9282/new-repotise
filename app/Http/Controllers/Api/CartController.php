@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
+use App\Models\Promocode;
 
 class CartController extends Controller
 {
@@ -27,11 +29,15 @@ class CartController extends Controller
         }
 
         SessionExpire::saveCart('cart', $cart_data);
+        Auth::user()->loadCart();
+
       } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => 'Something went wrong...'], 502);
       }
 
-      return response()->json(['status' => 'success', 'products_count' => count($cart_data['products'])]);
+      $order = Order::prepare(Auth::user()->getCart());
+      
+      return response()->json(['status' => 'success', 'products_count' => $order->getCount()]);
     }
 
     public function count(Request $request)
@@ -44,12 +50,12 @@ class CartController extends Controller
       SessionExpire::setCartItemCount('cart', $valid['item']['id'], $valid['count']);
       Auth::user()->loadCart();
 
+      $order = Order::prepare(Auth::user()->getCart());
+
       return response()->json([
         'status' => 'success', 
         'count' => Auth::user()->getCartCount(),
-        'costs' => [
-          'subtotal' => number_format(Auth::user()->getCartAmount()),
-        ],
+        'costs' => $order->getCosts(),
       ]);
     }
 
@@ -61,12 +67,29 @@ class CartController extends Controller
       $item = CustomEncrypt::decodeUrlHash($valid['item']);
       Auth::user()->removeFromCart($item['id']);
 
+      $order = Order::prepare(Auth::user()->getCart());
+      
       return response()->json([
         'status' => 'success',
         'count' => Auth::user()->getCartCount(),
-        'costs' => [
-          'subtotal' => number_format(Auth::user()->getCartAmount()),
-        ],
+        'costs' => $order->getCosts(),
+      ]);
+    }
+
+    public function promocode(Request $request)
+    {
+      $valid = $request->validate(['promocode' => 'required|string']);
+      $promocode = Promocode::where('code', $valid['promocode'])->first();
+      if (!$promocode || !$promocode->active) {
+        return response()->json(['status' => 'error', 'message' => 'Promocode doesn\'t exists!']);
+      }
+
+      Auth::user()->applyPromocode($promocode);
+      $order = Order::prepare(Auth::user()->getCart());
+      
+      return response()->json([
+        'status' => 'success',
+        'costs' => $order->getCosts(),
       ]);
     }
 }

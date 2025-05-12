@@ -147,6 +147,11 @@ header .about_block .right_group_block .rection_groups span {
   color: #000 !important;
 }
 
+.success_pay_block .breadcrumb-item:hover a {
+  color: #000 !important;
+}
+
+
 .parallax {
     position: absolute;
     top: 0;
@@ -857,6 +862,18 @@ aside .login svg {
   text-align: right;
 }
 
+.also_like .products_item .item .img_products .main_img {
+  width: 100%;
+}
+
+.also_like .products_item .item {
+  max-width: none;
+}
+
+.also-block {
+  padding-top: 100px;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -1253,6 +1270,11 @@ aside .login svg {
     .product_page_home {
       padding: 50px 0;
     }
+
+    .also-block {
+      padding-top: 50px;
+    }
+
 }
 
 @media (max-width: 992px) {
