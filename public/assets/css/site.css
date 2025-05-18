@@ -231,10 +231,6 @@ header .about_block .right_group_block .rection_groups span {
     max-width: none;
 }
 
-footer .bottom_connecting_group .connecting .second_connect:hover svg g path {
-    fill: #000;
-}
-
 footer .top_menu_group h3 {
     color: var(--white, #fff);
     text-align: center;
@@ -392,9 +388,25 @@ aside .login svg {
     gap: 10px;
 }
 
+.tips_news_group .row {
+  align-items: stretch;
+}
+
+.tips_news_group .about_block .item_group .cards_group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  padding-bottom: 40px;
+  height: 100%;
+}
+.tips_news_group .about_block .item_group .cards_group .date {
+  margin-top: auto;
+}
+
 .tips_news_group .about_block .item_group .cards_group .main_img {
     -o-object-fit: cover;
     object-fit: cover;
+    width: 100%;
 }
 
 .tips_news_group .about_block .item_group {
@@ -672,7 +684,7 @@ aside .login svg {
 }
 
 .filter_products .about_block .filter_products_group .filter {
-    min-width: 300px;
+    width: 300px !important;
     width: auto;
 }
 
@@ -876,6 +888,24 @@ aside .login svg {
 
 .also-block {
   padding-top: 100px;
+}
+
+.success_pay_block .about_block .share_earn_block .text_right .connecting a {
+  color: #383D38;
+}
+
+
+footer .bottom_connecting_group .connecting a {
+  color: #484134;
+}
+
+.name_articles .about_block .left_name_text .bottom_group .share_group .connects a {
+  color: rgba(72, 65, 52, 0.5);
+  transition: 0.3s;
+}
+
+.name_articles .about_block .left_name_text .bottom_group .share_group .connects a:hover {
+  opacity: 1;
 }
 
 @media (min-width: 1140px) {
@@ -1586,7 +1616,7 @@ aside .login svg {
     }
 
     .filter_products .about_block .filter_products_group .filter {
-        width: 100%;
+        width: 100% !important;
     }
 
     .placing_order .container {

@@ -58,7 +58,7 @@ if (! function_exists('rating_images')) {
 if (! function_exists('hash_like')) {
   function hash_like(string $type, int $id): string
   {
-    return CustomEncrypt::encrypt([
+    return CustomEncrypt::generateUrlHash([
       'user_id' => Auth::user()?->id ?? null,
       'type' => $type,
       'model_id' => $id,
@@ -69,7 +69,7 @@ if (! function_exists('hash_like')) {
 if (! function_exists('hash_more')) {
   function hash_more(array $comment): string
   {
-    return CustomEncrypt::encrypt([
+    return CustomEncrypt::generateUrlHash([
       'id' => $comment['id'],
     ]);
   }
@@ -84,7 +84,7 @@ if (! function_exists('is_liked')) {
 }
 
 if (! function_exists('enable_more')) {
-  function enable_more(array $comment): string
+  function enable_more(array $comment): bool
   {
     if (!isset($comment['children_count'])) {
       return false;

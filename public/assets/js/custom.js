@@ -10,6 +10,53 @@ if (window.outerWidth <= 768) {
   });
 }
 
+const makeParallax = function() {
+  this.root;
+  this.top;
+  this.height;
+  this.img;
+
+  this.createParallax = (obj) => {
+    this.root = $(obj);
+    this.top = Math.ceil($('header').outerHeight())
+    this.height =  Math.ceil(this.root.outerHeight());
+    this.img = this.root.data('img');
+    
+    this.setStyles();
+  }
+
+  this.setStyles = () => {
+    if (this.root.hasClass('parallax-home')) {
+      if ($(window).outerWidth() < 769) {
+        let h = this.height * 1.3;
+        let t = h / 100 * 10;
+        this.root.css({
+          'background-size': `auto ${h}px`,
+          'background-position': `center -${t}px`,
+        });
+        return;
+      }
+    }
+    
+    const styles = {
+      'background-position': `center top`,
+      'background-size': `auto ${(this.height + this.top)}px`,
+    }
+
+    if (this.root.data('url') && this.root.data('url').length) {
+      styles['background-image'] = `url(${this.root.data('url')})`;
+    }
+
+    this.root.css(styles);
+  }
+
+  this.init = () => {
+    return [...document.querySelectorAll('.parallax')].map((elem) => this.createParallax(elem))
+  }
+
+  return this.init();
+}
+
 const CommentWriters = function() {
   this.writers = [];
   
@@ -60,12 +107,12 @@ const CommentWriters = function() {
     });
 
     input.on('focusout', (evt) => {
-      setTimeout(() => {
+      // setTimeout(() => {
         if (!input.val().length && !input.is(':focus')) {
           $(input).animate({ 'height': '20px' });
           $(input).data('open', false);
         }
-      }, 500);
+      // }, 500);
     });
   }
 
@@ -93,53 +140,6 @@ const Editors = function() {
       });
     });
     return this;
-  }
-
-  return this.init();
-}
-
-const makeParallax = function() {
-  this.root;
-  this.top;
-  this.height;
-  this.img;
-
-  this.createParallax = (obj) => {
-    this.root = $(obj);
-    this.top = Math.ceil($('header').outerHeight())
-    this.height =  Math.ceil(this.root.outerHeight());
-    this.img = this.root.data('img');
-    
-    this.setStyles();
-  }
-
-  this.setStyles = () => {
-    if (this.root.hasClass('parallax-home')) {
-      if ($(window).outerWidth() < 769) {
-        let h = this.height * 1.3;
-        let t = h / 100 * 10;
-        this.root.css({
-          'background-size': `auto ${h}px`,
-          'background-position': `center -${t}px`,
-        });
-        return;
-      }
-    }
-    
-    const styles = {
-      'background-position': `center top`,
-      'background-size': `auto ${(this.height + this.top)}px`,
-    }
-
-    if (this.root.data('url') && this.root.data('url').length) {
-      styles['background-image'] = `url(${this.root.data('url')})`;
-    }
-
-    this.root.css(styles);
-  }
-
-  this.init = () => {
-    return [...document.querySelectorAll('.parallax')].map((elem) => this.createParallax(elem))
   }
 
   return this.init();
@@ -267,9 +267,12 @@ const RepliesButtons = function(container) {
         elem.detach();
         
         this.discover('.commend');
+        new Editors();
         if (this.afterDiscover !== null) {
           this.afterDiscover();
         }
+
+        window.ReplyButtons.discover();
       });
     });
   }
@@ -305,27 +308,30 @@ const RepliesButtons = function(container) {
 }
 
 const FavoriteButtons = function() {
-
   this.discover = (container) => {
-    $(container).find('.favorite-button').each((key, btn) => {
-      $(btn).on('click', function(evt) {
+    $(container).find('.favorite-button').each((k, btn) => {
+      const button = $(btn);
+      const hash = button.data('item');
+      const key = button.data('key');
+
+      button.on('click', function(evt) {
         evt.preventDefault();
       
         $.ajax({
-          url: '/api/user/favorite',
+          url: '/api/feedback/favorite',
           method: 'POST',
           data: {
             _token: getCSRF(),
-            hash: $(this).data('item'),
+            hash: hash,
           },
         }).then(response => {
           if (response.status) {
             if (response.value) {
               $(this).addClass('favorite-active');
-              $(".favorite-button[data-key='"+ $(this).data('key') +"']").addClass('favorite-active');
+              $(".favorite-button[data-key='"+ key +"']").addClass('favorite-active');
             } else {
               $(this).removeClass('favorite-active');
-              $(".favorite-button[data-key='"+ $(this).data('key') +"']").removeClass('favorite-active');
+              $(".favorite-button[data-key='"+ key +"']").removeClass('favorite-active');
             }
             
             const counters = $('.favorite-counter');
@@ -344,7 +350,7 @@ const FavoriteButtons = function() {
           }
         });
       });
-    })
+    });
   }
 
   return {
@@ -388,11 +394,147 @@ const CartButtons = function() {
   }
 }
 
+const CommentForms = function () {
+  this.forms = {};
+
+  this.setListeners = (obj) => {
+      const form = $(obj);
+      const key = form.find('input[name="article"]').val();
+      
+      if (Object.keys(this.forms).includes(key)) {
+        return ;
+      }
+
+      form.on("submit", (e) => {
+          e.preventDefault();
+
+          const formData = {
+              _token: getCSRF(),
+              article: form.find('input[name="article"]').val(),
+              text: form.find('textarea[name="text"]').val(),
+              reply: form.find('input[name="reply"]').val(),
+          };
+
+          $.ajax({
+              url: "/api/feedback/comment",
+              type: "POST",
+              data: formData,
+          })
+              .then((response) => {
+                  if (response.status === "success") {
+                      form[0].reset();
+                      const input = form.find('textarea');
+                      setTimeout(() => {
+                        if (!input.val().length && !input.is(':focus')) {
+                          $(input).animate({ 'height': '20px' });
+                          $(input).data('open', false);
+                        }
+                      }, 500);
+                      // form.find('textarea[name="comment"]').val("");
+                      // form.find('.feedback-form__message').text('Comment submitted successfully!');
+                  } else {
+                      // form.find('.feedback-form__message').text('Error submitting comment.');
+                  }
+              })
+              .catch((error) => {
+                  console.error("Error:", error);
+                  // form.find('.feedback-form__message').text('An error occurred while submitting the comment.');
+              });
+      });
+
+      this.forms[key] = form;
+  };
+
+  this.discover = () => {
+      const feedbackForms = $(".feedback-form");
+      feedbackForms.each((index, form) => {
+          this.setListeners(form);
+      });
+  };
+
+  return {
+      discover: this.discover,
+      forms: this.forms,
+  };
+};
+
+const ReplyButtons = function() {
+  this.buttons = [];
+
+  this.setListeners = (button) => {
+    $(button).on('click', function(evt) {
+      evt.preventDefault();
+      const input = $(this).closest('.about_block').find('.reply-input');
+      const textarea = $(this).closest('.about_block').find('textarea');
+      const value = $(this).data('reply');
+      const text = $(this).closest('.commend').find('.review').clone();
+      const reply = $(this).closest('.about_block').find('.reply-block');
+
+      $('html, body').animate({
+        scrollTop: $(this).closest('.about_block').offset().top,
+      }, 100, 'swing');
+
+      input.val(value);
+      reply.find('.reply-text').html(text);
+
+      if (reply.hasClass('hidden')) {
+        reply.removeClass('hidden');
+      }
+    });
+  }
+
+  this.discover = () => {
+    $('.reply-button').each((key, btn) => {
+      this.setListeners(btn);
+    });
+  }
+}
+
+const DropReplyButtons = function() {
+  this.buttons = [];
+
+  this.setListeners = (btn) => {
+    const button = $(btn);
+
+    if (Object.keys(this.buttons).includes(button.data('key'))) {
+      return;
+    }
+    button.on('click', function(evt) {
+      evt.preventDefault();
+      const input = $(this).closest('.about_block').find('.reply-input');
+      const textarea = $(this).closest('.about_block').find('textarea');
+      const reply = $(this).closest('.about_block').find('.reply-block');
+
+      input.val('');
+      textarea.val(''); 
+      reply.addClass('hidden');
+    });
+  }
+
+  this.discover = () => {
+    $('.drop-reply').each((key, btn) => {
+      this.setListeners(btn);
+    });
+  }
+  return {
+    discover: this.discover,
+  }
+}
+
 const header = $('header');
 const headerHeight = header.outerHeight();
 // const start = (document.querySelector('.parallax')) ? $('.parallax').outerHeight() : headerHeight;
-FavoriteButtons().discover('body');
-CartButtons().discover('body');
+window.FavoriteButtons = new FavoriteButtons();
+window.CartButtons = new CartButtons();
+window.CommentForms = new CommentForms();
+window.ReplyButtons = new ReplyButtons()
+window.DropReplyButtons = new DropReplyButtons();
+
+window.FavoriteButtons.discover('body');
+window.CartButtons.discover('body');
+window.CommentForms.discover();
+window.ReplyButtons.discover();
+window.DropReplyButtons.discover();
 
 let lastPoint = 0;
 

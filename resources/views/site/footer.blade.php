@@ -26,10 +26,10 @@
                 <div class="group mb-4 hidden md:block md:mb-0">
                     <h3 class="flex justify-between !mb-4"><span>Legal</span> </h3>
                     <ul class="overflow-hidden">
-                        <li><a href="{{ url('/terms-and-conditions') }}">Terms and Conditions</a></li>
-                        <li><a href="{{ url('/privacy-policy') }}">Privacy Policy</a></li>
-                        <li><a href="{{ url('/cookie-policy') }}">Cookie Policy</a></li>
-                        <li><a href="{{ url('/all-policies') }}">More Policies</a></li>
+                        <li><a href="{{ url('/policies/terms-and-conditions') }}">Terms and Conditions</a></li>
+                        <li><a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a></li>
+                        <li><a href="{{ url('/policies/cookie-policy') }}">Cookie Policy</a></li>
+                        <li><a href="{{ url('/policies') }}">More Policies</a></li>
                     </ul>
                 </div>
                 <div class="group mb-4 md:mb-0">
@@ -44,29 +44,29 @@
         </nav>
         <div class="bottom_connecting_group">
             <div class="logo">
-                <a href="#">
+                <a href="{{ route('home') }}">
                     @include('icons.footer_logo')
                 </a>
             </div>
             <div class="connecting">
-                <a href="#" class="first_connect transition">
+                <a href="#" class="first_connect transition !duration-500 hover:!text-blue-500">
                     @include('icons.facebook')
                 </a>
-                <a href="#" class="second_connect transition">
+                <a href="#" class="second_connect transition !duration-500 hover:!text-black">
                     @include('icons.twitter')
                 </a>
             </div>
         </div>
         <nav class="menu_bottom">
             <ul>
-                <li><a href="{{ url('/terms-and-conditions') }}">Terms and Conditions</a></li>
-                <li><a href="{{ url('/privacy-policy') }}">Privacy Policy</a></li>
-                <li><a href="{{ url('/cookie-policy') }}">Cookie Policy</a></li>
-                <li><a href="{{ url('/all-policies') }}">More Policies</a></li>
+                <li><a href="{{ url('/partner/terms-and-conditions') }}">Terms and Conditions</a></li>
+                <li><a href="{{ url('/partner/privacy-policy') }}">Privacy Policy</a></li>
+                <li><a href="{{ url('/partner/cookie-policy') }}">Cookie Policy</a></li>
+                <li><a href="{{ url('/partner/all-policies') }}">More Policies</a></li>
             </ul>
         </nav>
         <div class="bottom_by_des">
-            <span class="TrekGuider_span">2025 TrekGuider Ink.</span>
+            <span class="TrekGuider_span">{{ date('Y', time()) }} TrekGuider Ink.</span>
             <span class="by_to">by moloko69.ru</span>
         </div>
     </div>

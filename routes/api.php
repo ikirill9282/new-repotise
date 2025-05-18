@@ -24,11 +24,12 @@ Route::prefix('api')->group(function() {
   Route::prefix('/feedback')->middleware('auth:web')->controller(FeedbackController::class)->group(function() {
     Route::get('/views', 'views');
     Route::post('/likes', 'likes');
-  });
-
-  Route::prefix('/user')->middleware('auth:web')->controller(UserController::class)->group(function() {
+    Route::post('/comment', 'comment');
     Route::post('/favorite', 'favorite');
   });
+
+  // Route::prefix('/user')->middleware('auth:web')->controller(UserController::class)->group(function() {
+  // });
 
   Route::prefix('/cart')->middleware('auth:web')->controller(CartController::class)->group(function() {
     Route::post('/push', 'push');

@@ -128,7 +128,9 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function favorite_products()
     {
-      return $this->hasManyThrough(Product::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')->where('type', 'product');
+      return $this->hasManyThrough(Product::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')
+        ->where('type', 'product')
+        ->orderByDesc('user_favorites.created_at');
     }
 
     public function followers()
@@ -138,7 +140,9 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function favorite_authors()
     {
-      return $this->hasManyThrough(User::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')->where('type', 'author');
+      return $this->hasManyThrough(User::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')
+        ->where('type', 'author')
+        ->orderByDesc('user_favorites.created_at');
     }
 
     public function favoriteCount(): Attribute

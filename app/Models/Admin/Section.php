@@ -9,7 +9,7 @@ class Section extends Model
 {
     public function pages()
     {
-      return $this->belongsToMany(Page::class, 'page_sections')->withPivot('order');
+      // return $this->belongsToMany(Page::class, 'page_sections')->withPivot('order');
     }
 
     public function variables()

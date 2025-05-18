@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\SessionExpire;
 use App\Search\SearchClient;
-use App\Models\Admin\Page;
+use App\Models\Page;
 use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -18,93 +18,178 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Helpers\CustomEncrypt;
 use Illuminate\Support\ItemNotFoundException;
+use App\Models\Order;
 
 class SiteController extends Controller
 {
-  public function __invoke(Request $request, string $slug = 'home')
+
+  public function home(Request $request)
   {
-    // Session::forget('cart');
-    // dd(SessionExpire::getCart('cart'));
-    $params = $request->route()->parameters();
-    $page = Page::where('slug', $slug)
-      ->with('sections.variables')
+    $page = Page::where('slug', 'home')
+      ->with('config')
       ->first();
 
     if (is_null($page)) {
       return (new FallbackController())($request);
     }
-    
-    $response_data = [
-      'page' => $page,
-    ];
 
-    if ($page->slug === 'search') {
-      $response_data = array_merge($response_data, $this->getSearchData($request));
-    }
-
-    if ($page->slug === 'feed') {
-      $response_data = array_merge($response_data, $this->getFeedData($request));
-    }
-
-    if ($page->slug === 'favorites') {
-      if (!Auth::check()) return redirect('/');
-      $response_data = array_merge($response_data, $this->getFavoriteData($request));
-    }
-
-    if ($page->slug === 'products') {
-      try {
-        $response_data = array_merge($response_data, $this->getProductsData($request));
-        
-      } catch (ItemNotFoundException $e) {
-        return (new FallbackController())->__invoke($request);
-      }
-    }
-
-    return view("site.page", $response_data);
+    return view('site.pages.home', ['page' => $page]);
   }
 
-  public function getFeedData(Request $request): array
+  public function insights(Request $request)
   {
-    
-    $id = null;
+    $page = Page::where('slug', 'insights')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
+    return view('site.pages.insights', [
+      'page' => $page,
+      'articles' => Article::query()
+        // ->whereHas('author', function($query) {
+        //   $query->whereHas('roles', fn($subquery) => $subquery->whereIn('name', ['customer', 'creator']));
+        // })
+        ->orderByDesc('id')
+        ->paginate(9),
+    ]);
+  }
+
+  public function feed(Request $request, string $slug)
+  {
+    $page = Page::where('slug', 'feed')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
     if (request()->has('aid')) {
       $rdata = CustomEncrypt::decodeUrlHash(request()->get('aid'));
       if (isset($rdata['id'])) $id = $rdata['id'];
     }
 
-    $response_data = [];
-    $response_data['articles'] = Article::when($id, fn($q) => $q->where('id', '!=', $id))->orderByDesc('id')->limit(3)->get()->all();
-    $response_data['last_news'] = Article::getLastNews();
-    $response_data['first_article'] = ($id) ? Article::find($id) : null;
+    $first_article = (isset($id)) ? Article::find($id) : null;
+    if ($first_article) $first_article->updateViews();
 
-    if ($response_data['first_article']) $response_data['first_article']->updateViews();
-    
-    return $response_data;
+    return view('site.pages.feed', [
+      'page' => $page,
+      'articles' => Article::query()
+        ->when(isset($id), fn($q) => $q->where('id', '!=', $id))
+        ->orderByDesc('id')
+        ->limit(3)
+        ->get()
+        ->all(),
+      'last_news' => Article::getLastNews(),
+      'first_article' => $first_article,
+    ]);
   }
 
-  public function getSearchData(Request $request): array
+  public function helpCenter(Request $request)
   {
+    $page = Page::where('slug', 'help-center')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
+    return view('site.pages.help-center', ['page' => $page]);
+  }
+
+  public function favorites(Request $request)
+  {
+    if (!Auth::check()) return redirect('/');
+
+    $page = Page::where('slug', 'favorites')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
+    return view('site.pages.favorites', ['page' => $page]);
+  }
+
+  public function search(Request $request)
+  {
+    $page = Page::where('slug', 'search')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
     $query = ($request->has('q') && !empty($request->get('q'))) ? $request->get('q') : null;
-    $response_data = [];
-    $response_data['search_results'] = is_null($query) ? [] : SearchClient::full($query);
-    $response_data['tags'] = SearchClient::getTagsFromItem($response_data['search_results'][0] ?? []);
+    $search_results = is_null($query) ? [] : SearchClient::full($query);
+    $tags = SearchClient::getTagsFromItem($search_results[0] ?? []);
+
     if (!is_null($query)) {
       SearchQueries::create([
         'text' => $query,
-        'found' => count($response_data['search_results']),
+        'found' => count($search_results),
       ]);
     }
 
-    return $response_data;
+    return view('site.pages.search', [
+      'page' => $page,
+      'search_results' => $search_results,
+      'tags' => $tags,
+      'query' => $query,
+    ]);
   }
 
-  public function getFavoriteData(Request $request): array
+  public function policies(Request $request, ?string $slug = null)
   {
-    return [];
+    $page = Page::where('slug', ($slug ?? 'all-policies'))
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
+    return view('site.pages.custom-page', ['page' => $page]);
   }
 
-  public function getProductsData(Request $request): array
+  public function product(Request $request, string $country, string $product)
   {
+    $page = Page::where('slug', 'product')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
+    $product = Product::findByPid(request()->get('pid'));
+
+    if (!$product) {
+      return (new FallbackController())($request);
+    }
+
+    return view('site.pages.product', [
+      'page' => $page,
+      'product' => $product,
+    ]);
+  }
+  
+  public function products(Request $request)
+  {
+    $page = Page::where('slug', 'products')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
     $params = $request->route()->parameters();
 
     if (array_key_exists('product', $params) && $request->has('pid')) {
@@ -117,7 +202,6 @@ class SiteController extends Controller
       
       return $response_data;
     }
-
 
     $valid = $request->validate([
       'rating' => 'sometimes|nullable|integer',
@@ -182,13 +266,240 @@ class SiteController extends Controller
     ;
 
     $paginator = $query->paginate(20);
-    
-    // FOR TEST
-    // $paginator = $query->get();
-    // while($paginator->count() < 20 && $paginator->isNotEmpty()) {
-    //   $paginator = $paginator->collect()->merge($paginator)->slice(0, 20);
-    // }
 
-    return ['paginator' => $paginator];
+    return view('site.pages.products', [
+      'page' => $page,
+      'paginator' => $paginator,
+    ]);
   }
+
+  public function cart(Request $request)
+  {
+    $page = Page::where('slug', 'cart')
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+    if (!Auth::check()) return redirect('/');
+
+    $cart = Auth::user()->getCart();
+    $order = Order::prepare($cart);
+
+    return view("site.pages.cart", ['page' => $page, 'order' => $order]);
+  }
+
+  public function order(Request $request)
+  {
+    $cart = Auth::user()->getCart();
+    if (isset($cart['products']) && !empty($cart['products'])) {
+      $prepared = Order::prepare($cart);
+      $order = Order::create([
+        'user_id' => Auth::user()->id,
+        'price' => $prepared->getTotal(),
+        'tax' => $prepared->getTax(),
+        'price_without_discount' => $prepared->getAmount(),
+        'promocode' => $prepared->promocode?->id,
+        'recipient' => ($request->has('is-gift') && $request->get('is-gift')) ? $request->get('recipient') : null,
+        'recipient_message' => ($request->has('is-gift') && $request->get('is-gift')) ? $request->get('recipient_message') : null,
+      ]);
+
+      $order->products()->sync(array_map(function($item) {
+        $item['product_id'] = $item['id'];
+        unset($item['id']);
+        return $item;
+      }, $cart['products']));
+
+      Auth::user()->flushCart();
+    }
+  }
+
+  public function payment(Request $request, ?string $status = null)
+  {
+    $slug = $status ? 'payment-' . $status : 'payment';
+    $page = Page::where('slug', $slug)  
+      ->with('config')
+      ->first();
+
+    if (is_null($page)) {
+      return (new FallbackController())($request);
+    }
+
+    return view("site.pages.$slug", [
+      'page' => $page,
+      'status' => $status,
+    ]);
+  }
+
+  // public function __invoke(Request $request, string $slug = 'home')
+  // {
+  //   // Session::forget('cart');
+  //   // dd(SessionExpire::getCart('cart'));
+  //   $params = $request->route()->parameters();
+  //   $page = Page::where('slug', $slug)
+  //     ->with('sections.variables')
+  //     ->first();
+
+  //   if (is_null($page)) {
+  //     return (new FallbackController())($request);
+  //   }
+    
+  //   $response_data = [
+  //     'page' => $page,
+  //   ];
+
+  //   if ($page->slug === 'search') {
+  //     $response_data = array_merge($response_data, $this->getSearchData($request));
+  //   }
+
+  //   if ($page->slug === 'feed') {
+  //     $response_data = array_merge($response_data, $this->getFeedData($request));
+  //   }
+
+  //   if ($page->slug === 'favorites') {
+  //     if (!Auth::check()) return redirect('/');
+  //     $response_data = array_merge($response_data, $this->getFavoriteData($request));
+  //   }
+
+  //   if ($page->slug === 'products') {
+  //     try {
+  //       $response_data = array_merge($response_data, $this->getProductsData($request));
+        
+  //     } catch (ItemNotFoundException $e) {
+  //       return (new FallbackController())->__invoke($request);
+  //     }
+  //   }
+
+  //   return view("site.page", $response_data);
+  // }
+
+  // public function getFeedData(Request $request): array
+  // {
+    
+  //   $id = null;
+  //   if (request()->has('aid')) {
+  //     $rdata = CustomEncrypt::decodeUrlHash(request()->get('aid'));
+  //     if (isset($rdata['id'])) $id = $rdata['id'];
+  //   }
+
+  //   $response_data = [];
+  //   $response_data['articles'] = Article::when($id, fn($q) => $q->where('id', '!=', $id))->orderByDesc('id')->limit(3)->get()->all();
+  //   $response_data['last_news'] = Article::getLastNews();
+  //   $response_data['first_article'] = ($id) ? Article::find($id) : null;
+
+  //   if ($response_data['first_article']) $response_data['first_article']->updateViews();
+    
+  //   return $response_data;
+  // }
+
+  // public function getSearchData(Request $request): array
+  // {
+  //   $query = ($request->has('q') && !empty($request->get('q'))) ? $request->get('q') : null;
+  //   $response_data = [];
+  //   $response_data['search_results'] = is_null($query) ? [] : SearchClient::full($query);
+  //   $response_data['tags'] = SearchClient::getTagsFromItem($response_data['search_results'][0] ?? []);
+  //   if (!is_null($query)) {
+  //     SearchQueries::create([
+  //       'text' => $query,
+  //       'found' => count($response_data['search_results']),
+  //     ]);
+  //   }
+
+  //   return $response_data;
+  // }
+
+  // public function getFavoriteData(Request $request): array
+  // {
+  //   return [];
+  // }
+
+  // public function getProductsData(Request $request): array
+  // {
+  //   $params = $request->route()->parameters();
+
+  //   if (array_key_exists('product', $params) && $request->has('pid')) {
+  //     $response_data['page'] = Page::where('slug', 'product')->with('sections.variables')->first();
+  //     $response_data['product'] = Product::findByPid(request()->get('pid'));
+
+  //     if (!$response_data['product']) {
+  //       throw new ItemNotFoundException('Product Undefined');
+  //     }
+      
+  //     return $response_data;
+  //   }
+
+
+  //   $valid = $request->validate([
+  //     'rating' => 'sometimes|nullable|integer',
+  //     'price' => 'sometimes|nullable|array',
+  //     'price.min' => 'integer',
+  //     'price.max' => 'integer',
+  //     'categories' => 'sometimes|nullable|string',
+  //     'locations' => 'sometimes|nullable|string',
+  //     'sale' => 'sometimes|nullable|integer',
+  //     'type' => 'sometimes|nullable|string',
+  //     'q' => 'sometimes|nullable|string',
+  //   ]);
+
+  //   if (isset($valid['categories'])) {
+  //     $valid['categories'] = is_null($valid['categories']) ? null : explode(',', $valid['categories']);
+  //   }
+  //   if (isset($valid['locations'])) {
+  //     $valid['locations'] = is_null($valid['locations']) ? null : explode(',', $valid['locations']);
+  //   }
+    
+  //   $valid = array_filter($valid, fn($item) => !is_null($item));
+
+  //   $query = Product::query()
+  //     ->when(
+  //       isset($valid['rating']),
+  //       fn($q) => $q->where('rating', '>=', $valid['rating']),
+  //     )
+  //     ->when(
+  //       isset($valid['price']['min']),
+  //       fn($q) => $q->where('price', '>=', $valid['price']['min']),
+  //     )
+  //     ->when(
+  //       isset($valid['price']['max']),
+  //       fn($q) => $q->where('price', '<=', $valid['price']['max']),
+  //     )
+  //     ->when(
+  //       isset($valid['categories']),
+  //       fn($q) => $q->whereHas('categories', fn($sq) => $sq->whereIn('categories.slug', $valid['categories'])),
+  //     )
+  //     ->when(
+  //       isset($valid['type']),
+  //       fn($q) => $q->whereHas('type', fn($sq) => $sq->where('slug', $valid['type'])),
+  //     )
+  //     ->when(
+  //       isset($valid['locations']),
+  //       fn($q) => $q->whereHas('location', fn($sq) => $sq->whereIn('locations.slug', $valid['locations'])),
+  //     )
+  //     ->when(
+  //       isset($valid['q']),
+  //       function($q) use ($valid) {
+  //         $client = new SearchClient();
+  //         $products = $client->findIn($valid['q'], 'products', 5000);
+  //         $product_ids = array_column($products, 'id');
+
+  //         $q->whereIn('id', $product_ids);
+  //       },
+  //     )
+  //     ->when(
+  //       array_key_exists('country', $params),
+  //       fn($q) => $q->whereHas('location', fn($sq) => $sq->where('locations.slug', $params['country'])),
+  //     )
+  //   ;
+
+  //   $paginator = $query->paginate(20);
+    
+  //   // FOR TEST
+  //   // $paginator = $query->get();
+  //   // while($paginator->count() < 20 && $paginator->isNotEmpty()) {
+  //   //   $paginator = $paginator->collect()->merge($paginator)->slice(0, 20);
+  //   // }
+
+  //   return ['paginator' => $paginator];
+  // }
 }

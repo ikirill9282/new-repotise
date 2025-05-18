@@ -50,6 +50,8 @@
 
       @include('site.footer')
 
+      @livewire('auth')
+
     {{-- @include('site.sections.accept_cookie') --}}
     <script src="{{ asset('/assets/js/custom.js') }}"></script>
     <script>

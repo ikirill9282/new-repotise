@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'mailgun' => [
+      'domain' => env('MAILGUN_DOMAIN'),
+      'secret' => env('MAILGUN_API_KEY'),
+      'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
+    ],
 ];

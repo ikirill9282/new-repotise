@@ -21,6 +21,4 @@
             @endif
         @endforeach
     @endif
-
-    @livewire('auth')
 @endsection

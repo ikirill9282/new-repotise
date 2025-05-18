@@ -31,6 +31,7 @@ class SearchQueriesResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(static::getEloquentQuery()->orderByDesc('id'))
             ->columns([
               TextColumn::make('text'),
               TextColumn::make('found'),

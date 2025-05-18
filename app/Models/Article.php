@@ -95,14 +95,15 @@ class Article extends Model
       ->when(!is_null($limit), fn($q) => $q->limit($limit))
       ->withCount('likes')
       ->with('author')
+      ->orderByDesc('created_at')
       ->get();
     
     foreach ($this->comments as $key => &$comment) {
-      if ($this->comments_loading && $comment->children()->exists()) {
-        $comment->children = $this->getChildren($comment);
+      if ($comment->children()->exists()) {
+        $comment->getChildren($comment);
       }
     }
-
+    
     $this->comments = $this->comments->toArray();
     return $this;
   }
@@ -110,6 +111,7 @@ class Article extends Model
   public function getChildren($comment, int $max_level = 1)
   {
     $this->level++;
+
     $comment->load('likes.author', 'author');
     $comment->loadCount('likes', 'children');
 
@@ -127,7 +129,7 @@ class Article extends Model
 
     foreach ($comment->children as &$child) {
         if ($child->children()->exists()) {
-          $this->getChildren($child);
+          $child->getChildren($child);
         } else {
           $child->load('likes.author', 'author');
           $child->loadCount('likes');
@@ -194,7 +196,7 @@ class Article extends Model
 
   public function makeFeedUrl()
   {
-    return url("insights/feed/$this->slug?aid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
+    return url("insights/$this->slug?aid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
   }
 
   public function setAmountAnalogs(int $amount)

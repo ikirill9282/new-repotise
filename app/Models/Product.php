@@ -26,8 +26,8 @@ class Product extends Model
 
     $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
     $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
-    $array['type'] = $this->type->only(['id', 'title']);
-    $array['location'] = $this->location->only(['id', 'title']);
+    $array['type'] = $this->type->only(['id', 'title', 'slug']);
+    $array['location'] = $this->location->only(['id', 'title', 'slug']);
     $array['preview'] = $this->preview?->image ?? '';
     $array['reviews_count'] = $this->reviews_count;
 

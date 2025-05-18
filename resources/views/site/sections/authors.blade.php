@@ -1,5 +1,5 @@
 @php
-$authors = $variables->get('author_ids')?->value ?? [];
+$authors = $variables->get('authors_ids')?->value ?? [];
 if (!empty($authors)) {
   $authors = \App\Models\User::whereIn('id', $authors)->withCount('followers')->get();
   while ($authors->count() < 6) {
@@ -21,26 +21,6 @@ if (!empty($authors)) {
                               @include('site.components.cards.author', [
                                 'model' => $author,
                               ])
-                              {{-- <div class="cards_group">
-                                  <div class="img_products">
-                                      <img class="main_img" src="{{ url($author->avatar) }}" alt="Autho {{ $author->getName() }}">
-                                      
-                                      @include('site.components.favorite.button', [
-                                        'stroke' => '#FF2C0C',
-                                        'type' => 'author',
-                                        'item_id' => $author->id,
-                                      ])
-                                  </div>
-                                  <div class="name">
-                                      <p>{{ $author->name }}</p>
-                                      <img src="{{ asset('/assets/img/icon_verif.svg') }}" alt="Verify">
-                                  </div>
-                                  <h3><a class="author-link" href="{{ $author->makeProfileUrl() }}">{{ $author->profile }}</a></h3>
-                                  <div class="followers">
-                                      <img src="{{ asset('/assets/img/followers.svg') }}" alt="Followers">
-                                      <p>{{ $author->followers_count }} Followers</p>
-                                  </div>
-                              </div> --}}
                           </div>
                         @endforeach
                       @endif

@@ -23,7 +23,7 @@ use Filament\Tables\Grouping\Group;
 
 class FAQResource extends Resource
 {
-    protected static ?string $navigationGroup = 'Layouts';
+    protected static ?string $navigationGroup = 'Content';
 
     protected static ?string $model = FAQ::class;
 

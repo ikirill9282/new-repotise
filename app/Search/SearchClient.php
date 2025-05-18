@@ -33,6 +33,7 @@ class SearchClient
   public static function full(string $query): array
   {
     $client = static::getClient();
+    
 
     $records = $client->multiSearch(
       [
@@ -181,6 +182,7 @@ class SearchClient
   {
     if (is_null($item) || empty($item)) {
       return Category::query()
+        ->whereHas('products')
         ->select(['id', 'title'])
         ->orderByDesc('id')
         ->limit(6)

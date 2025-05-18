@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         RoleSeeder::class, 
         UserSeeder::class,
         PageSeeder::class,
-        SectionSeeder::class,
+        // SectionSeeder::class,
         TypeSeeder::class,
         LocationSeeder::class,
         CategorySeeder::class,
@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         FaqSeeder::class,
         OptionSeeder::class,
         PromocodeSeeder::class,
+        PagesConfigSeeder::class,
 
         MeilisearchSeeder::class,
       ]);

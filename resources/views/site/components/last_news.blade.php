@@ -7,7 +7,7 @@ if (!isset($news) || empty($news)) {
 @endphp
 
 <div class="last_news">
-  @include('site.components.heading', ['title' => 'last_news'])
+  @include('site.components.heading', ['variables' => $variables->where(fn($item) => str_contains($item->name, 'last_news'))])
   <div class="block_news_items">
     @if (isset($news))
     <div class="swiper" id="last_news_swiper">

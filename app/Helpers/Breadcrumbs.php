@@ -3,10 +3,12 @@
 namespace App\Helpers;
 
 use Illuminate\Routing\Route;
-use App\Models\Admin\Page;
+use App\Models\Page;
 use App\Models\Product;
+use Filament\Tables\Columns\Summarizers\Count;
 use Illuminate\Support\Facades\Route as FacadesRoute;
 use Illuminate\Support\Facades\URL;
+use App\Models\Location;
 
 class Breadcrumbs
 {
@@ -34,13 +36,6 @@ class Breadcrumbs
       $steps = array_filter($steps, fn($step) => !in_array($step, $exclude));
     }
 
-
-    if (isset($request_params['slug']) && ($request_params['slug'] == 'products')) {
-      if (isset($request_params['country']) && !empty($request_params['country'])) {
-        $steps[] = $request_params['slug'];
-      }
-    }
-
     $steps = array_flip($steps);
     $pages = Page::select('title', 'slug')->whereIn('slug', array_keys($steps))->get();
 
@@ -51,6 +46,10 @@ class Breadcrumbs
     };
 
 
+    if (isset($request_params['country']) && !empty($request_params['country'])) {
+      $location = Location::where('slug', $request_params['country'])->first();
+      $steps[$request_params['country']] = $location->makeUrl();
+    }
 
     if (isset($request_params['slug']) && ($request_params['slug'] == 'products')) {
       if (isset($request_params['product']) && request()->has('pid')) {

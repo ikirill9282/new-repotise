@@ -1,5 +1,6 @@
 @php
-$article = \App\Models\Article::find($variables->firstWhere('name', 'article_id')->value);
+// dd($variables);
+$article = \App\Models\Article::find($variables->firstWhere('name', 'main_article_id')->value);
 @endphp
 
 <section class="why_need_baby_monitor">

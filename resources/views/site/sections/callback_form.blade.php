@@ -18,7 +18,7 @@
                     </select>
                     <div class="textarea_block">
                         <textarea placeholder="{!! print_var('message_placeholder', $variables) !!}"></textarea>
-                        @include('icons.shield_answer')
+                        @include('icons.shield')
                     </div>
                     <a href="#">
                         @include('icons.download')

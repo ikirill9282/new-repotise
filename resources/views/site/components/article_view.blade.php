@@ -50,7 +50,7 @@
             @endif
             <div class="like">
                 @php
-                  $hash_id = \App\Helpers\CustomEncrypt::encrypt([$article->id]);
+                  $hash_id = \App\Helpers\CustomEncrypt::generateUrlHash([$article->id]);
                 @endphp
                 <a 
                   href="/feedback/likes"
@@ -66,13 +66,13 @@
                 </span>
             </div>
             <div class="connects">
-                <a href="#" class="first_connect">
+                <a href="#" class="first_connect hover:!text-blue-500">
                   @include('icons.facebook-sm')
                 </a>
-                <a href="#" class="second_connect">
+                <a href="#" class="second_connect hover:!text-black">
                   @include('icons.twitter-sm')
                 </a>
-                <a href="#" class="third_connect">
+                <a href="#" class="third_connect hover:!text-black">
                   @include('icons.reddit-sm')
                 </a>
                 <a href="#" class="share">{{ print_var('share_message', $variables) }}</a>

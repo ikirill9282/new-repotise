@@ -124,6 +124,9 @@ $(document).ready(function() {
                     likers.discover('.feed-item');
                     repliers.discover('.commend');
                     initAuth();
+                    window.CommentForms.discover();
+                    window.ReplyButtons.discover();
+                    window.DropReplyButtons.discover();
                 });
             }
         }

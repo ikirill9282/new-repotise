@@ -7,7 +7,7 @@
             @include('site.components.comments.comment', [
                 'comment' => $child,
                 'class' => 'answers border_none_block',
-                'replies' => false,
+                // 'replies' => false,
             ])
         @endforeach
     @endif

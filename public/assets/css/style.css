@@ -1131,24 +1131,14 @@ header .about_block .right_group_block .login svg {
 .name_articles .about_block .left_name_text .bottom_group .share_group .connects .first_connect:hover svg g {
   opacity: 1;
 }
-.name_articles .about_block .left_name_text .bottom_group .share_group .connects .first_connect:hover svg g path {
-  fill: #158CE8;
-}
 .name_articles .about_block .left_name_text .bottom_group .share_group .connects .first_connect:hover svg g path:last-child {
   fill: white;
 }
 .name_articles .about_block .left_name_text .bottom_group .share_group .connects .second_connect:hover svg g {
   opacity: 1;
 }
-.name_articles .about_block .left_name_text .bottom_group .share_group .connects .second_connect:hover svg g path {
-  fill: #212121;
-}
 .name_articles .about_block .left_name_text .bottom_group .share_group .connects .second_connect:hover svg g path:last-child {
   fill: white;
-}
-.name_articles .about_block .left_name_text .bottom_group .share_group .connects .third_connect:hover svg path {
-  fill: #212121;
-  opacity: 1;
 }
 .name_articles .about_block .left_name_text .bottom_group .share_group .connects .third_connect:hover svg path:last-child {
   fill: white;
@@ -6616,24 +6606,7 @@ footer .bottom_connecting_group .connecting {
   align-items: center;
   gap: 15px;
 }
-footer .bottom_connecting_group .connecting .first_connect:hover svg g {
-  opacity: 1;
-}
-footer .bottom_connecting_group .connecting .first_connect:hover svg g path {
-  fill: #158CE8;
-}
-footer .bottom_connecting_group .connecting .first_connect:hover svg g path:last-child {
-  fill: white;
-}
-footer .bottom_connecting_group .connecting .second_connect:hover svg g {
-  opacity: 1;
-}
-footer .bottom_connecting_group .connecting .second_connect:hover svg g path {
-  fill: #158CE8;
-}
-footer .bottom_connecting_group .connecting .second_connect:hover svg g path:last-child {
-  fill: white;
-}
+
 footer .menu_bottom ul {
   display: none;
   align-items: center;

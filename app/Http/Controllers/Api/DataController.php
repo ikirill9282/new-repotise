@@ -10,13 +10,14 @@ use App\Models\Comment;
 use Illuminate\Support\Facades\Blade;
 use App\Models\Article;
 use App\Models\User;
+use App\Models\Page;
 
 class DataController extends Controller
 {
 
   public function feed(Request $request, $id)
   {
-    $vars = SectionVariables::where('section_id', 7)->get()->keyBy('name');
+    $vars = Page::where('slug', 'feed')->with('config')->first()->config->keyBy('name');
     $news = Article::getLastNews();
     $aid = null;
 
@@ -45,16 +46,16 @@ class DataController extends Controller
     $valid = $request->validate([
       'hash' => 'required|string',
     ]);
-    $data = CustomEncrypt::decrypt($valid['hash']);
-    $comment = Comment::find($data['id']);
+    $id = CustomEncrypt::getId($valid['hash']);
+    $comment = Comment::find($id);
     $comment->getChildren();
     
-    $variables = SectionVariables::whereHas('section', fn($q) => $q->where('sections.component', 'feed'))->get();
+    $variables = Page::where('slug', 'feed')->with('config')->first()->config->keyBy('name');
 
     foreach ($comment->children as $child) {
       $view = Blade::render('site.components.comments.comment', [
         'comment' => $child->toArray(), 
-        'variables' => $variables->keyBy('name'),
+        'variables' => $variables,
         'class' => 'answers border_none_block',
       ]);
       array_push($result, $view);

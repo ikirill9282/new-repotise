@@ -40,6 +40,7 @@
               <a 
                 href="#" 
                 class="comment-link for_answer reply-button {{ auth()->check() ? '' : 'open_auth' }}"
+                data-reply="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $comment['id']]) }}"
                 >
                   {{ print_var('comment_reply_message', $variables) }}
               </a>
@@ -54,7 +55,7 @@
               @endif
 
               @php
-                $hash_id = \App\Helpers\CustomEncrypt::encrypt([$comment['id']]);
+                $hash_id = \App\Helpers\CustomEncrypt::generateUrlHash([$comment['id']]);
               @endphp
               <div class="like_commend {{ auth()->check() ? '' : 'open_auth' }}">
                   <a 

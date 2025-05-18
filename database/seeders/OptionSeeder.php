@@ -50,7 +50,7 @@ class OptionSeeder extends Seeder
             [
               'user_id' => $user->id,
               'option_id' => $option->id,
-              'value' => ($option->type === 'image') ? '/storage/images/default_avatar.png' : null,
+              'value' => ($option->type === 'image') ? '/storage/images/default_avatar.svg' : null,
             ]
           );
 

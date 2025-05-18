@@ -24,11 +24,12 @@ class UsersTable extends BaseWidget
       TextColumn::make('username')
         ->searchable(['name', 'username', 'email'])
         ->label('User info')
-        ->formatStateUsing(fn(string $state, $record): View => view(
-          'filament.tables.username',
-          ['state' => $state, 'record' => $record],
-        )),
-      TextColumn::make('email_verified_at')->since(),
+        ->view('filament.tables.columns.username')
+        ,
+      TextColumn::make('email_verified_at')
+        ->label('Verified')
+        ->dateTime()
+        ->icon('heroicon-o-clock'),
       TextColumn::make('roles.title'),
       TextColumn::make('created_at'),
       TextColumn::make('updated_at'),

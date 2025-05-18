@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Artisan;
-use App\Models\Admin\Page;
+use App\Models\Page;
 use App\Models\Admin\PageSection;
 use App\Models\Admin\Section;
 use App\Models\Admin\SectionVariables;
@@ -29,12 +29,10 @@ Artisan::command('tt', function() {
 });
 
 Artisan::command('tt_mail', function() {
-  $m = new VerifyMail([
-    'name' => 'Demo',
-  ]);
-  $mail = Mail::to('errewer123@gmail.com')->send($m);
-
-  dd($mail);
+  Mail::raw('Test email content', function ($message) {
+      $message->to('получатель@example.com')
+              ->subject('Test email');
+  });
 });
 
 Artisan::command('tt2', function() {
