@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
         OptionSeeder::class,
         PromocodeSeeder::class,
         PagesConfigSeeder::class,
+        StatusSeeder::class,
 
         MeilisearchSeeder::class,
       ]);

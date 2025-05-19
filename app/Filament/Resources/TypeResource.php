@@ -14,6 +14,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 
 class TypeResource extends Resource
 {
@@ -49,8 +54,29 @@ class TypeResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->modal(),
-                Tables\Actions\DeleteAction::make(),
+                
+              ActionGroup::make([
+                EditAction::make(),
+                ViewAction::make('view')
+                  ->url(fn (Type $record): string => url('products/?type=' . $record->slug))
+                  ->extraAttributes(['target' => '_blank'])
+                  ,
+                
+                Action::make('Approve')
+                  ->visible(fn (Type $record): bool => $record->status_id == 3)
+                  ->action(function (Type $record) {
+                      $record->update(['status_id' => 1]);
+                  })
+                  ,
+                Action::make('Reject')
+                  ->visible(fn (Type $record): bool => $record->status_id == 3)
+                  ->action(function (Type $record) {
+                      $record->update(['status_id' => 5]);
+                  })
+                  ,
+
+                DeleteAction::make(),
+              ]),
             ])
             // ->bulkActions([
             //     Tables\Actions\BulkActionGroup::make([

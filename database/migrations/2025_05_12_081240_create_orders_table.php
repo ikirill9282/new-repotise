@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index();
+            $table->bigInteger('status_id')->unsigned()->index();
             $table->decimal('price', 10, 2);
             $table->decimal('tax', 10, 2);
             $table->decimal('price_without_discount', 10, 2);
@@ -23,6 +24,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('status_id')->references('id')->on('order_statuses');
         });
     }
 

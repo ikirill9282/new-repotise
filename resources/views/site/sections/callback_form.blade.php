@@ -7,7 +7,7 @@
                 <form>
                     <div class="input_block">
                         <input type="text" placeholder="{{ print_var('name_placeholder', $variables) }}">
-                        @include('icons.shield_answer')
+                        @include('icons.shield')
                     </div>
                     <select>
                         <option value="" disabled selected>{{ print_var('subject_placeholder', $variables) }}

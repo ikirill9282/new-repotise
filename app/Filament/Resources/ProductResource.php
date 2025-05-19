@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\OrderProducts;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -20,7 +21,7 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationGroup = 'Products';
     protected static ?string $navigationLabel = 'Product List Table';
@@ -39,28 +40,130 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('author.name')
-                    ->label('Author')
-                    ->view('filament.tables.columns.author')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(),
                 TextColumn::make('id')
                     ->label('Product ID')
                     ->width('50px')
                     ->sortable()
                     ->searchable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ,
                 TextColumn::make('preview')
                     ->label('Image')
                     ->view('filament.tables.columns.image')
+                  ,
+                TextColumn::make('name')
+                  ->label('Product Name')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('model')
+                  ->label('Purchase Model')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('type.title')
+                  ->label('Product Type')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+                
+                TextColumn::make('author.name')
+                  ->label('Seller')
+                  ->view('filament.tables.columns.author')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+
+                TextColumn::make('price')
+                  ->label('Price')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ->money('usd', true)
+                  ,
+                TextColumn::make('status')
+                  ->label('Status')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('published_at')
+                  ->label('Published At')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ->dateTime('Y-m-d H:i:s')
+                  ,
+                TextColumn::make('sales')
+                  ->label('Sales')
+                  ->sortable(query: function (Builder $query, string $direction): Builder {
+                    return $query->join('order_products', 'products.id', '=', 'order_products.product_id')
+                      ->selectRaw('products.*, sum(order_products.count) as sales')
+                      ->orderBy('sales', $direction)
+                      ;
+                })
+                  ->searchable()
+                  ->toggleable()
+                  ->getStateUsing(function (Product $record) {
+                      return OrderProducts::where('product_id', $record->id)->sum('count');
+                  })
                   ,
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make()
+                      ->url(fn (Product $record): string => url($record->makeUrl()))
+                      ->extraAttributes(['target' => '_blank'])
+                      ,
+                    Tables\Actions\Action::make('Approve')
+                      ->visible(fn (Product $record): bool => $record->status_id === 3)
+                      ->action(function (Product $record) {
+                          $record->update(['status_id' => 1]);
+                      })
+                      ,
+                    Tables\Actions\Action::make('Reject')
+                      ->visible(fn (Product $record): bool => $record->status_id === 3)
+                      ->action(function (Product $record) {
+                          $record->update(['status_id' => 5]);
+                      })
+                      ,
+                    Tables\Actions\Action::make('Duplicate')
+                      ->icon('heroicon-o-document-duplicate')
+                      ->action(function (Product $record) {
+                          $newRecord = $record->replicate();
+                          $newRecord->save();
+                          Storage::copy($record->preview, $newRecord->preview);
+                      })
+                      ,
+                    
+                    Tables\Actions\Action::make('Publish')
+                      ->icon('heroicon-o-document-text')
+                      ->visible(fn (Product $record): bool => $record->status_id === 2)
+                      ->action(function (Product $record) {
+                          $record->update(['status_id' => 1]);
+                      })
+                      ,
+
+                    Tables\Actions\Action::make('Unpublish')
+                      ->icon('heroicon-o-x-circle')
+                      ->visible(fn (Product $record): bool => $record->status_id === 1)
+                      ->action(function (Product $record) {
+                          $record->update(['status_id' => 2]);
+                      })
+                      ,
+
+                    
+                    Tables\Actions\DeleteAction::make()
+                      ,
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

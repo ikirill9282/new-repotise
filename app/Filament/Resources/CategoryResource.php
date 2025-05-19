@@ -15,6 +15,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 
 class CategoryResource extends Resource
 {
@@ -43,19 +48,58 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title'),
-                TextColumn::make('slug'),
-                TextColumn::make('parent.title'),
-                TextColumn::make('created_at'),
-                TextColumn::make('updated_at'),
+                TextColumn::make('title')
+                  ->searchable()
+                  ->sortable()
+                  ,
+                TextColumn::make('slug')
+                  ->searchable()
+                  ->sortable()
+                  ,
+                TextColumn::make('parent.title')
+                  ->searchable()
+                  ->sortable()
+                  ,
+                TextColumn::make('usages')
+                  ->getStateUsing(function (Category $record) {
+                      return $record->products()->count();
+                  })
+                ,
+                TextColumn::make('status_id.title')
+                  ->label('Status')
+                  ->searchable()
+                  ->sortable()
+                  ,
+                TextColumn::make('created_at')->sortable(),
+                TextColumn::make('updated_at')->sortable(),
 
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->modal(),
-                Tables\Actions\DeleteAction::make(),
+              ActionGroup::make([
+                EditAction::make(),
+                ViewAction::make('view')
+                  ->url(fn (Category $record): string => url('products/?categories=' . $record->slug))
+                  ->extraAttributes(['target' => '_blank'])
+                  ,
+                
+                Action::make('Approve')
+                  ->visible(fn (Category $record): bool => $record->status_id == 3)
+                  ->action(function (Category $record) {
+                      $record->update(['status_id' => 1]);
+                  })
+                  ,
+                Action::make('Reject')
+                  ->visible(fn (Category $record): bool => $record->status_id == 3)
+                  ->action(function (Category $record) {
+                      $record->update(['status_id' => 5]);
+                  })
+                  ,
+
+                DeleteAction::make(),
+              ]),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

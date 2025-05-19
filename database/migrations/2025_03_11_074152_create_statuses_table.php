@@ -11,15 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('locations', function (Blueprint $table) {
+        Schema::create('statuses', function (Blueprint $table) {
             $table->id();
             $table->string('title')->unique();
-            $table->string('slug');
-            $table->string('poster')->nullable();
-            $table->bigInteger('status_id')->unsigned()->index()->default(3);
-            $table->timestamps();
-
-            $table->foreign('status_id')->references('id')->on('statuses');
         });
     }
 
@@ -28,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('locations');
+        Schema::dropIfExists('statuses');
     }
 };
