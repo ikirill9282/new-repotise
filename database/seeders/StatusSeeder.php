@@ -27,6 +27,9 @@ class StatusSeeder extends Seeder
           ],
           [
             'title' => 'Reject',
+          ],
+          [
+            'title' => 'Scheduled',
           ]
         ];
 

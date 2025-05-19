@@ -29,15 +29,17 @@ class AppServiceProvider extends ServiceProvider
             NavigationGroup::make('products')
                  ->label('Products')
                  ,
+            NavigationGroup::make('articles')
+                ->label('Articles')
+                ->collapsed()
+                ,
             NavigationGroup::make('content')
                 ->label('Content')
                 ,
-            NavigationGroup::make('articles')
-                ->label('Articles')
-                ->collapsed(),
             NavigationGroup::make('users')
                 ->label('Users')
-                ->collapsed(),
+                ->collapsed()
+                ,
         ]);
     });
     }
