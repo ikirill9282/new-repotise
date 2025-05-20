@@ -51,7 +51,7 @@ class ProductResource extends Resource
                     ->label('Image')
                     ->view('filament.tables.columns.image')
                   ,
-                TextColumn::make('name')
+                TextColumn::make('title')
                   ->label('Product Name')
                   ->sortable()
                   ->searchable()
