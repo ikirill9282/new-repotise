@@ -19,6 +19,9 @@ return new class extends Migration
             $table->longText('text');
             $table->timestamps();
 
+            $table->bigInteger('status_id')->unsigned()->index()->default(3);
+            $table->foreign('status_id')->references('id')->on('statuses');
+
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('parent_id')->references('id')->on('reviews')->onDelete('cascade');

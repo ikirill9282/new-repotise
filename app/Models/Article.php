@@ -12,10 +12,11 @@ use Laravel\Scout\Searchable;
 use App\Traits\HasKeywords;
 use App\Helpers\Slug;
 use App\Helpers\SessionExpire;
+use App\Traits\HasStatus;
 
 class Article extends Model
 {
-  use HasAuthor, HasGallery, Searchable, HasKeywords;
+  use HasAuthor, HasGallery, Searchable, HasKeywords, HasStatus;
 
   protected Collection|array $all_comments = [];
 

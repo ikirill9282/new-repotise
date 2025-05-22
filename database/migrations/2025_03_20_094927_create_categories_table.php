@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('parent_id')->unsigned()->index()->nullable();
             $table->string('title')->unique();
-            $table->bigInteger('status_id')->unsigned()->index()->default(2);
             $table->string('slug');
             $table->timestamps();
 
-            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->bigInteger('status_id')->unsigned()->index()->default(3);
             $table->foreign('status_id')->references('id')->on('statuses');
+
+            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 

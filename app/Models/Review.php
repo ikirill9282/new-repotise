@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Traits\HasAuthor;
+use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-  use HasAuthor;
+  use HasAuthor, HasStatus;
 
   public function likes()
   {

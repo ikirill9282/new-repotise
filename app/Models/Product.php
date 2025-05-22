@@ -8,6 +8,7 @@ use App\Helpers\Slug;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use App\Traits\HasPrice;
+use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +17,7 @@ use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-  use HasAuthor, HasGallery, Searchable, HasFactory;
+  use HasAuthor, HasGallery, Searchable, HasFactory, HasStatus;
 
   public function toSearchableArray(): array
   {

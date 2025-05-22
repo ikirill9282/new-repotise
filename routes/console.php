@@ -30,8 +30,10 @@ Artisan::command('tt', function() {
 
 Artisan::command('tt_mail', function() {
   Mail::raw('Test email content', function ($message) {
-      $message->to('получатель@example.com')
+      $message->to('errewer123@gmail.com')
+              ->replyTo('loyderhy2@gmail.com', 'Your Own Reply')
               ->subject('Test email');
+      
   });
 });
 

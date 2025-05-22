@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
       $this->call([
         RoleSeeder::class, 
         UserSeeder::class,
+        StatusSeeder::class,
+        
         PageSeeder::class,
         // SectionSeeder::class,
         TypeSeeder::class,
@@ -36,8 +38,7 @@ class DatabaseSeeder extends Seeder
         OptionSeeder::class,
         PromocodeSeeder::class,
         PagesConfigSeeder::class,
-        StatusSeeder::class,
-
+        
         MeilisearchSeeder::class,
       ]);
     }

@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use App\Helpers\Slug;
-
+use App\Traits\HasStatus;
 
 class Category extends Model
 {
-  use Searchable;
+  use Searchable, HasStatus;
 
   public function toSearchableArray(): array
   {

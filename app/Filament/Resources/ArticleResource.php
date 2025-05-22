@@ -19,6 +19,8 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Illuminate\Support\Facades\Storage;
+use Filament\Support\Colors\Color;
+
 
 class ArticleResource extends Resource
 {
@@ -48,10 +50,20 @@ class ArticleResource extends Resource
                     ->view('filament.tables.columns.author')
                     ->searchable()
                     ,
-                TextColumn::make('status_id')
+                TextColumn::make('status.title')
                   ->label('Status')
                   ->searchable()
                   ->sortable()
+
+                  ->badge()
+                  ->color(fn($record) => match($record->status_id) {
+                    1 => Color::Emerald,
+                    2 => Color::Indigo,
+                    3 => Color::Amber,
+                    4 => Color::Sky,
+                    5 => Color::Red,
+                    6 => Color::Orange,
+                  })
                   ,
                 TextColumn::make('scheduled_at')
                     ->dateTime()
@@ -89,12 +101,14 @@ class ArticleResource extends Resource
                   ,
                 
                 Action::make('Approve')
+                  ->icon('heroicon-o-check-circle')
                   ->visible(fn (Article $record): bool => $record->status_id == 3)
                   ->action(function (Article $record) {
                       $record->update(['status_id' => 1]);
                   })
                   ,
                 Action::make('Reject')
+                  ->icon('heroicon-o-shield-exclamation')
                   ->visible(fn (Article $record): bool => $record->status_id == 3)
                   ->action(function (Article $record) {
                       $record->update(['status_id' => 5]);

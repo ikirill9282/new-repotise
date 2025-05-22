@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Helpers\Slug;
+use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 
 class Location extends Model
 {
-  use Searchable;
+  use Searchable, HasStatus;
 
   public function toSearchableArray(): array
   {

@@ -9,6 +9,7 @@ use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -24,7 +25,7 @@ class ProductResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationGroup = 'Products';
-    protected static ?string $navigationLabel = 'Product List Table';
+    protected static ?string $navigationLabel = 'Product List';
 
     protected static ?int $navigationSort = 1;
 
@@ -85,11 +86,20 @@ class ProductResource extends Resource
                   ->toggleable()
                   ->money('usd', true)
                   ,
-                TextColumn::make('status')
+                TextColumn::make('status.title')
                   ->label('Status')
                   ->sortable()
                   ->searchable()
                   ->toggleable()
+                  ->badge()
+                  ->color(fn($record) => match($record->status_id) {
+                    1 => Color::Emerald,
+                    2 => Color::Indigo,
+                    3 => Color::Amber,
+                    4 => Color::Sky,
+                    5 => Color::Red,
+                    6 => Color::Orange,
+                  })
                   ,
                 TextColumn::make('published_at')
                   ->label('Published At')
@@ -124,12 +134,14 @@ class ProductResource extends Resource
                       ->extraAttributes(['target' => '_blank'])
                       ,
                     Tables\Actions\Action::make('Approve')
+                      ->icon('heroicon-o-check-circle')
                       ->visible(fn (Product $record): bool => $record->status_id === 3)
                       ->action(function (Product $record) {
                           $record->update(['status_id' => 1]);
                       })
                       ,
                     Tables\Actions\Action::make('Reject')
+                      ->icon('heroicon-o-shield-exclamation')
                       ->visible(fn (Product $record): bool => $record->status_id === 3)
                       ->action(function (Product $record) {
                           $record->update(['status_id' => 5]);

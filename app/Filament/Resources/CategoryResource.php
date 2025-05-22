@@ -20,6 +20,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Support\Colors\Color;
 
 class CategoryResource extends Resource
 {
@@ -65,10 +66,19 @@ class CategoryResource extends Resource
                       return $record->products()->count();
                   })
                 ,
-                TextColumn::make('status_id.title')
+                TextColumn::make('status.title')
                   ->label('Status')
                   ->searchable()
                   ->sortable()
+                  ->badge()
+                  ->color(fn($record) => match($record->status_id) {
+                    1 => Color::Emerald,
+                    2 => Color::Indigo,
+                    3 => Color::Amber,
+                    4 => Color::Sky,
+                    5 => Color::Red,
+                    6 => Color::Orange,
+                  })
                   ,
                 TextColumn::make('created_at')->sortable(),
                 TextColumn::make('updated_at')->sortable(),
@@ -86,12 +96,14 @@ class CategoryResource extends Resource
                   ,
                 
                 Action::make('Approve')
+                  ->icon('heroicon-o-check-circle')
                   ->visible(fn (Category $record): bool => $record->status_id == 3)
                   ->action(function (Category $record) {
                       $record->update(['status_id' => 1]);
                   })
                   ,
                 Action::make('Reject')
+                  ->icon('heroicon-o-shield-exclamation')
                   ->visible(fn (Category $record): bool => $record->status_id == 3)
                   ->action(function (Category $record) {
                       $record->update(['status_id' => 5]);
