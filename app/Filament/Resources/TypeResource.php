@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -19,6 +20,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Enums\ActionsPosition;
 
 class TypeResource extends Resource
 {
@@ -45,10 +47,26 @@ class TypeResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title'),
-                TextColumn::make('slug'),
-                TextColumn::make('created_at'),
-                TextColumn::make('updated_at'),
+                TextColumn::make('title')
+                  ->searchable()
+                  ->sortable()
+                  ->url(fn($record) => url("/admin/types/$record->id/edit"))
+                  ->color(Color::Sky)
+                  ,
+                TextColumn::make('slug')
+                  ->searchable()
+                  ->sortable()
+                  ,
+                TextColumn::make('created_at')
+                  ->searchable()
+                  ->sortable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('updated_at')
+                  ->searchable()
+                  ->sortable()
+                  ->toggleable()
+                  ,
             ])
             ->filters([
                 //
@@ -77,7 +95,7 @@ class TypeResource extends Resource
 
                 DeleteAction::make(),
               ]),
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

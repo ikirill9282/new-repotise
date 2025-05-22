@@ -14,6 +14,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Support\Colors\Color;
+use Filament\Tables\Enums\ActionsPosition;
 
 class TagResource extends Resource
 {
@@ -36,18 +43,51 @@ class TagResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title'),
-                TextColumn::make('created_at'),
-                TextColumn::make('updated_at'),
+                TextColumn::make('title')
+                  ->searchable()
+                  ->sortable()
+                  ->color(Color::Sky)
+                  ->url(fn($record) => url("/admin/tags/$record->id/edit"))
+                  ,
+                TextColumn::make('created_at')
+                  ->searchable()
+                  ->sortable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('updated_at')
+                  ->searchable()
+                  ->sortable()
+                  ->toggleable()
+                  ,
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                  ->modal(),
-                Tables\Actions\DeleteAction::make(),
-            ])
+                
+              ActionGroup::make([
+                EditAction::make(),
+                ViewAction::make('view')
+                  ->url(fn (Tag $record): string => url('products/?type=' . $record->slug))
+                  ->extraAttributes(['target' => '_blank'])
+                  ,
+                
+                Action::make('Approve')
+                  ->visible(fn (Tag $record): bool => $record->status_id == 3)
+                  ->action(function (Tag $record) {
+                      $record->update(['status_id' => 1]);
+                  })
+                  ,
+                Action::make('Reject')
+                  ->visible(fn (Tag $record): bool => $record->status_id == 3)
+                  ->action(function (Tag $record) {
+                      $record->update(['status_id' => 5]);
+                  })
+                  ,
+
+                DeleteAction::make(),
+              ]),
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -66,8 +106,8 @@ class TagResource extends Resource
     {
         return [
             'index' => Pages\ListTags::route('/'),
-            // 'create' => Pages\CreateTag::route('/create'),
-            // 'edit' => Pages\EditTag::route('/{record}/edit'),
+            'create' => Pages\CreateTag::route('/create'),
+            'edit' => Pages\EditTag::route('/{record}/edit'),
         ];
     }
 }

@@ -47,11 +47,14 @@ class LocationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(fn() => null)
             ->columns([
               TextColumn::make('title')
                 ->searchable()
                 ->sortable()
                 ->toggleable()
+                ->color(Color::Sky)
+                ->url(fn($record) => url("/admin/locations/$record->id/edit"))
                 ,
               TextColumn::make('slug')
                 ->searchable()
@@ -109,7 +112,7 @@ class LocationResource extends Resource
 
                 DeleteAction::make(),
               ]),
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

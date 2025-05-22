@@ -50,10 +50,13 @@ class CategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(fn() => null)
             ->columns([
                 TextColumn::make('title')
                   ->searchable()
                   ->sortable()
+                  ->url(fn($record) => url("/admin/categories/$record->id/edit"))
+                  ->color(Color::Sky)
                   ,
                 TextColumn::make('slug')
                   ->searchable()
@@ -114,7 +117,7 @@ class CategoryResource extends Resource
 
                 DeleteAction::make(),
               ]),
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

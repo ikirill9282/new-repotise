@@ -60,7 +60,7 @@ class ProductResource extends Resource
                   ->sortable()
                   ->searchable()
                   ->toggleable()
-                  ->url(fn($record) => url("/admin/articles/$record->id/edit"))
+                  ->url(fn($record) => url("/admin/products/$record->id/edit"))
                   ->color(Color::Sky)
                   ,
                 TextColumn::make('type.title')
