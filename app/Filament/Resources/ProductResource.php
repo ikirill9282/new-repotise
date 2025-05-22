@@ -17,6 +17,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
+use Filament\Tables\Enums\ActionsPosition;
+
 
 class ProductResource extends Resource
 {
@@ -40,29 +42,26 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(fn() => null)
             ->columns([
                 TextColumn::make('id')
-                    ->label('Product ID')
-                    ->width('50px')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable()
-                    ,
+                  ->label('Product ID')
+                  ->width('50px')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
                 TextColumn::make('preview')
-                    ->label('Image')
-                    ->view('filament.tables.columns.image')
+                  ->label('Image')
+                  ->view('filament.tables.columns.image')
                   ,
                 TextColumn::make('title')
                   ->label('Product Name')
                   ->sortable()
                   ->searchable()
                   ->toggleable()
-                  ,
-                TextColumn::make('model')
-                  ->label('Purchase Model')
-                  ->sortable()
-                  ->searchable()
-                  ->toggleable()
+                  ->url(fn($record) => url("/admin/articles/$record->id/edit"))
+                  ->color(Color::Sky)
                   ,
                 TextColumn::make('type.title')
                   ->label('Product Type')
@@ -70,7 +69,14 @@ class ProductResource extends Resource
                   ->searchable()
                   ->toggleable()
                   ,
-                
+
+                TextColumn::make('categories.title')
+                  ->label('Product Categories')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ->extraAttributes(['class' => '!w-[250px] whitespace-normal'])
+                  ,
                 TextColumn::make('author.name')
                   ->label('Seller')
                   ->view('filament.tables.columns.author')
@@ -101,13 +107,7 @@ class ProductResource extends Resource
                     6 => Color::Orange,
                   })
                   ,
-                TextColumn::make('published_at')
-                  ->label('Published At')
-                  ->sortable()
-                  ->searchable()
-                  ->toggleable()
-                  ->dateTime('Y-m-d H:i:s')
-                  ,
+
                 TextColumn::make('sales')
                   ->label('Sales')
                   ->sortable(query: function (Builder $query, string $direction): Builder {
@@ -115,12 +115,31 @@ class ProductResource extends Resource
                       ->selectRaw('products.*, sum(order_products.count) as sales')
                       ->orderBy('sales', $direction)
                       ;
-                })
+                  })
                   ->searchable()
                   ->toggleable()
                   ->getStateUsing(function (Product $record) {
                       return OrderProducts::where('product_id', $record->id)->sum('count');
                   })
+                  ,
+                TextColumn::make('published_at')
+                  ->label('Published At')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ->dateTime('Y-m-d H:i:s')
+                  ,
+                TextColumn::make('created_at')
+                  ->icon('heroicon-o-clock')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('updated_at')
+                  ->icon('heroicon-o-clock')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
                   ,
             ])
             ->filters([
@@ -176,7 +195,7 @@ class ProductResource extends Resource
                     Tables\Actions\DeleteAction::make()
                       ,
                 ])
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

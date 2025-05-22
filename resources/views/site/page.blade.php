@@ -21,4 +21,5 @@
             @endif
         @endforeach
     @endif
+    <div class="hidden !w-[250px] whitespace-normal"></div>
 @endsection

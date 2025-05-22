@@ -139,9 +139,14 @@ class Article extends Model
     }
   }
 
+  public function getFullCommentsCount()
+  {
+    return Comment::where('article_id', $this->id)->count();
+  }
+
   public function countComments(array|Collection|null $array = null)
   {
-    if (!isset($this->comments) || empty($this->comments)) return 0;
+    if (is_null($array) && (!isset($this->comments) || empty($this->comments))) return 0;
 
     $target = is_null($array) ? collect($this->comments)->toArray() : $array;
     $count = count($target);

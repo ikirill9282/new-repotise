@@ -21,6 +21,8 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Support\Colors\Color;
+use Filament\Tables\Enums\ActionsPosition;
+
 
 class CategoryResource extends Resource
 {
@@ -114,9 +116,9 @@ class CategoryResource extends Resource
               ]),
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

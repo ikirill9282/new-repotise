@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer('views')->default(0);
             $table->text('annotation')->nullable();
             $table->longText('text');
+            $table->datetime('scheduled_at')->index()->nullable();
+            $table->datetime('published_at')->index()->nullable();
             $table->timestamps();
 
             $table->bigInteger('status_id')->unsigned()->index()->default(3);

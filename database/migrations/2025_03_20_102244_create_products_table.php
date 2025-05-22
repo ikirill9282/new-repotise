@@ -20,6 +20,7 @@ return new class extends Migration
           $table->decimal('old_price', 10);
           $table->bigInteger('type_id')->unsigned()->index();
           $table->bigInteger('location_id')->unsigned()->index();
+          $table->datetime('published_at')->index()->nullable();
           $table->float('rating')->default(0);
           $table->longText('text');
           $table->timestamps();

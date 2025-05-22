@@ -20,6 +20,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Illuminate\Support\Facades\Storage;
 use Filament\Support\Colors\Color;
+use Filament\Tables\Enums\ActionsPosition;
 
 
 class ArticleResource extends Resource
@@ -45,7 +46,10 @@ class ArticleResource extends Resource
                 TextColumn::make('id'),
                 TextColumn::make('title')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->color(Color::Sky)
+                    ->url(fn($record) => url("/admin/articles/$record->id/edit"))
+                    ,
                 TextColumn::make('author')
                     ->view('filament.tables.columns.author')
                     ->searchable()
@@ -65,23 +69,48 @@ class ArticleResource extends Resource
                     6 => Color::Orange,
                   })
                   ,
-                TextColumn::make('scheduled_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->searchable()
-                    ,
                 TextColumn::make('views')
-                    ->sortable()
-                    ->searchable()
-                    ,
+                  ->sortable()
+                  ->searchable()
+                  ,
                 TextColumn::make('comments_count')
-                    ->sortable()
-                    ->searchable()
-                    ,
+                  ->sortable()
+                  ->searchable()
+                  ->getStateUsing(function($record) {
+                    return $record->getFullCommentsCount();
+                  })
+                  ,
+                
+                TextColumn::make('scheduled_at')
+                  ->dateTime()
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('published_at')
+                  ->label('Published At')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ->dateTime('Y-m-d H:i:s')
+                  ,
+                TextColumn::make('created_at')
+                  ->icon('heroicon-o-clock')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
+                TextColumn::make('updated_at')
+                  ->icon('heroicon-o-clock')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ,
             ])
             ->filters([
                 //
             ])
+            ->recordUrl(fn() => null)
             ->actions([
                 
               ActionGroup::make([
@@ -133,7 +162,7 @@ class ArticleResource extends Resource
 
                 DeleteAction::make(),
               ]),
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
