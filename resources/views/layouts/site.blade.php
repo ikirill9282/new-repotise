@@ -50,7 +50,7 @@
 
       @include('site.footer')
 
-      @livewire('auth')
+      @livewire('modal')
 
     {{-- @include('site.sections.accept_cookie') --}}
     <script src="{{ asset('/assets/js/custom.js') }}"></script>
@@ -68,8 +68,9 @@
     <script src="{{ asset('/assets/js/jquery.emojipicker.a.js') }}"></script>
     <script src="{{ asset('/assets/js/jquery.emojipicker.js') }}"></script>
 
-    @livewireScripts
     @vite('resources/js/app.js')
+
+    @livewireScripts
 
     @stack('js')
 

@@ -94,30 +94,6 @@ function toggleText() {
     }
 }
 
-function initAuth() {
-  const open_auth_items = [...document.querySelectorAll('.open_auth')];
-
-  if (open_auth_items.length) {
-    open_auth_items.map((item) => item.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      $('#auth_modal').css("display", "flex").hide().fadeIn();
-    }));
-  }
-
-  const close_auth_items = [...document.querySelectorAll('.close_auth')];
-  
-  if (close_auth_items.length) {
-    close_auth_items.map((item) => item.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      $('#auth_modal').fadeOut();
-    }))
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  initAuth();
-});
-
 
 const swiperArticles = new Swiper('#swiper-articles', {
   slidesPerView: 1.2,
@@ -303,20 +279,6 @@ const swiper14 = new Swiper(".mySwiper14", {
   },
 });
 
-
-// const stars = document.querySelectorAll('.stars span');
-
-// stars.forEach((star, index) => {
-//   star.addEventListener('click', () => {
-//     stars.forEach(s => s.classList.remove('active'));
-
-//     for (let i = 0; i <= index; i++) {
-//       stars[i].classList.add('active');
-//     }
-//   });
-// });
-
-
 function updateMaxPrice(value, sliderNumber) {
     const slider = document.getElementById(`range-slider-${sliderNumber}`);
     const percentage = ((value - slider.min) / (slider.max - slider.min)) * 100;
@@ -350,6 +312,33 @@ const counterChanged = (elem, count) => {
     }
   })
 }
+
+
+function initModal() {
+
+  
+  const open_auth_items = [...document.querySelectorAll('.open_auth')];
+
+  if (open_auth_items.length) {
+    open_auth_items.map((item) => item.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      Livewire.dispatch('modal.openAuth');
+    }));
+  }
+
+  // const close_auth_items = [...document.querySelectorAll('.close_modal')];
+  
+  // if (close_auth_items.length) {
+  //   close_auth_items.map((item) => item.addEventListener('click', (evt) => {      
+  //     evt.preventDefault();
+  //     Livewire.dispatch('modal.close');      
+  //   }))
+  // }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initModal();
+});
 
 document.querySelectorAll('.counter').forEach(counter => {
     const minusBtn = counter.querySelector('.minus');

@@ -31,6 +31,6 @@ class AuthController extends Controller
       Auth::logout();
       $request->session()->regenerate();
       
-      return redirect('home');
+      return redirect('/');
     }
 }

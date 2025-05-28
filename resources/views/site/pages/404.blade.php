@@ -23,5 +23,4 @@
         </div>
     </div>
   </section>
-  @livewire('auth')
 @endsection
