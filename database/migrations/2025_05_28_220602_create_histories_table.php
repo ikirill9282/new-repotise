@@ -21,6 +21,8 @@ return new class extends Migration
             $table->text('old_value')->nullable();
             $table->json('payload')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

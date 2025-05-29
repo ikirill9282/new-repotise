@@ -2,12 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Events\MailVerify;
 use Livewire\Component;
 use Livewire\Attributes\On; 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use App\Mail\ConfirmRegitster;
 
 
 class Modal extends Component
@@ -130,13 +133,13 @@ class Modal extends Component
           return ;
         }
 
-        User::create([
+        $user = User::create([
           'email' => $this->email,
-          'username' => $uname = preg_replace("/^(.*?)@.*#/is", "$1", $this->email),
-          'name' => ucfirst($uname),
           'password' => $this->password,
         ]);
-
+        $user->makeDefaultOptions();
+        $user->sendVerificationCode(seller: $this->as_seller);
+        
         $this->close();
         $this->openSuccess();
 

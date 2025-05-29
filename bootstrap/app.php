@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
       //   \Illuminate\View\Middleware\ShareErrorsFromSession::class,
       // ]);
     })
+    ->withEvents(discover: [
+      __DIR__.'/../app/Listeners',
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
         // $exceptions->render(function(\Exception $e) {
         //   if ($e instanceof NotFoundHttpException) {

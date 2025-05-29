@@ -26,22 +26,16 @@ use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 
-Artisan::command('tt',
-
- function() {
-  $src = '/images/product_7.jpg';
-  $name = preg_replace('/^.*?\/*([a-zA-Z0-9-_]+\.\w+)$/is', "$1", $src);
-  $path = Storage::disk('public')->path($src);
-  $file = new UploadedFile($path, $name);
-  $dst = '/images/' . trim(base64_encode(microtime()), '=') . '.' . $file->getFileInfo()->getExtension();
-
-  Storage::disk('public')->copy($src, $dst);
+Artisan::command('tt', function() {
+  $user = User::find(35);
+  $user->makeDefaultOptions();
+  
 });
 
 Artisan::command('ttm', function () {
   
   $user = User::find(1);
-  $mail = new ConfirmRegitster(url('/auth/email/verify/?' . http_build_query(['confirm' => $user->generateVerify()])));
+  $mail = new ConfirmRegitster($user->getVerifyUrl());
   Mail::to($user->email)->send($mail);
 });
 

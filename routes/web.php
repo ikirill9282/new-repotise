@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\UserController as BaseUserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CabinetController;
 use App\Http\Controllers\FallbackController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
@@ -39,6 +40,11 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/cart', [SiteController::class, 'cart']);
   Route::get('/cart/order', [SiteController::class, 'order']);
   Route::get('/cart/{status}', [SiteController::class, 'payment'])->name('payment.status');
+
+  Route::prefix('profile')->controller(CabinetController::class)->group(function() {
+    Route::get('/{user}', 'profile');
+    Route::get('/{user}/verify', 'verify');
+  });
 });
 
 // Route::get('/', SiteController::class)->name('home');

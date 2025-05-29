@@ -21,6 +21,10 @@ use Illuminate\Support\Facades\Session;
 use App\Traits\HasCart;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ConfirmRegitster;
+use App\Events\MailVerify;
+use App\Models\Options;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -64,6 +68,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         }
 
         $model->username = $username;
+        $model->name = ucfirst($username);
       });
     }
 
@@ -211,6 +216,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       return url("/profile/" . $this->profile);
     }
 
+    public function makeProfileVerificationUrl(): string 
+    {
+      return $this->makeProfileUrl() . '/verify';
+    }
+
     public function makeSubscribeUrl(): string
     {
       return url("/profile/subscribe/$this->profile");
@@ -236,15 +246,36 @@ class User extends Authenticatable implements HasName, FilamentUser
       return User::role('creator')->limit(6)->orderByDesc('id')->get();
     }
 
+    public function sendVerificationCode(bool $seller = false)
+    {
+      $mail = new ConfirmRegitster($this->getVerifyUrl($seller));
+      Mail::to($this->email)->send($mail);
+      MailVerify::dispatch($this);
+    }
+
+    public function getVerifyUrl(bool $seller = false): string
+    {
+      return url('/auth/email/verify/?' . http_build_query(['confirm' => $this->generateVerify(), 'seller' => $seller]));
+    }
+
     public function generateVerify(array $params = []): string
     {
       if ($this->verify()->exists()) {
-        return $this->verify->code;
+        return Crypt::encrypt(array_merge(['code' => $this->verify->code], $params));
       }
       
       $code = UserVerify::genCode();
       $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp]);
 
       return Crypt::encrypt(array_merge(['code' => $code], $params));
+    }
+
+    public function makeDefaultOptions()
+    {
+      foreach (Options::where('default', 1)->get() as $option) {
+        $this->options()->sync([
+          $option->id => ['value' => $option->getDefaultValue()],
+        ], false);
+      }
     }
 }

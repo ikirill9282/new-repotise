@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Validator;
+use Symfony\Component\Mailer\SentMessage;
 
 class History extends Model
 {
@@ -22,12 +23,24 @@ class History extends Model
       return $this->belongsTo(User::class);
     }
 
-    public static function emailVerifySuccess(int $user_id, array $payload = [])
+    public static function emailVerifySend(User $user)
+    {
+      return static::info()
+        ->action('Verify Email Sended')
+        ->userId($user->id)
+        ->message("Verification code sended to $user->email")
+        ->values($user->verify->code)
+        ->write()
+        ;
+    }
+
+    public static function emailVerifySuccess(User $user, string $code)
     {
       return static::success()
         ->action('Verify Email')
-        ->userId($user_id)
-        ->payload($payload)
+        ->userId($user->id)
+        ->message("Email verification sucess $user->username")
+        ->values($code)
         ->write()
         ;
     }
@@ -35,15 +48,19 @@ class History extends Model
     public static function emailVerifyValidationError(Validator $validator)
     {
       $message = static::makeValidatorMessage($validator);
-      return static::emailVerifyError($message);
+      return static::error()
+        ->action('Verify Email')
+        ->message($message)
+        ->write()
+        ;
     }
 
-    public static function emailVerifyError(string $message, array $payload = []): self
+    public static function emailVerifyError(string $message, string $code): self
     {
       return static::error()
         ->action('Verify Email')
         ->message($message)
-        ->payload($payload)
+        ->values($code)
         ->write()
         ;
     }
@@ -76,6 +93,11 @@ class History extends Model
       return (new static())->type('exception');
     }
 
+    public static function info(): self
+    {
+      return (new static())->type('info');
+    }
+
     public function type(string $type): self
     {
       $this->type = $type;
@@ -85,8 +107,8 @@ class History extends Model
 
     public function values(int|string|null $val = null, int|string|null $old_val = null): self
     {
-      $this->val = $val;
-      $this->old_val = $old_val;
+      $this->value = $val;
+      $this->old_value = $old_val;
 
       return $this;
     }

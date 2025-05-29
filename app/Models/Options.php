@@ -11,4 +11,11 @@ class Options extends Model
       return $this->belongsToMany(User::class, 'user_options', 'option_id', 'user_id', 'id', 'id')
         ->withPivot(['value']);
     }
+
+    public function getDefaultValue(): mixed
+    {
+      if ($this->name === 'avatar') return '/storage/images/default_avatar.svg';
+
+      return null;
+    }
 }

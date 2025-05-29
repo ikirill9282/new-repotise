@@ -44,8 +44,11 @@ class AuthController extends Controller
 
     public function verifyEmail(Request $request)
     {
+      // if (Auth::check()) return redirect(Auth::user()->makeProfileUrl());
+
       $validator = Validator::make($request->all(), [
         'confirm' => 'required|string',
+        'seller' => 'sometimes|boolean',
       ]);
 
       if ($validator->fails()) {;
@@ -58,9 +61,9 @@ class AuthController extends Controller
       try {
         $valid = $validator->validated();
         $data = Crypt::decrypt($valid['confirm']);
-        
+
         if (!isset($data['code']) || empty($data['code'])) {
-          History::emailVerifyError('Code does not exist in cipher');
+          History::emailVerifyError('Code does not exist in cipher', $data['code']);
           throw new Exception('Code does not exist in cipher');
         }
 
@@ -68,7 +71,7 @@ class AuthController extends Controller
           ->first();
 
         if (!$user) {
-          History::emailVerifyError('Code is expired', ['code' => $data['code']]);
+          History::emailVerifyError('Code is expired', $data['code']);
           throw new Exception('Code is expired');
         }
 
@@ -78,7 +81,16 @@ class AuthController extends Controller
 
         $user->update(['email_verified_at' => Carbon::now()->format('Y-m-d H:i:s')]);
         $user->verify()->delete();
-        History::emailVerifySuccess($user->id, ['code' => $data['code']]);
+        
+        History::emailVerifySuccess($user, $data['code']);
+
+        Auth::login($user);
+
+        $url = boolval($valid['seller']) 
+          ? $user->makeProfileVerificationUrl()
+          : $user->makeProfileUrl();
+        
+        return redirect($url);
 
       } catch (\Exception $e) {
         History::emailVerifyException($e);
