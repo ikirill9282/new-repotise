@@ -9,6 +9,7 @@ use App\Http\Controllers\SiteController;
 use Illuminate\Http\Request;
 use App\Mail\ConfirmRegitster;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 require __DIR__ . '/api.php';
 // Route::controller(SiteController::class)->group(function() {
@@ -17,7 +18,7 @@ require __DIR__ . '/api.php';
 // });
 
 Route::get('/mail/{slug}', function(Request $request, $slug) {
-  return view("emails.$slug");
+  return view("emails.$slug", ['user' => Auth::user()]);
 });
 
 Route::get('/mail', function(Request $request) {
@@ -42,8 +43,8 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/cart/{status}', [SiteController::class, 'payment'])->name('payment.status');
 
   Route::prefix('profile')->controller(CabinetController::class)->group(function() {
-    Route::get('/{user}', 'profile');
-    Route::get('/{user}/verify', 'verify');
+    Route::get('/', 'profile');
+    Route::get('/verify', 'verify');
   });
 });
 

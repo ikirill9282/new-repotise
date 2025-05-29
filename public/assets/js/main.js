@@ -325,6 +325,14 @@ function initModal() {
       Livewire.dispatch('modal.openAuth');
     }));
   }
+  const open_reset_password = [...document.querySelectorAll('.reset_password')];
+
+  if (open_reset_password.length) {
+    open_reset_password.map((item) => item.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      Livewire.dispatch('modal.openReset');
+    }));
+  }
 
   // const close_auth_items = [...document.querySelectorAll('.close_modal')];
   

@@ -37,7 +37,7 @@
                             class="stroke-[#A4A0A0] rotate-180 transition md:hidden">@include('icons.arrow_footer')</span></h3>
                     <ul class="overflow-hidden">
                         <li><a href="#" class="open_auth">Join / Sign In</a></li>
-                        <li><a href="#" class="">Forgot Password?</a></li>
+                        <li><a href="#" class="reset_password">Forgot Password?</a></li>
                     </ul>
                 </div>
             </div>

@@ -213,7 +213,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileUrl(): string
     {
-      return url("/profile/" . $this->profile);
+      return url("/profile");
     }
 
     public function makeProfileVerificationUrl(): string 
@@ -268,6 +268,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp]);
 
       return Crypt::encrypt(array_merge(['code' => $code], $params));
+    }
+
+    public function generateResetCode(): int
+    {
+      return random_int(100000, 999999);
     }
 
     public function makeDefaultOptions()
