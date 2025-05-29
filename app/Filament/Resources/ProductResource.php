@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Support\Carbon;
 
 class ProductResource extends Resource
 {
@@ -171,7 +171,7 @@ class ProductResource extends Resource
                       ->icon('heroicon-o-check-circle')
                       ->visible(fn (Product $record): bool => $record->status_id === 3)
                       ->action(function (Product $record) {
-                          $record->update(['status_id' => 1]);
+                          $record->update(['status_id' => 1, 'published_at' => Carbon::now()]);
                       })
                       ,
                     Tables\Actions\Action::make('Reject')
@@ -194,7 +194,7 @@ class ProductResource extends Resource
                       ->icon('heroicon-o-document-text')
                       ->visible(fn (Product $record): bool => $record->status_id === 2)
                       ->action(function (Product $record) {
-                          $record->update(['status_id' => 1]);
+                          $record->update(['status_id' => 1, 'published_at' => Carbon::now()]);
                       })
                       ,
 
@@ -202,7 +202,7 @@ class ProductResource extends Resource
                       ->icon('heroicon-o-x-circle')
                       ->visible(fn (Product $record): bool => $record->status_id === 1)
                       ->action(function (Product $record) {
-                          $record->update(['status_id' => 2]);
+                          $record->update(['status_id' => 2, 'published_at' => null]);
                       })
                       ,
 
