@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
           $table->id();
           $table->bigInteger('user_id')->unsigned()->index();
-          $table->string('title')->unique();
-          $table->text('slug');
+          $table->string('title');
+          $table->string('slug');
           $table->decimal('price', 10);
           $table->decimal('old_price', 10);
           $table->bigInteger('type_id')->unsigned()->index();

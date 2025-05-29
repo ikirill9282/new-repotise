@@ -1,15 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\UserController as BaseUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FallbackController;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
-use App\Models\Admin\Page;
-
+use Illuminate\Http\Request;
+use App\Mail\ConfirmRegitster;
+use App\Models\User;
 
 require __DIR__ . '/api.php';
 // Route::controller(SiteController::class)->group(function() {
@@ -17,11 +15,24 @@ require __DIR__ . '/api.php';
 //   Route::get('/{slug}');
 // });
 
+Route::get('/mail/{slug}', function(Request $request, $slug) {
+  return view("emails.$slug");
+});
+
+Route::get('/mail', function(Request $request) {
+  $user = User::find(1);
+  $mail = new ConfirmRegitster(url('/auth/email/verify/?' . http_build_query(['confirm' => $user->generateVerify()])));
+  
+  return $mail->render();
+});
+
 Route::prefix('/auth')
   ->controller(AuthController::class)
   ->group(function() {
     Route::post('signin', 'signin')->name('signin');
     Route::match(['get', 'post'], 'signout', 'signout')->name('signout');
+
+    Route::get('/email/verify', 'verifyEmail');
   });
 
 Route::middleware('auth:web')->group(function() {

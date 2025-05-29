@@ -21,7 +21,7 @@ use Filament\Tables\Actions\ViewAction;
 use Illuminate\Support\Facades\Storage;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Enums\ActionsPosition;
-
+use Illuminate\Support\Carbon;
 
 class ArticleResource extends Resource
 {
@@ -42,13 +42,14 @@ class ArticleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(fn() => null)
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('title')
                     ->searchable()
                     ->sortable()
                     ->color(Color::Sky)
-                    ->url(fn($record) => url("/admin/articles/$record->id/edit"))
+                    ->url(fn($record) => $record->makeFeedUrl(), true)
                     ,
                 TextColumn::make('author')
                     ->view('filament.tables.columns.author')
@@ -125,7 +126,7 @@ class ArticleResource extends Resource
                   ->action(function (Article $record) {
                       $newRecord = $record->replicate();
                       $newRecord->save();
-                      Storage::copy($record->preview, $newRecord->preview);
+                      $record->copyGallery($newRecord, 'articles');
                   })
                   ,
                 
@@ -133,7 +134,7 @@ class ArticleResource extends Resource
                   ->icon('heroicon-o-check-circle')
                   ->visible(fn (Article $record): bool => $record->status_id == 3)
                   ->action(function (Article $record) {
-                      $record->update(['status_id' => 1]);
+                      $record->update(['status_id' => 1, 'published_at' => Carbon::now()]);
                   })
                   ,
                 Action::make('Reject')
@@ -148,7 +149,7 @@ class ArticleResource extends Resource
                   ->icon('heroicon-o-document-text')
                   ->visible(fn (Article $record): bool => $record->status_id === 2)
                   ->action(function (Article $record) {
-                      $record->update(['status_id' => 1]);
+                      $record->update(['status_id' => 1, 'published_at' => Carbon::now()]);
                   })
                   ,
 
@@ -156,7 +157,7 @@ class ArticleResource extends Resource
                   ->icon('heroicon-o-x-circle')
                   ->visible(fn (Article $record): bool => $record->status_id === 1)
                   ->action(function (Article $record) {
-                      $record->update(['status_id' => 2]);
+                      $record->update(['status_id' => 2, 'published_at' => null]);
                   })
                   ,
 

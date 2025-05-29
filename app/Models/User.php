@@ -19,6 +19,8 @@ use Laravel\Scout\Searchable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Traits\HasCart;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Crypt;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -44,6 +46,11 @@ class User extends Authenticatable implements HasName, FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getFilamentName(): string
+    {
+      return $this->username;
     }
 
     protected static function boot()
@@ -111,9 +118,9 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->hasRole('admin');
     }
 
-    public function getFilamentName(): string
+    public function verify()
     {
-      return $this->username;
+      return $this->hasOne(UserVerify::class);
     }
 
     public function options()
@@ -227,5 +234,17 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function getRecomendAuthors(): Collection
     {
       return User::role('creator')->limit(6)->orderByDesc('id')->get();
+    }
+
+    public function generateVerify(array $params = []): string
+    {
+      if ($this->verify()->exists()) {
+        return $this->verify->code;
+      }
+      
+      $code = UserVerify::genCode();
+      $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp]);
+
+      return Crypt::encrypt(array_merge(['code' => $code], $params));
     }
 }

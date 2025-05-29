@@ -12,11 +12,12 @@ use Illuminate\Support\Facades\Session;
 
 class Modal extends Component
 {
-    public $open = true;
-    public $active = true;
-    public $view = 'backup';
+    public $open = false;
+    public $active = false;
+    public $view = 'auth';
     public $email = null;
     public $remember = false;
+    public $as_seller = false;
 
     public $password = null;
     public $repeat_password = null;
@@ -129,11 +130,12 @@ class Modal extends Component
           return ;
         }
 
-        // User::create([
-        //   'email' => $this->email,
-        //   'username' => preg_replace("/^(.*?)@.*#/is", "$1", $this->email),
-        //   'password' => $this->password,
-        // ]);
+        User::create([
+          'email' => $this->email,
+          'username' => $uname = preg_replace("/^(.*?)@.*#/is", "$1", $this->email),
+          'name' => ucfirst($uname),
+          'password' => $this->password,
+        ]);
 
         $this->close();
         $this->openSuccess();

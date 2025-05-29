@@ -47,9 +47,12 @@ class Product extends Model
     });
   }
 
-  private function generateSlug()
+  private function generateSlug(bool $salt = false)
   {
-    $this->slug = Slug::makeEn($this->title);
+    $this->slug = Slug::makeEn($this->title) . ($salt ? random_int(0, 10000) : '');
+    if (Product::where('slug', $this->slug)->exists()) {
+      return $this->generateSlug(true);
+    }
   }
 
   public function categories()

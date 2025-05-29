@@ -6,6 +6,7 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\OrderProducts;
 use App\Models\Product;
+use App\Models\Status;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,7 +19,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Enums\ActionsPosition;
-
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ProductResource extends Resource
 {
@@ -116,7 +119,6 @@ class ProductResource extends Resource
                       ->orderBy('sales', $direction)
                       ;
                   })
-                  ->searchable()
                   ->toggleable()
                   ->getStateUsing(function (Product $record) {
                       return OrderProducts::where('product_id', $record->id)->sum('count');
@@ -143,7 +145,10 @@ class ProductResource extends Resource
                   ,
             ])
             ->filters([
-                //
+                SelectFilter::make('status_id')
+                  ->label('Status')
+                  ->options(Status::all()->pluck('title', 'id'))
+                  ,
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -171,7 +176,7 @@ class ProductResource extends Resource
                       ->action(function (Product $record) {
                           $newRecord = $record->replicate();
                           $newRecord->save();
-                          Storage::copy($record->preview, $newRecord->preview);
+                          $record->copyGallery($newRecord, 'products');
                       })
                       ,
                     

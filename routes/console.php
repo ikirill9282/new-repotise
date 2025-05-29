@@ -1,5 +1,6 @@
 <?php
 
+use App\Mail\ConfirmRegitster;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Page;
 use App\Models\Admin\PageSection;
@@ -22,20 +23,28 @@ use Meilisearch\Contracts\MultiSearchFederation;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
-Artisan::command('tt', function() {
-  $t = Product::factory(10)->create();
-  dd($t);
+Artisan::command('tt',
+
+ function() {
+  $src = '/images/product_7.jpg';
+  $name = preg_replace('/^.*?\/*([a-zA-Z0-9-_]+\.\w+)$/is', "$1", $src);
+  $path = Storage::disk('public')->path($src);
+  $file = new UploadedFile($path, $name);
+  $dst = '/images/' . trim(base64_encode(microtime()), '=') . '.' . $file->getFileInfo()->getExtension();
+
+  Storage::disk('public')->copy($src, $dst);
 });
 
-Artisan::command('tt_mail', function() {
-  Mail::raw('Test email content', function ($message) {
-      $message->to('errewer123@gmail.com')
-              ->replyTo('loyderhy2@gmail.com', 'Your Own Reply')
-              ->subject('Test email');
-      
-  });
+Artisan::command('ttm', function () {
+  
+  $user = User::find(1);
+  $mail = new ConfirmRegitster(url('/auth/email/verify/?' . http_build_query(['confirm' => $user->generateVerify()])));
+  Mail::to($user->email)->send($mail);
 });
+
 
 Artisan::command('tt2', function() {
   $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));

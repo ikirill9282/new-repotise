@@ -2,8 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\History;
+use Exception;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use Illuminate\Support\Carbon;
 
 class AuthController extends Controller
 {
@@ -30,6 +37,52 @@ class AuthController extends Controller
     {
       Auth::logout();
       $request->session()->regenerate();
+      
+      return redirect('/');
+    }
+
+
+    public function verifyEmail(Request $request)
+    {
+      $validator = Validator::make($request->all(), [
+        'confirm' => 'required|string',
+      ]);
+
+      if ($validator->fails()) {;
+  
+        History::emailVerifyValidationError($validator);
+        
+        return redirect('/');
+      }
+
+      try {
+        $valid = $validator->validated();
+        $data = Crypt::decrypt($valid['confirm']);
+        
+        if (!isset($data['code']) || empty($data['code'])) {
+          History::emailVerifyError('Code does not exist in cipher');
+          throw new Exception('Code does not exist in cipher');
+        }
+
+        $user = User::whereHas('verify', fn($query) => $query->where('code', $data['code']))
+          ->first();
+
+        if (!$user) {
+          History::emailVerifyError('Code is expired', ['code' => $data['code']]);
+          throw new Exception('Code is expired');
+        }
+
+        if ($user->email_verified_at) {
+          return redirect('/');
+        }
+
+        $user->update(['email_verified_at' => Carbon::now()->format('Y-m-d H:i:s')]);
+        $user->verify()->delete();
+        History::emailVerifySuccess($user->id, ['code' => $data['code']]);
+
+      } catch (\Exception $e) {
+        History::emailVerifyException($e);
+      }
       
       return redirect('/');
     }

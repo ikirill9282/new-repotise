@@ -44,7 +44,7 @@
 
     <div class="flex items-center justify-between">
       <label class="flex justify-start items-center">
-        <input wire:model="remember" type="checkbox" name="as_seller" class="!rounded !border-gray-300 !text-orange-600 !focus:ring-orange-500 checked:bg-orange-500"/>
+        <input wire:model="as_seller" type="checkbox" name="as_seller" class="!rounded !border-gray-300 !text-orange-600 !focus:ring-orange-500 checked:bg-orange-500"/>
         <span class="ml-2 text-sm text-gray-600">Sign up as a seller</span>
       </label>
     </div>
