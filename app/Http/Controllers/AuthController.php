@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -85,6 +86,7 @@ class AuthController extends Controller
         History::emailVerifySuccess($user, $data['code']);
 
         Auth::login($user);
+        Session::regenerate();
 
         $url = boolval($valid['seller']) 
           ? $user->makeProfileVerificationUrl()
