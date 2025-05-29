@@ -56,7 +56,8 @@ class ArticleResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->color(Color::Sky)
-                    ->url(fn($record) => $record->makeFeedUrl(), true)
+                    // ->url(fn($record) => $record->makeUrl(), true)
+                    ->url(fn($record) => url("/admin/articles/$record->id/edit"))
                     ,
                 TextColumn::make('author')
                     ->view('filament.tables.columns.author')
