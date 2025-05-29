@@ -95,6 +95,16 @@ class ProductResource extends Resource
                   ->toggleable()
                   ->money('usd', true)
                   ,
+
+                TextColumn::make('old_price')
+                  ->label('Old Price')
+                  ->sortable()
+                  ->searchable()
+                  ->toggleable()
+                  ->money('usd', true)
+                  ->color(Color::Gray)
+                  // ->extraAttributes(['class' => 'line-through'])
+                  ,
                 TextColumn::make('status.title')
                   ->label('Status')
                   ->sortable()
