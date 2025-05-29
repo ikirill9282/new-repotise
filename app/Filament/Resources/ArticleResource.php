@@ -43,8 +43,15 @@ class ArticleResource extends Resource
     {
         return $table
             ->recordUrl(fn() => null)
+            ->query(static::getEloquentQuery()->orderByDesc('id'))
             ->columns([
-                TextColumn::make('id'),
+                TextColumn::make('id')
+                  ->label('Article ID')
+                  ,
+                TextColumn::make('preview')
+                  ->label('Image')
+                  ->view('filament.tables.columns.image')
+                  ,
                 TextColumn::make('title')
                     ->searchable()
                     ->sortable()
@@ -126,7 +133,9 @@ class ArticleResource extends Resource
                 Action::make('Duplicate')
                   ->icon('heroicon-o-document-duplicate')
                   ->action(function (Article $record) {
-                      $newRecord = $record->replicate();
+                      $newRecord = $record->replicate(['status_id', 'published_at']);
+                      // $newRecord->status_id = 3;
+                      // $newRecord->published_at = null;
                       $newRecord->save();
                       $record->copyGallery($newRecord, 'articles');
                   })

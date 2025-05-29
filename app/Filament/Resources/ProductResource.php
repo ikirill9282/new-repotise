@@ -46,6 +46,7 @@ class ProductResource extends Resource
     {
         return $table
             ->recordUrl(fn() => null)
+            ->query(static::getEloquentQuery()->orderByDesc('id'))
             ->columns([
                 TextColumn::make('id')
                   ->label('Product ID')
@@ -63,7 +64,7 @@ class ProductResource extends Resource
                   ->sortable()
                   ->searchable()
                   ->toggleable()
-                  ->url(fn($record) => url("/admin/products/$record->id/edit"))
+                  ->url(fn($record) => $record->makeUrl(), true)
                   ->color(Color::Sky)
                   ,
                 TextColumn::make('type.title')
@@ -123,12 +124,12 @@ class ProductResource extends Resource
 
                 TextColumn::make('sales')
                   ->label('Sales')
-                  ->sortable(query: function (Builder $query, string $direction): Builder {
-                    return $query->join('order_products', 'products.id', '=', 'order_products.product_id')
-                      ->selectRaw('products.*, sum(order_products.count) as sales')
-                      ->orderBy('sales', $direction)
-                      ;
-                  })
+                  // ->sortable(query: function (Builder $query, string $direction): Builder {
+                  //   return $query->join('order_products', 'products.id', '=', 'order_products.product_id')
+                  //     ->selectRaw('products.*, sum(order_products.count) as sales')
+                  //     ->orderBy('sales', $direction)
+                  //     ;
+                  // })
                   ->toggleable()
                   ->getStateUsing(function (Product $record) {
                       return OrderProducts::where('product_id', $record->id)->sum('count');
@@ -186,7 +187,9 @@ class ProductResource extends Resource
                     Tables\Actions\Action::make('Duplicate')
                       ->icon('heroicon-o-document-duplicate')
                       ->action(function (Product $record) {
-                          $newRecord = $record->replicate();
+                          $newRecord = $record->replicate(['status_id', 'published_at']);
+                          // $newRecord->status_id = 3;
+                          // $newRecord->published_at = null;
                           $newRecord->save();
                           $record->copyGallery($newRecord, 'products');
                       })
