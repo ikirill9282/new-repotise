@@ -2,7 +2,9 @@
 
 namespace App\Livewire;
 
+use Livewire\Attributes\Url;
 use App\Events\MailVerify;
+use App\Events\ResetFailed;
 use Livewire\Component;
 use Livewire\Attributes\On; 
 use App\Models\User;
@@ -11,7 +13,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Mail\ConfirmRegitster;
-
+use App\Models\History;
+use Illuminate\Support\Facades\Log;
 
 class Modal extends Component
 {
@@ -35,9 +38,22 @@ class Modal extends Component
 
     public string $currentUrl;
 
+    #[Url(as:'modal', except: '')]
+    public string $currentModal = '';
+
     public function mount(): void
     {
+      // dd('mount');
       $this->currentUrl = url()->current() . '?' . http_build_query($_GET);
+      if (request()->has('modal')) {
+        if (!empty(request()->get('modal'))) {
+          $this->open = true;
+          $this->view = request()->get('modal');
+          $this->activate();
+        } else {
+          $this->currentModal = '';
+        }
+      }
     }
     
     #[On('activate')]
@@ -56,6 +72,7 @@ class Modal extends Component
     public function close()
     {
       $this->open = false;
+      $this->currentModal = '';
     }
 
     #[On('modal.openAuth')]
@@ -83,6 +100,7 @@ class Modal extends Component
     #[On('modal.openReset')]
     public function resetPassword()
     {
+      $this->currentModal = 'reset';
       $this->open = true;
       $this->view = 'reset';
     }
@@ -107,11 +125,12 @@ class Modal extends Component
           return false;
         }
 
-        Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember);
-        Session::regenerate();
-        $this->deactivate();
-        
-        return redirect($this->currentUrl);
+        if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+          Session::regenerate(true);
+          $this->deactivate();
+          
+          return redirect($user->makeProfileUrl());
+        }
       }
 
       $this->addErrorText('auth', 'Invalid email or password. Please try again.');
@@ -151,8 +170,14 @@ class Modal extends Component
 
     public function sendResetCode()
     {
+      if (User::where('email', $this->email)->exists()) {
+        $user = User::firstWhere('email', $this->email);
+        $user->sendResetCode();
+      }
+
       $this->open = true;
       $this->view = 'reset_confirm';
+      $this->currentModal = 'reset_confirm';
     }
 
     public function openBackup()
@@ -179,8 +204,28 @@ class Modal extends Component
         return ;
       }
 
-      // User::whereHas('reset_code', fn($query) => $query->where('code', $this->code))->update(['password' => $this->new_password]);
+      $user = User::whereHas('verify', fn($query) => $query->where([
+        'code' => $this->code,
+        'type' => 'reset',
+      ]))
+        ->with('verify')
+        ->first();
 
+
+      if (!$user) {
+        $this->addErrorText('code', 'Code is expired');
+        ResetFailed::dispatch(null, $this->code, 'code');
+        return ;
+      }
+
+      if ($user->verify->where('type', 'reset')->first()?->code !== $this->code) {
+        $this->addErrorText('code', 'Invalid code');
+        ResetFailed::dispatch($user, $this->code, 'invalid');
+      }
+
+      $user->update(['password' => $this->new_password]);
+      $user->verify()->where('type', 'reset')->delete();
+  
       $this->openSuccess();
     }
 
@@ -192,6 +237,11 @@ class Modal extends Component
     protected function validatePassword(string $password)
     {
       return preg_match( '/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_\-+=]{8,}$/is', $password);
+    }
+
+    public function findUser(): ?User
+    {
+      return !empty($this->email) ? User::firstWhere('email', $this->email) : null;
     }
 
     public function render()

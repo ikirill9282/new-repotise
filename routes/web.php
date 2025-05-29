@@ -21,13 +21,6 @@ Route::get('/mail/{slug}', function(Request $request, $slug) {
   return view("emails.$slug", ['user' => Auth::user()]);
 });
 
-Route::get('/mail', function(Request $request) {
-  $user = User::find(1);
-  $mail = new ConfirmRegitster(url('/auth/email/verify/?' . http_build_query(['confirm' => $user->generateVerify()])));
-  
-  return $mail->render();
-});
-
 Route::prefix('/auth')
   ->controller(AuthController::class)
   ->group(function() {

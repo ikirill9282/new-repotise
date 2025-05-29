@@ -1,6 +1,6 @@
 <div class="max-w-md w-full bg-white rounded-xl shadow-lg !p-4 md:!p-8 relative">
   <h2 class="text-2xl font-bold !mb-6 text-center select-none">Check Your Email</h2>
-  <p class="!mb-4">We've sent a 6-digit verification code to {{ $this->email }}. Please enter the code below and create your new password. The code is valid for 24 hours.</p>
+  <p class="!mb-4">We've sent a 6-digit verification code to {{ $this->email }}. Please enter the code below and create your new password. The code is valid for 1 hour.</p>
   <form wire:submit="confirmNewPassword" class="!space-y-4">
     @csrf
     <div>
@@ -43,12 +43,12 @@
       @include('livewire.modal.error_message', ['key' => 'repeat_new_password'])
     </div>
 
-    <a class="w-full inline-block !text-orange-400 hover:!text-orange-600 hover:cursor-pointer !mb-2 font-medium !py-2.5 !rounded-lg transition-colors transition">
+    <a wire:click.prevent="sendResetCode" class="w-full inline-block !text-orange-400 hover:!text-orange-600 hover:cursor-pointer !mb-2 font-medium !py-2.5 !rounded-lg transition-colors transition">
       Didn't receive the code? Resend Code
     </a>
 
     <div class="flex justify-start items-stretch gap-3">
-      <a wire:click="openAuth" href="#" class="w-full border text-center !text-orange-400 !border-orange-400 hover:!border-orange-600 hover:!text-orange-600 font-medium !py-2.5 !rounded-lg transition-colors transition">
+      <a wire:click.prevent="resetPassword" href="#" class="w-full border text-center !text-orange-400 !border-orange-400 hover:!border-orange-600 hover:!text-orange-600 font-medium !py-2.5 !rounded-lg transition-colors transition">
         Back 
       </a>
 

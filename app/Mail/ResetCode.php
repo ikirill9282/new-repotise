@@ -40,7 +40,7 @@ class ResetCode extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.reset_code',
+            view: 'emails.reset_code',
         );
     }
 

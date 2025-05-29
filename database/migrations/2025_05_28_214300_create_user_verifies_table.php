@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('user_verifies', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->unsigned()->index()->unique();
+            $table->bigInteger('user_id')->unsigned()->index();
             $table->string('code');
+            $table->string('type')->index();
             $table->integer('created_at')->index();
+
+            $table->unique(['user_id', 'type']);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

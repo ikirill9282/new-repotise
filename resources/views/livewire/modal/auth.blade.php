@@ -32,7 +32,7 @@
         <input wire:model="remember" type="checkbox" name="remember" class="!rounded !border-gray-300 !text-orange-600 !focus:ring-orange-500 checked:bg-orange-500"/>
         <span class="ml-2 text-sm text-gray-600">Remember me</span>
       </label>
-      <a wire:click="resetPassword" href="#" class="disabled text-sm !text-orange-400 hover:!text-orange-600 transition">Forgot password?</a>
+      <a wire:click.prevent="resetPassword" href="#" class="disabled text-sm !text-orange-400 hover:!text-orange-600 transition">Forgot password?</a>
     </div>
 
     <button class="w-full !bg-orange-400 hover:!bg-orange-600 text-white font-medium !py-2.5 !rounded-lg transition-colors transition">

@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmRegitster;
 use App\Events\MailVerify;
+use App\Mail\ResetCode;
 use App\Models\Options;
 
 class User extends Authenticatable implements HasName, FilamentUser
@@ -248,9 +249,16 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function sendVerificationCode(bool $seller = false)
     {
-      $mail = new ConfirmRegitster($this->getVerifyUrl($seller));
+      $mail = new ConfirmRegitster($this);
       Mail::to($this->email)->send($mail);
       MailVerify::dispatch($this);
+    }
+
+    public function sendResetCode()
+    {
+      $mail = new ResetCode($this);
+      Mail::to($this->email)->send($mail);
+      // MailReset::dispatch($this);
     }
 
     public function getVerifyUrl(bool $seller = false): string
@@ -260,19 +268,26 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function generateVerify(array $params = []): string
     {
-      if ($this->verify()->exists()) {
-        return Crypt::encrypt(array_merge(['code' => $this->verify->code], $params));
+      if ($this->verify()->where('type', 'email')->exists()) {
+        return Crypt::encrypt(array_merge(['code' => $this->verify()->where('type', 'email')?->code], $params));
       }
       
       $code = UserVerify::genCode();
-      $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp]);
+      $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp, 'type' => 'email']);
 
       return Crypt::encrypt(array_merge(['code' => $code], $params));
     }
 
-    public function generateResetCode(): int
+    public function getResetCode(): int
     {
-      return random_int(100000, 999999);
+      if ($this->verify()->where('type', 'reset')->exists()) {
+        return $this->verify()->where('type', 'reset')->first()?->code;
+      }
+
+      $code = random_int(100000, 999999);
+      $model = $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp, 'type' => 'reset']);
+
+      return $model->code;
     }
 
     public function makeDefaultOptions()

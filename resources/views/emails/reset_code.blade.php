@@ -17,7 +17,7 @@
             Here's your code to set a new password:
         </p>
         <a href="{{ $url ?? '' }}" style="display: inline-block; padding: 15px 20px; background: #FC7361; color: #fff; text-decoration: none; border-radius: 4px;">
-          {{ $user->generateResetCode() }}  
+          {{ $user->getResetCode() }}  
         </a>
         <p>
             This code will expire in 1 hour for your security.

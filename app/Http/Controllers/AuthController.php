@@ -76,7 +76,7 @@ class AuthController extends Controller
         }
 
         if ($user->email_verified_at) {
-          return redirect('/');
+          return redirect($user->makeProfileUrl());
         }
 
         $user->update(['email_verified_at' => Carbon::now()->format('Y-m-d H:i:s')]);

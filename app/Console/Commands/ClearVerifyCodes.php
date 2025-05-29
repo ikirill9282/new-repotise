@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\UserVerify;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
 class ClearVerifyCodes extends Command
 {
@@ -25,6 +27,9 @@ class ClearVerifyCodes extends Command
      */
     public function handle()
     {
-        //
+      foreach (UserVerify::all() as $verify) {
+        $alive = Carbon::now()->timestamp - Carbon::parse($verify->created_at)->timestamp;
+        if ($alive >= 3600) $verify->delete();
+      }
     }
 }

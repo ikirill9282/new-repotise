@@ -17,7 +17,7 @@
     </div>
 
     <div class="flex justify-start items-stretch gap-3">
-      <a wire:click="openAuth" href="#" class="w-full border text-center !text-orange-400 !border-orange-400 hover:!border-orange-600 hover:!text-orange-600 font-medium !py-2.5 !rounded-lg transition-colors transition">
+      <a wire:click.prevent="openAuth" href="#" class="w-full border text-center !text-orange-400 !border-orange-400 hover:!border-orange-600 hover:!text-orange-600 font-medium !py-2.5 !rounded-lg transition-colors transition">
         Back to Login
       </a>
 

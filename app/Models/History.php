@@ -23,10 +23,42 @@ class History extends Model
       return $this->belongsTo(User::class);
     }
 
+    public static function resetUserUndefined(string $code)
+    {
+      return static::warning()
+        ->message("Undefined user with code")
+        ->values($code)
+        ->write()
+        ;
+    }
+
+    public static function resetCodeExpired(?User $user, string $code)
+    {
+      return static::warning()
+        ->action('Reset Code')
+        ->message('Reset code is expired')
+        ->userId($user?->id ?? null)
+        ->values($code)
+        ->write()
+        ;
+
+    }
+
+    public static function resetCodeSend(User $user)
+    {
+      return static::info()
+        ->action('Reset Code')
+        ->userId($user->id)
+        ->message("Send reset code to user $user->id")
+        ->values($user->getResetCode())
+        ->write()
+        ;
+    }
+
     public static function emailVerifySend(User $user)
     {
       return static::info()
-        ->action('Verify Email Sended')
+        ->action('Verify Email')
         ->userId($user->id)
         ->message("Verification code sended to $user->email")
         ->values($user->verify->code)
@@ -75,6 +107,7 @@ class History extends Model
           'line' => $e->getLine(),
           'code' => $e->getCode(),
         ])
+        ->write()
         ;
     }
 
@@ -96,6 +129,11 @@ class History extends Model
     public static function info(): self
     {
       return (new static())->type('info');
+    }
+
+    public static function warning(): self
+    {
+      return (new static())->type('warning');
     }
 
     public function type(string $type): self
@@ -134,7 +172,7 @@ class History extends Model
       return $this;
     }
 
-    public function userId(int $id): self
+    public function userId(?int $id): self
     {
       $this->user_id = $id;
       return $this;

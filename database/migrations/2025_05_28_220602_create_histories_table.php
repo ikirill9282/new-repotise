@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('histories', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('initiator')->unsigned()->index()->default(0);
             $table->bigInteger('user_id')->unsigned()->nullable()->index();
             $table->string('action')->index();
             $table->string('type')->index();
