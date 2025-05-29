@@ -94,6 +94,8 @@ class ArticleResource extends Resource
                   ->searchable()
                   ->toggleable()
                   ->dateTime('Y-m-d H:i:s')
+                  ->icon('heroicon-o-check-badge')
+                  ->iconColor(Color::Sky)
                   ,
                 TextColumn::make('created_at')
                   ->icon('heroicon-o-clock')
