@@ -45,8 +45,6 @@ class AuthController extends Controller
 
     public function verifyEmail(Request $request)
     {
-      // if (Auth::check()) return redirect(Auth::user()->makeProfileUrl());
-
       $validator = Validator::make($request->all(), [
         'confirm' => 'required|string',
         'seller' => 'sometimes|boolean',
