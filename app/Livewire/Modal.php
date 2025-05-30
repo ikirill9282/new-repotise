@@ -172,7 +172,6 @@ class Modal extends Component
     {
       if (User::where('email', $this->email)->exists()) {
         $user = User::firstWhere('email', $this->email);
-        dd($user);
         $user->sendResetCode();
       }
 

@@ -26,6 +26,7 @@ use App\Mail\ConfirmRegitster;
 use App\Events\MailVerify;
 use App\Mail\ResetCode;
 use App\Models\Options;
+use App\Events\MailReset;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -258,7 +259,7 @@ class User extends Authenticatable implements HasName, FilamentUser
     {
       $mail = new ResetCode($this);
       Mail::to($this->email)->send($mail);
-      // MailReset::dispatch($this);
+      MailReset::dispatch($this);
     }
 
     public function getVerifyUrl(bool $seller = false): string
