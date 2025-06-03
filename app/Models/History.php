@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Action;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Validator;
 use Symfony\Component\Mailer\SentMessage;
@@ -9,6 +10,7 @@ use Symfony\Component\Mailer\SentMessage;
 class History extends Model
 {
     protected $attributes = [
+      'initiator' => 0,
       'user_id' => null,
       'action' => null,
       'type' => null,
@@ -23,9 +25,20 @@ class History extends Model
       return $this->belongsTo(User::class);
     }
 
+    public static function userCreated(User $user)
+    {
+      return static::success()
+        ->action(Action::USER_CREATED)
+        ->userId($user->id)
+        ->message("User registration $user->username")
+        ->write()
+        ;
+    }
+
     public static function resetUserUndefined(string $code)
     {
       return static::warning()
+        ->action(Action::RESET_PASSWORD)
         ->message("Undefined user with code")
         ->values($code)
         ->write()
@@ -35,7 +48,7 @@ class History extends Model
     public static function resetCodeExpired(?User $user, string $code)
     {
       return static::warning()
-        ->action('Reset Code')
+        ->action(Action::RESET_PASSWORD)
         ->message('Reset code is expired')
         ->userId($user?->id ?? null)
         ->values($code)
@@ -47,9 +60,9 @@ class History extends Model
     public static function resetCodeSend(User $user)
     {
       return static::info()
-        ->action('Reset Code')
+        ->action(Action::RESET_PASSWORD)
         ->userId($user->id)
-        ->message("Send reset code to user $user->id")
+        ->message("Send reset password code to user $user->id")
         ->values($user->getResetCode())
         ->write()
         ;
@@ -58,7 +71,7 @@ class History extends Model
     public static function emailVerifySend(User $user)
     {
       return static::info()
-        ->action('Verify Email')
+        ->action(Action::VERIFY_EMAIL)
         ->userId($user->id)
         ->message("Verification code sended to $user->email")
         ->values($user->verify->code)
@@ -69,7 +82,7 @@ class History extends Model
     public static function emailVerifySuccess(User $user, string $code)
     {
       return static::success()
-        ->action('Verify Email')
+        ->action(Action::VERIFY_EMAIL)
         ->userId($user->id)
         ->message("Email verification sucess $user->username")
         ->values($code)
@@ -81,7 +94,7 @@ class History extends Model
     {
       $message = static::makeValidatorMessage($validator);
       return static::error()
-        ->action('Verify Email')
+        ->action(Action::VERIFY_EMAIL)
         ->message($message)
         ->write()
         ;
@@ -90,7 +103,7 @@ class History extends Model
     public static function emailVerifyError(string $message, string $code): self
     {
       return static::error()
-        ->action('Verify Email')
+        ->action(Action::VERIFY_EMAIL)
         ->message($message)
         ->values($code)
         ->write()
@@ -101,7 +114,7 @@ class History extends Model
     {
       return static::exception()
         ->message($e->getMessage())
-        ->action('Verify Email')
+        ->action(Action::VERIFY_EMAIL)
         ->payload([
           'file' => $e->getFile(),
           'line' => $e->getLine(),
@@ -175,6 +188,12 @@ class History extends Model
     public function userId(?int $id): self
     {
       $this->user_id = $id;
+      return $this;
+    }
+
+    public function initiator(?int $id): self
+    {
+      $this->initiator = $id;
       return $this;
     }
 

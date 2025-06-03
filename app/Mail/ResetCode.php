@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\Action;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,6 +15,8 @@ class ResetCode extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $trigger;
+
     /**
      * Create a new message instance.
      */
@@ -21,7 +24,7 @@ class ResetCode extends Mailable
       public User $user
     )
     {
-        //
+      $this->trigger = Action::RESET_PASSWORD;
     }
 
     /**

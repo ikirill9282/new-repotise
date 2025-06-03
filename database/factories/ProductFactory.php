@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ProductModel;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\Type;
@@ -28,29 +29,34 @@ class ProductFactory extends Factory
    */
   public function definition(): array
   {
-    $users = User::all()
-      ->filter(fn($user) => $user->can('create-products'))
-      ->pluck('id')
-      ->shuffle()
-      ->toArray();
+    // $users = User::all()
+    //   ->filter(fn($user) => $user->can('create-products'))
+    //   ->pluck('id')
+    //   ->shuffle()
+    //   ->toArray();
 
-    $types = Type::all()
-      ->pluck('id')
-      ->shuffle()
-      ->toArray();
+    // $types = Type::all()
+    //   ->pluck('id')
+    //   ->shuffle()
+    //   ->toArray();
 
-    $locations = Location::all()
-      ->pluck('id')
-      ->shuffle()
-      ->toArray();
+    // $locations = Location::all()
+    //   ->pluck('id')
+    //   ->shuffle()
+    //   ->toArray();
+
+    $users_count = User::count();
+    $types_count = Type::count();
+    $locations_count = Location::count();
 
     return [
-      'user_id' => $users[0],
+      'user_id' => fake()->numberBetween(1, $users_count),
       'title' => collect(fake()->words(3))->map(fn($word) => ucfirst($word))->join(' '),
       'price' => fake()->numberBetween(1000, 20000),
+      'model' => fake()->randomElement([ProductModel::PRODUCT, ProductModel::SUBSCRIPTION]),
       'old_price' => fake()->numberBetween(100000, 200000),
-      'type_id' => $types[0],
-      'location_id' => $locations[0],
+      'type_id' => fake()->numberBetween(1, $types_count),
+      'location_id' => fake()->numberBetween(1, $locations_count),
       'rating' => fake()->numberBetween(0, 5),
       'text' => collect(fake()->paragraphs(20))->map(fn($paragraph) => ucfirst($paragraph))->join("\n"),
     ];

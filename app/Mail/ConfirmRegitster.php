@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\Action;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -14,14 +15,17 @@ class ConfirmRegitster extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $trigger;
+    
     /**
      * Create a new message instance.
      */
     public function __construct(
-      public User $user
+      public User $user,
+      public bool $seller = false,
     )
     {
-
+      $this->trigger = Action::VERIFY_EMAIL;
     }
 
     /**

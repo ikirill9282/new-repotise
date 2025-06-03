@@ -16,18 +16,18 @@ return new class extends Migration
           $table->bigInteger('user_id')->unsigned()->index();
           $table->string('title');
           $table->string('slug');
+          $table->string('model')->default('product');
           $table->decimal('price', 10);
           $table->decimal('old_price', 10);
           $table->bigInteger('type_id')->unsigned()->index();
           $table->bigInteger('location_id')->unsigned()->index();
-          $table->datetime('published_at')->index()->nullable();
+          $table->bigInteger('status_id')->unsigned()->index()->default(3);
           $table->float('rating')->default(0);
           $table->longText('text');
+          $table->datetime('published_at')->index()->nullable();
           $table->timestamps();
 
-          $table->bigInteger('status_id')->unsigned()->index()->default(3);
           $table->foreign('status_id')->references('id')->on('statuses');
-
           $table->foreign('user_id')->references('id')->on('users');
           $table->foreign('type_id')->references('id')->on('types');
           $table->foreign('location_id')->references('id')->on('locations');

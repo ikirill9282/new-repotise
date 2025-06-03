@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\Action;
 use Livewire\Attributes\Url;
 use App\Events\MailVerify;
 use App\Events\ResetFailed;
@@ -138,7 +139,6 @@ class Modal extends Component
 
     public function reg()
     {
-      // dump($this);
       if (!User::where('email', $this->email)->exists()) {
         
         if (!$this->validatePassword($this->password)) {
@@ -156,6 +156,9 @@ class Modal extends Component
           'email' => $this->email,
           'password' => $this->password,
         ]);
+
+        History::userCreated($user);
+
         $user->makeDefaultOptions();
         $user->sendVerificationCode(seller: $this->as_seller);
         
@@ -223,10 +226,21 @@ class Modal extends Component
         ResetFailed::dispatch($user, $this->code, 'invalid');
       }
 
+      $op = $user->password;
       $user->update(['password' => $this->new_password]);
+      $user->refresh();
       $user->verify()->where('type', 'reset')->delete();
-  
+
+      History::success()
+        ->action(Action::RESET_PASSWORD)
+        ->userId($user->id)
+        ->values($op, $user->password)
+        ->message('User password changed')
+        ->write()
+        ;
+      
       $this->openSuccess();
+      $this->currentModal = '';
     }
 
     protected function addErrorText($key, $val)

@@ -18,7 +18,7 @@
             Welcome to TrekGuider! We're thrilled you've joined our community of travel explorers.
             Just one more step to get started: please confirm your email address by clicking the button below:
         </p>
-        <a href="{{ $user->getVerifyUrl() ?? '' }}" style="display: inline-block; padding: 15px 20px; background: #FC7361; color: #fff; text-decoration: none; border-radius: 4px;">
+        <a href="{{ $user->getVerifyUrl($seller) ?? '' }}" style="display: inline-block; padding: 15px 20px; background: #FC7361; color: #fff; text-decoration: none; border-radius: 4px;">
               Confirm Registration
           </a>
         <p>

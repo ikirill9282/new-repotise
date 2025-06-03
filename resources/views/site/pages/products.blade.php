@@ -594,7 +594,7 @@
                     queryData.q = q;
                     const queryString = $.param(queryData);
 
-                    window.location.href = `${baseUrl}?${queryString}`;
+                    window.location.href = `/products?${queryString}`;
                 });
 
             $("#search-product").on("submit", function(evt) {
@@ -604,7 +604,7 @@
                 queryData.q = q;
                 const queryString = $.param(queryData);
 
-                window.location.href = `${baseUrl}?${queryString}`;
+                window.location.href = `/products?${queryString}`;
             });
 
             // Price value control

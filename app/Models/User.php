@@ -250,7 +250,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function sendVerificationCode(bool $seller = false)
     {
-      $mail = new ConfirmRegitster($this);
+      $mail = new ConfirmRegitster($this, $seller);
       Mail::to($this->email)->send($mail);
       MailVerify::dispatch($this);
     }

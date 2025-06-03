@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ProductModel;
 use App\Mail\ConfirmRegitster;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Page;
@@ -25,18 +26,21 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
+use App\Mail\ResetCode;
+use App\Models\MailLog;
+use Illuminate\Support\Facades\Http;
+
+Schedule::command('app:check-mailgun-log')->hourly();
+
 
 Artisan::command('tt', function() {
-  $user = User::find(35);
-  $user->makeDefaultOptions();
   
 });
 
 Artisan::command('ttm', function () {
-  
   $user = User::find(1);
-  $mail = new ConfirmRegitster($user->getVerifyUrl());
-  Mail::to($user->email)->send($mail);
+  $mail = new ResetCode($user);
+  $t = Mail::to($user->email)->send($mail);
 });
 
 
