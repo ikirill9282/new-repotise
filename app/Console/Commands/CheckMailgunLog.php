@@ -50,8 +50,6 @@ class CheckMailgunLog extends Command
       }
     } while (isset($resp['pagination']) && isset($resp['pagination']['next']));
 
-    // dd(collect($data)->sortByDesc('@timestamp'));
-    // dd($data);
     foreach (MailLog::where('status', 'new')->get() as $mailLog) {
       $found = [];
       foreach ($data as $item) {

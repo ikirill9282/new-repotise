@@ -10,7 +10,7 @@
               <a href="{{ url(print_var('page_catalog_button_link', $variables)) }}" class="explore_ad">
                 {!! print_var('page_catalog_button_text', $variables) !!}
               </a>
-              <a href="{{ url(print_var('page_catalog_register_link', $variables)) }}" class="become_c">
+              <a href="{{ auth()->check() ? auth()->user()->makeProfileUrl() : '#' }}" class="become_c {{ auth()->check() ? '' : 'open_auth' }}">
                 {!! print_var('page_catalog_register_text', $variables) !!}
               </a>
           </div>
