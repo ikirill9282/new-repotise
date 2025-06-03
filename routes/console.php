@@ -36,7 +36,7 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Artisan::command('tt', function() {
   $user = User::find(1);
   // $user->resetBackup();
-  dd($user);
+  dd($user->avatar);
 });
 
 Artisan::command('ttm', function () {
