@@ -15,7 +15,7 @@ class UserOptionSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
         foreach (User::all() as $user) {
-          $user->options()->create(['description' => $faker->text(500)]);
+          $user->options()->updateOrCreate(['description' => $faker->text(500)]);
         }
     }
 }
