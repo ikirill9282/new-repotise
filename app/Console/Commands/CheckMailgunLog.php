@@ -30,7 +30,7 @@ class CheckMailgunLog extends Command
   {
     $url = 'https://api.mailgun.net/v1/analytics/logs';
     $query = [
-      'start' => Carbon::yesterday()->toRfc2822String(),
+      'start' => Carbon::today()->toRfc2822String(),
       'end' => Carbon::today()->endOfDay()->toRfc2822String(),
       'include_subaccounts' => true,
       'pagination' => [
@@ -50,6 +50,8 @@ class CheckMailgunLog extends Command
       }
     } while (isset($resp['pagination']) && isset($resp['pagination']['next']));
 
+    // dd(collect($data)->sortByDesc('@timestamp'));
+    // dd($data);
     foreach (MailLog::where('status', 'new')->get() as $mailLog) {
       $found = [];
       foreach ($data as $item) {
@@ -59,6 +61,7 @@ class CheckMailgunLog extends Command
         }
       }
 
+      // dd($mailLog->message_id);
       $mail = collect($found)->sortByDesc('@timestamp')->first();
       if ($mail) $mailLog->update(['status' => $mail['event'], 'mailgun_id' => $mail['id']]);
     }

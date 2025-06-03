@@ -30,7 +30,7 @@ use App\Mail\ResetCode;
 use App\Models\MailLog;
 use Illuminate\Support\Facades\Http;
 
-Schedule::command('app:check-mailgun-log')->hourly();
+Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 
 
 Artisan::command('tt', function() {
