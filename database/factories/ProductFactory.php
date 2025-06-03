@@ -53,7 +53,7 @@ class ProductFactory extends Factory
       'user_id' => fake()->numberBetween(1, $users_count),
       'title' => collect(fake()->words(3))->map(fn($word) => ucfirst($word))->join(' '),
       'price' => fake()->numberBetween(1000, 20000),
-      'model' => fake()->randomElement([ProductModel::PRODUCT, ProductModel::SUBSCRIPTION]),
+      // 'model' => fake()->randomElement([ProductModel::PRODUCT, ProductModel::SUBSCRIPTION]),
       'old_price' => fake()->numberBetween(100000, 200000),
       'type_id' => fake()->numberBetween(1, $types_count),
       'location_id' => fake()->numberBetween(1, $locations_count),

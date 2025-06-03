@@ -51,11 +51,7 @@
         ])
 
         <a href="{{ url('/cart') }}" class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($model->id) ? 'in-cart' : '' }}" data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}">
-          @if($model->model === 'product')
-            {{ auth()->user()?->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
-          @else
-            {{ 'Subscribe' }}
-          @endif
+          {{ auth()->user()?->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
         </a>
     </div>
     <h3 class="text-nowrap overflow-hidden text-ellipsis">

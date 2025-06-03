@@ -16,7 +16,7 @@ return new class extends Migration
           $table->bigInteger('user_id')->unsigned()->index();
           $table->string('title');
           $table->string('slug');
-          $table->string('model')->default('product');
+          // $table->string('model')->default('product');
           $table->decimal('price', 10);
           $table->decimal('old_price', 10);
           $table->bigInteger('type_id')->unsigned()->index();

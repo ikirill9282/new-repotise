@@ -79,6 +79,33 @@
                       <p>${{ $product->price }}</p>
                       <span>${{ $product->old_price }}</span>
                   </div>
+                  {{-- <div class="cards_monthly_group">
+                      <div class="card_monthly">
+                          <h3>Monthly</h3>
+                          <p>$20/month</p>
+                          <div class="subscribe">
+                              <a href="#">Subscribe</a>
+                              <span>Perfect for trying it out</span>
+                          </div>
+                      </div>
+                      <div class="card_monthly">
+                          <h3>Quarterly</h3>
+                          <p>$15/ month</p>
+                          <div class="subscribe">
+                              <a href="#">Subscribe</a>
+                              <span>Billed Quarterly</span>
+                          </div>
+                      </div>
+                      <div class="card_monthly">
+                          <h3>Yearly</h3>
+                          <p>$10/ month</p>
+                          <div class="subscribe">
+                              <a href="#">Subscribe</a>
+                              <span>Billed Annually</span>
+                          </div>
+                          <span class="best_value">BEST VALUE</span>
+                      </div>
+                  </div> --}}
                   <div class="add_to_card_block">
                       <a href="#" class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}" data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">

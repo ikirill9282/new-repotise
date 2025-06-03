@@ -1623,6 +1623,10 @@ footer .bottom_connecting_group .connecting a {
       padding-right: calc(var(--bs-gutter-x) * .5);
       padding-left: calc(var(--bs-gutter-x) * .5);
     }
+
+    .product_page_home .about_block .img_products {
+      width: 100%;
+    }
 }
 
 @media (max-width: 576px) {
