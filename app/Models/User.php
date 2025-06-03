@@ -86,6 +86,7 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function toSearchableArray(bool $load_options = true): array
     {
         $array = $this->toArray();
+        $array['avatar'] = $this->avatar;
 
         if ($load_options) {
           $array['options'] = $this->options?->toArray();
