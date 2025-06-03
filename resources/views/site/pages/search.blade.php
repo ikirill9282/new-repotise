@@ -43,7 +43,6 @@
                     </div>
                     <div class="result_cards">
                         @foreach ($search_results as $item)
-                          @dd($item);
                             @switch($item['index'])
                                 @case('products')
                                     <div class="card_group">
