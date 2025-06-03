@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\Promocode;
+use App\Services\Cart;
 
 class CartController extends Controller
 {
@@ -17,8 +18,10 @@ class CartController extends Controller
     {
       $valid = $request->validate(['item' => 'required|string']);
       try {
+        $cart = new Cart('cart');
         $product_data = CustomEncrypt::decodeUrlHash($valid['item']);
-        $cart_data = Auth::user()->getCart();
+        // $cart_data = Auth::user()->getCart();
+        $cart_data = $cart->getCart();
 
         if (!isset($cart_data['products'])) $cart_data['products'] = [];
         if (!in_array($product_data['id'], array_column($cart_data['products'], 'id'))) {

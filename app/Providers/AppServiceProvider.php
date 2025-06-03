@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
+use Opcodes\LogViewer\Facades\LogViewer;
+use Illuminate\Support\Facades\Auth;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
       Model::unguard();
+
+      LogViewer::auth(function ($request) {
+        return Auth::check();
+      });
+    
 
       Filament::serving(function () {
         Filament::registerNavigationGroups([

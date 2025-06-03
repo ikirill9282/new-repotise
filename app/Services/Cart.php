@@ -1,21 +1,27 @@
 <?php
 
-namespace App\Traits;
+namespace App\Services;
 
 use App\Helpers\SessionExpire;
-use App\Models\Product;
 use Illuminate\Support\Collection;
+use App\Models\Product;
 use App\Models\Promocode;
 
-trait HasCart
+class Cart
 {
   protected array $cart = [];
   protected int $tax = 5;
 
+  public function __construct(
+    protected string $name,
+  )
+  {
+    
+  }
+
   public function flushCart()
   {
-    SessionExpire::saveCart('cart', ['products' => []]);
-    $this->loadCart();
+    $this->updateCart(['products' => []]);
   }
 
   public function getCart()
@@ -27,9 +33,15 @@ trait HasCart
     return $this->cart;
   }
 
+  public function updateCart(array $data): void
+  {
+    SessionExpire::saveCart($this->name, $data);
+    $this->loadCart();
+  }
+
   public function loadCart()
   {
-    $this->cart = SessionExpire::getCart('cart') ?? [];
+    $this->cart = SessionExpire::getCart($this->name) ?? [];
   }
 
   public function inCart(int $id)
@@ -93,8 +105,7 @@ trait HasCart
         unset($cart['promocode']);
       }
 
-      SessionExpire::saveCart('cart', $cart);
-      $this->loadCart();
+      $this->updateCart($cart);
       return true;
     }
     return false;
@@ -113,7 +124,7 @@ trait HasCart
 
   public function applyPromocode(Promocode $promocode)
   {
-    SessionExpire::addPromocode('cart', $promocode->id);
+    SessionExpire::addPromocode($this->name, $promocode->id);
     $this->loadCart();
   }
 

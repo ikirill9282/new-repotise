@@ -160,7 +160,6 @@ class Modal extends Component
 
         History::userCreated($user);
 
-        $user->makeDefaultOptions();
         $user->sendVerificationCode(seller: $this->as_seller);
         
         $this->close();
