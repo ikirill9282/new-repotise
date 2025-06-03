@@ -44,7 +44,6 @@
                         <span class="text-nowrap">Join / Sign in</span>
                     </a>
                 @else
-                    @dd(auth()->user()->avatar)
                     <a href="{{ auth()->user()->makeProfileUrl() }}" class="profile">
                         <img src="{{ url(auth()->user()?->avatar) }}" alt="avatar"
                             class="profile_img">{{-- rounded-full w-8 --}}
