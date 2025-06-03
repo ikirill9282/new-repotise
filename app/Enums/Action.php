@@ -8,6 +8,7 @@ enum Action
   public const RESET_PASSWORD = 'Reset Password';
   public const VERIFY_EMAIL = 'Verify Email';
   public const USER_CREATED = 'User Created';
+  public const BACKUP_ACTIVATE = 'Backup Code Activate';
 
 
   public function toArray(): array

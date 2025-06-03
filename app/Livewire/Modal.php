@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Mail\ConfirmRegitster;
 use App\Models\History;
+use App\Models\UserBackup;
 use Illuminate\Support\Facades\Log;
 
 class Modal extends Component
@@ -191,6 +192,17 @@ class Modal extends Component
 
     public function useBackupCode()
     {
+      if (empty($this->backup) || !UserBackup::where('code', $this->backup)->exists()) {
+        $this->addError('backup', 'Invalid backup code');
+        return ;
+      }
+
+      $model = UserBackup::where('code', $this->backup)->with('user')->first();
+      $model->user->update(['2fa' => 0]);
+      $model->delete();
+
+      History::activateBackupCode($model->user, $this->backup);
+
       $this->openSuccess();
     }
 

@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mail_logs', function (Blueprint $table) {
+        Schema::create('user_backups', function (Blueprint $table) {
             $table->id();
-            $table->string('status')->index()->default('new');
-            $table->string('message_id')->index();
-            $table->string('mailgun_id')->nullable()->index();
-            $table->string('recipient');
-            $table->string('subject');
-            $table->string('trigger')->index();
+            $table->bigInteger('user_id')->unsigned()->index();
+            $table->string('code')->unique();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mail_logs');
+        Schema::dropIfExists('user_backups');
     }
 };

@@ -32,7 +32,7 @@ class EmailSentListener
         : ((empty($mail->getTo())) ? 'Unknown' : $mail->getTo()[0]->getAddress());
 
       $data = [
-        'external_id' => preg_replace('/^\<(.*?)@.*$/is', "$1", $sent->getMessageId()),
+        'message_id' => preg_replace('/^\<(.*?)@.*$/is', "$1", $sent->getMessageId()),
         'recipient' => $recipient,
         'subject' => $mail->getSubject(),
         'trigger' => $data['trigger'],

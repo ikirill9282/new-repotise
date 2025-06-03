@@ -25,6 +25,22 @@ class History extends Model
       return $this->belongsTo(User::class);
     }
 
+    public function initer()
+    {
+      return $this->belongsTo(User::class, 'initialtor', 'id');
+    }
+
+    public static function activateBackupCode(User $user, string $code)
+    {
+      return static::success()
+        ->action(Action::BACKUP_ACTIVATE)
+        ->userId($user->id)
+        ->values($code)
+        ->message("User backupcode [#$code] activated")
+        ->write()
+        ;
+    }
+
     public static function userCreated(User $user)
     {
       return static::success()

@@ -1,5 +1,5 @@
 @php
-  $record = $getRecord();
+  $record = $model ?? $getRecord();
 @endphp
 <div class="flex items-center gap-2 min-w-60">
     <x-filament::avatar

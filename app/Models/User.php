@@ -71,6 +71,16 @@ class User extends Authenticatable implements HasName, FilamentUser
         $model->username = $username;
         $model->name = ucfirst($username);
       });
+
+      self::created(function($model) {
+        $model->resetBackup();
+      });
+
+      self::saving(function($model) {
+        if (!empty($model->original) && ($model->password !== $model->original['password'])) {
+          $model->resetBackup();
+        }
+      });
     }
 
     public function toSearchableArray(bool $load_options = true): array
@@ -122,6 +132,11 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
       return $this->hasRole('admin');
+    }
+
+    public function backup()
+    {
+      return $this->hasMany(UserBackup::class);
     }
 
     public function verify()
@@ -278,12 +293,12 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $model->code;
     }
 
-    // public function makeDefaultOptions()
-    // {
-    //   foreach (Options::where('default', 1)->get() as $option) {
-    //     $this->options()->sync([
-    //       $option->id => ['value' => $option->getDefaultValue()],
-    //     ], false);
-    //   }
-    // }
+    public function resetBackup()
+    {
+      $this->backup()->delete();
+      $codes = UserBackup::generate();
+      foreach ($codes as $code) {
+        $this->backup()->create(['code' => $code]);
+      }
+    }
 }

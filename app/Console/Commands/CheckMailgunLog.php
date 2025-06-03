@@ -54,13 +54,13 @@ class CheckMailgunLog extends Command
       $found = [];
       foreach ($data as $item) {
         $messageId = preg_replace('/^(.*?)@.*$/is', "$1", $item['message']['headers']['message-id']);
-        if ($messageId == $mailLog->external_id) {
+        if ($messageId == $mailLog->message_id) {
           $found[] = $item;
         }
       }
 
       $mail = collect($found)->sortByDesc('@timestamp')->first();
-      if ($mail) $mailLog->update(['status' => $mail['event']]);
+      if ($mail) $mailLog->update(['status' => $mail['event'], 'mailgun_id' => $mail['id']]);
     }
   }
 }
