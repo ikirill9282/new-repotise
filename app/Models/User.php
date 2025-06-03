@@ -43,7 +43,6 @@ class User extends Authenticatable implements HasName, FilamentUser
     public $appends = [
       'profile',
       'avatar',
-      'name',
     ];
 
     protected function casts(): array
@@ -79,7 +78,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         $array = $this->toArray();
 
         if ($load_options) {
-          $array['options'] = $this->options->toArray();
+          $array['options'] = $this->options?->toArray();
         }
         $array['description'] = $this->description;
         $array['followers_count'] = $this->loadCount('followers')->followers_count;
@@ -132,7 +131,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function options()
     {
-      return $this->belongsToMany(Options::class, 'user_options', 'user_id', 'option_id')->withPivot(['value']);
+      return $this->hasOne(UserOptions::class);
     }
 
     public function products()
@@ -190,26 +189,14 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function description(): Attribute
     {
       return Attribute::make(
-        get: fn($val) => $this->options()
-          ->where([
-            'type' => 'text',
-            'name' => 'description',
-          ])
-          ->first()
-          ?->pivot->value,
+        get: fn($val) => $this->options?->description,
       );
     }
 
     public function avatar(): Attribute
     {
       return Attribute::make(
-        get: fn() => $this->options()
-          ->where([
-            'type' => 'image',
-            'name' => 'avatar',
-          ])
-          ->first()
-          ?->pivot->value,
+        get: fn() => $this->options?->avatar,
       );
     }
 
@@ -220,7 +207,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileVerificationUrl(): string 
     {
-      return $this->makeProfileUrl() . '/verify';
+      return url('/profile-verify');
     }
 
     public function makeSubscribeUrl(): string
@@ -230,7 +217,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function getName(): string
     {
-      return ucfirst($this->username);
+      return $this->name;
     }
 
     public function hasFavorite(int $id, string $type)
@@ -291,12 +278,12 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $model->code;
     }
 
-    public function makeDefaultOptions()
-    {
-      foreach (Options::where('default', 1)->get() as $option) {
-        $this->options()->sync([
-          $option->id => ['value' => $option->getDefaultValue()],
-        ], false);
-      }
-    }
+    // public function makeDefaultOptions()
+    // {
+    //   foreach (Options::where('default', 1)->get() as $option) {
+    //     $this->options()->sync([
+    //       $option->id => ['value' => $option->getDefaultValue()],
+    //     ], false);
+    //   }
+    // }
 }

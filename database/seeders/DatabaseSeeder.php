@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Article;
 use App\Models\ArticleLikes;
 use App\Models\User;
+use App\Models\UserOptions;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Meilisearch\Meilisearch;
@@ -22,7 +23,6 @@ class DatabaseSeeder extends Seeder
         StatusSeeder::class,
         
         PageSeeder::class,
-        // SectionSeeder::class,
         TypeSeeder::class,
         LocationSeeder::class,
         CategorySeeder::class,
@@ -35,9 +35,9 @@ class DatabaseSeeder extends Seeder
         FollowerSeeder::class,
         GallerySeeder::class,
         FaqSeeder::class,
-        OptionSeeder::class,
         PromocodeSeeder::class,
         PagesConfigSeeder::class,
+        UserOptionSeeder::class,
         
         MeilisearchSeeder::class,
       ]);

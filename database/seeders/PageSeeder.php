@@ -101,5 +101,13 @@ class PageSeeder extends Seeder
         'title' => 'Payment Error',
         'slug' => 'payment-error',
       ]);
+      $profile_verify = Page::firstOrCreate([
+        'title' => 'profile',
+        'slug' => 'profile',
+      ]);
+      $profile_verify = Page::firstOrCreate([
+        'title' => 'Verify Profile',
+        'slug' => 'profile-verify',
+      ]);
     }
 }

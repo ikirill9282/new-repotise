@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ asset('/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/style2.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/site.css') }}">
 
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
@@ -29,14 +30,15 @@
     <!-- or include the full Satellite theme -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@8.5.1/themes/satellite-min.css" integrity="sha256-woeV7a4SRDsjDc395qjBJ4+ZhDdFn8AqswN1rlTO64E=" crossorigin="anonymous">
 
-
-
     <link rel="icon" type="image/svg+xml" href="{{ asset('/favicon.svg') }}">
     <title>@yield('title', config('app.name'))</title>
 
     @livewireStyles
     @vite('resources/css/app.css')
+
     @stack('css')
+
+    @stack('head')
 </head>
 
 <body>
@@ -67,6 +69,8 @@
 
     <script src="{{ asset('/assets/js/jquery.emojipicker.a.js') }}"></script>
     <script src="{{ asset('/assets/js/jquery.emojipicker.js') }}"></script>
+
+    <script src="{{ asset('/assets/js/app.js') }}"></script>
 
     @vite('resources/js/app.js')
 

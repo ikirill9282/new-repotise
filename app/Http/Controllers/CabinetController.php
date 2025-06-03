@@ -14,7 +14,7 @@ class CabinetController extends Controller
       ]);
     }
 
-    public function profile(Request $request)
+    public function profile(Request $request, ?string $slug = null)
     {
       return view('site.pages.profile', [
         'user' => Auth::user(),

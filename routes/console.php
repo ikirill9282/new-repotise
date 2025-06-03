@@ -34,7 +34,7 @@ Schedule::command('app:check-mailgun-log')->hourly();
 
 
 Artisan::command('tt', function() {
-  
+  dd(User::find(1)->options->avatar);
 });
 
 Artisan::command('ttm', function () {

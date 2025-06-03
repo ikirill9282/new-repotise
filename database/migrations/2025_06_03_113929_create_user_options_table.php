@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('user_options', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->unsigned()->index();
-            $table->bigInteger('option_id')->unsigned()->index();
-            $table->text('value')->nullable();
+            $table->bigInteger('user_id')->unsigned()->index()->unique();
+            $table->string('avatar')->default('/storage/images/default_avatar.svg');
+            $table->text('description')->nullable();
+            $table->string('youtube')->nullable();
+            $table->string('tiktok')->nullable();
+            $table->string('google')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('twitter')->nullable();
             $table->timestamps();
 
-            $table->unique(['user_id', 'option_id']);
-
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('option_id')->references('id')->on('options')->onDelete('cascade');
         });
     }
 

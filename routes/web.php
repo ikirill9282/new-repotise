@@ -35,10 +35,9 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/cart/order', [SiteController::class, 'order']);
   Route::get('/cart/{status}', [SiteController::class, 'payment'])->name('payment.status');
 
-  Route::prefix('profile')->controller(CabinetController::class)->group(function() {
-    Route::get('/', 'profile');
-    Route::get('/verify', 'verify');
-  });
+  Route::get('/profile', [CabinetController::class, 'profile']);
+  Route::get('/profile/{slug}', [CabinetController::class, 'profile']);
+  Route::get('/profile-verify', [CabinetController::class, 'verify']);
 });
 
 // Route::get('/', SiteController::class)->name('home');
