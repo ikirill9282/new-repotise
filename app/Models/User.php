@@ -73,6 +73,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
       self::created(function($model) {
         $model->resetBackup();
+        $model->options()->create(['description' => null]);
       });
 
       self::saving(function($model) {
