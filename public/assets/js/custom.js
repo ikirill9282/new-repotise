@@ -663,3 +663,12 @@ $('.cart-drop').on('click', function(evt) {
     }
   })
 });
+
+
+$('[data-input="integer"]').on('input', function(evt) {
+  $(this).val(evt.target.value.replace(/[^0-9]+/is, ''));
+});
+
+$('[data-input="phone"]').on('input', function(evt) {
+  $(this).val(evt.target.value.replace(/[^0-9\+\(\)_\s\-]+/is, ''));
+});

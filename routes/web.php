@@ -31,18 +31,21 @@ Route::prefix('/auth')
   });
 
 Route::middleware('auth:web')->group(function() {
-  Route::get('/cart', [SiteController::class, 'cart']);
-  Route::get('/cart/order', [SiteController::class, 'order']);
-  Route::get('/cart/{status}', [SiteController::class, 'payment'])->name('payment.status');
-
   Route::get('/profile', [CabinetController::class, 'profile']);
+  Route::get('/profile/verify', [CabinetController::class, 'verify']);
+  Route::post('/profile/verify', [CabinetController::class, 'verificate']);
   Route::get('/profile/{slug}', [CabinetController::class, 'profile']);
-  Route::get('/profile-verify', [CabinetController::class, 'verify']);
 });
 
 // Route::get('/', SiteController::class)->name('home');
 // Route::get('/{slug}', SiteController::class);
 // Route::get('/insights/{slug}/{article}', SiteController::class);
+
+
+Route::get('/cart', [SiteController::class, 'cart']);
+Route::get('/cart/order', [SiteController::class, 'order']);
+Route::get('/cart/{status}', [SiteController::class, 'payment'])->name('payment.status');
+
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/help-center', [SiteController::class, 'helpCenter'])->name('help-center');

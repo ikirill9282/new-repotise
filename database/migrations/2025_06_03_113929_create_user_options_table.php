@@ -14,8 +14,21 @@ return new class extends Migration
         Schema::create('user_options', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index()->unique();
+            $table->string('stripe_id')->unique()->nullable();
             $table->string('avatar')->default('/storage/images/default_avatar.svg');
             $table->text('description')->nullable();
+
+            $table->string('full_name')->nullable();
+            $table->string('street')->nullable();
+            $table->string('street2')->nullable();
+            $table->string('city')->nullable();
+            $table->integer('zip')->nullable();
+            $table->string('state')->nullable();
+            $table->string('country')->nullable();
+            $table->string('birthday')->nullable();
+            $table->integer('tax_id')->nullable();
+            $table->string('phone')->nullable();
+
             $table->string('youtube')->nullable();
             $table->string('tiktok')->nullable();
             $table->string('google')->nullable();

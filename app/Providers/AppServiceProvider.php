@@ -8,6 +8,7 @@ use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
       Model::unguard();
 
       LogViewer::auth(function ($request) {
-        return Auth::check();
+        return $request->user() && $request->user()->hasRole('admin');
       });
     
 

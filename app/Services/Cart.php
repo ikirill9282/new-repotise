@@ -13,10 +13,10 @@ class Cart
   protected int $tax = 5;
 
   public function __construct(
-    protected string $name,
+    protected string $name = 'cart',
   )
   {
-    
+    $this->loadCart();
   }
 
   public function flushCart()

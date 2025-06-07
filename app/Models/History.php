@@ -7,6 +7,40 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Validator;
 use Symfony\Component\Mailer\SentMessage;
 
+/**
+ * user(): User
+ * initer(): User
+ * 
+ * userStartVerify(User $user)
+ * activateBackupCode(User $user, string $code): self
+ * userCreated(User $user): self
+ * resetUserUndefined(string $code): self
+ * resetCodeExpired(?User $user, string $code): self
+ * resetCodeSend(User $user): self
+ * emailVerifySend(User $user): self
+ * emailVerifySuccess(User $user, string $code): self
+ * emailVerifyValidationError(Validator $validator): self
+ * emailVerifyError(string $message, string $code): self
+ * emailVerifyException(\Exception $e): self
+ * 
+ * success(): self
+ * error(): self
+ * exception(): self
+ * info(): self
+ * warning(): self
+ * 
+ * type(string $type): self
+ * values(int|string|null $val = null, int|string|null $old_val = null): self
+ * message(string $message): self
+ * payload(array $data): self
+ * action(string $action): self
+ * userId(?int $id): self
+ * initiator(?int $id): self
+ * write(): self
+ * 
+ * makeValidatorMessage(Validator $validator): string
+ */
+
 class History extends Model
 {
     protected $attributes = [
@@ -28,6 +62,17 @@ class History extends Model
     public function initer()
     {
       return $this->belongsTo(User::class, 'initialtor', 'id');
+    }
+
+    public static function userStartVerify(User $user, array $payload = [])
+    {
+      return static::info()
+        ->action(Action::VERIFY_START)
+        ->userId($user->id)
+        ->message('Create verification session in stripe.')
+        ->payload($payload)
+        ->write()
+        ;
     }
 
     public static function activateBackupCode(User $user, string $code)

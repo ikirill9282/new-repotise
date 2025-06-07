@@ -27,11 +27,13 @@ use App\Events\MailVerify;
 use App\Mail\ResetCode;
 use App\Models\Options;
 use App\Events\MailReset;
+use Laravel\Cashier\Billable;
+use Laravel\Cashier\Cashier;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, Searchable, HasCart;
+    use HasFactory, Notifiable, HasRoles, Searchable, HasCart, Billable;
 
     protected $guarded = ['id'];
 
@@ -73,7 +75,13 @@ class User extends Authenticatable implements HasName, FilamentUser
 
       self::created(function($model) {
         $model->resetBackup();
-        $model->options()->create(['description' => null]);
+        $model->createOrGetStripeCustomer([
+          'metadata' => [
+            'user_id' => $model->id,
+          ]
+        ]);
+        $arr = $model->asStripeCustomer()->toArray();
+        $model->options()->create(['description' => null, 'stripe_id' => $arr['id']]);
       });
 
       self::saving(function($model) {
@@ -223,12 +231,21 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileVerificationUrl(): string 
     {
-      return url('/profile-verify');
+      return url('/profile/verify');
     }
 
     public function makeSubscribeUrl(): string
     {
       return url("/profile/subscribe/$this->profile");
+    }
+
+    public function makeStripeVerificationUrl(): ?string
+    {
+      $verify = $this->verify()->where('type', 'stripe')->first();
+      if (!$verify) return null;
+
+      $session_verify = Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
+      return $session_verify->url;
     }
 
     public function getName(): string

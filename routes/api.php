@@ -31,7 +31,8 @@ Route::prefix('api')->group(function() {
   // Route::prefix('/user')->middleware('auth:web')->controller(UserController::class)->group(function() {
   // });
 
-  Route::prefix('/cart')->middleware('auth:web')->controller(CartController::class)->group(function() {
+
+  Route::prefix('/cart')->controller(CartController::class)->group(function() {
     Route::post('/push', 'push');
     Route::post('/count', 'count');
     Route::post('/remove', 'remove');

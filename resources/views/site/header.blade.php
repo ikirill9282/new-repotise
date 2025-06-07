@@ -39,6 +39,10 @@
                     </ul>
                 </nav>
                 @if (!auth()->check())
+                    <a href="{{ url('/cart') }}" class="cart">
+                        @include('icons.cart')
+                        <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
+                    </a>
                     <a href="#" class="login open_auth">
                         @include('icons.user')
                         <span class="text-nowrap">Join / Sign in</span>
@@ -61,7 +65,7 @@
                     </a>
                     <a href="{{ url('/cart') }}" class="basket rection_groups">
                         @include('icons.cart')
-                        <span class="cart-counter @if (!auth()->user()->getCartCount()) hidden @endif">{{ auth()->user()->getCartCount() }}</span>
+                        <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
                     </a>
                 @endif
             </div>

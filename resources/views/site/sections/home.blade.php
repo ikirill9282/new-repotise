@@ -10,9 +10,15 @@
               <a href="{{ url(print_var('page_catalog_button_link', $variables)) }}" class="explore_ad">
                 {!! print_var('page_catalog_button_text', $variables) !!}
               </a>
-              <a href="{{ auth()->check() ? auth()->user()->makeProfileUrl() : '#' }}" class="become_c {{ auth()->check() ? '' : 'open_auth' }}">
-                {!! print_var('page_catalog_register_text', $variables) !!}
-              </a>
+              @if(auth()->check())
+                <a href="{{ auth()->user()->verify ? url('/profile/article/cleate') : auth()->user()->makeProfileVerificationUrl() }}" class="become_c">
+                  {!! print_var('page_catalog_register_text', $variables) !!}
+                </a>
+              @else
+                <a href="#" class="become_c open_auth">
+                  {!! print_var('page_catalog_register_text', $variables) !!}
+                </a>
+              @endif
           </div>
       </div>
   </div>

@@ -40,27 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
             form.querySelectorAll('.js-error').forEach(el => el.remove());
             form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
 
-            const requiredFields = [
-                { name: 'user-name' },
-                { name: 'user-street' },
-                { name: 'user-city' },
-                { name: 'user-state' },
-                { name: 'user-zip' },
-                { name: 'user-country' }
-            ];
-            requiredFields.forEach(field => {
-                const input = form.querySelector(`[name="${field.name}"]`);
-                if (input && !input.value.trim()) {
-                    input.classList.add('error');
-                    valid = false;
+            [...form.querySelectorAll('input')].forEach(el => {
+              if (el.hasAttribute('data-required')) {
+                if (!el.value.trim()) {
+                  valid = false;
+                  el.classList.add('error');
                 }
+              }
             });
-
-            const dob = form.querySelector('input[type="date"]');
-            if (dob && !dob.value) {
-                dob.classList.add('error');
-                valid = false;
-            }
 
             if (!valid) {
                 e.preventDefault();

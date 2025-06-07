@@ -17,7 +17,8 @@
     <link rel="stylesheet" href="{{ asset('/assets/css/site.css') }}">
 
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
-
+    <script src="https://js.stripe.com/v3/"></script>
+    
     <link rel="stylesheet" href="{{ asset('/assets/css/jquery.emojipicker.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/jquery.emojipicker.a.css') }}">
     
@@ -34,11 +35,17 @@
     <title>@yield('title', config('app.name'))</title>
 
     @livewireStyles
+
     @vite('resources/css/app.css')
 
     @stack('css')
 
     @stack('head')
+
+
+    @php
+      $cart = new \App\Services\Cart();
+    @endphp
 </head>
 
 <body>

@@ -15,11 +15,11 @@
                 <div class="left_form">
                     <form action="/cart/order" >
                         <div class="input_block">
-                            <input type="text" name="fullname" placeholder="Your Full Name">
+                            <input type="text" name="fullname" placeholder="Your Full Name" value="{{ auth()->check() ? auth()->user()->name : '' }}">
                             @include('icons.shield')
                         </div>
                         <div class="input_block">
-                            <input type="email" name="email" placeholder="Your Email">
+                            <input type="email" name="email" placeholder="Your Email" value="{{ auth()->check() ? auth()->user()->email : '' }}">
                             @include('icons.shield')
                         </div>
                         <div class="menu_block">

@@ -32,13 +32,13 @@ class CartController extends Controller
         }
 
         SessionExpire::saveCart('cart', $cart_data);
-        Auth::user()->loadCart();
+        $cart->loadCart();
 
       } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => 'Something went wrong...'], 502);
       }
 
-      $order = Order::prepare(Auth::user()->getCart());
+      $order = Order::prepare($cart->getCart());
       
       return response()->json(['status' => 'success', 'products_count' => $order->getCount()]);
     }
@@ -49,9 +49,10 @@ class CartController extends Controller
         'item' => 'required|string',
         'count' => 'required|integer',
       ]);
+      $cart = new Cart();
       $valid['item'] = CustomEncrypt::decodeUrlHash($valid['item']);
       SessionExpire::setCartItemCount('cart', $valid['item']['id'], $valid['count']);
-      Auth::user()->loadCart();
+      $cart->loadCart();
 
       $order = Order::prepare(Auth::user()->getCart());
 
@@ -67,14 +68,14 @@ class CartController extends Controller
       $valid = $request->validate([
         'item' => 'required|string',
       ]);
+      $cart = new Cart();
       $item = CustomEncrypt::decodeUrlHash($valid['item']);
-      Auth::user()->removeFromCart($item['id']);
-
-      $order = Order::prepare(Auth::user()->getCart());
+      $cart->removeFromCart($item['id']);
+      $order = Order::prepare($cart->getCart());
       
       return response()->json([
         'status' => 'success',
-        'count' => Auth::user()->getCartCount(),
+        'count' => $cart->getCartCount(),
         'costs' => $order->getCosts(),
       ]);
     }

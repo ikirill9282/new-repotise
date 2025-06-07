@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('email')->unique()->index();
             $table->tinyInteger('2fa')->default(0);
             $table->tinyInteger('verified')->default(0);
+            $table->decimal('balance')->default(0.00);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->tinyInteger('active')->default(1);

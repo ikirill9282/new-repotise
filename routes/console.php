@@ -28,70 +28,56 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use App\Mail\ResetCode;
 use App\Models\MailLog;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Laravel\Cashier\Cashier;
+use Stripe\Stripe;
+use Stripe\Identity\VerificationSession;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 
 
-Artisan::command('tt', function() {
-  $user = Product::find(87);
-  // $user->resetBackup();
-  dd($user->gallery->toArray(), $user->preview->image);
+Artisan::command('tt', function(Request $request) {
+  $user = User::find(3);
+  // $user->debitBalance(0.00, 'Bad usage penalty.');
+  // $verificationSession = Cashier::stripe()->identity->verificationSessions
+  //   ->create([
+  //     'type' => 'document',
+  //     'provided_details' => [
+  //         'email' => $user->email,
+  //     ],
+  //     'metadata' => [
+  //         'user_id' => $user->id,
+  //     ],
+  //   ]);
+
+  $verificationSession = Cashier::stripe()->identity->verificationSessions->retrieve('vs_1RXKYRFkz2A7XNTi2y60ZzqB');
+
+  dd($verificationSession->toArray());
 });
+
+  // "id" => "vs_1RWx7vFkz2A7XNTilUfYxhop"
+  // "object" => "identity.verification_session"
+  // "client_reference_id" => null
+  // "client_secret" => "vs_1RWx7vFkz2A7XNTilUfYxhop_secret_test_YWNjdF8xUjRrU2NGa3oyQTdYTlRpLF9TUnFwOEdCTU9HZ2x2R2liSDJaWWtIM0pBcUtiQUxK0100JgDIth0G"
+  // "created" => 1749204235
+  // "last_error" => null
+  // "last_verification_report" => null
+  // "livemode" => false
+  // "metadata" => array:1 [
+  //   "user_id" => "1"
+  // ]
+  // "options" => []
+  // "redaction" => null
+  // "related_customer" => null
+  // "status" => "requires_input"
+  // "type" => "document"
+  // "url" => "https://verify.stripe.com/start/test_YWNjdF8xUjRrU2NGa3oyQTdYTlRpLF9TUnFwOEdCTU9HZ2x2R2liSDJaWWtIM0pBcUtiQUxK0100JgDIth0G"
 
 Artisan::command('ttm', function () {
   $user = User::find(1);
   $mail = new ResetCode($user);
   $t = Mail::to($user->email)->send($mail);
-});
-
-
-Artisan::command('tt2', function() {
-  $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
-  $index = $client->index('articles');
-  
-  // $articles = Article::all()
-  //   ->map(fn($article) => [
-  //     'id' => $article->id,
-  //     'title' => $article->title,
-  //     'subtitle' => $article->subtitle,
-  //     'slug' => $article->slug,
-  //     'text' => $article->text,
-  //     'created_at' => $article->created_at,
-  //     'updated_at' => $article->updated_at,
-  //   ]);
-
-  // $index->addDocuments($articles->toArray());
-  // $index->updateDocuments($articles->toArray());
-  // dd($index->getDocuments()->toArray());
-  // dd($index->stats()['numberOfDocuments']);
-  // $index->addDocuments($articles->toArray());
-
-  $str = '';
-  // $qs = array_map(function($w) {
-  //   $query = (new SearchQuery())
-  //     ->setIndexUid('articles')
-  //     ->setQuery($w)
-  //     ->setLimit(1000)
-  //     ->setAttributesToRetrieve(['id', 'title', 'subtitle', 'slug', 'author.name'])
-  //     ;
-  //   return $query;
-
-  // }, explode(' ', $str));
-
-  // $r = $client->multiSearch($qs);
-
-  $r = Article::search($str)
-    ->options([
-    'limit' => 1000,
-    // 'offset' => 0,
-    'attributesToRetrieve' => ['id', 'title', 'subtitle', 'slug', 'author.name', 'text'],
-  ])
-      // ->get();
-    ->raw();
-  // $r = collect($r['results'])
-  //   ->flatMap(fn($item) => $item['hits']);
-  dd($r);
 });
 
 Artisan::command('rl_index', function() {
@@ -101,12 +87,12 @@ Artisan::command('rl_index', function() {
   Artisan::call('scout:flush', ['model' => Category::class]);
   Artisan::call('scout:flush', ['model' => Location::class]);
 
-  Artisan::call('scout:import', ['model' => Product::class]);
-  Artisan::call('scout:import', ['model' => Article::class]);
-  Artisan::call('scout:import', ['model' => User::class]);
-  Artisan::call('scout:import', ['model' => Category::class]);
-  Artisan::call('scout:import', ['model' => Location::class]);
+  // Artisan::call('scout:import', ['model' => Product::class]);
+  // Artisan::call('scout:import', ['model' => Article::class]);
+  // Artisan::call('scout:import', ['model' => User::class]);
+  // Artisan::call('scout:import', ['model' => Category::class]);
+  // Artisan::call('scout:import', ['model' => Location::class]);
 
-  $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
-  $index = $client->index('articles')->updateSortableAttributes(['created_at']);
+  // $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
+  // $index = $client->index('articles')->updateSortableAttributes(['created_at']);
 });
