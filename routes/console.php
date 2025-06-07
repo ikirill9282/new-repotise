@@ -56,6 +56,10 @@ Artisan::command('tt', function(Request $request) {
   dd($verificationSession->toArray());
 });
 
+Artisan::command('rl_stripe', function() {
+  $list = Cashier::stripe()->customers->list;
+});
+
   // "id" => "vs_1RWx7vFkz2A7XNTilUfYxhop"
   // "object" => "identity.verification_session"
   // "client_reference_id" => null
@@ -87,12 +91,12 @@ Artisan::command('rl_index', function() {
   Artisan::call('scout:flush', ['model' => Category::class]);
   Artisan::call('scout:flush', ['model' => Location::class]);
 
-  // Artisan::call('scout:import', ['model' => Product::class]);
-  // Artisan::call('scout:import', ['model' => Article::class]);
-  // Artisan::call('scout:import', ['model' => User::class]);
-  // Artisan::call('scout:import', ['model' => Category::class]);
-  // Artisan::call('scout:import', ['model' => Location::class]);
+  Artisan::call('scout:import', ['model' => Product::class]);
+  Artisan::call('scout:import', ['model' => Article::class]);
+  Artisan::call('scout:import', ['model' => User::class]);
+  Artisan::call('scout:import', ['model' => Category::class]);
+  Artisan::call('scout:import', ['model' => Location::class]);
 
-  // $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
-  // $index = $client->index('articles')->updateSortableAttributes(['created_at']);
+  $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
+  $index = $client->index('articles')->updateSortableAttributes(['created_at']);
 });
