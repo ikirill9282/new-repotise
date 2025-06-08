@@ -44,6 +44,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public $appends = [
       'profile',
+      'avatar',
     ];
 
     protected function casts(): array

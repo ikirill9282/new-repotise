@@ -40,7 +40,7 @@ Route::middleware('auth:web')->group(function() {
 });
 
 Route::get('/hook/stripe', function(Request $request) {
-  Log::debug('Stripe Event', ['data' => $request->all()]);
+  Log::debug('Stripe Event', ['data' => $request->json()]);
 });
 
 // Route::get('/', SiteController::class)->name('home');
