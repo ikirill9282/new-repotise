@@ -223,6 +223,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       );
     }
 
+    public function getAvatar(): ?string
+    {
+      return $this->options?->avatar;
+    }
+
     public function makeProfileUrl(): string
     {
       return url("/profile/@$this->username");
