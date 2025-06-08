@@ -50,7 +50,7 @@
                 @else
                     <a href="{{ auth()->user()->makeProfileUrl() }}" class="profile">
                         @dd(auth()->user()->options)
-                        <img src="{{ url(auth()->user()->getAvatar()) }}" alt="avatar"
+                        <img src="{{ auth()->user()?->avatar ? url(auth()->user()->avatar) : '' }}" alt="avatar"
                             class="profile_img">{{-- rounded-full w-8 --}}
                         <div class="right_text">
                             <div class="name">
