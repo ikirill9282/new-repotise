@@ -80,8 +80,6 @@ class User extends Authenticatable implements HasName, FilamentUser
             'user_id' => $model->id,
           ]
         ]);
-        $arr = $model->asStripeCustomer()->toArray();
-        $model->options()->create(['description' => null, 'stripe_id' => $arr['id']]);
       });
 
       self::saving(function($model) {

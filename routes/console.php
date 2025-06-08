@@ -57,7 +57,7 @@ Artisan::command('tt', function(Request $request) {
 });
 
 Artisan::command('rl_stripe', function() {
-  $list = Cashier::stripe()->customers->list;
+  // $list = Cashier::stripe()->customers->list;
 });
 
   // "id" => "vs_1RWx7vFkz2A7XNTilUfYxhop"

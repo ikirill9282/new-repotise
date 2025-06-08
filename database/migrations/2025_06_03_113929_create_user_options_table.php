@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('user_options', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index()->unique();
-            $table->string('stripe_id')->unique()->nullable();
             $table->string('avatar')->default('/storage/images/default_avatar.svg');
             $table->text('description')->nullable();
 

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Mail\ConfirmRegitster;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 require __DIR__ . '/api.php';
 // Route::controller(SiteController::class)->group(function() {
@@ -34,7 +35,12 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile', [CabinetController::class, 'profile']);
   Route::get('/profile/verify', [CabinetController::class, 'verify']);
   Route::post('/profile/verify', [CabinetController::class, 'verificate']);
+  Route::get('/profile/verify/complete', [CabinetController::class, 'verifyComplete']);
   Route::get('/profile/{slug}', [CabinetController::class, 'profile']);
+});
+
+Route::get('/hook/stripe', function(Request $request) {
+  Log::debug('Stripe Event', ['data' => $request->all()]);
 });
 
 // Route::get('/', SiteController::class)->name('home');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CustomEncrypt;
 use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,7 @@ use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class CabinetController extends Controller
 {
@@ -61,7 +63,7 @@ class CabinetController extends Controller
         $verify_session = Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
       } else {
         $verify_session = Cashier::stripe()->identity->verificationSessions->create([
-          'client_reference_id' => $user->options->stripe_id,
+          'client_reference_id' => $user->stripe_id,
           'metadata' => [
             'user_id' => $user->id,
             'user_email' => $user->email,
@@ -70,8 +72,8 @@ class CabinetController extends Controller
             'email' => $user->email,
             'phone' => $user->options->phone,
           ],
-          'related_customer' => $user->options->stripe_id,
-          'return_url' => url('/profile/verify/complete'),
+          'related_customer' => $user->stripe_id,
+          'return_url' => url('/profile/verify/complete?token=' . CustomEncrypt::generateUrlHash(['id' => $user->id])),
           'type' => (isset($valid['tax_id']) && !empty($valid['tax_id'])) ? 'id_number' : 'document',
         ]);
 
@@ -99,6 +101,13 @@ class CabinetController extends Controller
     }
     DB::commit();
     return redirect($verify_session->url);
+  }
+
+  public function verifyComplete(Request $request)
+  {
+    $valid = $request->validate([
+      'token' => 'required|string',
+    ]);
   }
 
   public function profile(Request $request, ?string $slug = null)
