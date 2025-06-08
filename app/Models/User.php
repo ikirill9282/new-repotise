@@ -81,6 +81,7 @@ class User extends Authenticatable implements HasName, FilamentUser
             'user_id' => $model->id,
           ]
         ]);
+        $model->options()->create(['description' => null]);
       });
 
       self::saving(function($model) {
@@ -221,11 +222,6 @@ class User extends Authenticatable implements HasName, FilamentUser
       return Attribute::make(
         get: fn() => $this->options?->avatar,
       );
-    }
-
-    public function getAvatar(): ?string
-    {
-      return $this->options?->avatar;
     }
 
     public function makeProfileUrl(): string
