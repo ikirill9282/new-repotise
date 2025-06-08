@@ -35,6 +35,10 @@ return Application::configure(basePath: dirname(__DIR__))
           if ($e instanceof AccessDeniedHttpException) {
             return redirect('/undefined');
           }
+
+          if (method_exists($e, 'getStatusCode') && $e->getStatusCode() === 403) {
+            return redirect('/undefined');
+          } 
         });
     })
     ->create();

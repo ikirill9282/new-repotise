@@ -115,8 +115,8 @@ class TypeResource extends Resource
     {
         return [
             'index' => Pages\ListTypes::route('/'),
-            // 'create' => Pages\CreateType::route('/create'),
-            // 'edit' => Pages\EditType::route('/{record}/edit'),
+            'create' => Pages\CreateType::route('/create'),
+            'edit' => Pages\EditType::route('/{record}/edit'),
         ];
     }
 }

@@ -33,31 +33,22 @@ use Illuminate\Support\Facades\Http;
 use Laravel\Cashier\Cashier;
 use Stripe\Stripe;
 use Stripe\Identity\VerificationSession;
+use App\Helpers\CustomEncrypt;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 
 
 Artisan::command('tt', function(Request $request) {
-  $user = User::find(3);
-  // $user->debitBalance(0.00, 'Bad usage penalty.');
-  // $verificationSession = Cashier::stripe()->identity->verificationSessions
-  //   ->create([
-  //     'type' => 'document',
-  //     'provided_details' => [
-  //         'email' => $user->email,
-  //     ],
-  //     'metadata' => [
-  //         'user_id' => $user->id,
-  //     ],
-  //   ]);
-
-  $verificationSession = Cashier::stripe()->identity->verificationSessions->retrieve('vs_1RXKYRFkz2A7XNTi2y60ZzqB');
-
-  dd($verificationSession->toArray());
+  $user = User::find(7);
+  $url = url('/profile/verify/complete?token=' . CustomEncrypt::generateUrlHash(['id' => $user->id]));
+  dd($user->makeProfileUrl() . '/?modal=success');
 });
 
 Artisan::command('rl_stripe', function() {
-  // $list = Cashier::stripe()->customers->list;
+  $list = Cashier::stripe()->customers->all();
+  foreach ($list->data as $item) {
+    $item->delete();
+  }
 });
 
   // "id" => "vs_1RWx7vFkz2A7XNTilUfYxhop"

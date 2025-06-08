@@ -43,6 +43,8 @@ class HistoryResource extends Resource
                   ,
                 TextColumn::make('user.name')
                   ,
+                TextColumn::make('action')
+                  ,
                 TextColumn::make('type')
                   ->badge()
                   ->color(fn($record) => match($record->type) {

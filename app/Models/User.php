@@ -150,7 +150,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function verify()
     {
-      return $this->hasOne(UserVerify::class);
+      return $this->hasMany(UserVerify::class);
     }
 
     public function options()

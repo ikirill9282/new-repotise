@@ -39,7 +39,7 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/{slug}', [CabinetController::class, 'profile']);
 });
 
-Route::get('/hook/stripe', function(Request $request) {
+Route::post('/hook/stripe', function(Request $request) {
   Log::debug('Stripe Event', ['data' => $request->json()]);
 });
 

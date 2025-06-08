@@ -26,7 +26,7 @@ class MailVerify
       public User $user,
     )
     {
-        Log::channel('email')->info('Email Sended', ['user' => $user]);
+        Log::channel('email')->info('Email Verififcation Sended', ['user' => $user, 'mail' => $this::class]);
         History::emailVerifySend($user);
     }
 

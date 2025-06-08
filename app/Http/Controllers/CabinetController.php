@@ -108,11 +108,43 @@ class CabinetController extends Controller
     $valid = $request->validate([
       'token' => 'required|string',
     ]);
+
+    $data = CustomEncrypt::decodeUrlHash($valid['token']);
+    $user = User::find($data['id']);
+    $verify = $user->verify()->where('type', 'stripe')->first();
+
+    DB::beginTransaction();
+    try {
+      $verify->delete();
+      History::userVerified($user);
+      $user->update(['verified' => 1, 'stripe_verified_at' => Carbon::now()->format('Y-m-d H:i:s')]);
+      Log::info("User verification success $user->username", [
+        'user' => $user,
+        'verify' => $verify,
+        'data' => $data,
+      ]);
+    } catch (\Exception $e) {
+      DB::rollBack();
+      Log::error('Error while complete user verification', [
+        'user' => $user,
+        'verify' => $verify,
+        'data' => $data,
+        'error' => $e,
+      ]);
+
+      return redirect($user->makeProfileUrl());
+    }
+
+    DB::commit();
+    return redirect($user->makeProfileUrl() . '/?modal=success');
   }
 
   public function profile(Request $request, ?string $slug = null)
   {
-    $user = is_null($slug) ? Auth::user() : (User::where('username', str_ireplace('@', '', $slug))->first() ?? Auth::user());
+    $user = is_null($slug) ? Auth::user() : User::where('username', str_ireplace('@', '', $slug))->first();
+    if (!$user) {
+      return redirect('/unknown');
+    }
     return view('site.pages.profile', [
       'user' => $user,
     ]);

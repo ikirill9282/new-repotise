@@ -26,8 +26,13 @@ class UsersTable extends BaseWidget
         ->label('User info')
         ->view('filament.tables.columns.username')
         ,
+      TextColumn::make('verified')
+        ->formatStateUsing(function($record) {
+          
+        })
+        ,
       TextColumn::make('email_verified_at')
-        ->label('Verified')
+        ->label('Email Verified')
         ->dateTime()
         ->icon('heroicon-o-clock'),
       TextColumn::make('roles.title'),

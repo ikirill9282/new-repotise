@@ -64,6 +64,15 @@ class History extends Model
       return $this->belongsTo(User::class, 'initialtor', 'id');
     }
 
+    public static function userVerified(User $user)
+    {
+      return static::success()
+        ->action(Action::VERIFY_SUCCESS)
+        ->userId($user->id)
+        ->message('User finished verification by stripe.')
+        ;
+    }
+
     public static function userStartVerify(User $user, array $payload = [])
     {
       return static::info()
@@ -135,7 +144,7 @@ class History extends Model
         ->action(Action::VERIFY_EMAIL)
         ->userId($user->id)
         ->message("Verification code sended to $user->email")
-        ->values($user->verify->code)
+        ->values($user->verify()->where('type', 'email')->first()?->code)
         ->write()
         ;
     }

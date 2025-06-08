@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('password');
             $table->tinyInteger('active')->default(1);
             $table->rememberToken();
+            $table->timestamp('stripe_verified_at')->nullable();
             $table->timestamps();
         });
 
