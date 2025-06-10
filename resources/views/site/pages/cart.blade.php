@@ -175,8 +175,29 @@
       $('.is-gift').val($(this).data('value'));
     });
 
-    window.addEventListener('DOMContentLoaded', function() {
-    })
+    $.ajax({
+      url: '/api/payment/intent',
+      method: 'POST',
+      data: { _token: getCSRF() }
+    }).then(response => {
+      const client_secret = response.client_secret
+      const stripe = Stripe('pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl');
+      const appearance = {
+        theme: 'night'
+      };
+
+      const elements = stripe.elements({ 
+        clientSecret: response.clientSecret,
+        // ...appearance,
+      });
+      
+      const paymentElement = elements.create('payment');
+      paymentElement.mount("#payment");      
+
+      console.log('opk');
+      console.log(paymentElement);
+      
+    });
     
   </script>
 @endpush

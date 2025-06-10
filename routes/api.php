@@ -9,6 +9,7 @@ use App\Models\Admin\SectionVariables;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use App\Models\Article;
+use App\Http\Controllers\PaymentController;
 
 Route::prefix('api')->group(function() {
   Route::prefix('search')->controller(SearchController::class)->group(function() {
@@ -37,5 +38,10 @@ Route::prefix('api')->group(function() {
     Route::post('/count', 'count');
     Route::post('/remove', 'remove');
     Route::post('/promocode', 'promocode');
+  });
+
+
+  Route::prefix('/payment')->middleware('auth:web')->controller(PaymentController::class)->group(function() {
+    Route::post('/intent', 'intent');
   });
 });
