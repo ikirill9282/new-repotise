@@ -66,7 +66,8 @@
                             </div>
                             <a href="#" class="apply">Apply</a>
                         </div>
-                        <div class="payment_methods">
+                        <div id="payment"></div>
+                        {{-- <div class="payment_methods">
                             <h3>Choose Payment Method</h3>
                             <label class="card-option">
                                 <div class="left_text">
@@ -90,7 +91,7 @@
                                     <img src="{{ asset('/assets/img/cards2.svg') }}" alt="MasterCard">
                                 </div>
                             </label>
-                        </div>
+                        </div> --}}
                         <div class="costs">
                             <div class="text_cost">
                                 <span>Subtotal</span>
@@ -173,5 +174,33 @@
     $('.is-gift-button').on('click', function() {
       $('.is-gift').val($(this).data('value'));
     });
+
+    window.addEventListener('DOMContentLoaded', function() {
+      const stripe = Stripe('pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl');
+      const clientSecret = 'sk_test_51R4kScFkz2A7XNTiPpQCTCWpyWQym4EnWVyXC9H5w1mBQtnmb9VVsNlrNbWjMcaMLYmnPjkJqBPsgdW22v8ejFIP000PyOmpyl';
+      
+      // const fetchClientSecret = async () => {
+      //   const clientSecret = await stripe.createCheckoutSession();
+      //   return clientSecret;
+      // };
+
+      // console.log(fetchClientSecret());
+
+      const appearance = {
+        theme: 'stripe',
+        variables: {
+          colorPrimary: '#0570de',
+          colorBackground: '#ffffff',
+          colorText: '#30313d',
+          colorDanger: '#df1b41',
+          fontFamily: 'Ideal Sans, system-ui, sans-serif',
+          spacingUnit: '2px',
+          borderRadius: '4px',
+          // See all possible variables below
+        }
+      };
+      const elements = stripe.elements({clientSecret, appearance});
+    })
+    
   </script>
 @endpush

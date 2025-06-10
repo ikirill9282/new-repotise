@@ -36,6 +36,7 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/verify', [CabinetController::class, 'verify']);
   Route::post('/profile/verify', [CabinetController::class, 'verificate']);
   Route::get('/profile/verify/complete', [CabinetController::class, 'verifyComplete']);
+  Route::get('/profile/verify/cancel', [CabinetController::class, 'verifyCancel']);
   Route::get('/profile/{slug}', [CabinetController::class, 'profile']);
 });
 

@@ -35,24 +35,30 @@
                         
                           <form action="{{ url('/profile/verify') }}" method="POST">
                               @csrf
+                              
+                              @error('form')
+                                <div class="bg-[#FC7361] text-white w-full p-3 rounded-lg">
+                                  {{ $message }}
+                                </div>
+                              @enderror
 
                               @if(auth()->user()->verify()->where('type', 'stripe')->exists())
                                 <a 
                                   class="block !bg-[#FC7361] hover:!bg-[#484134] text-white transition w-full mx-auto p-2 rounded-lg text-center"
                                   href="{{ auth()->user()->makeStripeVerificationUrl() }}"
                                 >
-                                  Continue verification
+                                  Continue Verification
+                                </a>
+                                <a 
+                                  href="{{ url('/profile/verify/cancel') }}"
+                                  class="block w-full !text-[#212529] p-2 mx-auto transition border rounded-lg text-center !border-[#212529]/50 hover:!text-[#FC7361] hover:!border-[#FC7361]"
+                                >
+                                  Cancel Verification
                                 </a>
                               @else
                                 <h2>
                                     Personal Details
                                 </h2>
-
-                                @error('form')
-                                  <div class="bg-[#FC7361] text-white w-full p-3 rounded-lg">
-                                    {{ $message }}
-                                  </div>
-                                @enderror
 
                                 <div class="form-group w-full">
                                     <label class="req">

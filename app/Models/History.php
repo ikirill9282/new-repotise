@@ -64,12 +64,47 @@ class History extends Model
       return $this->belongsTo(User::class, 'initialtor', 'id');
     }
 
+    public static function userVerifyInProgress(User $user)
+    {
+      return static::info()
+        ->action(Action::VERIFY_IN_PROGRESS)
+        ->userId($user->id)
+        ->values($user->getStripeVerify()?->code)
+        ->message('User verification in progress.')
+        ->write()
+        ;
+    }
+
+    public static function userVerifyRequiresInput(User $user)
+    {
+      return static::info()
+        ->action(Action::VERIFY_REQUIRES_INPUT)
+        ->userId($user->id)
+        ->values($user->getStripeVerify()?->code)
+        ->message('User verification requires input.')
+        ->write()
+        ;
+    }
+
+    public static function userCancelVerify(User $user)
+    {
+      return static::info()
+        ->action(Action::VERIFY_CANCEL)
+        ->userId($user->id)
+        ->values($user->getStripeVerify()?->code)
+        ->message('User cancel stripe verification.')
+        ->write()
+        ;
+    }
+
     public static function userVerified(User $user)
     {
       return static::success()
         ->action(Action::VERIFY_SUCCESS)
         ->userId($user->id)
+        ->values($user->getStripeVerify()?->code)
         ->message('User finished verification by stripe.')
+        ->write()
         ;
     }
 
@@ -78,6 +113,7 @@ class History extends Model
       return static::info()
         ->action(Action::VERIFY_START)
         ->userId($user->id)
+        ->values($user->verify->where('type', 'stripe')->first()?->code)
         ->message('Create verification session in stripe.')
         ->payload($payload)
         ->write()

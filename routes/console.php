@@ -34,14 +34,22 @@ use Laravel\Cashier\Cashier;
 use Stripe\Stripe;
 use Stripe\Identity\VerificationSession;
 use App\Helpers\CustomEncrypt;
+use App\Jobs\CheckStripeVerification;
+use App\Models\History;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
-
+Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $user = User::find(7);
-  $url = url('/profile/verify/complete?token=' . CustomEncrypt::generateUrlHash(['id' => $user->id]));
-  dd($user->makeProfileUrl() . '/?modal=success');
+  $j = new CheckStripeVerification(User::find(4));
+  try {
+    $j->handle();
+  } catch (\Exception $e) {
+    dd($e, $e->getMessage(), $e->getLine(), $e->getFile());
+  }
+  // $s = Cashier::stripe()->identity->verificationSessions->retrieve('vs_1RXm43Fkz2A7XNTiYQ0fas1u');
 });
 
 Artisan::command('rl_stripe', function() {

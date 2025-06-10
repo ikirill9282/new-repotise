@@ -11,6 +11,9 @@ enum Action
   public const BACKUP_ACTIVATE = 'Backup Code Activate';
   public const VERIFY_START = 'Start Verification';
   public const VERIFY_SUCCESS = 'User Verified';
+  public const VERIFY_CANCEL = 'User Cancel Verification';
+  public const VERIFY_REQUIRES_INPUT = 'User Verification Requires Input';
+  public const VERIFY_IN_PROGRESS = 'User Verification In Progress';
 
   public function toArray(): array
   {
@@ -21,6 +24,9 @@ enum Action
       self::BACKUP_ACTIVATE,
       self::VERIFY_START,
       self::VERIFY_SUCCESS,
+      self::VERIFY_CANCEL,
+      self::VERIFY_REQUIRES_INPUT,
+      self::VERIFY_IN_PROGRESS,
     ];
   }
 }

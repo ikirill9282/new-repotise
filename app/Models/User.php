@@ -29,6 +29,8 @@ use App\Models\Options;
 use App\Events\MailReset;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Cashier;
+use App\Helpers\CustomEncrypt;
+use Stripe\Identity\VerificationSession;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -103,20 +105,20 @@ class User extends Authenticatable implements HasName, FilamentUser
         $array['followers_count'] = $this->loadCount('followers')->followers_count;
         
         $products = $this->products()
-        ->with([
-          'categories' => function ($query) {
-            $query->select(['categories.id', 'categories.title']);
-          },
-          'location' => function ($query) {
-            $query->select(['locations.id', 'locations.title']);
-          },
-          'type' => function ($query) {
-            $query->select(['types.id', 'types.title']);
-          },
-        ])
-        ->select(['id', 'title', 'type_id', 'location_id', 'user_id'])
-        ->get()
-        ->toArray();
+          ->with([
+            'categories' => function ($query) {
+              $query->select(['categories.id', 'categories.title']);
+            },
+            'location' => function ($query) {
+              $query->select(['locations.id', 'locations.title']);
+            },
+            'type' => function ($query) {
+              $query->select(['types.id', 'types.title']);
+            },
+          ])
+          ->select(['id', 'title', 'type_id', 'location_id', 'user_id'])
+          ->get()
+          ->toArray();
         
         $array['products'] = collect($products)->select('id', 'title')->toArray();
         $array['categories'] = collect($products)->pluck('categories')
@@ -141,6 +143,11 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
       return $this->hasRole('admin');
+    }
+
+    public function notifications()
+    {
+      return $this->hasMany(UserNotification::class);
     }
 
     public function backup()
@@ -234,6 +241,12 @@ class User extends Authenticatable implements HasName, FilamentUser
       return url('/profile/verify');
     }
 
+    public function makeCompletetVerifyUrl(): string
+    {
+      return url('/profile/verify/complete' . '/?token=' . CustomEncrypt::generateUrlHash(['id' => $this->id]));
+      // return url('/profile/verify/complete');
+    }
+
     public function makeSubscribeUrl(): string
     {
       return url("/profile/subscribe/$this->profile");
@@ -245,6 +258,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       if (!$verify) return null;
 
       $session_verify = Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
+      
+      if ($session_verify['status'] === 'verified') {
+        return $this->makeCompletetVerifyUrl();
+      }
+
       return $session_verify->url;
     }
 
@@ -309,6 +327,19 @@ class User extends Authenticatable implements HasName, FilamentUser
       $model = $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp, 'type' => 'reset']);
 
       return $model->code;
+    }
+
+    public function getStripeVerify(): ?UserVerify
+    {
+      return $this->verify()->where('type', 'stripe')->first();
+    }
+
+    public function getStripeVerifySession(): ?VerificationSession
+    {
+      $verify = $this->getStripeVerify();
+      if (!$verify) return null;
+      
+      return Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
     }
 
     public function resetBackup()

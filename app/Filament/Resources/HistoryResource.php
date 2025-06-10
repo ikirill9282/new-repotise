@@ -34,6 +34,8 @@ class HistoryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(static::getEloquentQuery()->orderByDesc('created_at'))
+            ->recordUrl(fn() => null)
             ->columns([
                 TextColumn::make('initiator')
                   ->formatStateUsing(function($state, $record) {
@@ -75,12 +77,12 @@ class HistoryResource extends Resource
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
-                Action::make('view')
-                  ->link()
-                  ->icon('heroicon-o-eye')
-                  ->modal()
-                  ->modalContent(null)
-                  ,
+                // Action::make('view')
+                //   ->link()
+                //   ->icon('heroicon-o-eye')
+                //   ->modal()
+                //   ->modalContent(null)
+                //   ,
             ], position: ActionsPosition::BeforeColumns)
             // ->bulkActions([
             //     Tables\Actions\BulkActionGroup::make([
