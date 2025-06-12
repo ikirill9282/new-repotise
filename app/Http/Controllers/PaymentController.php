@@ -9,17 +9,26 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Order as EnumsOrder;
 use App\Models\Page;
+use Illuminate\Support\Facades\Session;
 
 class PaymentController extends Controller
 {
   public function intent(Request $request)
   {
-    // return Cashier::stripe()->paymentIntents->create([
-    //   'amount' => 2000,
-    //   'currency' => 'usd',
-    //   'automatic_payment_methods' => ['enabled' => true],
-    // ]);
-    return Cashier::stripe()->paymentIntents->retrieve('pi_3RYPkiFkz2A7XNTi0nepUAQ5');
+
+    if (Session::has('payment_intent')) {
+      $transaction = Cashier::stripe()->paymentIntents->retrieve(Session::get('payment_intent'));
+      return response()->json($transaction);
+    }
+
+    $transaction = Cashier::stripe()->paymentIntents->create([
+      'amount' => 2000,
+      'currency' => 'usd',
+      'automatic_payment_methods' => ['enabled' => true],
+    ]);
+    Session::put('payment_intent', $transaction->id);
+
+    return response()->json($transaction);
   }
 
 
