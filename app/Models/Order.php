@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\Cart;
+use Illuminate\Support\Collection;
 
 class Order extends Model
 {
@@ -70,7 +72,7 @@ class Order extends Model
 
     public function getTotal(): int
     {
-      return $this->getAmount() - $this->getDiscount() - $this->getTax();
+      return $this->getAmount() - $this->getDiscount() + $this->getTax();
     }
 
     public function getCosts()
@@ -93,22 +95,27 @@ class Order extends Model
       return static::calcPercent($price, $promo->percent);
     }
 
-    public static function prepare(array $cart): static
+    public static function prepare(Cart $cart): static
     {
       $order = new static();
       $order->prepare = true;
-      $order->promocode = (isset($cart['promocode']) && !empty($cart['promocode'])) ? Promocode::where('id', $cart['promocode'])->first() : null;
-      if (isset($cart['products']) && !empty($cart['products'])) {
-        $products = Product::whereIn('id', array_column($cart['products'], 'id'))->get();
-        $products = array_map(function($item) use ($products) {
+      $order->promocode = $cart->hasPromocode() ? Promocode::where('id', $cart->getCartPromocode())->first() : null;
+      $order->products = static::prepareCartProducts($cart);
+
+      return $order;
+    }
+
+    public static function prepareCartProducts(Cart $cart): Collection
+    {
+      $result = [];
+      if ($cart->hasProducts()) {
+        $products = $cart->getCartProducts();
+        $result = array_map(function($item) use ($products) {
           $product = $products->where('id', $item['id'])->first();
           $product->pivot = ['count' => $item['count']];
           return $product;
-        }, $cart['products']);
-
-        $order->products = collect($products); 
+        }, $cart->getProducts());
       }
-
-      return $order;
+      return collect($result);
     }
 }

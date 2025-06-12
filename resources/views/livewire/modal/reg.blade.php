@@ -1,4 +1,4 @@
-<div class="max-w-md w-full bg-white rounded-xl shadow-lg !p-4 md:!p-8 relative">
+<div class="w-full md:min-w-md bg-white rounded-xl shadow-lg !p-4 md:!p-8 relative">
   <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center select-none">Sign Up</h2>
   
   <form wire:submit="reg" class="!space-y-4">

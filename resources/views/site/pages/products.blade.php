@@ -133,7 +133,7 @@
             <div class="about_block">
                 @include('site.components.heading')
                 @include('site.components.breadcrumbs', [
-                    'current_name' => $location?->title,
+                  'current_name' => $location?->title,
                 ])
             </div>
         </div>

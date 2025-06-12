@@ -2,10 +2,9 @@
   <div
     id="modal"
     class="fixed {{ $this->active ? '' : 'hidden' }} top-0 left-0 z-130 w-screen min-h-screen bg-gray-100 flex items-center justify-center p-2 md:!p-4">
-      
-    <div class="relative max-w-md w-full">
-      <div wire:click="close" class="close_modal absolute top-8 right-8 rotate-45 stroke-gray-400 transition hover:cursor-pointer hover:!stroke-black z-40">
-        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+    <div class="relative w-full md:w-auto">
+      <div wire:click="close" class="close_modal absolute top-1.5 right-1.5 p-2 bg-white stroke-gray-400 transition hover:cursor-pointer hover:!stroke-black z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none" class="rotate-45">
           <path d="M8.19982 2.84314C8.19982 7.26142 8.19982 9.73857 8.19982 14.1568M2.54297 8.49999C6.96125 8.49999 9.4384 8.49999 13.8567 8.49999" stroke="inherit" stroke-width="1.5" stroke-linecap="round"/>
           <script xmlns=""/>
         </svg>

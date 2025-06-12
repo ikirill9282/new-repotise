@@ -41,7 +41,7 @@ Route::prefix('api')->group(function() {
   });
 
 
-  Route::prefix('/payment')->middleware('auth:web')->controller(PaymentController::class)->group(function() {
+  Route::prefix('/payment')->controller(PaymentController::class)->group(function() {
     Route::post('/intent', 'intent');
   });
 });

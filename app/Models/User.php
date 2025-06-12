@@ -276,9 +276,9 @@ class User extends Authenticatable implements HasName, FilamentUser
       return UserFavorite::where(['user_id' => Auth::user()->id, 'type' => $type, 'item_id' => $id])->exists();
     }
 
-    public function getRecomendProducts(): Collection
+    public function getRecomendProducts(int $limit = 6): Collection
     {
-      return Product::limit(6)->orderByDesc('id')->get();
+      return Product::limit($limit)->orderByDesc('id')->get();
     }
 
     public function getRecomendAuthors(): Collection

@@ -39,7 +39,7 @@
                     </ul>
                 </nav>
                 @if (!auth()->check())
-                    <a href="{{ url('/cart') }}" class="cart">
+                    <a href="#" class="cart open_cart">
                         @include('icons.cart')
                         <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
                     </a>
@@ -63,7 +63,11 @@
                         @include('icons.favorite')
                         <span class="favorite-counter @if (!auth()->user()->favorite_count) hidden @endif" >{{ auth()->user()->favorite_count }}</span>
                     </a>
-                    <a href="{{ url('/cart') }}" class="basket rection_groups">
+                    {{-- <a href="{{ url('/cart') }}" class="basket rection_groups">
+                        @include('icons.cart')
+                        <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
+                    </a> --}}
+                    <a href="#" class="basket rection_groups open_cart">
                         @include('icons.cart')
                         <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
                     </a>

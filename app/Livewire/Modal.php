@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Session;
 use App\Mail\ConfirmRegitster;
 use App\Models\History;
 use App\Models\UserBackup;
+use App\Services\Cart;
 use Illuminate\Support\Facades\Log;
 
 class Modal extends Component
@@ -105,6 +106,14 @@ class Modal extends Component
       $this->currentModal = 'reset';
       $this->open = true;
       $this->view = 'reset';
+    }
+
+    #[On('modal.openCart')]
+    public function openCart()
+    {
+      $this->currentModal = 'cart';
+      $this->open = true;
+      $this->view = 'cart';
     }
 
     public function openResetConfirm()

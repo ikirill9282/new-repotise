@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Order as EnumsOrder;
 use App\Helpers\SessionExpire;
 use App\Search\SearchClient;
 use App\Models\Page;
@@ -268,64 +269,6 @@ class SiteController extends Controller
     return view('site.pages.products', [
       'page' => $page,
       'paginator' => $paginator,
-    ]);
-  }
-
-  public function cart(Request $request)
-  {
-    $page = Page::where('slug', 'cart')
-      ->with('config')
-      ->first();
-
-    if (is_null($page)) {
-      return (new FallbackController())($request);
-    }
-
-    $cart = new Cart();
-    $order = Order::prepare($cart->getCart());
-
-    return view("site.pages.cart", ['page' => $page, 'order' => $order]);
-  }
-
-  public function order(Request $request)
-  {
-    $cart = new Cart();
-    if (isset($cart['products']) && !empty($cart['products'])) {
-      $prepared = Order::prepare($cart->getCart());
-      $order = Order::create([
-        'user_id' => Auth::user()->id,
-        'price' => $prepared->getTotal(),
-        'tax' => $prepared->getTax(),
-        'price_without_discount' => $prepared->getAmount(),
-        'promocode' => $prepared->promocode?->id,
-        'recipient' => ($request->has('is-gift') && $request->get('is-gift')) ? $request->get('recipient') : null,
-        'recipient_message' => ($request->has('is-gift') && $request->get('is-gift')) ? $request->get('recipient_message') : null,
-      ]);
-
-      $order->products()->sync(array_map(function($item) {
-        $item['product_id'] = $item['id'];
-        unset($item['id']);
-        return $item;
-      }, $cart['products']));
-
-      $cart->flushCart();
-    }
-  }
-
-  public function payment(Request $request, ?string $status = null)
-  {
-    $slug = $status ? 'payment-' . $status : 'payment';
-    $page = Page::where('slug', $slug)  
-      ->with('config')
-      ->first();
-
-    if (is_null($page)) {
-      return (new FallbackController())($request);
-    }
-
-    return view("site.pages.$slug", [
-      'page' => $page,
-      'status' => $status,
     ]);
   }
 }

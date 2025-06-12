@@ -4,6 +4,7 @@ use App\Http\Controllers\UserController as BaseUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CabinetController;
 use App\Http\Controllers\FallbackController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
 use Illuminate\Http\Request;
@@ -49,9 +50,10 @@ Route::post('/hook/stripe', function(Request $request) {
 // Route::get('/insights/{slug}/{article}', SiteController::class);
 
 
-Route::get('/cart', [SiteController::class, 'cart']);
-Route::get('/cart/order', [SiteController::class, 'order']);
-Route::get('/cart/{status}', [SiteController::class, 'payment'])->name('payment.status');
+Route::get('/payment/checkout', [PaymentController::class, 'checkout']);
+Route::get('/payment/order', [PaymentController::class, 'order']);
+Route::get('/payment/order/complete', [PaymentController::class, 'orderComplete']);
+Route::get('/payment/{status}', [PaymentController::class, 'payment'])->name('payment.status');
 
 
 Route::get('/', [SiteController::class, 'home'])->name('home');

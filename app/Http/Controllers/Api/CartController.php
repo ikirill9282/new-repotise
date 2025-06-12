@@ -38,7 +38,7 @@ class CartController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Something went wrong...'], 502);
       }
 
-      $order = Order::prepare($cart->getCart());
+      $order = Order::prepare($cart);
       
       return response()->json(['status' => 'success', 'products_count' => $order->getCount()]);
     }
@@ -54,7 +54,7 @@ class CartController extends Controller
       SessionExpire::setCartItemCount('cart', $valid['item']['id'], $valid['count']);
       $cart->loadCart();
 
-      $order = Order::prepare(Auth::user()->getCart());
+      $order = Order::prepare($cart);
 
       return response()->json([
         'status' => 'success', 
@@ -71,7 +71,7 @@ class CartController extends Controller
       $cart = new Cart();
       $item = CustomEncrypt::decodeUrlHash($valid['item']);
       $cart->removeFromCart($item['id']);
-      $order = Order::prepare($cart->getCart());
+      $order = Order::prepare($cart);
       
       return response()->json([
         'status' => 'success',
@@ -82,6 +82,7 @@ class CartController extends Controller
 
     public function promocode(Request $request)
     {
+      $cart = new Cart();
       $valid = $request->validate(['promocode' => 'required|string']);
       $promocode = Promocode::where('code', $valid['promocode'])->first();
       if (!$promocode || !$promocode->active) {
@@ -89,7 +90,7 @@ class CartController extends Controller
       }
 
       Auth::user()->applyPromocode($promocode);
-      $order = Order::prepare(Auth::user()->getCart());
+      $order = Order::prepare($cart);
       
       return response()->json([
         'status' => 'success',

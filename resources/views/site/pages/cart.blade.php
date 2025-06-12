@@ -13,7 +13,7 @@
         <div class="container">
             <div class="about_block">
                 <div class="left_form">
-                    <form action="/cart/order" >
+                    <form action="/cart/order" id="payment-form" >
                         <div class="input_block">
                             <input type="text" name="fullname" placeholder="Your Full Name" value="{{ auth()->check() ? auth()->user()->name : '' }}">
                             @include('icons.shield')
@@ -66,7 +66,7 @@
                             </div>
                             <a href="#" class="apply">Apply</a>
                         </div>
-                        <div id="payment"></div>
+                        <div id="payment" class="mb-4"></div>
                         {{-- <div class="payment_methods">
                             <h3>Choose Payment Method</h3>
                             <label class="card-option">
@@ -99,11 +99,11 @@
                             </div>
                             <div class="text_cost">
                                 <span>Discount</span>
-                                <h4 class="color_red">-$<span class="cart-discount">{{ number_format($order->getDiscount()) }}</span></h4>
+                                <h4 class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-$<span class="cart-discount">{{ number_format($order->getDiscount()) }}</span></h4>
                             </div>
                             <div class="text_cost">
                                 <span>Tax</span>
-                                <h4 class="color_red">-$<span class="cart-tax">{{ number_format($order->getTax()) }}</span></h4>
+                                <h4 class="color_red">$<span class="cart-tax">{{ number_format($order->getTax()) }}</span></h4>
                             </div>
                             <div class="text_cost">
                                 <h5>Total</h5>
@@ -175,29 +175,48 @@
       $('.is-gift').val($(this).data('value'));
     });
 
+
+    const stripe = Stripe('pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl');
+    const stripeData = {};
+
     $.ajax({
       url: '/api/payment/intent',
       method: 'POST',
       data: { _token: getCSRF() }
     }).then(response => {
       const client_secret = response.client_secret
-      const stripe = Stripe('pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl');
       const appearance = {
-        theme: 'night'
+        theme: 'stripe',
       };
 
-      const elements = stripe.elements({ 
-        clientSecret: response.clientSecret,
-        // ...appearance,
+      stripeData.elements = stripe.elements({
+        clientSecret: client_secret,
+        appearance: appearance,
       });
       
-      const paymentElement = elements.create('payment');
-      paymentElement.mount("#payment");      
-
-      console.log('opk');
-      console.log(paymentElement);
-      
+      try {
+        stripeData.paymentElement = stripeData.elements.create('payment', {
+          paymentMethodTypes: ['card'],
+        });
+        stripeData.paymentElement.mount("#payment");      
+      } catch (error) {
+        console.log(error);
+      }
     });
     
+    document.getElementById('payment-form').addEventListener('submit', async function(evt) {
+      evt.preventDefault();
+      const {error} = await stripe.confirmPayment({
+        elements: stripeData.elements,
+        confirmParams: {
+          return_url: 'http://localhost:9000/payment/order/complete',
+        },
+      });
+      if (error) {
+        // Обработка ошибок (например, показать сообщение пользователю)
+      }
+      // stripeData.paymentElement.
+    });
+
   </script>
 @endpush

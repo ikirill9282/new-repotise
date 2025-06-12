@@ -571,6 +571,7 @@ function applyPromocode(promocode)
   });
 }
 
+
 $(window).on('scroll', function(evt) {
     const point = $(this).scrollTop();
     if (point > (headerHeight + 10)) {

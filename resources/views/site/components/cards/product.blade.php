@@ -1,5 +1,6 @@
 @php
   $hash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]);
+  $cart = new \App\Services\Cart();
 @endphp
 
 @if(isset($template) && $template == 'cart')
@@ -50,8 +51,8 @@
           'item_id' => $model->id,
         ])
 
-        <a href="{{ url('/cart') }}" class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ auth()->user()?->inCart($model->id) ? 'in-cart' : '' }}" data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}">
-          {{ auth()->user()?->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+        <a href="{{ url('/cart') }}" class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}">
+          {{ $cart->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
         </a>
     </div>
     <h3 class="text-nowrap overflow-hidden text-ellipsis">
