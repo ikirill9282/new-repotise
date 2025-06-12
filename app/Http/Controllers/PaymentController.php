@@ -44,7 +44,12 @@ class PaymentController extends Controller
 
   public function orderComplete(Request $request)
   {
-    dd($request->all());
+    $t_session = Cashier::stripe()->identity->verificationSessions->retrieve(
+      $request->get('payment_intent'),
+      []
+    );
+
+    dd($t_session);
   }
 
   public function order(Request $request)
