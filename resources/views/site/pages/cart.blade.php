@@ -206,10 +206,11 @@
     
     document.getElementById('payment-form').addEventListener('submit', async function(evt) {
       evt.preventDefault();
+      const baseUrl = window.location.origin || (window.location.protocol + '//' + window.location.host);
       const {error} = await stripe.confirmPayment({
         elements: stripeData.elements,
         confirmParams: {
-          return_url: 'http://localhost:9000/payment/order/complete',
+          return_url: `${baseUrl}/payment/order/complete`,
         },
       });
       if (error) {
