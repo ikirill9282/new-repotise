@@ -15,13 +15,6 @@ class PaymentController extends Controller
 {
   public function intent(Request $request)
   {
-
-    if (Session::has('payment_intent')) {
-      dd(Session::get('payment_intent'));
-      $transaction = Cashier::stripe()->paymentIntents->retrieve(Session::get('payment_intent'));
-      return response()->json($transaction);
-    }
-
     $transaction = Cashier::stripe()->paymentIntents->create([
       'amount' => 2000,
       'currency' => 'usd',
