@@ -15,7 +15,7 @@ class StripeWebhook
      */
     public function handle(Request $request, Closure $next): Response
     {
-        dd($request->header('HTTP_STRIPE_SIGNATURE'));
+        print($request->header('HTTP_STRIPE_SIGNATURE'));
         return $next($request);
     }
 }
