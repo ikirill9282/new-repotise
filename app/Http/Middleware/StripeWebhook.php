@@ -17,7 +17,7 @@ class StripeWebhook
   {
     try {
       $event = \Stripe\Webhook::constructEvent(
-        $request->all(),
+        $request->body(),
         $request->header('stripe-signature'),
         env('STRIPE_WEBHOOK_SECRET'),
       );
