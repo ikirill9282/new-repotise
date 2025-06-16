@@ -23,7 +23,8 @@ class StripeWebhook
         $event = \Stripe\Webhook::constructEvent(
             $payload, $signature, $secret
         );
-        var_dump($event);
+        $request->attributes->set('stripe_event', $event);
+        
     } catch (\Exception $e) {
         return response('Unauthorized', 401);
     }
