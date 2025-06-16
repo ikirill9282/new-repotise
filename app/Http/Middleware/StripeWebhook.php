@@ -21,6 +21,7 @@ class StripeWebhook
         $request->header('stripe-signature'),
         env('STRIPE_WEBHOOK_SECRET'),
       );
+      var_dump($event);
     } catch (\UnexpectedValueException $e) {
       var_dump($e);
       http_response_code(400);
