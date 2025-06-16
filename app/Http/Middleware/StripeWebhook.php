@@ -8,15 +8,28 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StripeWebhook
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next): Response
-    {
-        var_dump($request->header('HTTP_STRIPE_SIGNATURE'));
-        exit(200);
-        return $next($request);
+  /**
+   * Handle an incoming request.
+   *
+   * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+   */
+  public function handle(Request $request, Closure $next): Response
+  {
+    try {
+      $event = \Stripe\Webhook::constructEvent(
+        $request->all(),
+        $request->header('HTTP_STRIPE_SIGNATURE'),
+        env('STRIPE_WEBHOOK_SECRET'),
+      );
+    } catch (\UnexpectedValueException $e) {
+      // Invalid payload
+      http_response_code(400);
+      exit();
+    } catch (\Stripe\Exception\SignatureVerificationException $e) {
+      // Invalid signature
+      http_response_code(400);
+      exit();
     }
+    return $next($request);
+  }
 }
