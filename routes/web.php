@@ -45,6 +45,7 @@ Route::middleware('auth:web')->group(function() {
 
 Route::post('/hook/stripe', function(Request $request) {
   Log::debug('Stripe Event', ['data' => $request->attributes->get('stripe_event')]);
+  return response('ok');
 })
   ->middleware(StripeWebhook::class)
   ->withoutMiddleware([VerifyCsrfToken::class]);;
