@@ -7,6 +7,7 @@ use App\Http\Controllers\FallbackController;
 use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
+use App\Http\Middleware\StripeWebhook;
 use Illuminate\Http\Request;
 use App\Mail\ConfirmRegitster;
 use App\Models\User;
@@ -45,6 +46,7 @@ Route::middleware('auth:web')->group(function() {
 Route::post('/hook/stripe', function(Request $request) {
   Log::debug('Stripe Event', ['data' => $request->json()]);
 })
+  ->middleware(StripeWebhook::class)
   ->withoutMiddleware([VerifyCsrfToken::class]);;
 
 // Route::get('/', SiteController::class)->name('home');
