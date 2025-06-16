@@ -183,36 +183,4 @@ class PaymentController extends Controller
       'paymentIntent' => $paymentIntent,
     ]);
   }
-
-  // public function order(Request $request)
-  // {
-  //   $cart = new Cart();
-    
-  //   if ($cart->hasProducts()) {
-  //     $prepared = Order::preparing($cart);
-  //     $order = $prepared->savePrepared();
-  //     $cart->flushCart();
-
-  //     return redirect('/order/success');
-  //   }
-
-  //   return redirect('/order/error');
-  // }
-
-  // public function payment(Request $request, ?string $status = null)
-  // {
-  //   $slug = $status ? 'payment-' . $status : 'payment';
-  //   $page = Page::where('slug', $slug)  
-  //     ->with('config')
-  //     ->first();
-
-  //   if (is_null($page)) {
-  //     return (new FallbackController())($request);
-  //   }
-
-  //   return view("site.pages.$slug", [
-  //     'page' => $page,
-  //     'status' => $status,
-  //   ]);
-  // }
 }
