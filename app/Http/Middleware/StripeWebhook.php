@@ -15,8 +15,6 @@ class StripeWebhook
    */
   public function handle(Request $request, Closure $next): Response
   {
-    var_dump($request->headers);
-    exit(200);
     try {
       $event = \Stripe\Webhook::constructEvent(
         $request->all(),
