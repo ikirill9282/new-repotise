@@ -15,10 +15,12 @@ class StripeWebhook
    */
   public function handle(Request $request, Closure $next): Response
   {
+    var_dump($request->headers);
+    exit(200);
     try {
       $event = \Stripe\Webhook::constructEvent(
         $request->all(),
-        $request->header('HTTP_STRIPE_SIGNATURE'),
+        $request->header('stripe-signature'),
         env('STRIPE_WEBHOOK_SECRET'),
       );
     } catch (\UnexpectedValueException $e) {
