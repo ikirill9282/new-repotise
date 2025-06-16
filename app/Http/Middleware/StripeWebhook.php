@@ -15,22 +15,16 @@ class StripeWebhook
    */
   public function handle(Request $request, Closure $next): Response
   {
+    $signature = $request->header('Stripe-Signature');
+    $payload = $request->getContent();
+    $secret = env('STRIPE_WEBHOOK_SECRET');
+
     try {
-      $event = \Stripe\Webhook::constructEvent(
-        json_encode($request->all()),
-        $request->header('stripe-signature'),
-        env('STRIPE_WEBHOOK_SECRET'),
-      );
-      var_dump($event);
-    } catch (\UnexpectedValueException $e) {
-      var_dump($e);
-      http_response_code(400);
-      exit();
-    } catch (\Stripe\Exception\SignatureVerificationException $e) {
-      // Invalid signature
-      var_dump($e);
-      http_response_code(400);
-      exit();
+        \Stripe\Webhook::constructEvent(
+            $payload, $signature, $secret
+        );
+    } catch (\Exception $e) {
+        return response('Unauthorized', 401);
     }
     return $next($request);
   }
