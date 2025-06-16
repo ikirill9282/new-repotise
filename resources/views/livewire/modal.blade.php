@@ -1,7 +1,7 @@
 <div>
   <div
     id="modal"
-    class="fixed {{ $this->active ? '' : 'hidden' }} top-0 left-0 z-130 w-screen min-h-screen bg-gray-100 flex items-center justify-center p-2 md:!p-4">
+    class="fixed {{ $this->active ? '' : 'hidden' }} top-0 left-0 z-[9999] w-screen min-h-screen bg-gray-100 flex items-center justify-center p-2 md:!p-4">
     <div class="relative w-full md:w-auto">
       <div wire:click="close" class="close_modal absolute top-1.5 right-1.5 p-2 bg-white stroke-gray-400 transition hover:cursor-pointer hover:!stroke-black z-40">
         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none" class="rotate-45">
@@ -30,6 +30,28 @@
         $('#modal').fadeOut();
         Livewire.dispatch('deactivate');
       }
+
+      document.querySelector('#modal').querySelectorAll('.counter').forEach(counter => {
+        const minusBtn = counter.querySelector('.minus');
+        const plusBtn = counter.querySelector('.plus');
+        const countEl = counter.querySelector('.count');
+      
+        let count = parseInt(countEl.textContent);
+      
+        plusBtn.addEventListener('click', function() {
+          count++;
+          countEl.textContent = count;
+          counterChanged(this.closest('.counter'), count);
+        });
+      
+        minusBtn.addEventListener('click', function() {
+          if (count > 1) {
+            count--;
+            countEl.textContent = count;
+            counterChanged(this.closest('.counter'), count);
+          }
+        });
+      });
   });
 </script>
 @endscript

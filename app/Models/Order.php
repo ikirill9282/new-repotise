@@ -6,6 +6,7 @@ use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Cart;
 use Illuminate\Support\Collection;
+use App\Enums\Order as EnumsOrder;
 
 class Order extends Model
 {
@@ -14,6 +15,20 @@ class Order extends Model
     protected static int $tax = 5;
 
     protected $guarded = ['id'];
+
+    protected $appends = [
+      'preparing' => false,
+    ];
+
+    public function user()
+    {
+      return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function paymentIntents()
+    {
+      return $this->hasMany(PaymentIntents::class, 'stripe_id', 'payment_id');
+    }
 
     public function products()
     {
@@ -30,23 +45,6 @@ class Order extends Model
       return $this->products->reduce(function($c, $i) {
         return $c += $i->price * ($i->pivot->count ?? $i->pivot['count']);
       }, 0);
-      // $result = 0;
-
-      // if ($this->prepare) {
-      //   $products = Product::whereIn('id', array_column($this->products, 'id'))->get();
-      //   foreach ($this->products as $product) {
-      //     $model = $products->where('id', $product['id'])->first();
-      //     if ($product) {
-      //       $result += ($model->price * $product['count']);
-      //     }
-      //   }
-      // } else {
-      //   return $this->products->reduce(function($c, $i) {
-      //     return $c += $i->price * $i->pivot->count;
-      //   }, 0);
-      // }
-
-      // return $result;
     }
 
     public function getCount(): int
@@ -75,6 +73,11 @@ class Order extends Model
       return $this->getAmount() - $this->getDiscount() + $this->getTax();
     }
 
+    public function getTotalWithDiscount(): int
+    {
+      return $this->getAmount() + $this->getTax();
+    }
+
     public function getCosts()
     {
       return [
@@ -95,17 +98,18 @@ class Order extends Model
       return static::calcPercent($price, $promo->percent);
     }
 
-    public static function prepare(Cart $cart): static
+    public static function preparing(Cart $cart): static
     {
       $order = new static();
       $order->prepare = true;
       $order->promocode = $cart->hasPromocode() ? Promocode::where('id', $cart->getCartPromocode())->first() : null;
-      $order->products = static::prepareCartProducts($cart);
+      $order->products = static::preparingCartProducts($cart);
+      $order->status_id = EnumsOrder::NEW;
 
       return $order;
     }
 
-    public static function prepareCartProducts(Cart $cart): Collection
+    public static function preparingCartProducts(Cart $cart): Collection
     {
       $result = [];
       if ($cart->hasProducts()) {
@@ -117,5 +121,53 @@ class Order extends Model
         }, $cart->getProducts());
       }
       return collect($result);
+    }
+
+    public function savePrepared(): static
+    {
+      if ($this->prepare) {
+        $this->prepare = false;
+        $order = Order::create($this->getPreparingAttributes());
+
+        $order = $this->syncPreparedProducts($order);
+        $order->refresh();
+        
+        return $order;
+      }
+
+      return $this;
+    }
+
+    public function mergePrepared(Order $order): static
+    {
+      $attributes = $this->getPreparingAttributes();
+      unset($attributes['user_id']);
+
+      $order->update($attributes);
+      $order = $this->syncPreparedProducts($order);
+      $order->refresh();
+
+      return $order;
+    }
+
+    public function syncPreparedProducts(Order $order): static
+    {
+      $order->products()->sync($this->products->map(fn($item) => ['product_id' => $item->id, 'count' => $item->pivot['count']])->toArray());
+      return $order;
+    }
+
+    public function getPreparingAttributes(): array
+    {
+      return [
+          'user_id' => $this->user_id,
+          'payment_id' => $this->payment_id,
+          'price' => $this->getTotal(),
+          'tax' => $this->getTax(),
+          'price_without_discount' => $this->getTotalWithDiscount(),
+          'status_id' => EnumsOrder::NEW,
+          'promocode' => $this->promocode?->id,
+          'recipient' => $this->recipent ?? null,
+          'recipient_message' => $this->recipient_message ?? null,
+      ];
     }
 }

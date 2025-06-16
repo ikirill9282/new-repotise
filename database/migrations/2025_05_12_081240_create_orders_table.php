@@ -12,19 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
+            $table->id()->from(100200);
             $table->bigInteger('user_id')->unsigned()->index();
             $table->bigInteger('status_id')->unsigned()->index();
             $table->decimal('price', 10, 2);
             $table->decimal('tax', 10, 2);
             $table->decimal('price_without_discount', 10, 2);
             $table->bigInteger('promocode')->unsigned()->nullable()->index();
+            $table->string('payment_id')->nullable()->index();
             $table->string('recipient')->index()->nullable();
             $table->string('recipient_message')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('status_id')->references('id')->on('statuses');
+            // $table->foreign('status_id')->references('id')->on('statuses');
         });
     }
 

@@ -28,7 +28,6 @@ class AuthController extends Controller
         return redirect()->back();
       }
 
-
       return back()->withErrors([
         'email' => 'The provided credentials do not match our records.',
       ])->onlyInput('email');

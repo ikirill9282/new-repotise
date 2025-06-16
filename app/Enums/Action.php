@@ -14,6 +14,7 @@ enum Action
   public const VERIFY_CANCEL = 'User Cancel Verification';
   public const VERIFY_REQUIRES_INPUT = 'User Verification Requires Input';
   public const VERIFY_IN_PROGRESS = 'User Verification In Progress';
+  public const INVITE_BY_PURCHASE = 'User Invited By Purchase';
 
   public function toArray(): array
   {
@@ -27,6 +28,7 @@ enum Action
       self::VERIFY_CANCEL,
       self::VERIFY_REQUIRES_INPUT,
       self::VERIFY_IN_PROGRESS,
+      self::INVITE_BY_PURCHASE,
     ];
   }
 }

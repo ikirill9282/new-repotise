@@ -84,6 +84,10 @@ class User extends Authenticatable implements HasName, FilamentUser
           ]
         ]);
         $model->options()->create(['description' => null]);
+        $model->notifications()->create([
+          'type' => 'info',
+          'message' => 'Welcome to TrekGuider! Please, complete your profile and verify your email address.',
+        ]);
       });
 
       self::saving(function($model) {
@@ -229,6 +233,20 @@ class User extends Authenticatable implements HasName, FilamentUser
       return Attribute::make(
         get: fn() => $this->options?->avatar,
       );
+    }
+
+    public static function makePassword(): string
+    {
+      $pass = substr(trim(base64_encode(random_bytes(10)), '='), -10);
+      if (!static::validatePassword($pass)) {
+        return static::makePassword();
+      }
+      return preg_replace('/[^0-9a-zA-Z]+/is', '', $pass);
+    }
+
+    public static function validatePassword(string $password): bool
+    {
+      return preg_match( '/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_\-+=]{8,}$/is', $password);
     }
 
     public function makeProfileUrl(): string

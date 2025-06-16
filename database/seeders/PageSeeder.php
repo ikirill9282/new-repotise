@@ -90,8 +90,8 @@ class PageSeeder extends Seeder
         'slug' => 'product',
       ]);
       $cart = Page::firstOrCreate([
-        'title' => 'Cart',
-        'slug' => 'cart',
+        'title' => 'Checkout',
+        'slug' => 'checkout',
       ]);
       $payment_success = Page::firstOrCreate([
         'title' => 'Payment Success',

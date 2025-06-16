@@ -394,6 +394,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initModal();
 });
 
+
 document.querySelectorAll('.counter').forEach(counter => {
     const minusBtn = counter.querySelector('.minus');
     const plusBtn = counter.querySelector('.plus');

@@ -43,5 +43,6 @@ Route::prefix('api')->group(function() {
 
   Route::prefix('/payment')->controller(PaymentController::class)->group(function() {
     Route::post('/intent', 'intent');
+    Route::post('/confirm', 'confirm');
   });
 });

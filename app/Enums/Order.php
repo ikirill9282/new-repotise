@@ -5,19 +5,23 @@ namespace App\Enums;
 
 enum Order
 {
-  public const NEW = 'new';
+  public const NEW = 1;
+  public const PAID = 2;
 
   public function toArray(): array
   {
     return [
       self::NEW,
+      self::PAID,
     ];
   }
 
-  public static function get($val)
+  public static function label(int $val)
   {
     return match($val) {
-      static::NEW => 1,
+      1 => 'New',
+      2 => 'Paid',
+      default => 'Unknown',
     };
   }
 }

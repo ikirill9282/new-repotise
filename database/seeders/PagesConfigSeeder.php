@@ -229,7 +229,7 @@ class PagesConfigSeeder extends Seeder
         ],
       ],
       [
-        'page' => Page::where('slug', 'cart')->first(),
+        'page' => Page::where('slug', 'checkout')->first(),
         'variables' => [
         ],
       ],

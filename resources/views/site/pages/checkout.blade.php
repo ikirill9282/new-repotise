@@ -15,25 +15,29 @@
                 <div class="left_form">
                     <form action="/cart/order" id="payment-form" >
                         <div class="input_block">
-                            <input type="text" name="fullname" placeholder="Your Full Name" value="{{ auth()->check() ? auth()->user()->name : '' }}">
-                            @include('icons.shield')
+                            <input type="text" name="fullname" placeholder="Your Full Name" value="{{ auth()->check() ? auth()->user()->name : '' }}" required>
+                            <x-tooltip class="!opacity-100 !absolute top-5 right-2" message='Enter your valid full name. e.g. "John Doe".'>  
+                              @include('icons.shield')
+                            </x-tooltip>
                         </div>
                         <div class="input_block">
-                            <input type="email" name="email" placeholder="Your Email" value="{{ auth()->check() ? auth()->user()->email : '' }}">
-                            @include('icons.shield')
+                            <input type="email" name="email" placeholder="Your Email" value="{{ auth()->check() ? auth()->user()->email : '' }}" required>
+                            <x-tooltip class="!opacity-100 !absolute top-5 right-2" message='Enter your valid email. We will send you validation link.'>  
+                              @include('icons.shield')
+                            </x-tooltip>
                         </div>
                         <div class="menu_block">
                             <input type="hidden" name="is-gift" class="is-gift" value="0">
                             <ul class="nav nav-pills" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link text-primary fw-semibold active position-relative is-gift-button"
-                                        id="pills-home-tab" data-value="1" data-bs-toggle="pill" data-bs-target="#pills-home"
+                                        id="pills-home-tab" data-value="0" data-bs-toggle="pill" data-bs-target="#pills-home"
                                         type="button" role="tab" aria-controls="pills-home"
                                         aria-selected="true">For Myself</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link text-primary fw-semibold position-relative is-gift-button"
-                                        id="pills-profile-tab" data-value="0" data-bs-toggle="pill" data-bs-target="#pills-profile"
+                                        id="pills-profile-tab" data-value="1" data-bs-toggle="pill" data-bs-target="#pills-profile"
                                         type="button" role="tab" aria-controls="pills-profile"
                                         aria-selected="false">Send as Gift</button>
                                 </li>
@@ -48,11 +52,11 @@
                                 <div class="tab-pane fade" id="pills-profile" role="tabpanel"
                                     aria-labelledby="pills-profile-tab">
                                     <div class="input_block gift_input">
-                                        <input type="email" placeholder="Gift Recipient Email">
+                                        <input type="email" name="recipient" placeholder="Gift Recipient Email">
                                         @include('icons.shield')
                                     </div>
                                     <div class="textarea_block">
-                                        <textarea class="text-area-gift" placeholder="Add a Gift Message (Optional)"></textarea>
+                                        <textarea class="text-area-gift" name="recipient_message" placeholder="Add a Gift Message (Optional)"></textarea>
                                         @include('icons.shield')
                                         <span class="text-area-gift-counter"><span class="text-area-counter">0</span>/150</span>
                                     </div>
@@ -62,7 +66,9 @@
                         <div class="promo_cod">
                             <div class="input_block">
                                 <input type="text" class="promocode-input" placeholder="Promo Code" value="{{ $order?->promocode->code  ?? ''}}">
-                                @include('icons.shield')
+                                <x-tooltip class="!opacity-100 !absolute top-5 right-2" message='If you know promocode, enter here.'>  
+                                  @include('icons.shield')
+                                </x-tooltip>
                             </div>
                             <a href="#" class="apply">Apply</a>
                         </div>
@@ -179,44 +185,62 @@
     const stripe = Stripe('pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl');
     const stripeData = {};
 
-    $.ajax({
-      url: '/api/payment/intent',
-      method: 'POST',
-      data: { _token: getCSRF() }
-    }).then(response => {
-      const client_secret = response.client_secret
-      const appearance = {
-        theme: 'stripe',
-      };
+    const client_secret = '{{ $transaction->client_secret }}';
+    const appearance = {
+      theme: 'stripe',
+    };
 
-      stripeData.elements = stripe.elements({
-        clientSecret: client_secret,
-        appearance: appearance,
-      });
-      
-      try {
-        stripeData.paymentElement = stripeData.elements.create('payment', {
-          paymentMethodTypes: ['card'],
-        });
-        stripeData.paymentElement.mount("#payment");      
-      } catch (error) {
-        console.log(error);
-      }
+    stripeData.elements = stripe.elements({
+      clientSecret: client_secret,
+      appearance: appearance,
     });
     
-    document.getElementById('payment-form').addEventListener('submit', async function(evt) {
+    try {
+      stripeData.paymentElement = stripeData.elements.create('payment', {
+        paymentMethodTypes: ['card'],
+      });
+      stripeData.paymentElement.mount("#payment");      
+    } catch (error) {
+      console.log(error);
+    }
+
+    document.getElementById('payment-form').addEventListener('submit', function(evt) {
       evt.preventDefault();
       const baseUrl = window.location.origin || (window.location.protocol + '//' + window.location.host);
-      const {error} = await stripe.confirmPayment({
-        elements: stripeData.elements,
-        confirmParams: {
-          return_url: `${baseUrl}/payment/order/complete`,
-        },
+      const data = Array.from(new FormData(this))
+        .filter(item => item[1] && item[1] !== undefined && item[1] !== null)
+        .reduce((c, i) => {
+          c[i[0]] = i[1];
+          return c;
+        } , {});
+
+      data['_token'] = getCSRF();
+      data['tid'] = (new URLSearchParams(window.location.search)).get('checkout');
+
+      $.ajax({
+        url: '/api/payment/confirm',
+        method: 'POST',
+        data: data,
+      }).then(async (response) => {
+        const {error} = await stripe.confirmPayment({
+          elements: stripeData.elements,
+          confirmParams: {
+            return_url: `${baseUrl}/payment/order/complete`,
+          },
+        });
+        if (error) {
+          
+        }
+      }).catch(error => {
+        Object.keys(error?.responseJSON?.errors ?? {}).map(name => {
+          const input = document.querySelector(`*[name='${name}']`);
+          console.log(input);
+          
+          input.classList.add('border');
+          input.classList.add('!border-red-500');
+          this.scrollIntoView({ behavior: 'smooth' });
+        });
       });
-      if (error) {
-        // Обработка ошибок (например, показать сообщение пользователю)
-      }
-      // stripeData.paymentElement.
     });
 
   </script>

@@ -16,8 +16,8 @@
                     @include('site.components.heading', ['variables' => $variables->filter(fn($item) => str_contains($item->name, 'page'))])
                     <p>{{ print_var('page_subtitle', $variables) }}</p>
                     <div class="block_view">
-                        <a href="{{ url(print_var('left_button_link', $variables)) }}" class="download">{{ print_var('left_button_text', $variables) }}</a>
-                        <a href="{{ url(print_var('right_button_link', $variables)) }}" class="view_purchas">{{ print_var('right_button_text', $variables) }}</a>
+                        <a href="{{ url(print_var('left_button_link', $variables)) }}" class="download open_auth">{{ print_var('left_button_text', $variables) }}</a>
+                        <a href="{{ url(print_var('right_button_link', $variables)) }}" class="view_purchas open_auth">{{ print_var('right_button_text', $variables) }}</a>
                     </div>
                 </div>
                 <img src="{{ asset('assets/img/checked.png') }}" alt="" class="checked">
@@ -66,51 +66,18 @@
                             <p>Items <span>(10)</span></p>
                         </div>
                         <div class="items_group">
-                            <div class="item">
-                                <img src="{{ asset('assets/img/order.png') }}" alt="" class="order_img">
-                                <div class="description_orders">
-                                    <div class="title_description">
-                                        <h4>A Guide to Getting to Know North Korea</h4>
-                                        <h5>$20 <span>$40</span></h5>
-                                    </div>
-                                    <p>Hiking, North Korea</p>
-                                    <div class="counter">
-                                        <button class="btn minus">−</button>
-                                        <span class="count">1</span>
-                                        <button class="btn plus">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <img src="{{ asset('assets/img/order.png') }}" alt="" class="order_img">
-                                <div class="description_orders">
-                                    <div class="title_description">
-                                        <h4>A Guide to Getting to Know North Korea</h4>
-                                        <h5>$20 <span>$40</span></h5>
-                                    </div>
-                                    <p>Hiking, North Korea</p>
-                                    <div class="counter">
-                                        <button class="btn minus">−</button>
-                                        <span class="count">1</span>
-                                        <button class="btn plus">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <img src="{{ asset('assets/img/order.png') }}" alt="" class="order_img">
-                                <div class="description_orders">
-                                    <div class="title_description">
-                                        <h4>A Guide to Getting to Know North Korea</h4>
-                                        <h5>$20 <span>$40</span></h5>
-                                    </div>
-                                    <p>Hiking, North Korea</p>
-                                    <div class="counter">
-                                        <button class="btn minus">−</button>
-                                        <span class="count">1</span>
-                                        <button class="btn plus">+</button>
-                                    </div>
-                                </div>
-                            </div>
+                            @foreach($order->products as $product)
+                              <div class="item">
+                                  <img src="{{ $product->preview->image }}" alt="Preview" class="order_img">
+                                  <div class="description_orders">
+                                      <div class="title_description">
+                                          <h4>{{ $product->title }} x {{ $product->pivot->count }}</h4>
+                                          <h5>${{ $product->price }} <span>${{ $product->old_price }}</span></h5>
+                                      </div>
+                                      <p>{{ $product->type->title }}, {{ $product->location->title }}</p>
+                                  </div>
+                              </div>
+                            @endforeach
                         </div>
                     </div>
                     <div class="payment_block">
@@ -125,38 +92,38 @@
                             <div class="descriptions_pay">
                                 <p>Order Number.</p>
                                 <div class="right_text">
-                                    <a href="#">#3891274219474986231984</a>
+                                    <a href="#">#{{ $order->id }}</a>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p>Date & Time:</p>
                                 <div class="right_text">
-                                    <span>09:00</span>
-                                    <span>03.30.2025</span>
+                                    <span>{{ \Illuminate\Support\Carbon::parse($order->updated_at)->format('H:i') }}</span>
+                                    <span>{{ \Illuminate\Support\Carbon::parse($order->updated_at)->format('d.m.Y') }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p>Subtotal:</p>
                                 <div class="right_text">
-                                    <span>$5,200</span>
+                                    <span>{{ $order->getAmount() }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p>Discount: </p>
                                 <div class="right_text">
-                                    <span class="color_red">-$200</span>
+                                    <span class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-${{ $order->getDiscount() }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p>Tax:</p>
                                 <div class="right_text">
-                                    <span class="color_red">-$2</span>
+                                    <span class="color_red">${{ $order->getTax() }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p class="color_black">Total:</p>
                                 <div class="right_text">
-                                    <span>$5000</span>
+                                    <span>${{ $order->getTotal() }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">

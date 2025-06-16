@@ -20,7 +20,6 @@ class CartController extends Controller
       try {
         $cart = new Cart('cart');
         $product_data = CustomEncrypt::decodeUrlHash($valid['item']);
-        // $cart_data = Auth::user()->getCart();
         $cart_data = $cart->getCart();
 
         if (!isset($cart_data['products'])) $cart_data['products'] = [];
@@ -38,7 +37,7 @@ class CartController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Something went wrong...'], 502);
       }
 
-      $order = Order::prepare($cart);
+      $order = Order::preparing($cart);
       
       return response()->json(['status' => 'success', 'products_count' => $order->getCount()]);
     }
@@ -54,11 +53,11 @@ class CartController extends Controller
       SessionExpire::setCartItemCount('cart', $valid['item']['id'], $valid['count']);
       $cart->loadCart();
 
-      $order = Order::prepare($cart);
+      $order = Order::preparing($cart);
 
       return response()->json([
         'status' => 'success', 
-        'count' => Auth::user()->getCartCount(),
+        'count' => $cart->getCartCount(),
         'costs' => $order->getCosts(),
       ]);
     }
@@ -71,7 +70,7 @@ class CartController extends Controller
       $cart = new Cart();
       $item = CustomEncrypt::decodeUrlHash($valid['item']);
       $cart->removeFromCart($item['id']);
-      $order = Order::prepare($cart);
+      $order = Order::preparing($cart);
       
       return response()->json([
         'status' => 'success',
@@ -90,7 +89,7 @@ class CartController extends Controller
       }
 
       Auth::user()->applyPromocode($promocode);
-      $order = Order::prepare($cart);
+      $order = Order::preparing($cart);
       
       return response()->json([
         'status' => 'success',

@@ -6,6 +6,7 @@ use App\Enums\Action;
 use Livewire\Attributes\Url;
 use App\Events\MailVerify;
 use App\Events\ResetFailed;
+use App\Helpers\CustomEncrypt;
 use Livewire\Component;
 use Livewire\Attributes\On; 
 use App\Models\User;
@@ -18,6 +19,8 @@ use App\Models\History;
 use App\Models\UserBackup;
 use App\Services\Cart;
 use Illuminate\Support\Facades\Log;
+use App\Models\Order;
+use Laravel\Cashier\Cashier;
 
 class Modal extends Component
 {
@@ -151,7 +154,7 @@ class Modal extends Component
     {
       if (!User::where('email', $this->email)->exists()) {
         
-        if (!$this->validatePassword($this->password)) {
+        if (!User::validatePassword($this->password)) {
           $this->addErrorText('reg.password', 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.');
           return ;
         }
@@ -216,7 +219,7 @@ class Modal extends Component
 
     public function confirmNewPassword()
     {
-      if (!$this->validatePassword($this->new_password)) {
+      if (!User::validatePassword($this->new_password)) {
         $this->addErrorText('new_password', 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.');
         return ;
       }
@@ -268,14 +271,33 @@ class Modal extends Component
       $this->errors[$key] = $val;
     }
 
-    protected function validatePassword(string $password)
-    {
-      return preg_match( '/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_\-+=]{8,}$/is', $password);
-    }
-
     public function findUser(): ?User
     {
       return !empty($this->email) ? User::firstWhere('email', $this->email) : null;
+    }
+
+    public function moveCheckout()
+    {
+      $cart = new Cart();
+      if ($cart->hasProducts()) {
+        $order = Order::preparing($cart);
+        $total = $order->getTotal() * 100;
+
+        $transaction = Cashier::stripe()->paymentIntents->create([
+          'amount' => $total,
+          'currency' => 'usd',
+          'automatic_payment_methods' => ['enabled' => true],
+          'metadata' => [
+            'user_id' => Auth::user()?->id ?? 0,
+          ],
+        ]);
+
+        return redirect()->route('checkout', [
+          'checkout' => CustomEncrypt::generateUrlHash(['id' => $transaction->id]),
+        ]);
+      }
+      
+      return ;
     }
 
     public function render()

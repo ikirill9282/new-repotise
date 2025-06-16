@@ -1199,6 +1199,19 @@ footer .bottom_connecting_group .connecting a {
   gap: 7px;
 }
 
+.placing_order .about_block .right_orders .items_group .item .order_img {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.placing_order .about_block .left_form form .input_block svg {
+  position: static;
+}
+
+.cart-modal .empty-cart .top_group_fav {
+  margin-bottom: 0;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -1386,6 +1399,10 @@ footer .bottom_connecting_group .connecting a {
 
     .products_favorite .about_block .sections_menu .top_group_fav .favorite_cards_group .item {
       
+    }
+
+    .cart-modal .empty-cart .top_group_fav {
+      flex-direction: column;
     }
 }
 

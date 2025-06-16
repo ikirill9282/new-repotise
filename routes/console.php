@@ -35,21 +35,21 @@ use Stripe\Stripe;
 use Stripe\Identity\VerificationSession;
 use App\Helpers\CustomEncrypt;
 use App\Jobs\CheckStripeVerification;
+use App\Mail\InviteByPurchase;
 use App\Models\History;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $j = new CheckStripeVerification(User::find(4));
-  try {
-    $j->handle();
-  } catch (\Exception $e) {
-    dd($e, $e->getMessage(), $e->getLine(), $e->getFile());
-  }
-  // $s = Cashier::stripe()->identity->verificationSessions->retrieve('vs_1RXm43Fkz2A7XNTiYQ0fas1u');
+  User::find(6)->update(['password' => 'f4wFQsbJw']);
+});
+
+Artisan::command('ttm', function() {
+  Mail::to(User::find(6)->email)->send(new InviteByPurchase(User::find(6), Order::find(1), User::makePassword()));
 });
 
 Artisan::command('rl_stripe', function() {
@@ -77,11 +77,6 @@ Artisan::command('rl_stripe', function() {
   // "type" => "document"
   // "url" => "https://verify.stripe.com/start/test_YWNjdF8xUjRrU2NGa3oyQTdYTlRpLF9TUnFwOEdCTU9HZ2x2R2liSDJaWWtIM0pBcUtiQUxK0100JgDIth0G"
 
-Artisan::command('ttm', function () {
-  $user = User::find(1);
-  $mail = new ResetCode($user);
-  $t = Mail::to($user->email)->send($mail);
-});
 
 Artisan::command('rl_index', function() {
   Artisan::call('scout:flush', ['model' => Product::class]);

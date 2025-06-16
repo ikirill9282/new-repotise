@@ -12,6 +12,7 @@ use App\Mail\ConfirmRegitster;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 require __DIR__ . '/api.php';
 // Route::controller(SiteController::class)->group(function() {
@@ -43,14 +44,15 @@ Route::middleware('auth:web')->group(function() {
 
 Route::post('/hook/stripe', function(Request $request) {
   Log::debug('Stripe Event', ['data' => $request->json()]);
-});
+})
+  ->withoutMiddleware([VerifyCsrfToken::class]);;
 
 // Route::get('/', SiteController::class)->name('home');
 // Route::get('/{slug}', SiteController::class);
 // Route::get('/insights/{slug}/{article}', SiteController::class);
 
 
-Route::get('/payment/checkout', [PaymentController::class, 'checkout']);
+Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('checkout');
 Route::get('/payment/order', [PaymentController::class, 'order']);
 Route::get('/payment/order/complete', [PaymentController::class, 'orderComplete']);
 Route::get('/payment/{status}', [PaymentController::class, 'payment'])->name('payment.status');
