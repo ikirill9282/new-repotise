@@ -17,7 +17,7 @@ class StripeWebhook
   {
     $signature = $request->header('Stripe-Signature');
     $payload = $request->getContent();
-    $secret = env('STRIPE_WEBHOOK_SECRET');
+    $secret = 'whsec_hwi48kvum7N4Q7noo2dMB5CjIG4Zy2Ae';
 
     try {
         \Stripe\Webhook::constructEvent(
