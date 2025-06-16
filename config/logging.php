@@ -83,7 +83,7 @@ return [
 
         'stripe_events' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/email.log'),
+            'path' => storage_path('logs/stripe_events.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 60),
             'replace_placeholders' => true,
