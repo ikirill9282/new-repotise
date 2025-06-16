@@ -18,7 +18,7 @@ class StripeWebhook
     try {
       $event = \Stripe\Webhook::constructEvent(
         $request->all(),
-        $request->header('stripe-signature')[0],
+        $request->header('stripe-signature'),
         env('STRIPE_WEBHOOK_SECRET'),
       );
     } catch (\UnexpectedValueException $e) {
