@@ -22,11 +22,12 @@ class StripeWebhook
         env('STRIPE_WEBHOOK_SECRET'),
       );
     } catch (\UnexpectedValueException $e) {
-      // Invalid payload
+      var_dump($e);
       http_response_code(400);
       exit();
     } catch (\Stripe\Exception\SignatureVerificationException $e) {
       // Invalid signature
+      var_dump($e);
       http_response_code(400);
       exit();
     }
