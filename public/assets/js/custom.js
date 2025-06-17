@@ -119,7 +119,7 @@ const CommentWriters = function() {
   this.init = () => {
     this.writers = [...$('.write_comment')].map((writer) => {
       return this.prepareOjbect(writer);
-    })
+    });
 
     return this;
   }
@@ -414,9 +414,14 @@ const CommentForms = function () {
               text: form.find('textarea[name="text"]').val(),
               reply: form.find('input[name="reply"]').val(),
           };
-
+          
+          const url = form.data('type') === 'review' ? "/api/feedback/review" : "/api/feedback/comment";
+          if (form.data('type') === 'review') {
+            formData['rating'] = document.querySelector('input[name="rating"]').value;
+          }
+          
           $.ajax({
-              url: "/api/feedback/comment",
+              url: url,
               type: "POST",
               data: formData,
           })

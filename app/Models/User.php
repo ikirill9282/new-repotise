@@ -174,6 +174,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->hasMany(Product::class);
     }
 
+    public function orders()
+    {
+      return $this->hasMany(Order::class);
+    }
+
     public function favorite_products()
     {
       return $this->hasManyThrough(Product::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')
@@ -367,5 +372,19 @@ class User extends Authenticatable implements HasName, FilamentUser
       foreach ($codes as $code) {
         $this->backup()->create(['code' => $code]);
       }
+    }
+
+    public function canWriteComment(Product $product, string $type = 'review')
+    {
+      $products = $this->orders->flatMap(fn($el) => $el->products)->pluck('id');
+      if (in_array($product->id, $products->toArray())) {
+        if ($product->reviews()->where('user_id', $this->id)->whereNull('parent_id')->exists()) {
+          if ($type === 'reply') return true;
+
+          return false;
+        }
+        return true;
+      }
+      return false;
     }
 }

@@ -16,11 +16,13 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned()->index();
             $table->bigInteger('product_id')->unsigned()->index();
             $table->bigInteger('parent_id')->unsigned()->index()->nullable();
-            $table->longText('text');
-            $table->timestamps();
 
             $table->bigInteger('status_id')->unsigned()->index()->default(3);
             $table->foreign('status_id')->references('id')->on('statuses');
+            $table->tinyInteger('rating')->index()->default(0);
+
+            $table->longText('text');
+            $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');

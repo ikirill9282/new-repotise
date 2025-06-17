@@ -38,12 +38,14 @@
       
         let count = parseInt(countEl.textContent);
       
+        plusBtn.removeEventListener('click');
         plusBtn.addEventListener('click', function() {
           count++;
           countEl.textContent = count;
           counterChanged(this.closest('.counter'), count);
         });
       
+        minusBtn.removeEventListener('click');
         minusBtn.addEventListener('click', function() {
           if (count > 1) {
             count--;

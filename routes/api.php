@@ -26,6 +26,7 @@ Route::prefix('api')->group(function() {
     Route::get('/views', 'views');
     Route::post('/likes', 'likes');
     Route::post('/comment', 'comment');
+    Route::post('/review', 'review');
     Route::post('/favorite', 'favorite');
   });
 

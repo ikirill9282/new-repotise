@@ -9,6 +9,7 @@ use App\Models\Likes;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Comment;
 use App\Models\UserFavorite;
+use App\Models\Review;
 
 class FeedbackController extends Controller
 {
@@ -90,5 +91,33 @@ class FeedbackController extends Controller
       }
 
       return response()->json(['status' => 'success', 'comment' => $comment]);
+    }
+
+    public function review(Request $request)
+    {
+      $valid = $request->validate([
+        'article' => 'required|string',
+        'text' => 'required|string',
+        'reply' => 'nullable|string',
+        'rating' => 'required|integer',
+      ]);
+
+      try {
+        $valid['product_id'] = CustomEncrypt::getId($valid['article']);
+        $valid['user_id'] = Auth::user()->id;
+        $valid['text'] = clean($valid['text'], 'user_comment');
+        
+        if (isset($valid['reply']) && $valid['reply']) {
+          $valid['parent_id'] = CustomEncrypt::getId($valid['reply']);
+        }
+
+        unset($valid['article'], $valid['reply']);
+        
+        $review = Review::create($valid);
+      } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+      }
+
+      return response()->json(['status' => 'success', 'comment' => $review]);
     }
 }

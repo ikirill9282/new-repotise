@@ -60,8 +60,8 @@
               <div class="like_commend {{ auth()->check() ? '' : 'open_auth' }}">
                   <a 
                     href="/feedback/likes" 
-                    class="like_to_commend feedback_button {{ is_liked('comment', $comment['id']) ? 'liked' : '' }}" 
-                    data-item="{{ hash_like('comment', $comment['id']) }}" 
+                    class="like_to_commend feedback_button {{ is_liked((isset($type) ? $type : 'comment'), $comment['id']) ? 'liked' : '' }}" 
+                    data-item="{{ hash_like((isset($type) ? $type : 'comment'), $comment['id']) }}" 
                     data-id="{{ $hash_id }}"
                   >
                     @include('icons.like_comment')

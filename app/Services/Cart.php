@@ -109,6 +109,8 @@ class Cart
         unset($this->cart['promocode']);
       }
 
+      $this->updateCart($this->cart);
+
       return true;
     }
     return false;

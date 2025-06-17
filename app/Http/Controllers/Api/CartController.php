@@ -68,8 +68,8 @@ class CartController extends Controller
         'item' => 'required|string',
       ]);
       $cart = new Cart();
-      $item = CustomEncrypt::decodeUrlHash($valid['item']);
-      $cart->removeFromCart($item['id']);
+      $id = CustomEncrypt::getId($valid['item']);
+      $cart->removeFromCart($id);
       $order = Order::preparing($cart);
       
       return response()->json([

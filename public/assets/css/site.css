@@ -1212,6 +1212,10 @@ footer .bottom_connecting_group .connecting a {
   margin-bottom: 0;
 }
 
+.stars_filter .stars span.hover svg path {
+  fill: #ffdb0c !important;
+}
+
 @media (min-width: 1140px) {
 }
 
