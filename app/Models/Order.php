@@ -32,7 +32,8 @@ class Order extends Model
 
     public function products()
     {
-      return $this->belongsToMany(Product::class, OrderProducts::class, 'order_id', 'product_id', 'id', 'id')->withPivot(['count']);
+      return $this->belongsToMany(Product::class, OrderProducts::class, 'order_id', 'product_id', 'id', 'id')
+        ->withPivot(['count', 'price', 'old_price']);
     }
 
     public function promocode()
@@ -116,7 +117,11 @@ class Order extends Model
         $products = $cart->getCartProducts();
         $result = array_map(function($item) use ($products) {
           $product = $products->where('id', $item['id'])->first();
-          $product->pivot = ['count' => $item['count']];
+          $product->pivot = [
+            'count' => $item['count'],
+            'price' => $product->price,
+            'old_price' => $product->old_price,
+          ];
           return $product;
         }, $cart->getProducts());
       }
@@ -152,7 +157,15 @@ class Order extends Model
 
     public function syncPreparedProducts(Order $order): static
     {
-      $order->products()->sync($this->products->map(fn($item) => ['product_id' => $item->id, 'count' => $item->pivot['count']])->toArray());
+      $prepared = $this->products->map(fn($item) => [
+        'product_id' => $item->id, 
+        'count' => $item->pivot['count'], 
+        'price' => $item->pivot['price'],
+        'old_price' => $item->pivot['old_price'],
+      ])
+        ->toArray();
+
+      $order->products()->sync($prepared);
       return $order;
     }
 

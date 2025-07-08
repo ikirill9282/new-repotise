@@ -207,4 +207,22 @@ class CabinetController extends Controller
       'user' => $user,
     ]);
   }
+
+  public function purchases(Request $request)
+  {
+    $user = Auth::user();
+    if (!$user) {
+      return redirect('/unknown');
+    }
+
+    return view('site.pages.profile-purchases', [
+      'user' => $user,
+    ]);
+  }
+
+
+  protected function getUser(string $slug)
+  {
+    return is_null($slug) ? Auth::user() : User::where('username', str_ireplace('@', '', $slug))->first();
+  }
 }

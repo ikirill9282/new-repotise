@@ -109,5 +109,17 @@ class PageSeeder extends Seeder
         'title' => 'Verify Profile',
         'slug' => 'profile-verify',
       ]);
+      $invite = Page::firstOrCreate([
+        'title' => 'Invite',
+        'slug' => 'invite',
+      ]);
+      $invite_referal = Page::firstOrCreate([
+        'title' => 'Referal invite',
+        'slug' => 'refereal',
+      ]);
+      $profile_purchases = Page::firstOrCreate([
+        'title' => 'My Purchases',
+        'slug' => 'profile-purchases',
+      ]);
     }
 }

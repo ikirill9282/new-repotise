@@ -17,7 +17,7 @@
                     <p>{{ print_var('page_subtitle', $variables) }}</p>
                     <div class="block_view">
                         <a href="{{ url(print_var('left_button_link', $variables)) }}" class="download open_auth">{{ print_var('left_button_text', $variables) }}</a>
-                        <a href="{{ url(print_var('right_button_link', $variables)) }}" class="view_purchas open_auth">{{ print_var('right_button_text', $variables) }}</a>
+                        <a href="{{ route('purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">{{ print_var('right_button_text', $variables) }}</a>
                     </div>
                 </div>
                 <img src="{{ asset('assets/img/checked.png') }}" alt="" class="checked">

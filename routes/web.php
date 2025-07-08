@@ -35,12 +35,15 @@ Route::prefix('/auth')
   });
 
 Route::middleware('auth:web')->group(function() {
-  Route::get('/profile', [CabinetController::class, 'profile']);
-  Route::get('/profile/verify', [CabinetController::class, 'verify']);
+  Route::get('/profile', [CabinetController::class, 'profile'])->name('profile');
+  Route::get('/profile/verify', [CabinetController::class, 'verify'])->name('verify');
   Route::post('/profile/verify', [CabinetController::class, 'verificate']);
   Route::get('/profile/verify/complete', [CabinetController::class, 'verifyComplete']);
   Route::get('/profile/verify/cancel', [CabinetController::class, 'verifyCancel']);
-  Route::get('/profile/{slug}', [CabinetController::class, 'profile']);
+  Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('purchases');
+
+
+  Route::get('/profile/{slug}', [CabinetController::class, 'profile'])->name('view.profile');
 });
 
 Route::post('/hook/stripe', function(Request $request) {
@@ -77,6 +80,8 @@ Route::get('/products/{country}', [SiteController::class, 'products'])->name('pr
 Route::get('/products/{country}/{product}', [SiteController::class, 'product'])->name('products.country.product');
 
 Route::get('/payment', [SiteController::class, 'payment'])->name('payment');
+Route::get('/invite', [SiteController::class, 'invite'])->name('invite');
+Route::get('/referal', [SiteController::class, 'referal'])->name('referal');
 
 // Products
 // Route::get('/{slug}/{country}', SiteController::class);

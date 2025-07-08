@@ -124,10 +124,8 @@
     <section class="home_discover relative">
         @include('site.components.parallax', [
             'class' => 'parallax-products',
-            'attributes' => [
-                'data-url' => $location && $location->hasPoster() ? $location->poster : '',
-                'style' => $location && $location->hasPoster() ? "background-image: url($location->poster)" : '',
-            ],
+            'data-url' => $location && $location->hasPoster() ? $location->poster : '',
+            'style' => $location && $location->hasPoster() ? "background-image: url($location->poster)" : '',  
         ])
         <div class="container relative z-10">
             <div class="about_block">

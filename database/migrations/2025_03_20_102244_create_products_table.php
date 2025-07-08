@@ -17,7 +17,7 @@ return new class extends Migration
           $table->string('title');
           $table->string('slug');
           $table->decimal('price', 10);
-          $table->decimal('old_price', 10);
+          $table->decimal('old_price', 10)->nullable();
           $table->tinyInteger('subscription')->default(0);
           $table->bigInteger('type_id')->unsigned()->index();
           $table->bigInteger('location_id')->unsigned()->index();

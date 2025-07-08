@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('order_id')->unsigned()->index();
             $table->bigInteger('product_id')->unsigned()->index();
+            $table->decimal('price');
+            $table->decimal('old_price')->nullable();
             $table->integer('count')->unsigned();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');

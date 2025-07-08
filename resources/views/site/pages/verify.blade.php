@@ -355,7 +355,7 @@
                               @if(!auth()->user()->verify()->where('type', 'stripe')->exists())
                               <div class="action">
                                   <a 
-                                    href="{{ auth()->user()->makeProfileUrl() }}" 
+                                    href="{{ url()->previous() }}" 
                                     class="back border rounded transition leading-10 px-4 
                                       !text-[#212529] 
                                       hover:!text-[#FC7361] 

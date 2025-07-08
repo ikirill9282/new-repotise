@@ -271,4 +271,27 @@ class SiteController extends Controller
       'paginator' => $paginator,
     ]);
   }
+
+  public function invite(Request $request)
+  {
+    $page = Page::where('slug', 'invite')
+      ->with('config')
+      ->first();
+    
+    return view('site.pages.invite', [
+      'page' => $page,
+    ]);
+  }
+
+  public function referal(Request $request)
+  {
+    
+    $page = Page::where('slug', 'referal')
+      ->with('config')
+      ->first();
+    
+    return view('site.pages.referal', [
+      'page' => $page,
+    ]);
+  }
 }

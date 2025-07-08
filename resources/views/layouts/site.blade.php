@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('/assets/css/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style2.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/style3.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/site.css') }}">
 
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
