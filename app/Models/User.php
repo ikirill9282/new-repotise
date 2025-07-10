@@ -266,7 +266,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileUrl(): string
     {
-      return Auth::user()->hasRole('creator') ? url("/profile/@$this->username") : route('profile.purchases') ;
+      return Auth::user()?->hasRole('creator') ? url("/profile/@$this->username") : route('profile.purchases') ;
     }
 
     public function makeProfileVerificationUrl(): string 
