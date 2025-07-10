@@ -35,7 +35,6 @@ class DatabaseSeeder extends Seeder
         FollowerSeeder::class,
         GallerySeeder::class,
         FaqSeeder::class,
-        PromocodeSeeder::class,
         PagesConfigSeeder::class,
         UserOptionSeeder::class,
         
