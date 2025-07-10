@@ -1,5 +1,6 @@
 @php
     $article = $article->getFullComments()->getAnalogs()->getLikes();
+    // dd($article->comments);
 @endphp
 
 <div class="feed-item" data-content={{ $article->id }}>

@@ -121,5 +121,13 @@ class PageSeeder extends Seeder
         'title' => 'My Purchases',
         'slug' => 'profile-purchases',
       ]);
+      $profile_purchases = Page::firstOrCreate([
+        'title' => 'Referal Programm',
+        'slug' => 'profile-referal',
+      ]);
+      $profile_settigns = Page::firstOrCreate([
+        'title' => 'Profile settings',
+        'slug' => 'profile-settings',
+      ]);
     }
 }

@@ -220,6 +220,28 @@ class CabinetController extends Controller
     ]);
   }
 
+  public function referal(Request $request)
+  {
+    $user = Auth::user();
+    if (!$user) {
+      return redirect('/unknown');
+    }
+    return view('site.pages.profile-referal', [
+      'user' => $user,
+    ]);
+  }
+
+  public function settings(Request $request)
+  {
+    $user = Auth::user();
+    if (!$user) {
+      return redirect('/unknown');
+    }
+    return view('site.pages.profile-settings', [
+      'user' => $user,
+    ]);
+  }
+
 
   protected function getUser(string $slug)
   {

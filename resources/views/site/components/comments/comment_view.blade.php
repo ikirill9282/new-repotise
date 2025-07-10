@@ -1,10 +1,10 @@
 <div class="commend">
-  <img src="{{ $comment['author']['avatar'] }}" alt="Avatar" class="img_commendor">
+  <img src="{{ $comment['author']['options']['avatar'] }}" alt="Avatar" class="img_commendor">
   <div class="right_text_group">
       <div class="name_commendor">
           <div class="left_text">
               <a
-                  href="{{ url('/users/profile/' . $comment['author']['profile']) }}">{{ $comment['author']['profile'] }}</a>
+                  href="{{ url('/profile/@' . $comment['author']['username']) }}">{{ $comment['author']['name'] }}</a>
           </div>
           <a href="#" class="editor_btn" data-target="editor-{{ $comment['id'] }}">
               <img src="{{ asset('assets/img/options.svg') }}" alt="Options">
@@ -48,7 +48,7 @@
               @if (isset($comment['likes']) && !empty($comment['likes']))
                   <div class="img_men">
                       @foreach ($comment['likes'] as $key => $like)
-                          <img src="{{ isset($like['author']['avatar']) ? url($like['author']['avatar']) : '' }}"
+                          <img src="{{ isset($like['author']['options']['avatar']) ? url($like['author']['options']['avatar']) : '' }}"
                               class="@if ($key > 0) last_img @endif rounded-full" alt="Avatar">
                       @endforeach
                   </div>

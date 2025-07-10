@@ -42,7 +42,11 @@ class Modal extends Component
 
     public $errors = [];
 
-    public string $currentUrl;
+    public ?string $currentRouteName = null;
+
+    public array $currentRouteParams = [];
+
+    public ?string $currentUrl = null;
 
     #[Url(as:'modal', except: '')]
     public string $currentModal = '';
@@ -51,6 +55,9 @@ class Modal extends Component
     {
       // dd('mount');
       $this->currentUrl = url()->current() . '?' . http_build_query($_GET);
+      $this->currentRouteName = request()->route()->getName();
+      $this->currentRouteParams = request()->all();
+
       if (request()->has('modal')) {
         if (!empty(request()->get('modal'))) {
           $this->open = true;
@@ -152,6 +159,7 @@ class Modal extends Component
 
     public function reg()
     {
+      dd($this->currentRouteParams);
       if (!User::where('email', $this->email)->exists()) {
         
         if (!User::validatePassword($this->password)) {

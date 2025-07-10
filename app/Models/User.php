@@ -44,10 +44,10 @@ class User extends Authenticatable implements HasName, FilamentUser
         'remember_token',
     ];
 
-    public $appends = [
-      'profile',
-      'avatar',
-    ];
+    // public $appends = [
+    //   'profile',
+    //   'avatar',
+    // ];
 
     protected function casts(): array
     {
@@ -179,6 +179,16 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->hasMany(Order::class);
     }
 
+    public function referals()
+    {
+      return $this->hasManyThrough(User::class, UserReferal::class, 'owner_id', 'id', 'id', 'referal_id');
+    }
+
+    public function owner()
+    {
+      return $this->hasOneThrough(User::class, UserReferal::class, 'referal_id', 'owner_id', 'id', 'id');
+    }
+
     public function favorite_products()
     {
       return $this->hasManyThrough(Product::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')
@@ -256,7 +266,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileUrl(): string
     {
-      return url("/profile/@$this->username");
+      return Auth::user()->hasRole('creator') ? url("/profile/@$this->username") : route('profile.purchases') ;
     }
 
     public function makeProfileVerificationUrl(): string 
@@ -273,6 +283,14 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function makeSubscribeUrl(): string
     {
       return url("/profile/subscribe/$this->profile");
+    }
+
+    public function makeReferalUrl(): string
+    {
+      return url('/invite?token='. CustomEncrypt::generateUrlHash([
+        'id' => $this->id, 
+        'created_at' => $this->created_at->format('Y-m-d'),
+      ], false));
     }
 
     public function makeStripeVerificationUrl(): ?string

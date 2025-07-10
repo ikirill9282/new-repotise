@@ -36,14 +36,14 @@ class Comment extends Model
 
   public function getChildren()
   {
-    $this->load('children', 'likes.author', 'author');
+    $this->load('children', 'likes.author.options', 'author.options');
     $this->loadCount('likes', 'children');
 
     foreach ($this->children as &$child) {
       // if ($child->children()->exists()) {
       //   $child->getChildren();
       // } else {
-        $child->load('likes.author', 'author');
+        $child->load('likes.author.options', 'author.options');
         $child->loadCount('likes', 'children');
       // }
     }

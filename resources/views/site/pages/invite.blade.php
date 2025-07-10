@@ -5,7 +5,7 @@
       <section class="invite-hero hero relative">
         @include('site.components.parallax', ['class' => 'parallax-invite'])
         <div class="container">
-          <div class="invite-hero__text hero__text">
+          <div x-data="{}" class="invite-hero__text hero__text">
             <h1>Turn Your Travel Passion into Profit</h1>
             <p>
               Join TrekGuider to monetize your travel expertise and reach a
@@ -13,8 +13,9 @@
               like you.
             </p>
             <x-btn 
-              class="{{ auth()->check() ? '' : 'open_auth' }}" 
-              href="{{ auth()->check() ? route('profile') : '#' }}"
+              {{-- class="{{ auth()->check() ? '' : 'open_auth' }}"  --}}
+              {{-- href="{{ auth()->check() ? route('profile') : '#' }}" --}}
+              x-on:click.prevent="Livewire.dispatch('modal.openReg')"
             >
               Get Started
             </x-btn>

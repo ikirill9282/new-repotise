@@ -2192,6 +2192,7 @@ body::-webkit-scrollbar-thumb {
   margin-left: 5px;
   white-space: nowrap;
 }
+
 .rp-top__info .col .progress span {
   display: block;
   font-size: 14px;

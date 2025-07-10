@@ -54,16 +54,16 @@ class CustomEncrypt
   //   return hash('sha256', static::$key, true);
   // }
 
-  public static function getId(string $encrypted): ?int
+  public static function getId(string $encrypted, bool $salt = true): ?int
   {
-    $data = static::decodeUrlHash($encrypted);
+    $data = static::decodeUrlHash($encrypted, $salt);
     return $data['id'] ?? null;
   }
 
-  public static function generateUrlHash(array $data): string
+  public static function generateUrlHash(array $data, bool $salt = true): string
   {
     ksort($data);
-    $queryString = static::generateRandomString(5) . http_build_query($data);
+    $queryString = ($salt ? static::generateRandomString(5) : '') . http_build_query($data);
     
     return rtrim(strtr(base64_encode($queryString), '+/', '-_'), '=');
   }
@@ -72,12 +72,11 @@ class CustomEncrypt
   {
     return rtrim(strtr(base64_encode(http_build_query($data)), '+/', '-_'), '=');
   }
-
   
-  public static function decodeUrlHash(string $hash): array
+  public static function decodeUrlHash(string $hash, bool $salt = true): array
   {
     $base64 = strtr($hash, '-_', '+/') . str_repeat('=', 3 - (3 + strlen($hash)) % 4);
-    $queryString = substr(base64_decode($base64), 5);
+    $queryString = $salt ? substr(base64_decode($base64), 5) : base64_decode($base64);
     $result = [];
     parse_str($queryString, $result);
     return $result;

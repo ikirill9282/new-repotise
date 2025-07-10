@@ -17,7 +17,7 @@
                     <p>{{ print_var('page_subtitle', $variables) }}</p>
                     <div class="block_view">
                         <a href="{{ url(print_var('left_button_link', $variables)) }}" class="download open_auth">{{ print_var('left_button_text', $variables) }}</a>
-                        <a href="{{ route('purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">{{ print_var('right_button_text', $variables) }}</a>
+                        <a href="{{ route('profile.purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">{{ print_var('right_button_text', $variables) }}</a>
                     </div>
                 </div>
                 <img src="{{ asset('assets/img/checked.png') }}" alt="" class="checked">
@@ -105,25 +105,25 @@
                             <div class="descriptions_pay">
                                 <p>Subtotal:</p>
                                 <div class="right_text">
-                                    <span>{{ $order->getAmount() }}</span>
+                                    <span>{{ currency($order->getAmount()) }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p>Discount: </p>
                                 <div class="right_text">
-                                    <span class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-${{ $order->getDiscount() }}</span>
+                                    <span class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-{{ currency($order->getDiscount()) }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p>Tax:</p>
                                 <div class="right_text">
-                                    <span class="color_red">${{ $order->getTax() }}</span>
+                                    <span class="color_red">{{ currency($order->getTax()) }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">
                                 <p class="color_black">Total:</p>
                                 <div class="right_text">
-                                    <span>${{ $order->getTotal() }}</span>
+                                    <span>{{ currency($order->getTotal()) }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">

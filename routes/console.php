@@ -45,7 +45,8 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  User::find(6)->update(['password' => 'f4wFQsbJw']);
+  $crypt = CustomEncrypt::generateUrlHash(['id' => 1, 'created_at' => 'test123'], false);
+  dd($crypt, CustomEncrypt::getId($crypt, false));
 });
 
 Artisan::command('ttm', function() {

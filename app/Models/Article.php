@@ -90,14 +90,19 @@ class Article extends Model
       ->where('article_id', $this->id)
       ->whereNull('parent_id')
       ->with('likes', function($query) {
-        $query->with('author')->orderByDesc('id')->limit(4);
+        $query->with('author.options')->orderByDesc('id')->limit(4);
       })
       // ->with('likes.author')
       ->when(!is_null($limit), fn($q) => $q->limit($limit))
       ->withCount('likes')
-      ->with('author')
+      ->with('author.options')
       ->orderByDesc('created_at')
-      ->get();
+      ->get()
+      // ->map(function($comment) {
+      //   $comment->author->load('options');
+      //   return $comment;
+      // })
+      ;
     
     foreach ($this->comments as $key => &$comment) {
       if ($comment->children()->exists()) {
@@ -105,7 +110,9 @@ class Article extends Model
       }
     }
     
+    // dd($this->comments->toArray());
     $this->comments = $this->comments->toArray();
+    
     return $this;
   }
 
@@ -113,7 +120,7 @@ class Article extends Model
   {
     $this->level++;
 
-    $comment->load('likes.author', 'author');
+    $comment->load('likes.author', 'author.options');
     $comment->loadCount('likes', 'children');
 
     // if (!is_null($this->comments_limit) && $this->countComments() > $this->comments_limit) {
@@ -132,7 +139,7 @@ class Article extends Model
         if ($child->children()->exists()) {
           $child->getChildren($child);
         } else {
-          $child->load('likes.author', 'author');
+          $child->load('likes.author', 'author.options');
           $child->loadCount('likes');
           $this->level = 0;
         }

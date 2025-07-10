@@ -1264,6 +1264,53 @@ footer .bottom_connecting_group .connecting a {
   display: inline-block;
 }
 
+.rp-top__info .col .progresss span {
+  display: block;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #A4A0A0;
+  box-sizing: border-box;
+}
+.rp-top__info .col .progresss .progresss-item {
+  padding-top: 18px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+}
+.rp-top__info .col .progresss .progresss-item i {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: 12px;
+  background-color: #F9F9F9;
+  box-sizing: border-box;
+  margin-right: 6px;
+  position: relative;
+}
+.rp-top__info .col .progresss .progresss-item i:last-child {
+  margin-right: 0;
+}
+.rp-top__info .col .progresss .progresss-item i.active {
+  background-color: #FC7361;
+}
+.rp-top__info .col .progresss .progresss-item i.last::before {
+  content: "10%";
+  position: absolute;
+  left: 50%;
+  top: -19px;
+  width: 22px;
+  height: 18px;
+  background-color: #FC7361;
+  color: #fff;
+  border-radius: 5px 5px 5px 0;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 @media (min-width: 1140px) {
 }
 
@@ -2032,6 +2079,10 @@ footer .bottom_connecting_group .connecting a {
     .invite-power__items .item .img img {
       min-width: 48px;
       min-height: 48px;
+    }
+
+    .filter_products .about_block .search_filter .search_top .add_products a {
+      padding: 6px 20px;
     }
 }
 

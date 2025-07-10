@@ -8,7 +8,7 @@
 <div class="the-content-wrap">
       <div class="container">
           <div class="the-profile__sidebar">
-              <a class="{{ (request()->route()->getName() === 'purchases') ? 'active' : '' }}" href="{{ route('purchases') }}">
+              <a class="{{ (request()->route()->getName() === 'profile.purchases') ? 'active' : '' }}" href="{{ route('profile.purchases') }}">
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                           d="M9.00091 11.1142C11.4432 11.1079 13.5198 12.2293 14.2831 14.6432C12.7446 15.5811 10.9336 15.9423 9.00091 15.9376C7.06826 15.9423 5.25727 15.5811 3.71875 14.6432C4.48293 12.2267 6.55602 11.1079 9.00091 11.1142Z"
@@ -17,7 +17,7 @@
                   </svg>
                   My Purchases
               </a>
-              <a href="#">
+              <a class="{{ (request()->route()->getName() === 'profile.referal') ? 'active' : '' }}" href="{{ route('profile.referal') }}">
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
                       <g clip-path="url(#clip0_3066_70773)">
@@ -33,7 +33,7 @@
 
                   purch Program
               </a>
-              <a href="#">
+              <a class="{{ (request()->route()->getName() === 'profile.settings') ? 'active' : '' }}" href="{{ route('profile.settings') }}">
                   <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
                       <path fill-rule="evenodd" clip-rule="evenodd"

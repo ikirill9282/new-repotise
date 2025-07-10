@@ -5,12 +5,12 @@
     <section class="invite-hero hero custom relative">
       @include('site.components.parallax', ['class' => 'parallax-referal'])
       <div class="container">
-        <div class="invite-hero__text hero__text">
+        <div x-data="{}" class="invite-hero__text hero__text">
           <h1>Referral Program</h1>
           <p>
             Your influence is your asset. Turn your network into net worth. Share your unique link now and watch your rewards multiply! Enjoy exclusive discounts, free products, and earn passive income with up to 25% of seller commissions. Every share boosts your income!
           </p>
-          <a class="main-btn" href="#">Get Started</a>
+          <a x-on:click.prevent="Livewire.dispatch('modal.openReg')" class="main-btn" href="#">Get Started</a>
         </div>
       </div>
     </section>

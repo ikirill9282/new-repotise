@@ -103,3 +103,10 @@ if (! function_exists('enable_more')) {
     return true;
   }
 }
+
+if (! function_exists('currency')) {
+  function currency(int|float $value): string
+  {
+    return '$' . number_format($value, 2, '.', ' ');
+  }
+}

@@ -40,7 +40,9 @@ Route::middleware('auth:web')->group(function() {
   Route::post('/profile/verify', [CabinetController::class, 'verificate']);
   Route::get('/profile/verify/complete', [CabinetController::class, 'verifyComplete']);
   Route::get('/profile/verify/cancel', [CabinetController::class, 'verifyCancel']);
-  Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('purchases');
+  Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('profile.purchases');
+  Route::get('/profile/referal', [CabinetController::class, 'referal'])->name('profile.referal');
+  Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
 
 
   Route::get('/profile/{slug}', [CabinetController::class, 'profile'])->name('view.profile');
