@@ -286,24 +286,12 @@ class SiteController extends Controller
 
   public function referal(Request $request)
   {
-    if (!$request->has('token')) {
-      return redirect('/');
-    }
-
-    try {
-      $id = CustomEncrypt::getId($request->get('token'));
-      if (is_null($id)) throw new Exception('Undefined user owner id.');
-    } catch (\Exception $e) {
-      return redirect('/');
-    }
-
     $page = Page::where('slug', 'referal')
       ->with('config')
       ->first();
     
     return view('site.pages.referal', [
       'page' => $page,
-      'owner_id' => $id,
     ]);
   }
 }

@@ -7,10 +7,10 @@
                             class="stroke-[#A4A0A0] rotate-180 transition md:hidden">@include('icons.arrow_footer')</span></h3>
                     <ul class="overflow-hidden">
                         <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ url('/products') }}">All Products</a></li>
-                        <li><a href="{{ url('/favorites') }}" class="{{ auth()->check() ? '' : 'open_auth' }}">Favorite</a></li>
+                        <li><a href="{{ route('products') }}">All Products</a></li>
+                        <li><a href="{{ route('favorites') }}" class="{{ auth()->check() ? '' : 'open_auth' }}">Favorite</a></li>
                         <li><a href="{{ url('/creators') }}">Creators</a></li>
-                        <li><a href="{{ url('/insights') }}">Travel Insights</a></li>
+                        <li><a href="{{ route('insights') }}">Travel Insights</a></li>
                     </ul>
                 </div>
                 <div class="group mb-4 md:mb-0">
@@ -19,8 +19,8 @@
                     <ul class="overflow-hidden">
                         <li><a href="{{ url('/partner/creators') }}">For Creators</a></li>
                         <li><a href="{{ url('/partner/investors') }}">For Investors & Partners</a></li>
-                        <li><a href="{{ url('/partner/referal') }}">Referral Program</a></li>
-                        <li><a href="{{ url('/help-center') }}">Help Center</a></li>
+                        <li><a href="{{ route('referal') }}">Referral Program</a></li>
+                        <li><a href="{{ route('help-center') }}">Help Center</a></li>
                     </ul>
                 </div>
                 <div class="group mb-4 hidden md:block md:mb-0">

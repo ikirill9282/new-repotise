@@ -179,6 +179,7 @@ class Modal extends Component
           'email' => $this->email,
           'password' => $this->password,
         ]);
+        
         if ($this->currentRouteName == 'referal' && array_key_exists('token', $this->currentRouteParams)) {
           $id = CustomEncrypt::getId($this->currentRouteParams['token']);
           $owner = User::find($id);
