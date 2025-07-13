@@ -10,6 +10,7 @@ use App\Http\Controllers\SiteController;
 use App\Http\Middleware\StripeWebhook;
 use Illuminate\Http\Request;
 use App\Mail\ConfirmRegitster;
+use App\Models\Discount;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +23,7 @@ require __DIR__ . '/api.php';
 // });
 
 Route::get('/mail/{slug}', function(Request $request, $slug) {
-  return view("emails.$slug", ['user' => Auth::user()]);
+  return view("emails.$slug", ['user' => Auth::user(), 'discount' => Discount::first()]);
 });
 
 Route::prefix('/auth')
@@ -43,6 +44,7 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('profile.purchases');
   Route::get('/profile/referal', [CabinetController::class, 'referal'])->name('profile.referal');
   Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
+  Route::get('/profile/checkout', [CabinetController::class, 'checkout'])->name('profile.checkout');
 
 
   Route::get('/profile/{slug}', [CabinetController::class, 'profile'])->name('view.profile');
@@ -61,10 +63,8 @@ Route::post('/hook/stripe', function(Request $request) {
 
 
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('checkout');
-Route::get('/payment/order', [PaymentController::class, 'order']);
-Route::get('/payment/order/complete', [PaymentController::class, 'orderComplete']);
-Route::get('/payment/{status}', [PaymentController::class, 'payment'])->name('payment.status');
-
+Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment-success');
+Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment-error');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/help-center', [SiteController::class, 'helpCenter'])->name('help-center');

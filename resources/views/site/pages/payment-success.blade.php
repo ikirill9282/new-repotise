@@ -28,12 +28,18 @@
                     <div class="share_text">
                       {!! print_var('share_text', $variables) !!}
                     </div>
-                    <a href="{{ url(print_var('share_button_link', $variables)) }}" class="learn_more">{{ print_var('share_button_text', $variables) }}</a>
+                    <a href="{{ auth()->check() ? route('profile.referal') : url('/referal') }}" class="learn_more">
+                      {{ print_var('share_button_text', $variables) }}
+                    </a>
                 </div>
                 <div class="text_right">
                     <div class="input_block">
-                        <input type="text" value="https://ru.freepik.com" readonly/>
-                        <button><img src="{{ asset('assets/img/copy.svg') }}" alt=""></button>
+                        @if ($user)
+                          <input type="text" value="{{ $user->makeReferalUrl() }}" readonly/>
+                          <button><img src="{{ asset('assets/img/copy.svg') }}" alt=""></button>
+                        @else
+                          <x-btn outlined class="open_auth">Sign in</x-btn>
+                        @endif
                     </div>
                     <div class="connecting">
                         <a href="#" class="hover:!text-blue-500 transition duration-500">
@@ -45,13 +51,13 @@
                         <a href="#" class="hover:!text-black transition duration-500">
                             @include('icons.twitter')
                         </a>
-                        <a href="#" class="hover:!text-pink-500 transition duration-500">
+                        <a href="#" class="hover:!text-orange-500 transition duration-500">
                             @include('icons.mail')
                         </a>
                         <a href="#" class="hover:!text-emerald-500 transition duration-500">
                             @include('icons.whatsapp')
                         </a>
-                        <a href="#" class="hover:!text-cyan-500 transition duration-500">
+                        <a href="#" class="hover:!text-sky-500 transition duration-500">
                             @include('icons.telegram')
                         </a>
                     </div>
@@ -63,7 +69,7 @@
                     <div class="left_orders_group">
                         <div class="title_block">
                             <h3>Your order</h3>
-                            <p>Items <span>(10)</span></p>
+                            <p>Items <span>({{ $order->products->count() }})</span></p>
                         </div>
                         <div class="items_group">
                             @foreach($order->products as $product)
@@ -84,9 +90,9 @@
                         <h2>Payment</h2>
                         <div class="descriptions_group">
                             <div class="descriptions_pay">
-                                <p>Payment Method: Credit Card</p>
+                                <p>Payment Method: Card</p>
                                 <div class="right_text">
-                                    <span>Tinkoff pay</span>
+                                    <span>{{ strtoupper($paymentMethod?->card->brand) }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">

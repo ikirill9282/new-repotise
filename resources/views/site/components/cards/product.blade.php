@@ -27,7 +27,7 @@
             <span class="count">{{ $model->pivot->count ?? $model->pivot['count'] }}</span>
             <button class="btn plus">+</button>
         </div>
-        <div class="drop cart-drop hover:cursor-pointer"  data-item="{{ $hash }}">
+        <div class="drop cart-drop hover:cursor-pointer"  data-item="{{ $hash }}" data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $model->id]) }}">
           <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" fill="transparent">
             <rect width="24" height="24" fill="white"/>
             <path d="M5 7.5H19L18 21H6L5 7.5Z" stroke="currentColor" stroke-linejoin="round"/>
@@ -51,7 +51,12 @@
           'item_id' => $model->id,
         ])
 
-        <a href="{{ url('/cart') }}" class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}">
+        <a 
+          href="{{ url('/cart') }}" 
+          class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" 
+          data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}"
+          data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $model->id]) }}"
+        >
           {{ $cart->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
         </a>
     </div>

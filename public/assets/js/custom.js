@@ -375,10 +375,11 @@ const CartButtons = function() {
                 _token: getCSRF(),
                 item: $(this).data('value'),
               }
-            }).then(response => {
+            }).then(response => {              
               if (response.status === 'success') {
                 $('.cart-counter').html(response.products_count);
                 $('.cart-counter').removeClass('hidden');
+                $('.cart-counter').attr('style', '');
                 $(this).addClass('in-cart');
                 $(this).html($(this).html().replace('Add to cart', 'In cart'));
               }
@@ -557,23 +558,13 @@ function setCosts(data)
     cartDiscount.html(data?.discount)
     cartTax.html(data?.tax)
     cartTotal.html(data?.total)
-  })
-}
 
-function applyPromocode(promocode)
-{
-  $.ajax({
-    method: 'POST',
-    url: '/api/cart/promocode',
-    data: {
-      _token: getCSRF(),
-      promocode: promocode
+    if (data?.discount > 0) {
+      cartDiscount.closest('h4').addClass('!text-emerald-500');
+    } else {
+      cartDiscount.closest('h4').removeClass('!text-emerald-500');
     }
-  }).then(response => {
-    if (response.status === 'success') {
-      setCosts(response.costs);
-    }
-  });
+  })
 }
 
 
@@ -635,41 +626,6 @@ $('.search-button').on('click', function(evt) {
   $('.search-form').submit();
 });
 
-$('.cart-drop').on('click', function(evt) {
-  evt.preventDefault();
-  $.ajax({
-    method: 'POST',
-    url: '/api/cart/remove',
-    data: {
-      _token: getCSRF(),
-      item: $(this).data('item'),
-    }
-  }).then(response => {
-    if (response.status === 'success') {
-      $(this).closest('.item').animate({
-        opacity: 0,
-      });
-      $(this).closest('.item').animate({
-        height: 'toggle',
-      });
-
-
-      if (response.count == 0) {
-        $('.cart-counter').fadeOut(function() {
-          $(this).addClass('hidden');
-        });
-        $('.placing_order').fadeOut();
-        $('.empty-container').fadeIn();
-      } else {
-        $('.cart-counter').html(response.count);
-        $('.cart-counter').removeClass('hidden');
-      }
-
-      setCosts(response.costs);
-    }
-  })
-});
-
 
 $('[data-input="integer"]').on('input', function(evt) {
   $(this).val(evt.target.value.replace(/[^0-9]+/is, ''));
@@ -677,4 +633,67 @@ $('[data-input="integer"]').on('input', function(evt) {
 
 $('[data-input="phone"]').on('input', function(evt) {
   $(this).val(evt.target.value.replace(/[^0-9\+\(\)_\s\-]+/is, ''));
+});
+
+
+
+const dropButtons = [];
+
+function discoverCartDropButtons(container=null)
+{
+  const base = (container == null) ? 'body' : container;
+
+  $(base).find('.cart-drop').each((k, btn) => {
+    const hash = $(btn).data('item');
+    if (!dropButtons.includes(hash)) {
+      dropButtons.push(hash);
+      $(btn).on('click', function(evt) {
+        evt.preventDefault();
+        $.ajax({
+          method: 'POST',
+          url: '/api/cart/remove',
+          data: {
+            _token: getCSRF(),
+            item: $(this).data('item'),
+          }
+        }).then(response => {
+          if (response.status === 'success') {
+            $(this).closest('.item').animate({
+              opacity: 0,
+            });
+            $(this).closest('.item').animate({
+              height: 'toggle',
+            });
+
+            if (response.count == 0) {
+              $('.cart-counter').fadeOut(function() {
+                $(this).addClass('hidden');
+              });
+              $(this).closest('.order-view').fadeOut(() => $('.empty-container').fadeIn());
+              
+            } else {
+              $('.cart-counter').html(response.count);
+              $('.cart-counter').removeClass('hidden');
+            }
+
+            const key = $(this).data('key');
+            console.log(key,$(`a[data-key="${key}"]`));
+            $(`a[data-key="${key}"]`).each((k, a) => {
+              $(a).removeClass('in-cart');
+              $(a).html('Add to cart');
+            })
+
+            setCosts(response.costs);
+          }
+        })
+      });
+    }
+  });
+}
+
+$(document).ready(function() {
+  discoverCartDropButtons();
+  Livewire.hook('morphed',  ({ el, component }) => {
+    discoverCartDropButtons(el);
+  })
 });

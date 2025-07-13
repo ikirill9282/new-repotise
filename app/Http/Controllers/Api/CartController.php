@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\CustomEncrypt;
 use App\Helpers\SessionExpire;
 use App\Http\Controllers\Controller;
+use App\Models\Discount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
-use App\Models\Promocode;
 use App\Services\Cart;
+use Exception;
 
 class CartController extends Controller
 {
@@ -81,16 +82,21 @@ class CartController extends Controller
 
     public function promocode(Request $request)
     {
-      $cart = new Cart();
-      $valid = $request->validate(['promocode' => 'required|string']);
-      $promocode = Promocode::where('code', $valid['promocode'])->first();
-      if (!$promocode || !$promocode->active) {
-        return response()->json(['status' => 'error', 'message' => 'Promocode doesn\'t exists!']);
-      }
+      $valid = $request->validate([
+        'promocode' => 'required|string|exists:discounts,code',
+      ]);
 
-      Auth::user()->applyPromocode($promocode);
+      $discount = Discount::where('code', trim($valid['promocode']))->first();
+      if ($discount->visibility == 'private') {
+        if (!Auth::check() || !$discount->user->id === Auth::user()->id) {
+          throw new Exception('Incorrect promocode.');
+        }
+      }
+      $cart = new Cart();
+      $cart->applyPromocode($discount);
       $order = Order::preparing($cart);
       
+      // dd($order->getCosts());
       return response()->json([
         'status' => 'success',
         'costs' => $order->getCosts(),

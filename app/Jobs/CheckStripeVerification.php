@@ -82,6 +82,7 @@ class CheckStripeVerification implements ShouldQueue
             'type' => 'success',
             'message' => "Verification success! Your account is now verified.",
           ]);
+          
           History::userVerified($this->user);
           $verify->delete();
           $this->user->update(['verified' => 1, 'stripe_verified_at' => now()]);

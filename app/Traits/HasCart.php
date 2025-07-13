@@ -5,7 +5,6 @@ namespace App\Traits;
 use App\Helpers\SessionExpire;
 use App\Models\Product;
 use Illuminate\Support\Collection;
-use App\Models\Promocode;
 
 trait HasCart
 {
@@ -106,12 +105,12 @@ trait HasCart
     return round(($int / 100) * $this->tax);
   }
 
-  public function calcDiscount(Promocode $promo, ?int $price = null) {
+  public function calcDiscount($promo, ?int $price = null) {
     $int = is_null($price) ? $this->getCartAmount() : $price;
     return round(($int / 100) * $promo->percentage);
   }
 
-  public function applyPromocode(Promocode $promocode)
+  public function applyPromocode($promocode)
   {
     SessionExpire::addPromocode('cart', $promocode->id);
     $this->loadCart();

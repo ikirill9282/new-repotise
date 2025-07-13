@@ -18,8 +18,9 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('tax', 10, 2);
             $table->decimal('price_without_discount', 10, 2);
-            $table->bigInteger('promocode')->unsigned()->nullable()->index();
-            $table->string('payment_id')->nullable()->index();
+            $table->bigInteger('discount_id')->unsigned()->nullable()->index();
+            $table->string('payment_id')->nullable()->unique();
+            $table->tinyInteger('gift')->default(0);
             $table->string('recipient')->index()->nullable();
             $table->string('recipient_message')->nullable();
             $table->timestamps();

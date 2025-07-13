@@ -13,16 +13,21 @@ return new class extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
           $table->id();
-          $table->bigInteger('user_id')->unsigned()->index();
+          $table->bigInteger('author_id')->default(0);
+          $table->bigInteger('user_id')->unsigned()->index()->nullable();
+          $table->enum('visibility', ['private', 'public'])->default('public');
+          $table->string('group')->nullable()->index();
           $table->string('type');
           $table->string('target');
+          $table->integer('target_id')->nullable();
           $table->string('code')->unique();
           $table->integer('percent')->nullable();
           $table->decimal('sum')->nullable();
           $table->decimal('min')->nullable();
           $table->decimal('max')->nullable();
           $table->integer('uses')->unsigned()->default(1);
-          $table->tinyInteger('active')->default(1);
+          $table->tinyInteger('one_time')->default(1);
+          $table->tinyInteger('active')->default(1)->index();
           $table->datetime('end');
 
           $table->timestamps();

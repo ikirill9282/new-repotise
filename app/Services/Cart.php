@@ -7,11 +7,19 @@ use Illuminate\Support\Collection;
 use App\Models\Product;
 use App\Models\Promocode;
 use App\Models\Order;
+use Laravel\Cashier\Cashier;
+use Illuminate\Support\Facades\Auth;
 
 class Cart
 {
   protected array $cart = [];
   protected int $tax = 5;
+
+  protected $template = [
+    'products' => [],
+    'promocode' => null,
+    'payment_id' => null,
+  ];
 
   public function __construct(
     protected string $name = 'cart',
@@ -22,7 +30,7 @@ class Cart
 
   public function flushCart()
   {
-    $this->updateCart(['products' => []]);
+    $this->updateCart($this->template);
   }
 
   public function getCart()
@@ -90,9 +98,21 @@ class Cart
     return ($this->hasProducts()) ? array_column($this->getProducts(), 'id') : [];
   }
 
+  public function applyPromocode($promocode)
+  {
+    SessionExpire::addPromocode($this->name, $promocode->id);
+    $this->loadCart();
+  }
+
   public function getCartPromocode()
   {
     return $this->getCart()['promocode'] ?? null;
+  }
+
+  public function clearPromocode(): void
+  {
+    $this->cart['promocode'] = null;
+    $this->updateCart($this->cart);
   }
 
   public function removeFromCart(int $id): bool
@@ -122,15 +142,9 @@ class Cart
     return round(($int / 100) * $this->tax);
   }
 
-  public function calcDiscount(Promocode $promo, ?int $price = null) {
+  public function calcDiscount($promo, ?int $price = null) {
     $int = is_null($price) ? $this->getCartAmount() : $price;
     return round(($int / 100) * $promo->percentage);
-  }
-
-  public function applyPromocode(Promocode $promocode)
-  {
-    SessionExpire::addPromocode($this->name, $promocode->id);
-    $this->loadCart();
   }
 
   public function hasProducts(?array $cart = null)
@@ -143,5 +157,21 @@ class Cart
   {
     if (is_null($cart)) $cart = $this->getCart();
     return (isset($cart['promocode']) && !empty($cart['promocode']));
+  }
+
+  public function paymentExists()
+  {
+    
+  }
+
+  public function setPaymentId(string $payment_id): void
+  {
+    $this->cart['payment_id'] = $payment_id;
+    $this->updateCart($this->cart);
+  }
+
+  public function getPaymentId(): ?string
+  {
+    return $this->cart['payment_id'] ?? null;
   }
 }

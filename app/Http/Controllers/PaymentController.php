@@ -16,7 +16,7 @@ use App\Models\PaymentIntents;
 use App\Jobs\CancelPaymentIntents;
 use App\Mail\InviteByPurchase;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\Session;
 
 class PaymentController extends Controller
 {
@@ -39,22 +39,15 @@ class PaymentController extends Controller
     return response()->json($transaction);
   }
 
-
   public function checkout(Request $request)
   {
-    $validaor = Validator::make($request->all(), [
-      'checkout' => 'required|string',
-    ]);
-
-    if ($validaor->fails()) {
-      return redirect('/?modal=cart')
-        ->withErrors($validaor)
-        ->withInput();
+    if (!Session::exists('checkout') || empty(Session::get('checkout'))) {
+      return redirect('/products');
     }
-
-    $checkout = CustomEncrypt::decodeUrlHash($request->get('checkout'));
+    
+    $order = Order::find(Session::get('checkout'));
     $transaction = Cashier::stripe()->paymentIntents->retrieve(
-      $checkout['id'],
+      $order->payment_id,
       []
     );
     $page = Page::where('slug', 'checkout')
@@ -65,10 +58,6 @@ class PaymentController extends Controller
       return (new FallbackController())($request);
     }
 
-    $cart = new Cart();
-    $order = Order::preparing($cart);
-
-    // dd($transaction);
     return view("site.pages.checkout", [
       'page' => $page, 
       'order' => $order,
@@ -149,38 +138,28 @@ class PaymentController extends Controller
     ));
   }
 
-  public function orderComplete(Request $request)
+  public function success(Request $request)
   {
-    $paymentIntent = Cashier::stripe()->paymentIntents->retrieve(
-      $request->get('payment_intent'),
-      []
-    );
-    $order = Order::find($paymentIntent->metadata->order_id);
-    if (is_null($order)) {
-      return view('site.pages.payment-error', [
-        'page' => Page::where('slug', 'payment-error')->with('config')->first(),
-        'order' => $order,
-        'paymentIntent' => $paymentIntent,
-      ]);
-    }
-    $order->update([
-      'status_id' => EnumsOrder::PAID,
-    ]);
-    $orderPaymentIntent = $order->paymentIntents()->where('stripe_id', $paymentIntent->id)->first();
-    $orderPaymentIntent->update([
-      'status' => $paymentIntent->status,
-    ]);
-    $paymentIntentIds = $order->paymentIntents()->where('stripe_id', '!=', $orderPaymentIntent->stripe_id)
-      ->pluck('stripe_id')
-      ->toArray();
+    $valid = $request->validate(['payment_intent' => 'required|string']);
+    $order = Order::where('payment_id', $valid['payment_intent'])->first();
+    $order->complete();
 
-    CancelPaymentIntents::dispatch($paymentIntentIds);
-    (new Cart())->flushCart();
-
+    $paymentIntent = $order->getTransaction();
+    $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($paymentIntent->payment_method);
+    
     return view('site.pages.payment-success', [
       'page' => Page::where('slug', 'payment-success')->with('config')->first(),
+      'user' => Auth::user() ?? null,
       'order' => $order,
       'paymentIntent' => $paymentIntent,
+      'paymentMethod' => $paymentMethod,
+    ]);
+  }
+
+  public function error(Request $request)
+  {
+    return view('site.pages.payment-error', [
+      'page' => Page::where('slug', 'payment-error')->with('config')->first(),
     ]);
   }
 }

@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use App\Services\Cart;
 use Illuminate\Support\Collection;
 use App\Enums\Order as EnumsOrder;
+use Laravel\Cashier\Cashier;
+use Stripe\PaymentIntent;
+use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
 {
@@ -19,6 +22,38 @@ class Order extends Model
     protected $appends = [
       'preparing' => false,
     ];
+
+    protected static function booted(): void
+    {
+      parent::booted();
+
+      static::creating(function($model) {
+        $transaction = Cashier::stripe()->paymentIntents->create([
+          'amount' => ($model->price * 100),
+          'currency' => 'usd',
+          'automatic_payment_methods' => ['enabled' => true],
+          'metadata' => [
+            'user_id' => Auth::user()?->id ?? 0,
+          ],
+        ]);
+        $model->payment_id = $transaction->id;
+      });
+
+      static::created(function($model) {
+        Cashier::stripe()->paymentIntents->update($model->payment_id, ['metadata' => ['order_id' => $model->id]]);
+      });
+
+      static::deleting(function($model) {
+        Cashier::stripe()->paymentIntents->update($model->payment_id, [
+          'metadata' => [
+            'message' => 'Cancel by order delete.',
+          ]
+        ]);
+        Cashier::stripe()->paymentIntents->cancel($model->payment_id);
+      });
+      
+    }
+
 
     public function user()
     {
@@ -36,9 +71,33 @@ class Order extends Model
         ->withPivot(['count', 'price', 'old_price']);
     }
 
-    public function promocode()
+    public function discount()
     {
-      return $this->hasOne(Promocode::class, 'id', 'promocode');
+      return $this->belongsTo(Discount::class, 'discount_id', 'id');
+    }
+
+    public function complete()
+    {
+      $this->discount?->complete();
+      $this->update([
+        'status_id' => EnumsOrder::PAID,
+      ]);
+    }
+
+
+    public function createPayment(int $amount): void
+    {
+      $total = $amount * 100;
+      $transaction = Cashier::stripe()->paymentIntents->create([
+        'amount' => $total,
+        'currency' => 'usd',
+        'automatic_payment_methods' => ['enabled' => true],
+        'metadata' => [
+          'user_id' => Auth::user()?->id ?? 0,
+        ],
+      ]);
+
+      $this->setPaymentId($transaction->id);
     }
 
     public function getAmount(): int
@@ -55,18 +114,13 @@ class Order extends Model
 
     public function getTax(): int
     {
-      return static::calcPercent($this->getAmount(), static::$tax);
+      $amount = $this->getAmount() - $this->getDiscount();
+      return static::calcPercent($amount, static::$tax);
     }
 
     public function getDiscount(): int
     {
-      if ($this->prepare && isset($this->promocode)) {
-        return static::calcDiscount($this->getAmount(), $this->promocode);
-      } else {
-        return 0;
-      }
-
-      return ($this->promocode()->exists()) ? static::calcDiscount($this->getAmount(), $this->promocode) : 0;
+      return $this->discount()->exists() ? $this->discount->calcOrderDiscount($this) : 0;
     }
 
     public function getTotal(): int
@@ -94,16 +148,16 @@ class Order extends Model
       return round(($price / 100) * $percent);
     }
 
-    public function calcDiscount(int $price, Promocode $promo): int
-    {
-      return static::calcPercent($price, $promo->percent);
-    }
+    // public function calcDiscount(int $price, $promo): int
+    // {
+    //   return static::calcPercent($price, $promo->percent);
+    // }
 
     public static function preparing(Cart $cart): static
     {
       $order = new static();
       $order->prepare = true;
-      $order->promocode = $cart->hasPromocode() ? Promocode::where('id', $cart->getCartPromocode())->first() : null;
+      $order->promocode = $cart->hasPromocode() ? $cart->getCartPromocode() : null;
       $order->products = static::preparingCartProducts($cart);
       $order->status_id = EnumsOrder::NEW;
 
@@ -178,9 +232,14 @@ class Order extends Model
           'tax' => $this->getTax(),
           'price_without_discount' => $this->getTotalWithDiscount(),
           'status_id' => EnumsOrder::NEW,
-          'promocode' => $this->promocode?->id,
+          'discount_id' => $this->discount_id,
           'recipient' => $this->recipent ?? null,
           'recipient_message' => $this->recipient_message ?? null,
       ];
+    }
+
+    public function getTransaction(): ?PaymentIntent
+    {
+      return $this->payment_id ? Cashier::stripe()->paymentIntents->retrieve($this->payment_id) : null;
     }
 }

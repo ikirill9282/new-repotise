@@ -15,6 +15,8 @@ enum Action
   public const VERIFY_REQUIRES_INPUT = 'User Verification Requires Input';
   public const VERIFY_IN_PROGRESS = 'User Verification In Progress';
   public const INVITE_BY_PURCHASE = 'User Invited By Purchase';
+  public const PROMOCODE_CREATED = 'Promocode Created';
+  public const REFERAL_PROMOCODE_CREATED = 'Referal Promocode Created';
 
   public function toArray(): array
   {
@@ -29,6 +31,8 @@ enum Action
       self::VERIFY_REQUIRES_INPUT,
       self::VERIFY_IN_PROGRESS,
       self::INVITE_BY_PURCHASE,
+      self::PROMOCODE_CREATED,
+      self::REFERAL_PROMOCODE_CREATED,
     ];
   }
 }

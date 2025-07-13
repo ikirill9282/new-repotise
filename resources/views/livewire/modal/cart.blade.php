@@ -63,52 +63,52 @@
         <div class="swiper-scrollbar swiper-pagination swiper-pagination-progressbar swiper-pagination-vertical hidden md:block md:!top-0 md:!right-0 md:!left-auto md:!bottom-auto">
         </div>
     </div>
-    <div class="md:basis-3/4 bg-white pt-4 px-2 pb-2 md:p-2 rounded-lg flex flex-col">
-        @if($cart->hasProducts())
-          <div class="title_block px-2 py-4 flex justify-between items-center">
+    <div class="md:basis-3/4 bg-white pt-4 px-2 pb-2 md:p-2 rounded-lg flex flex-col transition">
+        <div class="order-view {{ ($order?->products && $order->products->isNotEmpty()) ? '' : 'hidden' }}">
+            <div class="title_block px-2 py-4 flex justify-between items-center">
               <h3>Your order</h3>
               <p>Items <span><span class="cart-counter text-gray-400">({{ $cart->getCartCount() }})</span></span></p>
-          </div>
-          <div class="products_modal overflow-y-scroll">
-              <div class="items_group">
-                  @foreach ($order->products as $product)
-                      @include('site.components.cards.product', [
-                          'template' => 'cart',
-                          'model' => $product,
-                      ])
-                  @endforeach
-              </div>
-          </div>
-          <div class="costs pt-4">
-              <div class="text_cost">
-                  <span>Subtotal</span>
-                  <h4>$<span class="cart-subtotal">{{ number_format($order->getAmount()) }}</span></h4>
-              </div>
-              <div class="text_cost">
-                  <span>Discount</span>
-                  <h4 class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-$<span
-                          class="cart-discount">{{ number_format($order->getDiscount()) }}</span></h4>
-              </div>
-              <div class="text_cost">
-                  <span>Tax</span>
-                  <h4 class="color_red">$<span class="cart-tax">{{ number_format($order->getTax()) }}</span></h4>
-              </div>
-              <div class="text_cost">
-                  <h5>Total</h5>
-                  <h6>$<span class="cart-total">{{ number_format($order->getTotal()) }}</span></h6>
-              </div>
-          </div>
-          <a wire:click.prevent="moveCheckout" href="#" class="place_button">Place Order</a>
-          <p class="terms_service pb-4">By placing your order, you agree to our <a href="{{ url('/all-policies') }}">Terms of
-                  Service & Privacy Policy.</a>
-          </p>
-        @else
+            </div>
+            <div class="products_modal overflow-y-scroll">
+                <div class="items_group">
+                    @foreach ($order->products as $product)
+                        @include('site.components.cards.product', [
+                            'template' => 'cart',
+                            'model' => $product,
+                        ])
+                    @endforeach
+                </div>
+            </div>
+            <div class="costs pt-4">
+                <div class="text_cost">
+                    <span>Subtotal</span>
+                    <h4>$<span class="cart-subtotal">{{ number_format($order->getAmount()) }}</span></h4>
+                </div>
+                <div class="text_cost">
+                    <span>Discount</span>
+                    <h4 class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-$<span
+                            class="cart-discount">{{ number_format($order->getDiscount()) }}</span></h4>
+                </div>
+                <div class="text_cost">
+                    <span>Tax</span>
+                    <h4 class="color_red">$<span class="cart-tax">{{ number_format($order->getTax()) }}</span></h4>
+                </div>
+                <div class="text_cost">
+                    <h5>Total</h5>
+                    <h6>$<span class="cart-total">{{ number_format($order->getTotal()) }}</span></h6>
+                </div>
+            </div>
+            <a wire:click.prevent="moveCheckout" href="#" class="place_button inline-block">Place Order</a>
+            <p class="terms_service pb-4">By placing your order, you agree to our <a href="{{ url('/all-policies') }}">Terms of
+                    Service & Privacy Policy.</a>
+            </p>
+        </div>
+          
           <div class="container empty-container {{ ($order?->products && $order->products->isNotEmpty()) ? 'hidden' : '' }}">
             @include('site.components.favorite.empty', [
               'text' => 'Cart',
               'class' => 'empty-cart',
             ])
           </div>
-        @endif
     </div>
 </div>

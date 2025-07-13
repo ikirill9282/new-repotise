@@ -35,7 +35,10 @@ use Stripe\Stripe;
 use Stripe\Identity\VerificationSession;
 use App\Helpers\CustomEncrypt;
 use App\Jobs\CheckStripeVerification;
+use App\Jobs\TestQueue;
 use App\Mail\InviteByPurchase;
+use App\Mail\Promocode;
+use App\Models\Discount;
 use App\Models\History;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
@@ -45,12 +48,22 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $crypt = CustomEncrypt::generateUrlHash(['id' => 1, 'created_at' => 'test123'], false);
-  dd($crypt, CustomEncrypt::getId($crypt, false));
+  // $id = 'pi_3RkATYFkz2A7XNTi0oN0Kw3m';
+  // Cashier::stripe()->paymentIntents->update($id, ['metadata' => ['message' => 'Cancel by order delete.', 'order_id' => 1]]);
+  // Cashier::stripe()->paymentIntents->cancel($id);
+
+  $dis = Discount::find(2);
+  dd($dis->isAvailable());
+  // $dis->sendToOwners();
+  Mail::to(User::find(9)->email)->send(new Promocode($dis));
 });
 
 Artisan::command('ttm', function() {
   Mail::to(User::find(6)->email)->send(new InviteByPurchase(User::find(6), Order::find(1), User::makePassword()));
+});
+
+Artisan::command('ttq', function() {
+  TestQueue::dispatch();
 });
 
 Artisan::command('rl_stripe', function() {

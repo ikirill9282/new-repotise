@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 
 class UserSeeder extends Seeder
 {
@@ -93,6 +94,19 @@ class UserSeeder extends Seeder
           // 'avatar' => '/storage/images/man.png',
         ],
       );
+
+      if (!User::where('id', 0)->exists()) {
+        $system = User::create([
+          'email' => env('MAIL_FROM_ADDRESS', 'system@trekguider.com'),
+          'email_verified_at' => Carbon::now(),
+          'password' => 'k48dvR6aT3',
+        ]);
+        $system->backup()->delete();
+        $system->notifications()->delete();
+        $system->options()->delete();
+        $system->update(['id' => 0]);
+        $system->assignRole(Role::findByName('admin'));
+      }
 
       if (!$buyer->hasRole('customer')) $buyer->assignRole(Role::findByName('customer'));
       if (!$buyer2->hasRole('customer')) $buyer2->assignRole(Role::findByName('customer'));

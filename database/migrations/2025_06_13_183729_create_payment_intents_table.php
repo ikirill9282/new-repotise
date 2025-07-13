@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('payment_intents', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->unsigned()->nullable()->index();
+            $table->bigInteger('order_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned()->default(0);
             $table->string('stripe_id')->unique()->index();
             $table->string('status')->index();
+
             $table->timestamps();
+            
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

@@ -7,6 +7,7 @@ use Livewire\Attributes\Url;
 use App\Events\MailVerify;
 use App\Events\ResetFailed;
 use App\Helpers\CustomEncrypt;
+use App\Helpers\SessionExpire;
 use Livewire\Component;
 use Livewire\Attributes\On; 
 use App\Models\User;
@@ -15,11 +16,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Mail\ConfirmRegitster;
+use App\Models\Discount;
 use App\Models\History;
 use App\Models\UserBackup;
 use App\Services\Cart;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
+use App\Models\UserReferal;
 use Laravel\Cashier\Cashier;
 
 class Modal extends Component
@@ -159,7 +162,6 @@ class Modal extends Component
 
     public function reg()
     {
-      dd($this->currentRouteParams);
       if (!User::where('email', $this->email)->exists()) {
         
         if (!User::validatePassword($this->password)) {
@@ -177,9 +179,21 @@ class Modal extends Component
           'email' => $this->email,
           'password' => $this->password,
         ]);
+        if ($this->currentRouteName == 'referal' && array_key_exists('token', $this->currentRouteParams)) {
+          $id = CustomEncrypt::getId($this->currentRouteParams['token']);
+          $owner = User::find($id);
+          UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $user->id]);
+          Discount::createForUsers([$owner->id, $user->id], [
+            'group' => 'referal',
+            'visibility' => 'private',
+            'type' => 'promocode',
+            'target' => 'cart',
+            'percent' => 15,
+            'max' => 50,
+          ]);
+        }
 
         History::userCreated($user);
-
         $user->sendVerificationCode(seller: $this->as_seller);
         
         $this->close();
@@ -289,20 +303,13 @@ class Modal extends Component
       $cart = new Cart();
       if ($cart->hasProducts()) {
         $order = Order::preparing($cart);
-        $total = $order->getTotal() * 100;
+        $order->user_id = Auth::user()?->id ?? 0;
+        $order = $order->savePrepared();
 
-        $transaction = Cashier::stripe()->paymentIntents->create([
-          'amount' => $total,
-          'currency' => 'usd',
-          'automatic_payment_methods' => ['enabled' => true],
-          'metadata' => [
-            'user_id' => Auth::user()?->id ?? 0,
-          ],
-        ]);
+        $cart->flushCart();
+        Session::put('checkout', $order->id);
 
-        return redirect()->route('checkout', [
-          'checkout' => CustomEncrypt::generateUrlHash(['id' => $transaction->id]),
-        ]);
+        return redirect()->route('checkout');
       }
       
       return ;

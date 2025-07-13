@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->unique(['owner_id', 'referal_id']);
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('referal_id')->references('id')->on('users');
+            $table->foreign('referal_id')->references('id')->on('users')->onDelete('cascade');
 
             // $table->timestamps();
         });

@@ -44,7 +44,7 @@
                   </p>
                   <p>
                     <span>Referral Income Earned:</span>
-                    <b>$10 000</b>
+                    <b>{{ currency(10000) }}</b>
                   </p>
                 </div>
                 <div class="col">

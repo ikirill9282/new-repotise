@@ -46,9 +46,15 @@
                         </div>
                         <div class="actions">
                             <div class="col">
-                                <a class="orange" href="#">
-                                    View & Download
-                                </a>
+                                @if($order->status_id == 1)
+                                  <a class="black" href="{{ url("/profile/checkout?order=" . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $order->id])) }}">
+                                      Confirm Payment
+                                  </a>
+                                @else
+                                  <a class="orange" href="#">
+                                      View & Download
+                                  </a>
+                                @endif
                             </div>
                             <div class="col">
                                 <a class="black" href="#">Leave Review</a>

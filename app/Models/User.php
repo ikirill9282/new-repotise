@@ -287,7 +287,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeReferalUrl(): string
     {
-      return url('/invite?token='. CustomEncrypt::generateUrlHash([
+      return url('/referal?token='. CustomEncrypt::generateUrlHash([
         'id' => $this->id, 
         'created_at' => $this->created_at->format('Y-m-d'),
       ], false));

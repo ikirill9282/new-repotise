@@ -27,7 +27,7 @@ class EmailSentListener
       $sent = $event->sent->getSymfonySentMessage();
       // dd($mail);
 
-      $recipient = !array_key_exists('user', $data) 
+      $recipient = array_key_exists('user', $data) 
         ? $data['user']->email
         : ((empty($mail->getTo())) ? 'Unknown' : $mail->getTo()[0]->getAddress());
 

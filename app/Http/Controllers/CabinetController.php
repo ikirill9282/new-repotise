@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use App\Models\UserNotification;
+use App\Models\Order;
+use Illuminate\Support\Facades\Session;
 
 class CabinetController extends Controller
 {
@@ -242,6 +243,14 @@ class CabinetController extends Controller
     ]);
   }
 
+  public function checkout(Request $request)
+  {
+    $valid = $request->validate(['order' => 'required|string']);
+    $id = CustomEncrypt::getId($valid['order']);
+    Session::put('checkout', $id);
+    
+    return redirect()->route('checkout');
+  }
 
   protected function getUser(string $slug)
   {
