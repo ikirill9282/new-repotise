@@ -45,12 +45,12 @@ class ProductFactory extends Factory
     //   ->shuffle()
     //   ->toArray();
 
-    $users_count = User::count();
+    $users = User::whereRole('creator')->all();
     $types_count = Type::count();
     $locations_count = Location::count();
 
     return [
-      'user_id' => fake()->numberBetween(1, $users_count),
+      'user_id' => $users->shuffle()->first()->id,
       'title' => collect(fake()->words(3))->map(fn($word) => ucfirst($word))->join(' '),
       'price' => fake()->numberBetween(10, 200),
       // 'model' => fake()->randomElement([ProductModel::PRODUCT, ProductModel::SUBSCRIPTION]),
