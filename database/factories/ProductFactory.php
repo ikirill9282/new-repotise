@@ -45,7 +45,7 @@ class ProductFactory extends Factory
     //   ->shuffle()
     //   ->toArray();
 
-    $users = User::whereRole('creator')->all();
+    $users = User::role('creator')->get();
     $types_count = Type::count();
     $locations_count = Location::count();
 
