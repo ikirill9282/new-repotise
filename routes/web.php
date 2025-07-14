@@ -8,6 +8,7 @@ use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
 use App\Http\Middleware\StripeWebhook;
+use App\Jobs\CalcReward;
 use Illuminate\Http\Request;
 use App\Mail\ConfirmRegitster;
 use App\Models\Discount;
@@ -15,6 +16,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use App\Jobs\ProcessOrder;
+use App\Models\Order;
 
 require __DIR__ . '/api.php';
 // Route::controller(SiteController::class)->group(function() {
@@ -88,5 +91,10 @@ Route::get('/referal', [SiteController::class, 'referal'])->name('referal');
 // Products
 // Route::get('/{slug}/{country}', SiteController::class);
 // Route::get('/{slug}/{country}/{product}', SiteController::class);
+
+Route::get('/test', function() {
+  $job = new CalcReward(Order::find(100200));
+  $job->handle();
+});
 
 Route::fallback(FallbackController::class);

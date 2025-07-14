@@ -35,6 +35,7 @@ use Stripe\Stripe;
 use Stripe\Identity\VerificationSession;
 use App\Helpers\CustomEncrypt;
 use App\Jobs\CheckStripeVerification;
+use App\Jobs\ProcessOrder;
 use App\Jobs\TestQueue;
 use App\Mail\InviteByPurchase;
 use App\Mail\Promocode;
@@ -48,14 +49,9 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  // $id = 'pi_3RkATYFkz2A7XNTi0oN0Kw3m';
-  // Cashier::stripe()->paymentIntents->update($id, ['metadata' => ['message' => 'Cancel by order delete.', 'order_id' => 1]]);
-  // Cashier::stripe()->paymentIntents->cancel($id);
-
-  $dis = Discount::find(2);
-  dd($dis->isAvailable());
-  // $dis->sendToOwners();
-  Mail::to(User::find(9)->email)->send(new Promocode($dis));
+  // $job = new ProcessOrder(Order::find(100200));
+  // $job->handle();
+  ProcessOrder::dispatch(Order::find(100200));
 });
 
 Artisan::command('ttm', function() {

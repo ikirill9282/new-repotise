@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id()->from(100200);
             $table->bigInteger('user_id')->unsigned()->index();
             $table->bigInteger('status_id')->unsigned()->index();
-            $table->decimal('price', 10, 2);
+            $table->decimal('cost', 10, 2);
             $table->decimal('tax', 10, 2);
-            $table->decimal('price_without_discount', 10, 2);
+            $table->decimal('cost_without_discount', 10, 2);
+            $table->decimal('cost_without_tax', 10, 2);
+            $table->decimal('stripe_fee')->nullable();
+            $table->decimal('profit')->nullable();
             $table->bigInteger('discount_id')->unsigned()->nullable()->index();
             $table->string('payment_id')->nullable()->unique();
             $table->tinyInteger('gift')->default(0);

@@ -29,7 +29,7 @@ class Order extends Model
 
       static::creating(function($model) {
         $transaction = Cashier::stripe()->paymentIntents->create([
-          'amount' => ($model->price * 100),
+          'amount' => ($model->cost * 100),
           'currency' => 'usd',
           'automatic_payment_methods' => ['enabled' => true],
           'metadata' => [
@@ -62,7 +62,7 @@ class Order extends Model
     public function products()
     {
       return $this->belongsToMany(Product::class, OrderProducts::class, 'order_id', 'product_id', 'id', 'id')
-        ->withPivot(['count', 'price', 'old_price']);
+        ->withPivot(['count', 'price', 'old_price', 'reward']);
     }
 
     public function discount()
@@ -142,11 +142,6 @@ class Order extends Model
       return round(($price / 100) * $percent);
     }
 
-    // public function calcDiscount(int $price, $promo): int
-    // {
-    //   return static::calcPercent($price, $promo->percent);
-    // }
-
     public static function preparing(Cart $cart): static
     {
       $order = new static();
@@ -222,9 +217,10 @@ class Order extends Model
       return [
           'user_id' => $this->user_id,
           'payment_id' => $this->payment_id,
-          'price' => $this->getTotal(),
+          'cost' => $this->getTotal(),
           'tax' => $this->getTax(),
-          'price_without_discount' => $this->getTotalWithDiscount(),
+          'cost_without_discount' => $this->getTotalWithDiscount(),
+          'cost_without_tax' => $this->getAmount(),
           'status_id' => EnumsOrder::NEW,
           'discount_id' => $this->discount_id,
           'recipient' => $this->recipent ?? null,

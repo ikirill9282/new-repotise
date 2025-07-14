@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('price');
             $table->decimal('old_price')->nullable();
             $table->integer('count')->unsigned();
+            $table->decimal('reward')->nullable();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products');
