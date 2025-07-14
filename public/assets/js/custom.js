@@ -374,6 +374,9 @@ const CartButtons = function() {
               data: {
                 _token: getCSRF(),
                 item: $(this).data('value'),
+              },
+              headers: {
+                'X-CSRF-TOKEN': getCSRF(),
               }
             }).then(response => {              
               if (response.status === 'success') {
