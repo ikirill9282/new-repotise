@@ -48,7 +48,7 @@
                         <span class="text-nowrap">Join / Sign in</span>
                     </a>
                 @else
-                    <a href="{{ auth()->user()->makeProfileUrl() }}" class="profile">
+                    <a href="{{ route('profile') }}" class="profile">
                         <img src="{{ auth()->user()?->avatar ? url(auth()->user()->avatar) : '' }}" alt="avatar"
                             class="profile_img">{{-- rounded-full w-8 --}}
                         <div class="right_text">
@@ -100,7 +100,7 @@
                 </li>
             </ul>
             @if (auth()->check())
-                <a href="{{ auth()->user()->makeProfileUrl() }}" class="profile flex items-center gap-2">
+                <a href="{{ route('profile') }}" class="profile flex items-center gap-2">
                     <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
                     <div class="right_text">
                         <div class="name">
@@ -109,7 +109,7 @@
                     </div>
                 </a>
                 <div class="bottom_connect_group">
-                    <a href="{{ auth()->user()->makeProfileUrl() }}" class="bottom_profile">
+                    <a href="{{ route('profile') }}" class="bottom_profile">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                             fill="none">
                             <path

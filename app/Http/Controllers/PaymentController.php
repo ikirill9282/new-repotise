@@ -17,6 +17,7 @@ use App\Jobs\CancelPaymentIntents;
 use App\Mail\InviteByPurchase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use App\Jobs\ProcessOrder;
 
 class PaymentController extends Controller
 {
@@ -142,7 +143,7 @@ class PaymentController extends Controller
   {
     $valid = $request->validate(['payment_intent' => 'required|string']);
     $order = Order::where('payment_id', $valid['payment_intent'])->first();
-    $order->complete();
+    ProcessOrder::dispatch($order);
 
     $paymentIntent = $order->getTransaction();
     $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($paymentIntent->payment_method);

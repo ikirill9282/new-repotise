@@ -169,7 +169,7 @@ class SiteController extends Controller
     }
 
     $product = Product::findByPid(request()->get('pid'));
-
+    
     if (!$product) {
       return (new FallbackController())($request);
     }

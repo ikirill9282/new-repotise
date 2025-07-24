@@ -1,57 +1,31 @@
 <?php
 
-use App\Enums\ProductModel;
-use App\Mail\ConfirmRegitster;
+use App\Jobs\PayReward;
+use App\Jobs\ProcessOrder;
+use App\Jobs\ReferalPromocode;
+use App\Jobs\ReferalFreeProduct;
 use Illuminate\Support\Facades\Artisan;
-use App\Models\Page;
-use App\Models\Admin\PageSection;
-use App\Models\Admin\Section;
-use App\Models\Admin\SectionVariables;
 use App\Models\Product;
 use App\Models\Category;
-use Illuminate\Support\Carbon;
 use App\Models\Article;
-use App\Models\Comment;
 use App\Models\Location;
-use App\Models\Options;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\VerifyMail;
-use App\Models\News;
 use Meilisearch\Client;
-use Meilisearch\Contracts\SearchQuery;
-use Meilisearch\Contracts\MultiSearchFederation;
-use App\Models\Tag;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
-use App\Mail\ResetCode;
-use App\Models\MailLog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Laravel\Cashier\Cashier;
-use Stripe\Stripe;
-use Stripe\Identity\VerificationSession;
-use App\Helpers\CustomEncrypt;
-use App\Jobs\CheckStripeVerification;
-use App\Jobs\ProcessOrder;
 use App\Jobs\TestQueue;
 use App\Mail\InviteByPurchase;
-use App\Mail\Promocode;
 use App\Models\Discount;
-use App\Models\History;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  // $job = new ProcessOrder(Order::find(100200));
-  // $job->handle();
-  ProcessOrder::dispatch(Order::find(100200));
+  $t = new PayReward(Order::find(100211));
+  $t->handle();
 });
 
 Artisan::command('ttm', function() {
@@ -59,7 +33,7 @@ Artisan::command('ttm', function() {
 });
 
 Artisan::command('ttq', function() {
-  TestQueue::dispatch();
+  TestQueue::dispatch()->delay(60);
 });
 
 Artisan::command('rl_stripe', function() {

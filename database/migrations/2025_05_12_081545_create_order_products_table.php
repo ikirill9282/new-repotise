@@ -17,8 +17,13 @@ return new class extends Migration
             $table->bigInteger('product_id')->unsigned()->index();
             $table->decimal('price');
             $table->decimal('old_price')->nullable();
+            $table->decimal('discount')->unsigned()->nullable()->default(0);
+            $table->decimal('price_without_discount')->unsigned()->nullable();
             $table->integer('count')->unsigned();
-            $table->decimal('reward')->nullable();
+            $table->decimal('payment_fee')->nullable();
+            $table->decimal('seller_reward')->nullable();
+            $table->decimal('referal_reward')->nullable();
+            $table->decimal('platform_reward')->nullable();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products');

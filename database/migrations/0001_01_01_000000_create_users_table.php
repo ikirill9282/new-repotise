@@ -17,11 +17,11 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique()->index();
             $table->tinyInteger('2fa')->default(0);
-            $table->tinyInteger('verified')->default(0);
+            $table->tinyInteger('verified')->default(0)->index();
             $table->decimal('balance')->default(0.00);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->tinyInteger('active')->default(1);
+            $table->tinyInteger('active')->default(1)->index();
             $table->rememberToken();
             $table->timestamp('stripe_verified_at')->nullable();
             $table->timestamps();

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('user_funds', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index();
+            $table->char('group', 10)->index();
             $table->enum('type', ['credit', 'debit', 'freeze', 'unfreeze']);
             $table->decimal('sum');
             $table->text('message');

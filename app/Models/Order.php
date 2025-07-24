@@ -10,6 +10,8 @@ use App\Enums\Order as EnumsOrder;
 use Laravel\Cashier\Cashier;
 use Stripe\PaymentIntent;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\ProcessOrder;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -18,10 +20,6 @@ class Order extends Model
     protected static int $tax = 5;
 
     protected $guarded = ['id'];
-
-    protected $appends = [
-      'preparing' => false,
-    ];
 
     protected static function booted(): void
     {
@@ -62,7 +60,12 @@ class Order extends Model
     public function products()
     {
       return $this->belongsToMany(Product::class, OrderProducts::class, 'order_id', 'product_id', 'id', 'id')
-        ->withPivot(['count', 'price', 'old_price', 'reward']);
+        ->withPivot(['count', 'price', 'old_price', 'seller_reward']);
+    }
+
+    public function order_products()
+    {
+      return $this->hasMany(OrderProducts::class);
     }
 
     public function discount()
@@ -77,7 +80,6 @@ class Order extends Model
         'status_id' => EnumsOrder::PAID,
       ]);
     }
-
 
     public function createPayment(int $amount): void
     {
@@ -108,23 +110,21 @@ class Order extends Model
 
     public function getTax(): int
     {
-      $amount = $this->getAmount() - $this->getDiscount();
-      return static::calcPercent($amount, static::$tax);
+      // $amount = $this->getAmount() - $this->getDiscount();
+      // return static::calcPercent($amount, static::$tax);
+      return 0;
     }
 
     public function getDiscount(): int
-    {
+    { 
+      if ($this->discount_amount > 0) return $this->discount_amount;
+      
       return $this->discount()->exists() ? $this->discount->calcOrderDiscount($this) : 0;
     }
 
     public function getTotal(): int
     {
       return $this->getAmount() - $this->getDiscount() + $this->getTax();
-    }
-
-    public function getTotalWithDiscount(): int
-    {
-      return $this->getAmount() + $this->getTax();
     }
 
     public function getCosts()
@@ -205,6 +205,7 @@ class Order extends Model
         'count' => $item->pivot['count'], 
         'price' => $item->pivot['price'],
         'old_price' => $item->pivot['old_price'],
+        'price_without_discount' => $item->pivot['price'],
       ])
         ->toArray();
 
@@ -219,7 +220,7 @@ class Order extends Model
           'payment_id' => $this->payment_id,
           'cost' => $this->getTotal(),
           'tax' => $this->getTax(),
-          'cost_without_discount' => $this->getTotalWithDiscount(),
+          'cost_without_discount' => ($this->getAmount() + $this->getTax()),
           'cost_without_tax' => $this->getAmount(),
           'status_id' => EnumsOrder::NEW,
           'discount_id' => $this->discount_id,

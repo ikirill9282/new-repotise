@@ -3,9 +3,6 @@
 
 @section('content')
     @if (isset($product))
-        {{-- @push('before_header')
-      @include('site.components.bonus')
-    @endpush --}}
         @php
             $variables = $page->variables;
             $product = $product->getAllReviews();
@@ -319,6 +316,7 @@
                 </div>
             </div>
         </section>
+        
         @push('js')
             <script src="{{ asset('assets/js/product.js') }}"></script>
         @endpush

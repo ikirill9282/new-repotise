@@ -7,14 +7,16 @@ enum Order
 {
   public const NEW = 1;
   public const PAID = 2;
-  public const CALC_REWARD = 3;
+  public const REWARDING = 3;
+  public const COMPLETE = 4;
 
   public function toArray(): array
   {
     return [
       self::NEW,
       self::PAID,
-      self::CALC_REWARD,
+      self::REWARDING,
+      self::COMPLETE,
     ];
   }
 
@@ -23,7 +25,8 @@ enum Order
     return match($val) {
       1 => 'New',
       2 => 'Paid',
-      3 => 'Calculating Reward',
+      3 => 'Rewarding',
+      4 => 'Complete',
       default => 'Unknown',
     };
   }

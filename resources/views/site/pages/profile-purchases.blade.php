@@ -24,7 +24,7 @@
                 <div class="col">Price</div>
             </div>
             <div class="purch__items">
-                @foreach($user->orders->sortByDesc('crated_at') as $order)
+                @foreach($user->orders->sortByDesc('id') as $order)
                   @foreach($order->products as $product)
                     {{-- @dump($product) --}}
                     <div class="purch__item">
@@ -37,8 +37,8 @@
                             </span>
                         </div>
                         <div class="name">
-                            <div class="img">
-                                <img src="{{ $product->preview->image }}" alt="Product '{{ $product->title }}' preview">
+                            <div class="img !w-16 !h-16 !max-w-none">
+                                <img class="object-cover" src="{{ $product->preview->image }}" alt="Product '{{ $product->title }}' preview">
                             </div>
                             <p>
                                 {{ $product->title }}
@@ -57,7 +57,9 @@
                                 @endif
                             </div>
                             <div class="col">
-                                <a class="black" href="#">Leave Review</a>
+                                @if($user->canWriteComment($product))
+                                  <a class="black" href="{{ $product->makeUrl() }}">Leave Review</a>
+                                @endif
                                 <a class="gray" href="#">Refund</a>
                             </div>
                         </div>
@@ -69,74 +71,6 @@
                     </div>
                   @endforeach
                 @endforeach
-                {{-- <div class="purch__item">
-                    <div class="date">
-                        <span>05.28.2025</span>
-                    </div>
-                    <div class="order">
-                        <span>
-                            #J4RW45Z
-                        </span>
-                    </div>
-                    <div class="name">
-                        <div class="img">
-                            <img src="{{ asset('assets/imgs/item-preview.png') }}" alt="">
-                        </div>
-                        <p>
-                            A Guide to Getting to Know North Korea
-                        </p>
-                    </div>
-                    <div class="actions">
-                        <div class="col">
-                            <a class="orange" href="#">
-                                View & Download
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a class="black" href="#">Leave Review</a>
-                            <a class="gray" href="#">Refund</a>
-                        </div>
-                    </div>
-                    <div class="price">
-                        <span>
-                            1000$
-                        </span>
-                    </div>
-                </div>
-                <div class="purch__item">
-                    <div class="date">
-                        <span>05.28.2025</span>
-                    </div>
-                    <div class="order">
-                        <span>
-                            #J4RW45Z
-                        </span>
-                    </div>
-                    <div class="name">
-                        <div class="img">
-                            <img src="{{ asset('assets/imgs/item-preview.png') }}" alt="">
-                        </div>
-                        <p>
-                            A Guide to Getting to Know North Korea
-                        </p>
-                    </div>
-                    <div class="actions">
-                        <div class="col">
-                            <a class="orange" href="#">
-                                View & Download
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a class="black" href="#">Leave Review</a>
-                            <a class="gray" href="#">Refund</a>
-                        </div>
-                    </div>
-                    <div class="price">
-                        <span>
-                            1000$
-                        </span>
-                    </div>
-                </div> --}}
             </div>
             @else
               No purchases yet.

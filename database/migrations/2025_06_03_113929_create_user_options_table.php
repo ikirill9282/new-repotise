@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('user_options', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index()->unique();
+            $table->integer('level')->nullable()->default(1);
+
             $table->string('avatar')->default('/storage/images/default_avatar.svg');
             $table->text('description')->nullable();
 

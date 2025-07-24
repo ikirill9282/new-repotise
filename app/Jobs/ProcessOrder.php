@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\Order;
 use Laravel\Cashier\Cashier;
+use Illuminate\Support\Facades\DB;
 
 class ProcessOrder implements ShouldQueue, ShouldBeUnique
 {
@@ -35,18 +36,26 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
+
+      if ($this->order->status_id == EnumsOrder::NEW) {
+        $this->order->complete();
+      }
+
       if ($this->order->status_id == EnumsOrder::PAID) {
         $paymentIntent = $this->order->getTransaction();
         $charge = Cashier::stripe()->charges->retrieve($paymentIntent->latest_charge);
         $transaction = Cashier::stripe()->balanceTransactions->retrieve($charge->balance_transaction);
+        
+        DB::transaction(function() use ($transaction) {
+          $this->order->update([
+            'stripe_fee' => $transaction->fee / 100,
+            'base_reward' => $transaction->net / 100,
+            'status_id' => EnumsOrder::REWARDING,
+          ]);
+        });
 
-        $this->order->update([
-          'stripe_fee' => $transaction->fee / 100,
-          'profit' => $transaction->net / 100,
-          'status_id' => EnumsOrder::CALC_REWARD,
-        ]);
-
-
+        PayReward::dispatch($this->order);
+        ReferalFreeProduct::dispatch($this->order->user);
       }
     }
 }

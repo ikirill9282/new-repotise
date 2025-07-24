@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
+use App\Jobs\ReferalPromocode;
 
 class AuthController extends Controller
 {
@@ -84,6 +85,7 @@ class AuthController extends Controller
 
         Auth::login($user);
         Session::regenerate();
+        ReferalPromocode::dispatch($user);
 
         $url = boolval($valid['seller']) 
           ? $user->makeProfileVerificationUrl()

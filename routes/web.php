@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
 use App\Http\Middleware\StripeWebhook;
 use App\Jobs\CalcReward;
+use App\Jobs\PayReward;
 use Illuminate\Http\Request;
 use App\Mail\ConfirmRegitster;
 use App\Models\Discount;
@@ -50,7 +51,7 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/checkout', [CabinetController::class, 'checkout'])->name('profile.checkout');
 
 
-  Route::get('/profile/{slug}', [CabinetController::class, 'profile'])->name('view.profile');
+  Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
 });
 
 Route::post('/hook/stripe', function(Request $request) {
@@ -93,8 +94,8 @@ Route::get('/referal', [SiteController::class, 'referal'])->name('referal');
 // Route::get('/{slug}/{country}/{product}', SiteController::class);
 
 Route::get('/test', function() {
-  $job = new CalcReward(Order::find(100200));
-  $job->handle();
+  // $job = new PayReward(Order::find(100201));
+  // $job->handle();
 });
 
 Route::fallback(FallbackController::class);

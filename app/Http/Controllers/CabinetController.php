@@ -123,61 +123,9 @@ class CabinetController extends Controller
     $data = CustomEncrypt::decodeUrlHash($valid['token']);
     $user = User::find($data['id']);
 
-    // UserNotification::clear($user->id, 'stripe_verification');
-    // UserNotification::create([
-    //   'user_id' => $user->id,
-    //   'type' => 'info',
-    //   'message' => "Your verification is in progress. Please wait.",
-    //   'group' => 'stripe_verification',
-    //   'closable' => 0,
-    // ]);
     CheckStripeVerification::dispatch($user);
     
     return redirect($user->makeProfileUrl());
-    
-    // $verify = $user->getStripeVerify();
-    // $verify_session = $user->getStripeVerifySession();
-    
-    // if ($verify_session->status == 'requires_input') {
-    //   $response = redirect($user->makeProfileVerificationUrl());
-    //   if (!empty($verify_session->last_error)) {
-    //     $response->withErrors([
-    //       'form' => $verify_session->last_error->reason,
-    //     ]);
-    //   }
-    //   return $response;
-    // }
-
-    // if ($verify_session->status == 'processing') {
-    //   dd('proc');
-    // }
-
-    // dd($verify_session);
-
-    // DB::beginTransaction();
-    // try {
-    //   History::userVerified($user);
-    //   Log::info("User verification success $user->username", [
-    //     'user' => $user,
-    //     'verify' => $verify,
-    //     'data' => $data,
-    //   ]);
-    //   $verify->delete();
-    //   $user->update(['verified' => 1, 'stripe_verified_at' => Carbon::now()->format('Y-m-d H:i:s')]);
-    // } catch (\Exception $e) {
-    //   DB::rollBack();
-    //   Log::error('Error while complete user verification', [
-    //     'user' => $user,
-    //     'verify' => $verify,
-    //     'data' => $data,
-    //     'error' => $e,
-    //   ]);
-
-    //   return redirect($user->makeProfileUrl());
-    // }
-
-    // DB::commit();
-    // return redirect($user->makeProfileUrl() . '/?modal=success');
   }
 
   public function verifyCancel(Request $request)
@@ -198,13 +146,22 @@ class CabinetController extends Controller
     }
   }
 
-  public function profile(Request $request, ?string $slug = null)
+  public function profile(Request $request)
   {
-    $user = is_null($slug) ? Auth::user() : User::where('username', str_ireplace('@', '', $slug))->first();
+    return view('site.pages.profile', [
+      'user' => Auth::user(),
+    ]);
+  }
+
+  public function public_profile(Request $request, string $slug)
+  {
+    $user = User::where('username', $slug)->first();
+
     if (!$user) {
       return redirect('/unknown');
     }
-    return view('site.pages.profile', [
+
+    return view('site.pages.public-profile', [
       'user' => $user,
     ]);
   }

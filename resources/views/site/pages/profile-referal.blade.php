@@ -19,7 +19,7 @@
                   </span>
                   <div class="balance-input__input">
                     <span>
-                      {{ currency(10000) }}
+                      {{ currency($user->funds()->where('group', 'referal')->sum('sum')) }}
                     </span>
                   </div>
                 </div>
@@ -36,15 +36,15 @@
                   </p>
                   <p>
                     <span>Discount Codes Earned:</span>
-                    <b>4</b>
+                    <b>{{ $user->referal_codes()->count() }}</b>
                   </p>
                   <p>
                     <span>Free Products Unlocked:</span>
-                    <b>4</b>
+                    <b>{{ $user->referal_free_products()->count() }}</b>
                   </p>
                   <p>
                     <span>Referral Income Earned:</span>
-                    <b>{{ currency(10000) }}</b>
+                    <b>{{ currency($user->referal_income()->sum('sum')) }}</b>
                   </p>
                 </div>
                 <div class="col">
@@ -53,17 +53,16 @@
                       Next Free Product Reward Progress:
                     </span>
                     <!-- здесь просто указать от 0 до 10 с шагом по 1 -->
-                    <div data-progress="5" class="progresss-item">
-                      <i class="active"></i>
-                      <i class="active"></i>
-                      <i class="active last"></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
+                    <div data-progress="3" class="progresss-item">
+                      @php
+                        $referals_count = $user->referal_buyers()->count();
+                        $delimeter = $referals_count > 0 ? ($referals_count % 10) : 0;
+                      @endphp
+                      @for($i = 0; $i <= 10; $i++)
+                        <i class="{{ $i <= $delimeter ? 'active' : '' }} {{ $i == $delimeter ? 'last' : '' }}">
+                          <span class="active-percent">{{ $i == $delimeter ? ($i > 0 ? $i : '')."0%" : '' }}</span>
+                        </i>
+                      @endfor
                     </div>
                   </div>
                 </div>

@@ -311,6 +311,7 @@ class History extends Model
       return $this;
     }
 
+
     protected static function makeValidatorMessage(Validator $validator)
     {
       return collect($validator->errors()->getMessages())

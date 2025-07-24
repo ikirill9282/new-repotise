@@ -144,9 +144,19 @@ class User extends Authenticatable implements HasName, FilamentUser
         return $array;
     }
 
+    public function discounts()
+    {
+      return $this->hasMany(Discount::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
       return $this->hasRole('admin');
+    }
+
+    public function funds()
+    {
+      return $this->hasMany(UserFunds::class);
     }
 
     public function notifications()
@@ -179,14 +189,34 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->hasMany(Order::class);
     }
 
+    public function owner()
+    {
+      return $this->hasOneThrough(User::class, UserReferal::class, 'referal_id', 'id', 'id', 'owner_id');
+    }
+
     public function referals()
     {
       return $this->hasManyThrough(User::class, UserReferal::class, 'owner_id', 'id', 'id', 'referal_id');
     }
 
-    public function owner()
+    public function referal_buyers()
     {
-      return $this->hasOneThrough(User::class, UserReferal::class, 'referal_id', 'owner_id', 'id', 'id');
+      return $this->referals()->whereNotNull('email_verified_at')->whereHas('orders', fn($query) => $query->where('orders.status_id', '>=', 2));
+    }
+
+    public function referal_codes()
+    {
+      return $this->discounts()->where(['group' => 'referal', 'type' => 'promocode']);
+    }
+
+    public function referal_free_products()
+    {
+      return $this->discounts()->where(['group' => 'referal', 'type' => 'freeproduct']);
+    }
+
+    public function referal_income()
+    {
+      return $this->funds()->where(['group' => 'referal']);
     }
 
     public function favorite_products()
@@ -266,7 +296,8 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileUrl(): string
     {
-      return Auth::user()?->hasRole('creator') ? url("/profile/@$this->username") : route('profile.purchases') ;
+      // return $this->hasRole('creator') ? url("/profile/@$this->username") : route('profile.purchases') ;
+      return url("/profile/@$this->username");
     }
 
     public function makeProfileVerificationUrl(): string 

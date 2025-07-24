@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('owner_id')->unsigned();
             $table->bigInteger('referal_id')->unsigned()->unique();
+            $table->tinyInteger('promocode')->nullable()->default(0);
 
             $table->unique(['owner_id', 'referal_id']);
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');

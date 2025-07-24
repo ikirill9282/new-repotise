@@ -120,12 +120,12 @@ class Product extends Model
       ->where('product_id', $this->id)
       ->whereNull('parent_id')
       ->with('likes', function($query) {
-        $query->with('author')->orderByDesc('id')->limit(4);
+        $query->with('author.options')->orderByDesc('id')->limit(4);
       })
       // ->with('likes.author')
       ->when(!is_null($limit), fn($q) => $q->limit($limit))
       ->withCount('likes')
-      ->with('author')
+      ->with('author.options')
       ->get(); 
 
     
@@ -143,7 +143,7 @@ class Product extends Model
   public function getChildren($review, int $max_level = 1)
   {
     $this->level++;
-    $review->load('likes.author', 'author');
+    $review->load('likes.author', 'author.options');
     $review->loadCount('likes', 'children');
 
     if ($this->level > $max_level) {
@@ -157,7 +157,7 @@ class Product extends Model
         if ($child->children()->exists()) {
           $this->getChildren($child);
         } else {
-          $child->load('likes.author', 'author');
+          $child->load('likes.author', 'author.options');
           $child->loadCount('likes');
           $this->level = 0;
         }
@@ -207,7 +207,7 @@ class Product extends Model
     $rdata = CustomEncrypt::decodeUrlHash($pid);
     $id = isset($rdata['id']) ? $rdata['id'] : null;
 
-    return static::where('id', $id)->with('author')->withCount('reviews')->first();
+    return static::where('id', $id)->with('author.options')->withCount('reviews')->first();
   }
 
   public static function getAnalogs(int $product_id = null)

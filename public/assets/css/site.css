@@ -850,6 +850,7 @@ aside .login svg {
 }
 
 .commends_product_page .about_block .block_commends .commends_group:first-child::after {
+  display: none;
   height: 55%;
   top: 34%;
   left: 33px;
@@ -1395,6 +1396,29 @@ footer .bottom_connecting_group .connecting a {
 
 .success_pay_block .about_block .share_earn_block .text_right .input_block button {
   right: 10px;
+}
+
+.rp-top__info .col .progresss .progresss-item i.last::before {
+    display: none;
+}
+
+.rp-top__info .col .progresss .progresss-item .active-percent {
+    display: none;
+}
+
+.rp-top__info .col .progresss .progresss-item .active.last .active-percent {
+    position: absolute;
+    left: 50%;
+    top: -19px;
+    width: 25px !important;
+    height: 18px !important;
+    background-color: #FC7361;
+    color: #fff;
+    border-radius: 5px 5px 5px 0;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (min-width: 1140px) {

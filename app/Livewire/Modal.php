@@ -23,7 +23,9 @@ use App\Services\Cart;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
 use App\Models\UserReferal;
+use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
+use Illuminate\Support\Facades\DB;
 
 class Modal extends Component
 {
@@ -153,7 +155,7 @@ class Modal extends Component
           Session::regenerate(true);
           $this->deactivate();
           
-          return redirect($user->makeProfileUrl());
+          return redirect('/');
         }
       }
 
@@ -181,17 +183,11 @@ class Modal extends Component
         ]);
         
         if ($this->currentRouteName == 'referal' && array_key_exists('token', $this->currentRouteParams)) {
-          $id = CustomEncrypt::getId($this->currentRouteParams['token']);
-          $owner = User::find($id);
-          UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $user->id]);
-          Discount::createForUsers([$owner->id, $user->id], [
-            'group' => 'referal',
-            'visibility' => 'private',
-            'type' => 'promocode',
-            'target' => 'cart',
-            'percent' => 15,
-            'max' => 50,
-          ]);
+          DB::transaction(function() use ($user) {
+            $id = CustomEncrypt::getId($this->currentRouteParams['token']);
+            $owner = User::find($id);
+            UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $user->id]);
+          });
         }
 
         History::userCreated($user);

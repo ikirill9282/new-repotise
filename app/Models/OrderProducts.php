@@ -9,6 +9,17 @@ class OrderProducts extends Model
     protected $guarded = ['id'];
     public $timestamps = false;
 
+    protected static function boot()
+    {
+      parent::boot();
+
+      self::creating(function (Model $model) {
+        if (is_null($model->price_without_discount)) {
+          $model->price_without_discount = $model->price;
+        }
+      });
+    }
+
     public function product()
     {
       return $this->belongsTo(Product::class);

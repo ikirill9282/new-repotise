@@ -9,9 +9,11 @@ class InviteCalculator extends Component
 {
     public $amount = 10000;
 
+    public $platform_fee = 5;
+
     public array $numbers = [
-      'avg' => null,
-      'sales' => null,
+      'avg' => 50,
+      'sales' => 100,
     ];
 
     public function calcAmount()
@@ -26,7 +28,13 @@ class InviteCalculator extends Component
       }
 
       $valid = $validator->validated();
-      $this->amount = $valid['avg'] * $valid['sales'];
+      $payouts = 12;
+      $gross = $valid['avg'] * $valid['sales'] * $payouts;
+      $platform_fee = $gross / 100 * $this->platform_fee;
+      $payment_fee = ($gross / 100 * 2.9) + (($valid['sales'] * $payouts) * 0.30);
+      $subtotal = $gross - $platform_fee - $payment_fee;
+      $payout_fee = ($subtotal / 100 * 0.25) + ($payouts * 0.25);
+      $this->amount = ceil($subtotal - $payout_fee);
     }
 
     public function render()

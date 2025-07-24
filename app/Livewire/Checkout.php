@@ -12,6 +12,7 @@ use App\Models\Product;
 use Illuminate\Validation\ValidationException;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class Checkout extends Component
 {
@@ -50,12 +51,8 @@ class Checkout extends Component
         ->where('code', $this->promocode)
         ->first();
         
-      if ($discount->isAvailable()) {
-        $this->order->update(['discount_id' => $discount->id]);
-        $this->order->update([
-          'price' => $this->order->getTotal(),
-          'tax' => $this->order->getTax(),
-        ]);
+      if ($discount->isAvailable($this->order)) {
+        $discount->applyOrder($this->order);
         $this->updatePaymentIntent();
       } else {
         $this->addError('promocode', 'Incorrect promocode');
@@ -64,11 +61,9 @@ class Checkout extends Component
 
     public function removePromocode(): void
     {
-      $this->order->update(['discount_id' => null]);
-      $this->order->update([
-          'price' => $this->order->getTotal(),
-          'tax' => $this->order->getTax(),
-        ]);
+      $discount = $this->order->discount;
+      $discount->removeOrder($this->order);
+      
       $this->promocode = null;
       $this->updatePaymentIntent();
     }

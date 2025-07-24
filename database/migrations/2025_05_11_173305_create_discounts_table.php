@@ -20,13 +20,13 @@ return new class extends Migration
           $table->string('type');
           $table->string('target');
           $table->integer('target_id')->nullable();
+          $table->enum('target_author', ['system', 'seller', 'all'])->nullable()->default('all');
           $table->string('code')->unique();
           $table->integer('percent')->nullable();
           $table->decimal('sum')->nullable();
           $table->decimal('min')->nullable();
           $table->decimal('max')->nullable();
           $table->integer('uses')->unsigned()->default(1);
-          $table->tinyInteger('one_time')->default(1);
           $table->tinyInteger('active')->default(1)->index();
           $table->datetime('end');
 
