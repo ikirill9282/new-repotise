@@ -32,7 +32,7 @@ class PayReward implements ShouldQueue, ShouldBeUnique
    */
   public function handle(): void
   {
-    if ($this->order->status_id !== EnumsOrder::REWARDING) {
+    if ($this->order->status_id == EnumsOrder::REWARDING) {
       $max_fee = $this->order->stripe_fee;
       $processing_products = $this->order->order_products->where('price', '>', 0);
       $fee_per_product = round($this->order->stripe_fee / $processing_products->count(), 2);
@@ -122,11 +122,11 @@ class PayReward implements ShouldQueue, ShouldBeUnique
 
       } catch (\Exception $e) {
         DB::rollBack();
-        dd($e);
+        // dd($e);
         throw $e;
       } catch (\Error $e) {
         DB::rollBack();
-        dd($e);
+        // dd($e);
         throw $e;
       }
       DB::commit();

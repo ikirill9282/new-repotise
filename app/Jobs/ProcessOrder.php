@@ -54,6 +54,8 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
           ]);
         });
 
+        $this->order->refresh();
+
         PayReward::dispatch($this->order);
         ReferalFreeProduct::dispatch($this->order->user);
       }
