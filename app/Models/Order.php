@@ -98,9 +98,11 @@ class Order extends Model
 
     public function getAmount(): int
     {
-      return $this->products->reduce(function($c, $i) {
-        return $c += $i->price * ($i->pivot->count ?? $i->pivot['count']);
-      }, 0);
+      return $this->prepare 
+        ? $this->products->reduce(function($c, $i) {
+          return $c += ($i->pivot['price'] * ($i->pivot['count'] ?? 1));
+        }, 0)
+        : $this->order_products->reduce(fn($c, $i) => $c += $i->getTotal(), 0);
     }
 
     public function getCount(): int
@@ -113,13 +115,6 @@ class Order extends Model
       // $amount = $this->getAmount() - $this->getDiscount();
       // return static::calcPercent($amount, static::$tax);
       return 0;
-    }
-
-    public function getDiscount(): int
-    { 
-      if ($this->discount_amount > 0) return $this->discount_amount;
-      
-      return $this->discount()->exists() ? $this->discount->calcOrderDiscount($this) : 0;
     }
 
     public function getTotal(): int
@@ -174,9 +169,7 @@ class Order extends Model
     public function savePrepared(): static
     {
       if ($this->prepare) {
-        $this->prepare = false;
         $order = Order::create($this->getPreparingAttributes());
-
         $order = $this->syncPreparedProducts($order);
         $order->refresh();
         
@@ -205,7 +198,8 @@ class Order extends Model
         'count' => $item->pivot['count'], 
         'price' => $item->pivot['price'],
         'old_price' => $item->pivot['old_price'],
-        'price_without_discount' => $item->pivot['price'],
+        'total' => $item->pivot['price'] * ($item->pivot['count'] ?? 1),
+        'total_without_discount' => $item->pivot['price'] * ($item->pivot['count'] ?? 1),
       ])
         ->toArray();
 
@@ -232,5 +226,166 @@ class Order extends Model
     public function getTransaction(): ?PaymentIntent
     {
       return $this->payment_id ? Cashier::stripe()->paymentIntents->retrieve($this->payment_id) : null;
+    }
+
+    public function getDiscount(): int
+    {
+      $sum = 0;
+      if (!$this->discount()->exists()) return $sum;
+
+      $discount = $this->discount;
+
+      if ($discount->type == 'promocode') {
+        if ($discount->target == 'cart') {
+          $amount = $this->getAmount();
+
+          if (!is_null($discount->percent)) {
+            $sum = round(($amount / 100 * $discount->percent), 2);
+            $sum = ($sum > $discount->max) ? $discount->max : $sum;
+          }
+        }
+      }
+
+      if ($this->discount->type == 'freeproduct') {
+        // if ($this->group == 'referal') {
+          // $res = [];
+          // foreach ($this->order_products as $op) {
+          //   if ($op->price > 50) continue;
+          //   if ($op->product->author->id > 0 && $op->price > 25) continue;
+            
+          //   $res[$op->product_id] = $op->price;
+          // }
+          // $cost = max($res);
+          // $product_id = array_search($cost, $res);
+          $op = $this->findReferalFreeProduct();
+          $max_discount = $op->product->author->id > 0 ? 25 : 50;
+
+          return $max_discount > $op->price ? $op->price : $max_discount;
+        // }
+      }
+
+      return floor($sum);
+    }
+
+    public function applyDiscount(Discount $discount)
+    {
+      $this->discount_id = $discount->id;
+      $this->recalculateDiscount();
+      $this->recalculateCosts();
+      $this->saveThroughTransaction();
+    }
+
+    public function removeDiscount()
+    {
+      $this->discount_id = null;
+      $this->recalculateDiscount();
+      $this->recalculateCosts();
+      $this->saveThroughTransaction();
+    }
+
+    public function recalculate()
+    {
+      $this->tax = $this->getTax();
+
+      $this->recalculateDiscount();
+      $this->recalculateStripeFee();
+      $this->recalculateCosts();
+
+      $this->saveThroughTransaction();
+      // dd($this->toArray());
+      // dd('recalc...');
+    }
+
+    public function recalculateDiscount()
+    {
+      $this->discount_amount = $this->getDiscount();
+      
+      if (!is_null($this->discount_id) && $this->discount_amount) {
+        $discount_max = $this->discount_amount;
+        $discount_per_product = $discount_max / $this->order_products->count();
+
+        if ($this->discount->type == 'promocode') {
+          if ($this->discount->target == 'cart') {
+            foreach ($this->order_products as $op) {
+              $discount_product = $discount_per_product > $discount_max ? $discount_max : $discount_per_product;
+              $discount_product = $discount_product > $op->price ? $op->price : $discount_product;
+              
+              $op->discount = $discount_product;
+              $op->total = ($op->price * $op->count ?? 1) - $discount_product;
+              $op->total_without_discount = ($op->price * $op->count ?? 1);
+              $discount_max = $discount_max - $discount_product;
+
+            }
+          }
+        }
+
+        if ($this->discount->type == 'freeproduct') {
+          $op = $this->findReferalFreeProduct();
+          $op->discount = $this->getDiscount();
+          $op->total = ($op->price * $op->count ?? 1) - $op->discount;
+          $op->total_without_discount = ($op->price * $op->count ?? 1);
+        }
+
+      } else {
+        $this->discount_amount = 0;
+        foreach ($this->order_products as $op) {
+          $op->discount = 0;
+          $op->total = ($op->price * $op->count ?? 1);
+          $op->total_without_discount = ($op->price * $op->count ?? 1);
+        }
+      }
+    }
+
+    public function recalculateStripeFee()
+    {
+      if (!is_null($this->stripe_fee)) {
+        $this->base_reward = $this->cost - $this->stripe_fee;
+
+        $fee_max = $this->stripe_fee;
+        $fee_per_product = round($fee_max / $this->order_products->count(), 2);
+
+        foreach ($this->order_products as $op) {
+          if ($op->total > 0) {
+            $fee_product = ($fee_per_product > $fee_max) ? $fee_max : $fee_per_product;
+            if ($op == $this->order_products->last()) {
+              $fee_product = $fee_max;
+            }
+            $op->payment_fee = $fee_product;
+            $fee_max -= $fee_product;
+          } else {
+            $op->payment_fee = 0;
+          }
+        }
+      }
+    }
+
+
+    public function recalculateCosts()
+    {
+      $this->cost_without_tax = $amount = $this->getAmount();
+      $this->cost = $amount - $this->discount_amount + $this->tax;
+      $this->cost_without_discount = $amount + $this->tax;
+    }
+
+    public function saveThroughTransaction()
+    {
+      DB::transaction(function() {
+        $this->save();
+        $this->order_products->map(fn($op) => $op->save());
+      });
+    }
+
+    public function findReferalFreeProduct()
+    {
+      $res = [];
+      foreach ($this->order_products as $op) {
+        if ($op->price > 50) continue;
+        if ($op->product->author->id > 0 && $op->price > 25) continue;
+        
+        $res[$op->product_id] = $op->price;
+      }
+      $cost = max($res);
+      $product_id = array_search($cost, $res);
+      return $this->order_products->where('product_id', $product_id)->first();
     }
 }

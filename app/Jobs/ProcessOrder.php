@@ -46,15 +46,11 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
         $charge = Cashier::stripe()->charges->retrieve($paymentIntent->latest_charge);
         $transaction = Cashier::stripe()->balanceTransactions->retrieve($charge->balance_transaction);
         
-        DB::transaction(function() use ($transaction) {
-          $this->order->update([
-            'stripe_fee' => $transaction->fee / 100,
-            'base_reward' => $transaction->net / 100,
-            'status_id' => EnumsOrder::REWARDING,
-          ]);
-        });
+        $this->order->stripe_fee = $transaction->fee / 100;
+        $this->order->base_reward = $transaction->net / 100;
+        $this->order->status_id = EnumsOrder::REWARDING;
 
-        $this->order->refresh();
+        $this->order->recalculate();
 
         PayReward::dispatch($this->order);
         ReferalFreeProduct::dispatch($this->order->user);

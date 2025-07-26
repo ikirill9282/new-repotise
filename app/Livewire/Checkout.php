@@ -52,7 +52,7 @@ class Checkout extends Component
         ->first();
         
       if ($discount->isAvailable($this->order)) {
-        $discount->applyOrder($this->order);
+        $this->order->applyDiscount($discount);
         $this->updatePaymentIntent();
       } else {
         $this->addError('promocode', 'Incorrect promocode');
@@ -61,37 +61,43 @@ class Checkout extends Component
 
     public function removePromocode(): void
     {
-      $discount = $this->order->discount;
-      $discount->removeOrder($this->order);
-      
-      $this->promocode = null;
+      $this->order->removeDiscount();
       $this->updatePaymentIntent();
     }
 
     public function dropProduct(int $product_id): void
     {
-      $product = $this->order->products->where('id', $product_id)->first();
-      $this->deleteOrderProduct($product);
+      DB::transaction(function() use ($product_id) {
+        $this->order->order_products()->where('product_id', $product_id)->delete();
+        $this->order->load('products');
+
+        
+        // $this->order->discount->isAvailable($this->order);
+        if ($this->order->discount_id && !$this->order->discount->isAvailable($this->order)) {
+          $this->order->removeDiscount();
+          $this->promocode = null;
+        }
+      });
       
       if ($this->order->products->isEmpty()) {
         $this->order->delete();
         Session::forget('checkout');
       } else {
+        $this->order->recalculate();
         $this->updatePaymentIntent();
       }
     }
     
-    protected function deleteOrderProduct($product)
-    {
-      $product->pivot->delete($product);
-      $this->order->load('products');
-    }
 
     public function incrementProductCount(int $product_id): void
     {
       $product = $this->order->products->where('id', $product_id)->first();
       $product->pivot->update(['count' => ($product->pivot->count + 1)]);
+
+      $this->order->recalculate();
       $this->updatePaymentIntent();
+      // $this->order->refresh();
+      // $this->order->updateCosts();
     }
 
     public function decrementProductCount(int $product_id): void
@@ -99,6 +105,9 @@ class Checkout extends Component
       $product = $this->order->products->where('id', $product_id)->first();
       if ($product->pivot->count > 1) {
         $product->pivot->update(['count' => ($product->pivot->count - 1)]);
+        $this->order->recalculate();
+        // $this->order->refresh();
+        // $this->order->updateCosts();
         $this->updatePaymentIntent();
       }
     }

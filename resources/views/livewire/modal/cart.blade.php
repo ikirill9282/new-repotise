@@ -63,13 +63,13 @@
         <div class="swiper-scrollbar swiper-pagination swiper-pagination-progressbar swiper-pagination-vertical hidden md:block md:!top-0 md:!right-0 md:!left-auto md:!bottom-auto">
         </div>
     </div>
-    <div class="md:basis-3/4 bg-white pt-4 px-2 pb-2 md:p-2 rounded-lg flex flex-col transition">
+    <div class="cart-order-view md:basis-3/4 bg-white pt-4 px-2 pb-2 md:p-2 rounded-lg flex flex-col transition overflow-y-scroll">
         <div class="order-view {{ ($order?->products && $order->products->isNotEmpty()) ? '' : 'hidden' }}">
             <div class="title_block px-2 py-4 flex justify-between items-center">
               <h3>Your order</h3>
               <p>Items <span><span class="cart-counter text-gray-400">({{ $cart->getCartCount() }})</span></span></p>
             </div>
-            <div class="products_modal overflow-y-scroll">
+            <div class="products_modal">
                 <div class="items_group">
                     @foreach ($order->products as $product)
                         @include('site.components.cards.product', [

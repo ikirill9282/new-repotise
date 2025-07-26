@@ -32,6 +32,6 @@ class OrderProducts extends Model
 
     public function getTotal(): int
     {
-      return round($this->price * $this->count);
+      return round($this->price * $this->count ?? 1, 2);
     }
 }

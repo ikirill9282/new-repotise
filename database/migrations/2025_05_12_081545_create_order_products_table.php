@@ -18,8 +18,9 @@ return new class extends Migration
             $table->decimal('price');
             $table->decimal('old_price')->nullable();
             $table->decimal('discount')->unsigned()->nullable()->default(0);
-            $table->decimal('price_without_discount')->unsigned()->nullable();
             $table->integer('count')->unsigned();
+            $table->decimal('total');
+            $table->decimal('total_without_discount')->unsigned()->nullable();
             $table->decimal('payment_fee')->nullable();
             $table->decimal('seller_reward')->nullable();
             $table->decimal('referal_reward')->nullable();

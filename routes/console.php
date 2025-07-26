@@ -24,8 +24,15 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $t = new PayReward(Order::find(100211));
+  $t = new PayReward(Order::find(100217));
   $t->handle();
+  // Discount::createForUsers([7], [
+  //   'visibility' => 'public',
+  //   'type' => 'freeproduct',
+  //   'target' => 'cart',
+  //   // 'percent' => 15,
+  //   'max' => 50,
+  // ]);
 });
 
 Artisan::command('ttm', function() {

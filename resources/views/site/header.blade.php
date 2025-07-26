@@ -52,8 +52,9 @@
                         <img src="{{ auth()->user()?->avatar ? url(auth()->user()->avatar) : '' }}" alt="avatar"
                             class="profile_img">{{-- rounded-full w-8 --}}
                         <div class="right_text">
-                            <div class="name">
+                            <div class="name flex flex-col">
                                 <h3>{{ auth()->user()?->profile }}</h3>
+                                {{-- <div class="text-sm">{{ currency(auth()->user()?->balance) }}</div> --}}
                             </div>
                             <img class="hidden" src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
                         </div>
@@ -103,8 +104,9 @@
                 <a href="{{ route('profile') }}" class="profile flex items-center gap-2">
                     <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
                     <div class="right_text">
-                        <div class="name">
+                        <div class="name flex flex-col">
                             <h3>{{ auth()->user()?->profile }}</h3>
+                            {{-- <div class="text-sm">{{ currency(auth()->user()?->balance) }}</div> --}}
                         </div>
                     </div>
                 </a>

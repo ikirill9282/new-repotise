@@ -56,14 +56,14 @@ class Discount extends Model
           $amount = $order->getAmount();
 
           if (!is_null($this->percent)) {
-            $discount = floor($amount / 100 * $this->percent);
+            $discount = round($amount / 100 * $this->percent, 2);
             $discount = ($discount > $this->max) ? $this->max : $discount;
           }
         }
       }
 
       if ($this->type == 'freeproduct') {
-        if ($this->group == 'referal') {
+        // if ($this->group == 'referal') {
           $res = [];
           foreach ($order->order_products as $op) {
             if ($op->price > 50) continue;
@@ -76,7 +76,7 @@ class Discount extends Model
           $product = $order->order_products->where('product_id', $product_id)->first();
 
           return $product->price;
-        }
+        // }
       }
 
       return $discount;
@@ -112,7 +112,7 @@ class Discount extends Model
       if (Carbon::today()->gt(Carbon::parse($this->end))) {
         return false;
       }
-      if ($this->uses == 0 || $this->uses == $this->orders()->count()) {
+      if ($this->uses == 0 || $this->uses == $this->orders()->whereNot('id', $order->id)->count()) {
         return false;
       }
 
@@ -120,6 +120,7 @@ class Discount extends Model
       }
 
       if ($this->type == 'freeproduct') {
+        // dd($order->order_products);
         foreach ($order->order_products as $op) {
           if ($op->product->author->id === 0 && $op->price < 50) {
             return true;
@@ -154,78 +155,86 @@ class Discount extends Model
     public static function generateCode(): string
     {
       $str = str_shuffle(trim(base64_encode(random_bytes(10)), '='));
-      $str = preg_replace('/[+_]/is', '', $str);
+      $str = preg_replace('/[^a-zA-Z]/is', '', $str);
       $code = "#" . strtoupper(substr($str, 0, 8));
       return static::where('code', $code)->exists() ? static::generateCode() : $code;
     }
 
 
-    public function applyOrder(Order $order)
-    {
-      DB::transaction(function() use($order) {
-        $order->update(['discount_id' => $this->id]);
-        $order->update([
-          'discount_amount' => $order->getDiscount(),
-          'cost' => $order->getTotal(),
-          'tax' => $order->getTax(),
-        ]);
+    // public function applyOrder(Order $order)
+    // {
+    //   DB::transaction(function() use($order) {
+    //     $order->update(['discount_id' => $this->id]);
+    //     $order->update([
+    //       'discount_amount' => $order->getDiscount(),
+    //       'cost' => $order->getTotal(),
+    //       'tax' => $order->getTax(),
+    //     ]);
 
-        $max_discount = $order->discount_amount;
-        $get_dicsount = fn($val) => $val > $max_discount ? $max_discount : $val;
+    //     $max_discount = $order->discount_amount;
+    //     $get_dicsount = fn($val) => $val > $max_discount ? $max_discount : $val;
 
-        if ($this->type == 'promocode') {
+    //     if ($this->type == 'promocode') {
 
-          if ($this->target == 'cart') {
-            $discount_per_product = round($max_discount / $order->order_products->count(), 2);
-            foreach ($order->order_products as $product) {
-              $discount = $get_dicsount($discount_per_product);
-              $product->update(['discount' => $discount]);
-            }
-          }
-        }
+    //       if ($this->target == 'cart') {
+    //         $discount_per_product = round($max_discount / $order->order_products->count(), 2);
+    //         foreach ($order->order_products as $product) {
+    //           $discount = $get_dicsount($discount_per_product);
+    //           $product->update([
+    //             'discount' => $discount,
+    //             'price' => ($product->price - $discount),
+    //             'price_without_discount' => $product->price,
+    //             'total' => $product->getTotal() - $discount,
+    //             'total_without_discount' => $product->getTotal(),
+    //           ]);
+    //           $max_discount -= $discount;
+    //         }
+    //       }
+    //     }
 
-        if ($this->type == 'freeproduct') {
-          if ($this->target == 'cart') {
-            foreach ($order->order_products as $op) {
-              if ($op->price > 50) continue;
-              if ($op->product->author->id > 0 && $op->price > 25) continue;
+    //     if ($this->type == 'freeproduct') {
+    //       if ($this->target == 'cart') {
+    //         foreach ($order->order_products as $op) {
+    //           if ($op->price > 50) continue;
+    //           if ($op->product->author->id > 0 && $op->price > 25) continue;
               
-              $res[$op->product_id] = $op->price;
-            }
-            $cost = max($res);
-            $product_id = array_search($cost, $res);
-            $product = $order->order_products->where('product_id', $product_id)->first();
-            $max_discount = $product->product->author->id > 0 ? 25 : 50;
-            $dis = $max_discount > $product->price ? $product->price : $max_discount;
-            $product->update([
-              'discount' => $dis, 
-              'price' => ($product->price - $dis), 
-              'price_without_discount' => $product->price, 
-            ]);
-          }
-        }
-      });
-    }
+    //           $res[$op->product_id] = $op->price;
+    //         }
+    //         $cost = max($res);
+    //         $product_id = array_search($cost, $res);
+    //         $product = $order->order_products->where('product_id', $product_id)->first();
+    //         $max_discount = $product->product->author->id > 0 ? 25 : 50;
+    //         $dis = $max_discount > $product->price ? $product->price : $max_discount;
+    //         $product->update([
+    //           'discount' => $dis,
+    //           'total' => $product->getTotal() - $dis,
+    //           'total_without_discount' => $product->getTotal(),
+    //         ]);
+    //       }
+    //     }
+    //   });
+    // }
 
-    public function removeOrder(Order $order)
-    {
-      DB::transaction(function() use($order) {
-        $order->update(['discount_id' => null]);
-        $order->update([
-          'discount_amount' => $order->getDiscount(),
-          'cost' => $order->getTotal(),
-          'tax' => $order->getTax(),
-        ]);
+    // public function removeOrder(Order $order)
+    // {
+    //   DB::transaction(function() use($order) {
+    //     $order->update([
+    //       'discount_id' => null,
+    //       'discount_amount' => 0,
+    //       'cost' => $order->cost_without_discount,
+    //     ]);
 
-        if ($this->target == 'cart') {
-          foreach ($order->order_products as $product) {
-            $product->update([
-              'discount' => 0,
-              'price' => $product->price_without_discount,
-            ]);
-          }
-        }
-      });
-    }
+    //     if ($this->target == 'cart') {
+    //       foreach ($order->order_products as $product) {
+    //         $product->update([
+    //           'discount' => 0,
+    //           'price' => $product->price_without_discount,
+    //           'total' => $product->getTotalWithotDiscount(),
+    //           'total_without_discount' => $product->getTotalWithotDiscount(),
+    //         ]);
+    //       }
+    //     }
+    //   });
+    // }
     
 }
