@@ -8,6 +8,10 @@
 <div class="the-content-wrap">
       <div class="container">
           <div class="the-profile__sidebar">
+            <div class="the-profile__accord-button">
+              <button>Menu</button>
+            </div>
+            <div class="the-profile__wrap">
               <a class="{{ (request()->route()->getName() === 'profile.purchases') ? 'active' : '' }}" href="{{ route('profile.purchases') }}">
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -45,6 +49,7 @@
 
                   Settings
               </a>
+            </div>
           </div>
           {{ $slot }}
       </div>
