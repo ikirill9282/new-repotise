@@ -132,8 +132,10 @@
                             @enderror
                         </div>
 
-                        <div class="" wire:ignore>
-                            <div id="payment" class="mb-4"></div>
+                        <div class="class="@if($order->cost <= 0) hidden @endif">
+                          <div wire:ignore>
+                              <div id="payment" class="mb-4"></div>
+                          </div>
                         </div>
 
                         <div class="costs">
@@ -264,7 +266,7 @@
 
       $('.apply').on('click', function(evt) {
           evt.preventDefault();
-          applyPromocode($(this).siblings('.input_block').find('input').val(), '#error-promo');
+          // applyPromocode($(this).siblings('.input_block').find('input').val(), '#error-promo');
       });
 
       $('.is-gift-button').on('click', function() {
@@ -274,33 +276,41 @@
           // $wire.call('setGift', val);
       });
 
-
       const stripe = Stripe(
-          'pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl'
+        'pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl'
       );
       const stripeData = {};
+      if (document.getElementById('payment')) {
+        const client_secret = '{{ $order->getTransaction()?->client_secret }}';
+        const appearance = {
+            theme: 'stripe',
+        };
 
-      const client_secret = '{{ $order->getTransaction()?->client_secret }}';
-      const appearance = {
-          theme: 'stripe',
-      };
+        stripeData.elements = stripe.elements({
+            clientSecret: client_secret,
+            appearance: appearance,
+        });
 
-      stripeData.elements = stripe.elements({
-          clientSecret: client_secret,
-          appearance: appearance,
+        try {
+            stripeData.paymentElement = stripeData.elements.create('payment', {
+                // paymentMethodTypes: ['card'],
+            });
+            stripeData.paymentElement.mount("#payment");
+        } catch (error) {
+            console.log(error);
+        }
+      }
+      
+      Livewire.hook('morphed', () => {
+        // initStripe();
       });
 
-      try {
-          stripeData.paymentElement = stripeData.elements.create('payment', {
-              paymentMethodTypes: ['card'],
-          });
-          stripeData.paymentElement.mount("#payment");
-      } catch (error) {
-          console.log(error);
-      }
 
-
+      console.log(stripeData);
+      
       Livewire.on('payment-confirm', async (arg) => {
+        console.log(stripeData);
+        
         const {error} = await stripe.confirmPayment({
           elements: stripeData.elements,
           confirmParams: {
@@ -315,32 +325,3 @@
       
   </script>
 @endscript
-
-
-      {{-- // document.getElementById('payment-form').addEventListener('submit', function(evt) {
-      //   evt.preventDefault();
-      //   $.ajax({
-      //     url: '/api/payment/confirm',
-      //     method: 'POST',
-      //     data: data,
-      //   }).then(async (response) => {
-      //     const {error} = await stripe.confirmPayment({
-      //       elements: stripeData.elements,
-      //       confirmParams: {
-      //         return_url: ``,
-      //       },
-      //     });
-      //     if (error) {
-            
-      //     }
-      //   }).catch(error => {
-      //     Object.keys(error?.responseJSON?.errors ?? {}).map(name => {
-      //       const input = document.querySelector(`*[name='${name}']`);
-      //       console.log(input);
-            
-      //       input.classList.add('border');
-      //       input.classList.add('!border-red-500');
-      //       this.scrollIntoView({ behavior: 'smooth' });
-      //     });
-      //   });
-      // }); --}}

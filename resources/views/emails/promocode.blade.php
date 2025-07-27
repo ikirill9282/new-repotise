@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
+@extends('layouts.email')
+@push('css')
+  <style>
         * {
           box-sizing: border-box;
         }
@@ -104,8 +101,9 @@
         }
 
     </style>
-</head>
-<body>
+@endpush
+
+@section('content')
     <div class="container">
         <div class="logo">
           <img src="{{ asset('assets/img/bounty.jpg') }}" alt="Промо" class="header-image" />
@@ -130,12 +128,5 @@
         <p>Simply apply your promo code at checkout to get a discount on tour bookings, gear purchases, and other services. Don’t miss the chance to make your next adventure even brighter and more affordable!</p>
 
         <a href="{{ route('products') }}" class="btn" target="_blank" rel="noopener">Begin travel</a>
-
-        <div class="footer">
-            Best regards,<br>
-            The trekguider.com Team<br>
-            &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
-        </div>
     </div>
-</body>
-</html>
+@endsection

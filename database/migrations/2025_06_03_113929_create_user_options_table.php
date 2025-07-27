@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('user_options', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index()->unique();
-            $table->integer('level')->nullable()->default(1);
+            $table->bigInteger('level_id')->unsigned()->default(1);
+
+            $table->decimal('fee')->nullable();
+            $table->decimal('sales_treshold')->nullable();
+            $table->decimal('space')->nullable();
 
             $table->string('avatar')->default('/storage/images/default_avatar.svg');
             $table->text('description')->nullable();
@@ -39,6 +43,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('level_id')->references('id')->on('levels');
         });
     }
 

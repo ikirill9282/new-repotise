@@ -27,7 +27,7 @@ require __DIR__ . '/api.php';
 // });
 
 Route::get('/mail/{slug}', function(Request $request, $slug) {
-  return view("emails.$slug", ['user' => Auth::user(), 'discount' => Discount::first()]);
+  return view("emails.$slug", ['recipient' => User::find(7), 'sender' => User::find(1), 'msg' => 'test msg', 'credentials' => ['password' => '123']]);
 });
 
 Route::prefix('/auth')
@@ -88,7 +88,7 @@ Route::get('/products/{country}/{product}', [SiteController::class, 'product'])-
 Route::get('/payment', [SiteController::class, 'payment'])->name('payment');
 Route::get('/invite', [SiteController::class, 'invite'])->name('invite');
 Route::get('/referal', [SiteController::class, 'referal'])->name('referal');
-
+Route::get('/gift', [SiteController::class, 'gift'])->name('gift');
 // Products
 // Route::get('/{slug}/{country}', SiteController::class);
 // Route::get('/{slug}/{country}/{product}', SiteController::class);

@@ -42,18 +42,29 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
       }
 
       if ($this->order->status_id == EnumsOrder::PAID) {
-        $paymentIntent = $this->order->getTransaction();
-        $charge = Cashier::stripe()->charges->retrieve($paymentIntent->latest_charge);
-        $transaction = Cashier::stripe()->balanceTransactions->retrieve($charge->balance_transaction);
         
-        $this->order->stripe_fee = $transaction->fee / 100;
-        $this->order->base_reward = $transaction->net / 100;
-        $this->order->status_id = EnumsOrder::REWARDING;
+        if (!$this->order->free()) {
 
+          $paymentIntent = $this->order->getTransaction();
+          $charge = Cashier::stripe()->charges->retrieve($paymentIntent->latest_charge);
+          $transaction = Cashier::stripe()->balanceTransactions->retrieve($charge->balance_transaction);
+          
+          $this->order->stripe_fee = $transaction->fee / 100;
+          $this->order->base_reward = $transaction->net / 100;
+        } else {
+          $this->order->stripe_fee = 0;
+          $this->order->base_reward = 0;
+        }
+
+        $this->order->status_id = EnumsOrder::REWARDING;
         $this->order->recalculate();
 
         PayReward::dispatch($this->order);
         ReferalFreeProduct::dispatch($this->order->user);
+
+        if ($this->order->gift) {
+          DeliveryGift::dispatch($this->order);
+        }
       }
     }
 }

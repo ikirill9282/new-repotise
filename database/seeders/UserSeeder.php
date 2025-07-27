@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
       $buyer = Role::firstOrCreate(['name' => 'customer'], ['name' => 'customer', 'title' => 'Customer']);
       $seller = Role::firstOrCreate(['name' => 'creator'], ['name' => 'creator', 'title' => 'Creator']);
 
+      
       $write_comment_premission = Permission::firstOrCreate(
         ['name' => 'write_comment'],
         ['name' => 'write_comment', 'title' => 'Write Comments'],

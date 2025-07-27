@@ -82,18 +82,51 @@ const swiper1 = new Swiper(".mySwiper1", {
     },
 });
 
-function toggleText() {
-    let hiddenText = document.querySelector(".hidden-text");
-    let dots = document.querySelector(".dots");
-    let button = document.querySelector(".show-more");
-
-    if (hiddenText.style.display === "none" || hiddenText.style.display === "") {
-        hiddenText.style.display = "inline";
-        dots.style.display = "none";
-        button.style.display = "none";
-    }
-}
-
+const swiper2 = new Swiper(".mySwiper2", {
+    slidesPerView: 2,
+    spaceBetween: 10,
+    navigation: {
+        nextEl: ".mySwiper2 .swiper-button-next",
+        prevEl: ".mySwiper2 .swiper-button-prev",
+    },
+    pagination: {
+        el: ".swiper-pagination",
+    },
+    breakpoints: {
+        320: {
+            slidesPerView: 1.6,
+            spaceBetween: 10,
+        },
+        400: {
+            slidesPerView: 1.9,
+            spaceBetween: 10,
+        },
+        500: {
+            slidesPerView: 2.4,
+            spaceBetween: 10,
+        },
+        600: {
+            slidesPerView: 2.9,
+            spaceBetween: 10,
+        },
+        700: {
+            slidesPerView: 3.1,
+            spaceBetween: 10,
+        },
+        768: {
+            slidesPerView: 3.1,
+            spaceBetween: 10,
+        },
+        1024: {
+            slidesPerView: 2,
+            spaceBetween: 10,
+        },
+        1200: {
+            slidesPerView: 2,
+            spaceBetween: 10,
+        },
+    },
+});
 
 const swiperArticles = new Swiper('#swiper-articles', {
   slidesPerView: 1.2,
@@ -132,7 +165,6 @@ const swiperNews = new Swiper('#swiper-news', {
     },
   }
 });
-
 
 const swiperTrending = new Swiper(".mySwiperTrending", {
   slidesPerView: 5,
@@ -278,6 +310,18 @@ const swiper14 = new Swiper(".mySwiper14", {
       swiper: swiper13, 
   },
 });
+
+function toggleText() {
+  let hiddenText = document.querySelector(".hidden-text");
+  let dots = document.querySelector(".dots");
+  let button = document.querySelector(".show-more");
+
+  if (hiddenText.style.display === "none" || hiddenText.style.display === "") {
+      hiddenText.style.display = "inline";
+      dots.style.display = "none";
+      button.style.display = "none";
+  }
+}
 
 function updateMaxPrice(value, sliderNumber) {
     const slider = document.getElementById(`range-slider-${sliderNumber}`);

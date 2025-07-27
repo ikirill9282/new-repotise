@@ -14,6 +14,6 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-    
+      Role::firstOrCreate(['name' => 'refered-seller'], ['name' => 'refered-seller', 'title' => 'Refered Seller']);
     }
 }

@@ -90,9 +90,9 @@
                         <h2>Payment</h2>
                         <div class="descriptions_group">
                             <div class="descriptions_pay">
-                                <p>Payment Method: Card</p>
+                                <p>Payment Method: {{-- Card --}} </p> 
                                 <div class="right_text">
-                                    <span>{{ strtoupper($paymentMethod?->card->brand) }}</span>
+                                    <span>{{ strtoupper(is_object($paymentMethod) ? $paymentMethod?->card->brand : $paymentMethod) }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">

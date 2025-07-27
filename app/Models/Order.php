@@ -30,8 +30,9 @@ class Order extends Model
           'amount' => ($model->cost * 100),
           'currency' => 'usd',
           'automatic_payment_methods' => ['enabled' => true],
+          'customer' => $model->user->asStripeCustomer()->id,
           'metadata' => [
-            'user_id' => Auth::user()?->id ?? 0,
+            'user_id' => $model->user?->id ?? 0,
           ],
         ]);
         $model->payment_id = $transaction->id;
@@ -42,14 +43,20 @@ class Order extends Model
       });
 
       static::deleting(function($model) {
-        Cashier::stripe()->paymentIntents->update($model->payment_id, [
-          'metadata' => [
-            'message' => 'Cancel by order delete.',
-          ]
-        ]);
-        Cashier::stripe()->paymentIntents->cancel($model->payment_id);
+        $model->cancelTransaction('Cancel by order delete.');
+        // Cashier::stripe()->paymentIntents->update($model->payment_id, [
+        //   'metadata' => [
+        //     'message' => 'Cancel by order delete.',
+        //   ]
+        // ]);
+        // Cashier::stripe()->paymentIntents->cancel($model->payment_id);
       });
       
+    }
+
+    public function free(): bool
+    {
+      return $this->discount && $this->cost == 0;
     }
 
     public function user()
@@ -226,6 +233,16 @@ class Order extends Model
     public function getTransaction(): ?PaymentIntent
     {
       return $this->payment_id ? Cashier::stripe()->paymentIntents->retrieve($this->payment_id) : null;
+    }
+
+    public function cancelTransaction(string $message)
+    {
+        Cashier::stripe()->paymentIntents->update($this->payment_id, [
+          'metadata' => [
+            'message' => $message,
+          ]
+        ]);
+        Cashier::stripe()->paymentIntents->cancel($this->payment_id);
     }
 
     public function getDiscount(): int

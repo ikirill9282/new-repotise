@@ -18,6 +18,8 @@ return new class extends Migration
             $table->enum('type', ['credit', 'debit', 'freeze', 'unfreeze']);
             $table->decimal('sum');
             $table->text('message');
+            $table->string('model')->nullable();
+            $table->bigInteger('model_id')->unsigned()->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

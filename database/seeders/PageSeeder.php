@@ -129,5 +129,9 @@ class PageSeeder extends Seeder
         'title' => 'Profile settings',
         'slug' => 'profile-settings',
       ]);
+      $gift = Page::firstOrCreate([
+        'title' => 'Gift',
+        'slug' => 'gift',
+      ]);
     }
 }

@@ -17,6 +17,7 @@ enum Action
   public const INVITE_BY_PURCHASE = 'User Invited By Purchase';
   public const PROMOCODE_CREATED = 'Promocode Created';
   public const REFERAL_PROMOCODE_CREATED = 'Referal Promocode Created';
+  public const GIFT_SEND = 'Gift sended.';
 
   public function toArray(): array
   {
@@ -33,6 +34,7 @@ enum Action
       self::INVITE_BY_PURCHASE,
       self::PROMOCODE_CREATED,
       self::REFERAL_PROMOCODE_CREATED,
+      self::GIFT_SEND,
     ];
   }
 }

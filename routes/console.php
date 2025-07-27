@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\DeliveryGift;
 use App\Jobs\PayReward;
 use App\Jobs\ProcessOrder;
 use App\Jobs\ReferalPromocode;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Schedule;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use App\Jobs\TestQueue;
+use App\Mail\Gift;
 use App\Mail\InviteByPurchase;
 use App\Models\Discount;
 use App\Models\Order;
@@ -24,8 +26,11 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $t = new PayReward(Order::find(100217));
+  // Mail::to(User::find(7)->email)->send(new Gift(User::find(7), Order::find(100229), ['password' => '123']));
+  
+  $t = new PayReward(Order::find(100200));
   $t->handle();
+
   // Discount::createForUsers([7], [
   //   'visibility' => 'public',
   //   'type' => 'freeproduct',

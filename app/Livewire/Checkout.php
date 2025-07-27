@@ -53,7 +53,9 @@ class Checkout extends Component
         
       if ($discount->isAvailable($this->order)) {
         $this->order->applyDiscount($discount);
-        $this->updatePaymentIntent();
+        if ($this->order->cost > 0) {
+          $this->updatePaymentIntent();
+        }
       } else {
         $this->addError('promocode', 'Incorrect promocode');
       }
@@ -96,8 +98,6 @@ class Checkout extends Component
 
       $this->order->recalculate();
       $this->updatePaymentIntent();
-      // $this->order->refresh();
-      // $this->order->updateCosts();
     }
 
     public function decrementProductCount(int $product_id): void
@@ -105,9 +105,8 @@ class Checkout extends Component
       $product = $this->order->products->where('id', $product_id)->first();
       if ($product->pivot->count > 1) {
         $product->pivot->update(['count' => ($product->pivot->count - 1)]);
+
         $this->order->recalculate();
-        // $this->order->refresh();
-        // $this->order->updateCosts();
         $this->updatePaymentIntent();
       }
     }
@@ -134,6 +133,9 @@ class Checkout extends Component
         'form.recipient_message' => 'required_if_accepted:form.gift|nullable|string',
       ]);
 
+      if ($this->order->free()) {
+        return redirect(route('payment-success', ['payment_intent' => $this->order->payment_id]));
+      }
       $transaction = $this->order->getTransaction();
       $this->dispatch('payment-confirm', $transaction);
     }

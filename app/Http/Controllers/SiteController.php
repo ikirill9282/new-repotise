@@ -22,6 +22,7 @@ use Illuminate\Support\ItemNotFoundException;
 use App\Models\Order;
 use App\Services\Cart;
 use Exception;
+use Illuminate\Support\Facades\Crypt;
 
 class SiteController extends Controller
 {
@@ -292,6 +293,26 @@ class SiteController extends Controller
     
     return view('site.pages.referal', [
       'page' => $page,
+    ]);
+  }
+
+  public function gift(Request $request)
+  {
+    try {
+      $order_id = Crypt::decrypt($request->get('h'));
+    } catch (\Exception $e) {
+      return redirect('/');
+    }
+
+    $order = Order::find($order_id);
+    
+    $page = Page::where('slug', 'gift')
+      ->with('config')
+      ->first();
+    
+    return view('site.pages.gift', [
+      'page' => $page,
+      'order' => $order,
     ]);
   }
 }

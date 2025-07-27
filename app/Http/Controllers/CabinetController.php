@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use App\Models\Order;
+use App\Models\OrderProducts;
 use Illuminate\Support\Facades\Session;
 
 class CabinetController extends Controller
@@ -173,8 +174,13 @@ class CabinetController extends Controller
       return redirect('/unknown');
     }
 
+    $products = OrderProducts::whereIn('order_id', $user->orders->pluck('id'))
+      ->orderByDesc('order_id')
+      ->paginate(10);
+
     return view('site.pages.profile-purchases', [
       'user' => $user,
+      'products' => $products,
     ]);
   }
 

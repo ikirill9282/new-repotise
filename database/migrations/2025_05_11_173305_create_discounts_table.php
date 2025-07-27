@@ -26,7 +26,8 @@ return new class extends Migration
           $table->decimal('sum')->nullable();
           $table->decimal('min')->nullable();
           $table->decimal('max')->nullable();
-          $table->integer('uses')->unsigned()->default(1);
+          $table->integer('limit')->unsigned()->default(1);
+          $table->integer('attempts')->unsigned()->nullable();
           $table->tinyInteger('active')->default(1)->index();
           $table->datetime('end');
 

@@ -266,6 +266,10 @@ header .about_block .right_group_block .cart svg:hover {
     background-size: 100% auto !important;
 }
 
+.parallax-gift {
+  background-image: url(../img/bg_gift.png);
+}
+
 .popular_products .about_block .products_item .item {
     max-width: none;
 }
@@ -1422,6 +1426,27 @@ footer .bottom_connecting_group .connecting a {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.mySwiper2 a {
+  transition: color 0.3s;
+  color: var(--gray, #A4A0A0);
+}
+
+.mySwiper2 a:link {
+  color: var(--gray, #A4A0A0);
+}
+
+.mySwiper2 a:visited {
+  color: var(--gray, #A4A0A0);
+}
+
+.mySwiper2 a:active {
+  color: var(--gray, #A4A0A0);
+}
+
+.mySwiper2 a:hover {
+  color: var(--black, #000);
 }
 
 @media (min-width: 1140px) {
