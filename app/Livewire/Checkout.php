@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class Checkout extends Component
 {
@@ -125,7 +126,7 @@ class Checkout extends Component
 
     public function submit()
     {
-      $this->validate([
+      $valid = $this->validate([
         'form.fullname' => 'required|string',
         'form.email' => 'required|email',
         'form.gift' => 'required|boolean',
@@ -133,9 +134,19 @@ class Checkout extends Component
         'form.recipient_message' => 'required_if_accepted:form.gift|nullable|string',
       ]);
 
+      
       if ($this->order->free()) {
         return redirect(route('payment-success', ['payment_intent' => $this->order->payment_id]));
       }
+
+      if (Arr::get($valid, 'form.gift')) {
+        $this->order->update([
+          'gift' => 1,
+          'recipient' => Arr::get($valid, 'form.recipient'),
+          'recipient_message' => Arr::get($valid, 'form.recipient_message'),
+        ]);
+      }
+
       $transaction = $this->order->getTransaction();
       $this->dispatch('payment-confirm', $transaction);
     }

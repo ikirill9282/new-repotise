@@ -15,7 +15,7 @@
                     <p>Items <span> ({{ $products->total() }}) </span></p>
                 </div>
             </div>
-            @if($user->orders->isNotEmpty())
+            @if($products->isNotEmpty())
             <div class="purch__items-head">
                 <div class="col">Date</div>
                 <div class="col">Order</div>
@@ -40,34 +40,54 @@
                             <img class="object-cover" src="{{ $op->product->preview->image }}" alt="Product '{{ $op->product->title }}' preview">
                         </div>
                         <p>
-                            {{ $op->product->title }} x {{ $op->count }}
+                            <a href="{{ $op->product->makeUrl() }}" class="link-black">{{ $op->product->title }} x {{ $op->count }}</a>
                         </p>
                     </div>
                     <div class="actions">
-                        <div class="col">
-                            @if($op->order->status_id == 1)
-                              <a class="black" href="{{ url("/profile/checkout?order=" . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $op->order_id])) }}">
-                                  Confirm Payment
-                              </a>
-                            @else
-                              <a class="orange" href="#">
-                                  View & Download
-                              </a>
-                            @endif
-                        </div>
-                        <div class="col">
-                            @if ($op->order->status_id >= 2)
-                              @if($user->canWriteComment($op->product))
-                                <a class="black" href="{{ $op->product->makeUrl() }}">Leave Review</a>
+                          <div class="col">
+                              @if($op->order->status_id == 1)
+                                <a class="black" href="{{ url("/profile/checkout?order=" . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $op->order_id])) }}">
+                                    Await Payment
+                                </a>
+                              @else
+
+                                @if($op->order->gift && $op->order->recipient !== $user->email)
+                                  <span class="gray">Gift</span>
+                                @else
+                                <a class="orange" href="#">
+                                    View & Download
+                                </a>
+                                @endif
                               @endif
-                              <a class="gray" href="#">Refund</a>
-                            @endif
-                        </div>
+                          </div>
+
+                          <div class="col">
+                              @if ($op->order->status_id >= 2)
+                                
+                                @if($user->canWriteComment($op->product))
+                                  <a class="black" href="{{ $op->product->makeUrl() }}">Leave Review</a>
+                                @endif
+
+                                @if ($op->order->gift && !$op->order->recipient === $user->email)
+                                  <a class="gray" href="#">Refund</a>
+                                @endif
+                              @endif
+                          </div>
                     </div>
                     <div class="price">
-                        <span>
-                            {{ $op->order->cost == 0 ? 0 : $op->getTotal() }}$
-                        </span>
+                        @if($op->order->gift)
+                          @if($op->order->recipient == $user->email)
+                            <span class="gray">Gift</span>
+                          @else
+                            <span>
+                                {{ $op->order->cost == 0 ? 0 : $op->getTotal() }}$
+                            </span>
+                          @endif
+                        @else
+                          <span>
+                              {{ $op->order->cost == 0 ? 0 : $op->getTotal() }}$
+                          </span>
+                        @endif
                     </div>
                 </div>
               @endforeach

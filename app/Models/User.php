@@ -316,12 +316,24 @@ class User extends Authenticatable implements HasName, FilamentUser
       return url("/profile/subscribe/$this->profile");
     }
 
-    public function makeReferalUrl(): string
+    public function makeReferalUrl(?string $source = null): string
     {
-      return url('/referal?token='. CustomEncrypt::generateUrlHash([
+      $url = url('/referal?token='. CustomEncrypt::generateUrlHash([
         'id' => $this->id, 
         'created_at' => $this->created_at->format('Y-m-d'),
       ], false));
+      $route_url = urlencode($url);
+      $title = urlencode('Discover your next adventure together!');
+
+      return match($source) {
+        'FB' => "http://www.facebook.com/share.php?u=$route_url&title=$title",
+        'TW' => "https://twitter.com/intent/tweet?text=" . ($title." ".$route_url),
+        'PI' => "http://pinterest.com/pin/create/link/?url=$route_url&description=$title",
+        'GM' => "https://mail.google.com/mail/u/0/?ui=2&fs=1&tf=cm&su=$title&body=Link:+$route_url",
+        'WA' => "https://wa.me/?text=$title $route_url",
+        'TG' => "https://t.me/share/url?url=$route_url&text=$title",
+        default => $url
+      };
     }
 
     public function makeStripeVerificationUrl(): ?string
@@ -423,17 +435,44 @@ class User extends Authenticatable implements HasName, FilamentUser
       }
     }
 
-    public function canWriteComment(Product $product, string $type = 'review')
+    public function canWriteComment(Product $product, string $type = 'review'): bool
     {
-      $products = $this->orders->flatMap(fn($el) => $el->products)->pluck('id');
-      if (in_array($product->id, $products->toArray())) {
-        if ($product->reviews()->where('user_id', $this->id)->whereNull('parent_id')->exists()) {
-          if ($type === 'reply') return true;
 
-          return false;
-        }
-        return true;
+      $orders = Order::query()
+        ->where('orders.status_id', '>=', 1)
+        ->whereHas('order_products', fn($query) => $query->where('order_products.product_id', $product->id))
+        ->where(fn($query) => $query->where('orders.user_id', $this->id)->orWhere('orders.recipient', $this->email))
+        // ->ddRawSql();
+        ->get()
+      ;
+
+      if ($orders->isEmpty()) {
+        return false;
       }
+
+      foreach ($orders as $order) {
+        $result = false;
+
+
+        if ($order->gift) {
+          if ($order->recipient == $this->email) {
+            $result = true;
+          }
+        } else {
+          if ($order->user_id == $this->id) {
+            $result = true;
+          }
+        }
+
+        if ($result) {
+          return !Review::where([
+            'product_id' => $product->id,
+            'user_id' => $this->id,
+          ])
+          ->exists();
+        }
+      }
+
       return false;
     }
 }

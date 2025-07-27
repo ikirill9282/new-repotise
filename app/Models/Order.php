@@ -32,24 +32,20 @@ class Order extends Model
           'automatic_payment_methods' => ['enabled' => true],
           'customer' => $model->user->asStripeCustomer()->id,
           'metadata' => [
-            'user_id' => $model->user?->id ?? 0,
+            'initiator' => ($model->user?->id ?? 0 == 0) ? 'system' : 'customer',
+            'inititator_id' => $model->user?->id ?? 0,
+            'type' => 'order',
           ],
         ]);
         $model->payment_id = $transaction->id;
       });
 
       static::created(function($model) {
-        Cashier::stripe()->paymentIntents->update($model->payment_id, ['metadata' => ['order_id' => $model->id]]);
+        Cashier::stripe()->paymentIntents->update($model->payment_id, ['metadata' => ['id' => $model->id]]);
       });
 
       static::deleting(function($model) {
         $model->cancelTransaction('Cancel by order delete.');
-        // Cashier::stripe()->paymentIntents->update($model->payment_id, [
-        //   'metadata' => [
-        //     'message' => 'Cancel by order delete.',
-        //   ]
-        // ]);
-        // Cashier::stripe()->paymentIntents->cancel($model->payment_id);
       });
       
     }
@@ -264,21 +260,10 @@ class Order extends Model
       }
 
       if ($this->discount->type == 'freeproduct') {
-        // if ($this->group == 'referal') {
-          // $res = [];
-          // foreach ($this->order_products as $op) {
-          //   if ($op->price > 50) continue;
-          //   if ($op->product->author->id > 0 && $op->price > 25) continue;
-            
-          //   $res[$op->product_id] = $op->price;
-          // }
-          // $cost = max($res);
-          // $product_id = array_search($cost, $res);
           $op = $this->findReferalFreeProduct();
           $max_discount = $op->product->author->id > 0 ? 25 : 50;
 
           return $max_discount > $op->price ? $op->price : $max_discount;
-        // }
       }
 
       return floor($sum);
@@ -309,8 +294,6 @@ class Order extends Model
       $this->recalculateCosts();
 
       $this->saveThroughTransaction();
-      // dd($this->toArray());
-      // dd('recalc...');
     }
 
     public function recalculateDiscount()

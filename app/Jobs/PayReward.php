@@ -35,7 +35,7 @@ class PayReward implements ShouldQueue, ShouldBeUnique
    */
   public function handle(): void
   {
-    if ($this->order->status_id !== EnumsOrder::REWARDING) {
+    if ($this->order->status_id == EnumsOrder::REWARDING) {
 
       foreach ($this->order->order_products as $op) {
 
@@ -82,6 +82,8 @@ class PayReward implements ShouldQueue, ShouldBeUnique
             'type' => 'credit',
             'sum' => $op->seller_reward,
             'message' => "Reward by selling product #[$op->product_id]",
+            'model' => '\App\Models\Order',
+            'model_id' => $op->order_id,
           ]);
           $author->update(['balance' => DB::raw("`balance` + $op->seller_reward")]);
 

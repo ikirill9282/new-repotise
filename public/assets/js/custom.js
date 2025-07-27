@@ -3,6 +3,45 @@ $('a.disabled').on('click', (evt) => evt.preventDefault());
 const getCSRF = () => $('meta[name="csrf"]').attr('content');
 
 
+function copyTextToClipboard(text) {
+  if (!text) return;
+
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).then(() => {
+      console.log('Текст успешно скопирован через Clipboard API');
+    }).catch(err => {
+      console.error('Ошибка копирования через Clipboard API:', err);
+      fallbackCopyTextToClipboard(text);
+    });
+  } else {
+    fallbackCopyTextToClipboard(text);
+  }
+}
+
+function fallbackCopyTextToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.position = "fixed";
+  textArea.style.top = "-9999px";
+  textArea.style.left = "-9999px";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      console.log('Текст успешно скопирован через execCommand');
+    } else {
+      console.error('Не удалось скопировать текст через execCommand');
+    }
+  } catch (err) {
+    console.error('Ошибка копирования через execCommand:', err);
+  }
+  document.body.removeChild(textArea);
+}
+
 if (window.outerWidth <= 768) {
   $('footer .group > h3').on('click', function() {
     $(this).children().last().toggleClass('!rotate-0 !stroke-white');
@@ -698,5 +737,30 @@ $(document).ready(function() {
   discoverCartDropButtons();
   Livewire.hook('morphed',  ({ el, component }) => {
     discoverCartDropButtons(el);
-  })
+  });
+
+  $('.copyToClipboard').each((k, el) => {
+    $(el).on('click', function() {
+      const target = $(`[data-copyId='${$(this).data('target')}']`);
+      if (target) {
+        copyTextToClipboard(target.val())
+      }
+    })
+  });
 });
+
+// document.addEventListener('click', function(event) {
+//   const icon = event.target.closest('[data-target]');
+//   if (!icon) return;
+
+//   const targetSelector = icon.getAttribute('data-target');
+//   if (!targetSelector) return;
+
+//   const sourceElement = document.querySelector(targetSelector);
+//   if (!sourceElement) return;
+
+//   const textToCopy = sourceElement.innerText || sourceElement.textContent;
+//   if (!textToCopy) return;
+
+//   copyTextToClipboard(textToCopy);
+// });

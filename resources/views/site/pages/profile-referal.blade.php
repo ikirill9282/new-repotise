@@ -137,39 +137,40 @@
                 <span>
                   Your Referral Link
                 </span>
-                <div class="link-item break-all" data-copy="">
+                <input type="hidden" value="{{ $user->makeReferalUrl() }}" data-copyId="referal" readonly />
+                <div class="link-item break-all copyToClipboard" data-target="referal">
                   {{ $user->makeReferalUrl() }}
                 </div>
               </div>
               <div class="socials basis-1/2">
                 <ul class="flex-wrap gap-3">
                   <li class="!mr-0">
-                    <a href="#" class="transition !text-gray-700 hover:!text-blue-600">
+                    <a href="{{ $user->makeReferalUrl('FB') }}" target="_blank" class="transition !text-gray-700 hover:!text-blue-600">
                       @include('icons.facebook')
                     </a>
                   </li>
                   <li class="!mr-0">
-                    <a href="#" class="transition !text-gray-700 hover:!text-rose-600">
+                    <a href="{{ $user->makeReferalUrl('PI') }}" class="transition !text-gray-700 hover:!text-rose-600" target="_blank">
                       @include('icons.pinterest')
                     </a>
                   </li>
                   <li class="!mr-0">
-                    <a href="#" class="transition !text-gray-700 hover:!text-gray-900">
+                    <a href="{{ $user->makeReferalUrl('TW') }}" target="_blank" class="transition !text-gray-700 hover:!text-gray-900">
                       @include('icons.twitter')
                     </a>
                   </li>
                   <li class="!mr-0">
-                    <a href="#" class="transition !text-gray-700 hover:!text-orange-600">
+                    <a href="{{ $user->makeReferalUrl('GM') }}" class="transition !text-gray-700 hover:!text-orange-600" target="_blank">
                       @include('icons.mail')
                     </a>
                   </li>
                   <li class="!mr-0">
-                    <a href="#" class="transition !text-gray-700 hover:!text-emerald-600">
+                    <a href="{{ $user->makeReferalUrl('WA') }}" class="transition !text-gray-700 hover:!text-emerald-600" target="_blank">
                       @include('icons.whatsapp')
                     </a>
                   </li>
                   <li class="!mr-0">
-                    <a href="#" class="transition !text-gray-700 hover:!text-sky-600">
+                    <a href="{{ $user->makeReferalUrl('TG') }}" class="transition !text-gray-700 hover:!text-sky-600" target="_blank">
                       @include('icons.telegram')
                     </a>
                   </li>

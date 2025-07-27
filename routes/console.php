@@ -28,12 +28,13 @@ Schedule::command('artisan queue-monitor:stale')->daily();
 Artisan::command('tt', function(Request $request) {
   // Mail::to(User::find(7)->email)->send(new Gift(User::find(7), Order::find(100229), ['password' => '123']));
   
-  $t = new PayReward(Order::find(100200));
+  $t = new PayReward(Order::find(100206));
   $t->handle();
 
   // Discount::createForUsers([7], [
   //   'visibility' => 'public',
   //   'type' => 'freeproduct',
+  //   'group' => 'referal',
   //   'target' => 'cart',
   //   // 'percent' => 15,
   //   'max' => 50,

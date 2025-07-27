@@ -26,6 +26,50 @@ body {
     background-color: #fff;
 }
 
+a {
+  transition: color 0.3s;
+}
+
+a.link {
+  color: var(--gray, '#a4a0a0');
+}
+
+a.link:visited {
+  color: var(--gray, '#a4a0a0');
+}
+
+a.link:active {
+  color: var(--gray, '#a4a0a0');
+}
+
+a.link:link {
+  color: var(--gray, '#a4a0a0');
+}
+
+a.link:hover {
+  color: var(--black, '#000');
+}
+
+a.link-black {
+  color: var(--black, '#000');
+}
+
+a.link-black:visited {
+  color: var(--black, '#a4a0a0');
+}
+
+a.link-black:active {
+  color: var(--black, '#a4a0a0');
+}
+
+a.link-black:link {
+  color: var(--black, '#a4a0a0');
+}
+
+a.link-black:hover {
+  color: var(--main, #FC7361)
+}
+
 .liked svg {
     fill: #ff2c0c !important;
 }
@@ -1428,6 +1472,10 @@ footer .bottom_connecting_group .connecting a {
     justify-content: center;
 }
 
+.gray {
+  color: var(--gray, #A4A0A0);
+}
+
 .mySwiper2 a {
   transition: color 0.3s;
   color: var(--gray, #A4A0A0);
@@ -1447,6 +1495,10 @@ footer .bottom_connecting_group .connecting a {
 
 .mySwiper2 a:hover {
   color: var(--black, #000);
+}
+
+.rp-share__action .link .link-item::before {
+  background-image: url(../img/copy-icon.svg);
 }
 
 @media (min-width: 1140px) {

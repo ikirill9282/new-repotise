@@ -174,7 +174,9 @@ class CabinetController extends Controller
       return redirect('/unknown');
     }
 
+
     $products = OrderProducts::whereIn('order_id', $user->orders->pluck('id'))
+      ->orWhereIn('order_id', Order::where('recipient', $user->email)->pluck('id'))
       ->orderByDesc('order_id')
       ->paginate(10);
 

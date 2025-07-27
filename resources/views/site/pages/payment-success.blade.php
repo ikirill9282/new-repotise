@@ -35,29 +35,29 @@
                 <div class="text_right">
                     <div class="input_block">
                         @if ($user)
-                          <input type="text" value="{{ $user->makeReferalUrl() }}" readonly/>
-                          <button><img src="{{ asset('assets/img/copy.svg') }}" alt=""></button>
+                          <input type="text" value="{{ $user->makeReferalUrl() }}" readonly data-copyId="referal"/>
+                          <button class="copyToClipboard" data-target="referal"><img src="{{ asset('assets/img/copy.svg') }}" alt=""></button>
                         @else
                           <x-btn outlined class="open_auth">Sign in</x-btn>
                         @endif
                     </div>
                     <div class="connecting">
-                        <a href="#" class="hover:!text-blue-500 transition duration-500">
+                        <a href="{{ $user->makeReferalUrl('FB') }}" class="hover:!text-blue-500 transition duration-500">
                             @include('icons.facebook')
                         </a>
-                        <a href="#" class="hover:!text-rose-500 transition duration-500">
+                        <a href="{{ $user->makeReferalUrl('PI') }}" class="hover:!text-rose-500 transition duration-500">
                             @include('icons.pinterest')
                         </a>
-                        <a href="#" class="hover:!text-black transition duration-500">
+                        <a href="{{ $user->makeReferalUrl('TW') }}" class="hover:!text-black transition duration-500">
                             @include('icons.twitter')
                         </a>
-                        <a href="#" class="hover:!text-orange-500 transition duration-500">
+                        <a href="{{ $user->makeReferalUrl('GM') }}" class="hover:!text-orange-500 transition duration-500">
                             @include('icons.mail')
                         </a>
-                        <a href="#" class="hover:!text-emerald-500 transition duration-500">
+                        <a href="{{ $user->makeReferalUrl('WA') }}" class="hover:!text-emerald-500 transition duration-500">
                             @include('icons.whatsapp')
                         </a>
-                        <a href="#" class="hover:!text-sky-500 transition duration-500">
+                        <a href="{{ $user->makeReferalUrl('TG') }}" class="hover:!text-sky-500 transition duration-500">
                             @include('icons.telegram')
                         </a>
                     </div>
@@ -77,7 +77,7 @@
                                   <img src="{{ $product->preview->image }}" alt="Preview" class="order_img">
                                   <div class="description_orders">
                                       <div class="title_description">
-                                          <h4>{{ $product->title }} x {{ $product->pivot->count }}</h4>
+                                          <h4><a href="{{ $product->makeUrl() }}" class="link-black">{{ $product->title }} x {{ $product->pivot->count }}</a></h4>
                                           <h5>${{ $product->price }} <span>${{ $product->old_price }}</span></h5>
                                       </div>
                                       <p>{{ $product->type->title }}, {{ $product->location->title }}</p>
