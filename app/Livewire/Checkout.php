@@ -139,7 +139,7 @@ class Checkout extends Component
         return redirect(route('payment-success', ['payment_intent' => $this->order->payment_id]));
       }
 
-      if (Arr::get($valid, 'form.gift')) {
+      if (Arr::get($valid, 'form.gift') && Arr::get($valid, 'form.recipient') !== $this->order->user->email) {
         $this->order->update([
           'gift' => 1,
           'recipient' => Arr::get($valid, 'form.recipient'),

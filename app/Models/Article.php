@@ -39,6 +39,11 @@ class Article extends Model
     return $this->hasMany(Likes::class, 'model_id')->where('type', 'article');
   }
 
+  public function user()
+  {
+    return $this->belongsTo(User::class);
+  }
+
 
   public function toSearchableArray(): array
   {
@@ -228,7 +233,7 @@ class Article extends Model
   public static function getLastNews(int|string $maximum_models = 4)
   {
     $last_news = static::query()
-      ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'admin')))
+      ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'system')))
       ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
       ->orderByDesc('id')
       ->get();

@@ -13,7 +13,17 @@ class ListArticles extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\Action::make('create-news')
+              ->label('Create News')
+              ->outlined()
+              ->icon('heroicon-o-plus')
+              ->url(fn() => ArticleResource::getUrl('create', ['type' => 'news']))
+              ,
+            Actions\CreateAction::make()
+              ->label('Create Article')
+              ->outlined()
+              ->icon('heroicon-o-plus')
+              ,
         ];
     }
 }

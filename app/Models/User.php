@@ -144,6 +144,11 @@ class User extends Authenticatable implements HasName, FilamentUser
         return $array;
     }
 
+    public function articles()
+    {
+      return $this->hasMany(Article::class);
+    }
+
     public function discounts()
     {
       return $this->hasMany(Discount::class);

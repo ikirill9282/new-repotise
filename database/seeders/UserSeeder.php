@@ -106,7 +106,7 @@ class UserSeeder extends Seeder
         $system->notifications()->delete();
         $system->options()->delete();
         $system->update(['id' => 0]);
-        $system->assignRole(Role::findByName('admin'));
+        $system->assignRole(Role::findByName('system'));
       }
 
       if (!$buyer->hasRole('customer')) $buyer->assignRole(Role::findByName('customer'));

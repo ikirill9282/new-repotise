@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ArticleResource\Pages;
 use App\Filament\Resources\ArticleResource\RelationManagers;
 use App\Models\Article;
+use App\Models\Status;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -21,7 +23,12 @@ use Filament\Tables\Actions\ViewAction;
 use Illuminate\Support\Facades\Storage;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Carbon;
+use App\Models\User;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
+
 
 class ArticleResource extends Resource
 {
@@ -59,10 +66,14 @@ class ArticleResource extends Resource
                     // ->url(fn($record) => $record->makeUrl(), true)
                     ->url(fn($record) => url("/admin/articles/$record->id/edit"))
                     ,
-                TextColumn::make('author')
+                TextColumn::make('user')
                     ->view('filament.tables.columns.author')
-                    ->searchable()
-                    ,
+                    ->searchable(query: function ($query, $search) {
+                        $query->orWhereHas('user', function ($q) use ($search) {
+                            $q->where('username', 'like', "%{$search}%")
+                              ->orWhere('email', 'like', "%{$search}%");
+                        });
+                    }),
                 TextColumn::make('status.title')
                   ->label('Status')
                   ->searchable()
@@ -84,7 +95,6 @@ class ArticleResource extends Resource
                   ,
                 TextColumn::make('comments_count')
                   ->sortable()
-                  ->searchable()
                   ->getStateUsing(function($record) {
                     return $record->getFullCommentsCount();
                   })
@@ -119,7 +129,80 @@ class ArticleResource extends Resource
                   ,
             ])
             ->filters([
-                //
+                SelectFilter::make('type')
+                  ->label('Filter by Content Type')
+                  ->options([
+                    'article' => 'Article',
+                    'news' => 'News',
+                  ])
+                  ->query(function($query, $state) {
+                    if (!empty($state['value'])) {
+                      $query->when($state['value'] == 'article', function ($query) {
+                        $query->whereHas(
+                          'author', 
+                          fn($subquery) => $subquery->whereHas(
+                            'roles', 
+                            fn($ssq) => $ssq->where('roles.name', '!=', 'admin')
+                          )
+                        );
+                      })
+                      ->when($state['value'] == 'news', function ($query) {
+                        $query->whereHas(
+                          'author',
+                          fn($subquery) => $subquery->whereHas(
+                            'roles',
+                            fn($ssq) => $ssq->where('roles.name', 'admin')
+                          )
+                        );
+                      })
+                      // ->ddRawSql()
+                      ;
+                    }
+                  })
+                  ,
+                SelectFilter::make('user_id')
+                  ->label('Filter by Author')
+                  ->searchable()
+                  ->options(User::whereHas('articles')->get()->pluck('name', 'id'))
+                  ->query(function($query, $state) {
+                    if (!empty($state['value'])) {
+                      // dd($state['value']);
+                      $query->where('user_id', $state['value']);
+                    }
+                  })
+                  ,
+                SelectFilter::make('status_id')
+                  ->label('Filter by Status')
+                  ->searchable()
+                  ->options(Status::all()->pluck('title', 'id'))
+                  ->query(function($query, $state) {
+                    if (!empty($state['value'])) {
+                      $query->where('status_id', $state['value']);
+                    }
+                  })
+                  ,
+                DateRangeFilter::make('created_at') // поле модели для фильтрации по дате
+                  ->label('Filter by Date created')
+                  ->query(function ($query, array $data) {
+                    if (!empty($data['created_at'])) {
+                      $arr = explode('-', $data['created_at']);
+                      $arr = array_map(fn($val) => Carbon::createFromFormat('d/m/Y', trim($val))->format('Y-m-d'), $arr);
+                      
+                      return $query->whereBetween('created_at', ["$arr[0] 00:00:00", "$arr[1] 23:59:59"]);
+                    }
+                  })
+                  ,
+                DateRangeFilter::make('updated_at') // поле модели для фильтрации по дате
+                  ->label('Filter by Date update')
+                  ->query(function ($query, array $data) {
+                    if (!empty($data['updated_at'])) {
+                      $arr = explode('-', $data['updated_at']);
+                      $arr = array_map(fn($val) => Carbon::createFromFormat('d/m/Y', trim($val))->format('Y-m-d'), $arr);
+                      
+                      return $query->whereBetween('updated_at', ["$arr[0] 00:00:00", "$arr[1] 23:59:59"]);
+                    }
+                  })
+                  ,
             ])
             ->recordUrl(fn() => null)
             ->actions([

@@ -18,9 +18,9 @@ class ArticleSeeder extends Seeder
     {
       $cnt = 1;
       for ($x = 0; $x < 6; $x++) {
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 0; $i <= 4; $i++) {
           // try {
-          $title = ($i == 1) ? "Why do you need a Baby Monitor? We'll tell you in our article $cnt" : "Article Title $cnt";
+          $title = ($i == 0) ? "Why do you need a Baby Monitor? We'll tell you in our article $cnt" : "Article Title $cnt";
           $article = Article::firstOrCreate(
             ['user_id' => $i, 'title' => $title],
             [
