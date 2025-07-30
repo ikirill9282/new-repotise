@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     { 
-      $admin = Role::firstOrCreate(['name' => 'admin'], ['name' => 'admin', 'title' => 'Admin']);
+      $admin = Role::firstOrCreate(['name' => 'super-admin'], ['name' => 'super-admin', 'title' => 'Admin']);
       $buyer = Role::firstOrCreate(['name' => 'customer'], ['name' => 'customer', 'title' => 'Customer']);
       $seller = Role::firstOrCreate(['name' => 'creator'], ['name' => 'creator', 'title' => 'Creator']);
 
@@ -50,7 +50,7 @@ class UserSeeder extends Seeder
             // 'avatar' => '/storage/images/man.png',
           ],
         );
-        if (!$admin->hasRole('admin')) $admin->assignRole(Role::findByName('admin'));
+        if (!$admin->hasRole('admin')) $admin->assignRole(Role::findByName('super-admin'));
       }
 
       $seller = User::firstOrCreate(

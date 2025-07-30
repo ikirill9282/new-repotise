@@ -71,7 +71,7 @@
                                                   </a>
                                                 </h3>
                                                 <div class="profile">
-                                                    <img class="rounded-full" src="{{ print_key('avatar', $item['author']) }}"
+                                                    <img class="rounded-full object-cover" src="{{ print_key('avatar', $item['author']) }}"
                                                         alt="Avatar {{ print_key('profile', $item['author']) }}">
                                                     <a href="{{ url('/profile/' . print_key('profile', $item['author'] ?? [])) }}"
                                                         class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">
@@ -113,11 +113,12 @@
                                         <div class="profile_commendor">
                                             <div class="img-wrap">
                                                 <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile"
-                                                    class="img_profile rounded-full">
+                                                    class="img_profile rounded-full object-cover">
                                             </div>
+
                                             <div class="right_text">
                                                 <h3 class=""><a class="!text-inherit"
-                                                        href="{{ url('/users/profile/' . print_key('profile', $item)) }}">{{ print_key('profile', $item) }}</a>
+                                                        href="{{ url('/users/profile/' . print_key('profile', $item)) }}">{{ print_key('name', $item) }}</a>
                                                 </h3>
                                                 <div>
                                                     {!! print_key('description', $item) !!}
@@ -162,7 +163,7 @@
                                                     {!! print_key('short', $item) !!}
                                                 </div>
                                                 <div class="profile">
-                                                    <img class="rounded-full"
+                                                    <img class="rounded-full object-cover"
                                                         src="{{ url(print_key('avatar', $item['author'] ?? [])) }}" alt="Avatar">
                                                     <a href="{{ url('/users/profile/' . print_key('profile', $item['author'] ?? [])) }}"
                                                         class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">{{ print_key('profile', $item['author'] ?? []) }}</a>

@@ -22,7 +22,8 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Enums\ActionsPosition;
-
+use Filament\Tables\Filters\SelectFilter;
+use App\Models\Status;
 
 class CategoryResource extends Resource
 {
@@ -90,7 +91,10 @@ class CategoryResource extends Resource
 
             ])
             ->filters([
-                //
+                SelectFilter::make('status_id')
+                  ->label('Filter by Status')
+                  ->options(Status::pluck('title', 'id'))
+                ,
             ])
             ->actions([
               ActionGroup::make([

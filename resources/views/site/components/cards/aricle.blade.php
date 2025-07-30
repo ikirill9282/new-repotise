@@ -10,7 +10,7 @@
     <div class="print-content">{!! $model->short() !!}</div>
     <div class="name_author">
       <a class="group w-full flex items-center justify-start gap-2" href="{{ $model->author->makeProfileUrl() }}" class="author-link">
-        <img class="rounded-full" src="{{ $model->author->avatar }}"
+        <img class="rounded-full object-cover" src="{{ $model->author->avatar }}"
             alt="Avatar">
         <p class="">Author <span class="group-hover:!text-black transition">{{ $model->author->name }}</span></p>
       </a>
@@ -31,7 +31,7 @@
         <div class="name_author">
             <a class="group flex justify-start items-center gap-2"
                 href="{{ $model->author->makeProfileUrl() }}">
-                <img src="{{ url($model->author->avatar) }}" alt="Avatar">
+                <img class="object-cover" src="{{ url($model->author->avatar) }}" alt="Avatar">
                 <p class="transition group-hover:!text-black">
                     {{ $model->author->profile }}</p>
             </a>

@@ -201,7 +201,7 @@
                         @endif
                     @endcomponent
                     <div class="search_results flex-wrap">
-                        @foreach (\App\Models\Location::whereHas('product')->limit(20)->orderByDesc('id')->get() as $item)
+                        @foreach (\App\Models\Location::whereHas('products')->limit(20)->orderByDesc('id')->get() as $item)
                             <span>
                                 <a class="px-2" href="{{ url("/products/$item->slug?" . $getQueryString([])) }}">
                                     {{ $item->title }}

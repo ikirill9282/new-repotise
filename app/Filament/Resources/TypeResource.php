@@ -3,9 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TypeResource\Pages;
-use App\Filament\Resources\TypeResource\RelationManagers;
 use App\Models\Type;
-use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,14 +11,14 @@ use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
+use App\Models\Status;
 
 class TypeResource extends Resource
 {
@@ -46,6 +44,7 @@ class TypeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(fn() => null)
             ->columns([
                 TextColumn::make('title')
                   ->searchable()
@@ -57,6 +56,25 @@ class TypeResource extends Resource
                   ->searchable()
                   ->sortable()
                   ,
+                TextColumn::make('status.title')
+                  ->searchable()
+                  ->sortable()
+                  ->badge()
+                  ->color(fn($record) => match($record->status_id) {
+                    1 => Color::Emerald,
+                    2 => Color::Indigo,
+                    3 => Color::Amber,
+                    4 => Color::Sky,
+                    5 => Color::Red,
+                    6 => Color::Orange,
+                  })
+                  ,
+                
+                TextColumn::make('usages')
+                  ->getStateUsing(function (Type $record) {
+                      return $record->products()->count();
+                  })
+                ,
                 TextColumn::make('created_at')
                   ->searchable()
                   ->sortable()
@@ -69,7 +87,11 @@ class TypeResource extends Resource
                   ,
             ])
             ->filters([
-                //
+                
+                SelectFilter::make('status_id')
+                  ->label('Filter by Status')
+                  ->options(Status::pluck('title', 'id'))
+                ,
             ])
             ->actions([
                 
@@ -81,12 +103,14 @@ class TypeResource extends Resource
                   ,
                 
                 Action::make('Approve')
+                  ->icon('heroicon-o-check-circle')
                   ->visible(fn (Type $record): bool => $record->status_id == 3)
                   ->action(function (Type $record) {
                       $record->update(['status_id' => 1]);
                   })
                   ,
                 Action::make('Reject')
+                  ->icon('heroicon-o-shield-exclamation')
                   ->visible(fn (Type $record): bool => $record->status_id == 3)
                   ->action(function (Type $record) {
                       $record->update(['status_id' => 5]);

@@ -21,6 +21,8 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
+use App\Models\Status;
 
 
 class LocationResource extends Resource
@@ -74,6 +76,11 @@ class LocationResource extends Resource
                   6 => Color::Orange,
                 })
                 ,
+              TextColumn::make('usages')
+                ->getStateUsing(function (Location $record) {
+                    return $record->products()->count();
+                })
+              ,
               TextColumn::make('created_at')
                 ->searchable()
                 ->sortable()
@@ -84,7 +91,10 @@ class LocationResource extends Resource
                 ,
             ])
             ->filters([
-                //
+                SelectFilter::make('status_id')
+                  ->label('Filter by Status')
+                  ->options(Status::pluck('title', 'id'))
+                ,
             ])
             ->actions([
                 

@@ -30,4 +30,14 @@ class Type extends Model
   {
     $this->slug = Slug::makeEn($this->title);
   }
+
+  public function status()
+  {
+    return $this->belongsTo(Status::class);
+  }
+
+  public function products()
+  {
+    return $this->hasMany(Product::class);
+  }
 }

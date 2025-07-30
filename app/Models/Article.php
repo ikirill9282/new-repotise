@@ -233,12 +233,15 @@ class Article extends Model
   public static function getLastNews(int|string $maximum_models = 4)
   {
     $last_news = static::query()
-      ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'system')))
+      // ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'system')))
+      ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'admin')))
       ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
       ->orderByDesc('id')
+      // ->ddRawSql()
       ->get();
     
-    while ($last_news->count() < $maximum_models) {
+    
+    while ($last_news->count() > 0 && $last_news->count() < $maximum_models) {
       $last_news = $last_news->collect()->merge($last_news)->slice(0, $maximum_models);
     }
 

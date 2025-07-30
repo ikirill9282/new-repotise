@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('seller_reward')->nullable();
             $table->decimal('referal_reward')->nullable();
             $table->decimal('platform_reward')->nullable();
+            $table->tinyInteger('refunded')->default(0);
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products');

@@ -49,6 +49,21 @@ class TagResource extends Resource
                   ->color(Color::Sky)
                   ->url(fn($record) => url("/admin/tags/$record->id/edit"))
                   ,
+                TextColumn::make('slug')
+                  ,
+                TextColumn::make('status.title')
+                  ->searchable()
+                  ->sortable()
+                  ->badge()
+                  ->color(fn($record) => match($record->status_id) {
+                    1 => Color::Emerald,
+                    2 => Color::Indigo,
+                    3 => Color::Amber,
+                    4 => Color::Sky,
+                    5 => Color::Red,
+                    6 => Color::Orange,
+                  })
+                  ,
                 TextColumn::make('created_at')
                   ->searchable()
                   ->sortable()

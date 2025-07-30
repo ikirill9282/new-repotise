@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\History;
 use Exception;
-use Illuminate\Container\Attributes\Log;
+use App\Models\History;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use App\Jobs\ReferalPromocode;

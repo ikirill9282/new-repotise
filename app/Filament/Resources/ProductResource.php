@@ -7,6 +7,7 @@ use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\OrderProducts;
 use App\Models\Product;
 use App\Models\Status;
+use App\Models\Type;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -22,6 +23,10 @@ use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Carbon;
+use App\Models\User;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductResource extends Resource
 {
@@ -160,9 +165,60 @@ class ProductResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('status_id')
-                  ->label('Status')
+                  ->label('Filter by Status')
                   ->options(Status::all()->pluck('title', 'id'))
                   ,
+                SelectFilter::make('model')
+                  ->label('Filter by Purchase Model')
+                  ->options([
+                    0 => 'Product',
+                    1 => 'Subscription',
+                  ])
+                  ->query(function($query, $state) {
+                    if (!empty($state['value'])) {
+                      $query->where('subscription', $state['value']);
+                    }
+                  })
+                  ,
+                SelectFilter::make('type_id')
+                  ->label('Filter by Product Type')
+                  ->searchable()
+                  ->multiple()
+                  ->options(Type::pluck('title', 'id'))
+                  ,
+                SelectFilter::make('user_id')
+                  ->label('Filter by Seller')
+                  ->searchable()
+                  ->options(
+                    User::query()
+                      ->whereHas('roles', fn($q) => $q->whereIn('name', ['system', 'creator', 'admin']))
+                      ->pluck('username', 'id')
+                  )
+                  ,
+                
+                DateRangeFilter::make('created_at')
+                  ->label('Filter by Date created')
+                  ->query(function ($query, array $data) {
+                    if (!empty($data['created_at'])) {
+                      $arr = explode('-', $data['created_at']);
+                      $arr = array_map(fn($val) => Carbon::createFromFormat('d/m/Y', trim($val))->format('Y-m-d'), $arr);
+                      
+                      return $query->whereBetween('created_at', ["$arr[0] 00:00:00", "$arr[1] 23:59:59"]);
+                    }
+                  })
+                  ,
+                DateRangeFilter::make('updated_at')
+                  ->label('Filter by Date updated')
+                  ->query(function ($query, array $data) {
+                    if (!empty($data['updated_at'])) {
+                      $arr = explode('-', $data['updated_at']);
+                      $arr = array_map(fn($val) => Carbon::createFromFormat('d/m/Y', trim($val))->format('Y-m-d'), $arr);
+                      
+                      return $query->whereBetween('updated_at', ["$arr[0] 00:00:00", "$arr[1] 23:59:59"]);
+                    }
+                  })
+                  ,
+
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -220,6 +276,67 @@ class ProductResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\EditBulkAction::make(),
+                    // Tables\Actions\ViewAction::make()
+                    //   ->url(fn (Product $record): string => url($record->makeUrl()))
+                    //   ->extraAttributes(['target' => '_blank'])
+                    //   ,
+
+                    Tables\Actions\BulkAction::make('Need Review')
+                      ->icon('heroicon-o-check-circle')
+                      ->action(function (Collection $records) {
+                        $items = $records->pluck('id');
+                        Product::whereIn('id', $items)->update(['status_id' => 3, 'published_at' => null]);
+                      })
+                      ,
+                    Tables\Actions\BulkAction::make('Approve')
+                      ->icon('heroicon-o-check-circle')
+                      ->action(function (Collection $records) {
+                        $items = $records->pluck('id');
+                        Product::whereIn('id', $items)->update(['status_id' => 1, 'published_at' => Carbon::now()]);
+                      })
+                      ,
+                    Tables\Actions\BulkAction::make('Reject')
+                      ->icon('heroicon-o-shield-exclamation')
+                      ->action(function (Collection $records) {
+                        $items = $records->pluck('id');
+                        Product::whereIn('id', $items)->update(['status_id' => 5, 'published_at' => null]);
+                      })
+                      ,
+                    
+                    Tables\Actions\BulkAction::make('Publish')
+                      ->icon('heroicon-o-document-text')
+                      ->action(function (Collection $records) {
+                          $items = $records->pluck('id');
+                          Product::whereIn('id', $items)->update(['status_id' => 1, 'published_at' => Carbon::now()]);
+                          // $record->update(['status_id' => 1, 'published_at' => Carbon::now()]);
+                      })
+                      ,
+
+                    Tables\Actions\BulkAction::make('Unpublish')
+                      ->icon('heroicon-o-x-circle')
+                      ->action(function (Collection $records) {
+                          $items = $records->pluck('id');
+                          Product::whereIn('id', $items)->update(['status_id' => 2, 'published_at' => null]);
+                          // $record->update(['status_id' => 2, 'published_at' => null]);
+                      })
+                      ,
+                    
+                    Tables\Actions\BulkAction::make('Duplicate')
+                      ->icon('heroicon-o-document-duplicate')
+                      ->action(function ($records) {
+                          foreach ($records as $record) {
+                            $newRecord = $record->replicate(['status_id', 'published_at']);
+                            $newRecord->save();
+                            $record->copyGallery($newRecord, 'products');
+                          }
+                          // $newRecord = $record->replicate(['status_id', 'published_at']);
+                          // $newRecord->status_id = 3;
+                          // $newRecord->published_at = null;
+                          // $newRecord->save();
+                          // $record->copyGallery($newRecord, 'products');
+                      })
+                      ,
                 ]),
             ]);
     }

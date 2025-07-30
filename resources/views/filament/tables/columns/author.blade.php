@@ -6,6 +6,7 @@
         :src="url($record->author->avatar)"
         :alt="$record->author->name"
         :label="$record->author->name"
+        class="object-cover"
     />
     <div>
         <p class="text-sm font-medium text-gray-900 dark:text-white">

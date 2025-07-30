@@ -28,7 +28,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Carbon;
 use App\Models\User;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
-
+use Illuminate\Database\Eloquent\Collection;
 
 class ArticleResource extends Resource
 {
@@ -193,7 +193,7 @@ class ArticleResource extends Resource
                   })
                   ,
                 DateRangeFilter::make('updated_at') // поле модели для фильтрации по дате
-                  ->label('Filter by Date update')
+                  ->label('Filter by Date updated')
                   ->query(function ($query, array $data) {
                     if (!empty($data['updated_at'])) {
                       $arr = explode('-', $data['updated_at']);
@@ -262,6 +262,58 @@ class ArticleResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+
+
+                    Tables\Actions\BulkAction::make('Need Review')
+                      ->icon('heroicon-o-check-circle')
+                      ->action(function (Collection $records) {
+                        $items = $records->pluck('id');
+                        Article::whereIn('id', $items)->update(['status_id' => 3, 'published_at' => null]);
+                      })
+                      ,
+                    Tables\Actions\BulkAction::make('Approve')
+                      ->icon('heroicon-o-check-circle')
+                      ->action(function (Collection $records) {
+                        $items = $records->pluck('id');
+                        Article::whereIn('id', $items)->update(['status_id' => 1, 'published_at' => Carbon::now()]);
+                      })
+                      ,
+                    Tables\Actions\BulkAction::make('Reject')
+                      ->icon('heroicon-o-shield-exclamation')
+                      ->action(function (Collection $records) {
+                        $items = $records->pluck('id');
+                        Article::whereIn('id', $items)->update(['status_id' => 5, 'published_at' => null]);
+                      })
+                      ,
+                    
+                    Tables\Actions\BulkAction::make('Publish')
+                      ->icon('heroicon-o-document-text')
+                      ->action(function (Collection $records) {
+                          $items = $records->pluck('id');
+                          Article::whereIn('id', $items)->update(['status_id' => 1, 'published_at' => Carbon::now()]);
+                          // $record->update(['status_id' => 1, 'published_at' => Carbon::now()]);
+                      })
+                      ,
+
+                    Tables\Actions\BulkAction::make('Unpublish')
+                      ->icon('heroicon-o-x-circle')
+                      ->action(function (Collection $records) {
+                          $items = $records->pluck('id');
+                          Article::whereIn('id', $items)->update(['status_id' => 2, 'published_at' => null]);
+                          // $record->update(['status_id' => 2, 'published_at' => null]);
+                      })
+                      ,
+                    
+                    Tables\Actions\BulkAction::make('Duplicate')
+                      ->icon('heroicon-o-document-duplicate')
+                      ->action(function ($records) {
+                          foreach ($records as $record) {
+                            $newRecord = $record->replicate(['status_id', 'published_at']);
+                            $newRecord->save();
+                            $record->copyGallery($newRecord, 'articles');
+                          }
+                      })
+                      ,
                 ]),
             ]);
     }

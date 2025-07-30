@@ -40,9 +40,9 @@ class Location extends Model
     $this->slug = Slug::makeEn($this->title);
   }
 
-  public function product()
+  public function products()
   {
-    return $this->hasOne(Product::class);
+    return $this->hasMany(Product::class);
   }
 
   public function hasPoster(): bool

@@ -1,5 +1,7 @@
 @php
+
 $news = \App\Models\Article::getLastNews(5);
+
 @endphp
 
 <section class="news">
