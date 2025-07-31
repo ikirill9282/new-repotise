@@ -123,7 +123,7 @@ $(document).ready(function() {
                     
                     likers.discover('.feed-item');
                     repliers.discover('.commend');
-                    initAuth();
+                    initModal();
                     window.CommentForms.discover();
                     window.ReplyButtons.discover();
                     window.DropReplyButtons.discover();

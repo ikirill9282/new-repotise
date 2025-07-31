@@ -172,7 +172,7 @@
                                     <span>{{ $product->author->profile }}</span>
                                 </div>
                             </div>
-                            <div class="creator-description read-more" data-text="Read More" data-color="#fff">{!! substr($product->author->description, 0, 300) . '...' !!}</div>
+                            <div class="creator-description read-more" data-text="Read More" data-color="#fff">{!! $product->author->description !!}</div>
                             {{-- <span class="read-more">Read More</span> --}}
                         </div>
                         <div class="share">
