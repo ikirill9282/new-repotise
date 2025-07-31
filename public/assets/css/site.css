@@ -1501,6 +1501,52 @@ footer .bottom_connecting_group .connecting a {
   background-image: url(../img/copy-icon.svg);
 }
 
+.read-more {
+  height: 150px;
+  overflow: hidden;
+  position: relative;
+  transition: 0.5s;
+}
+
+.read-more.read-more-open {
+  /* overflow: visible; */
+}
+
+.read-more-wrap {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  background-color: inherit;
+  box-shadow: 0px 0px 30px 30px #f9f9f9;
+  transition: 0.5s;
+}
+
+.read-more-open .read-more-wrap {
+  position: static;
+  box-shadow: none !important;
+  padding: 5px 0;
+}
+
+.read-more-btn {
+  z-index: 10;
+  color: var(--gray, #A4A0A0);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  padding-bottom: 3px;
+  border-bottom: 1px dashed var(--gray, #A4A0A0);
+  cursor: pointer;
+  transition: 0.5s all ease;
+  display: inline-block;
+}
+
+.read-more-btn:hover {
+  color: var(--black, #000);
+  border-color: var(--black, #000);
+}
+
 @media (min-width: 1140px) {
 }
 

@@ -1,16 +1,32 @@
 <div class="commend">
+  
   <img src="{{ $comment['author']['options']['avatar'] }}" alt="Avatar" class="img_commendor">
+
+
   <div class="right_text_group">
       <div class="name_commendor">
-          <div class="left_text">
-              <a
-                  href="{{ url('/profile/@' . $comment['author']['username']) }}">{{ $comment['author']['name'] }}</a>
+          <div class="left_text flex-row items-center gap-2">
+              <a href="{{ url('/profile/@' . $comment['author']['username']) }}">{{ $comment['author']['name'] }}</a>
+              @if(isset($comment['rating']))
+                <div class="flex">
+                   @for($i = 0; $i < $comment['rating']; $i++)
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 16 17"
+                          fill="#FFDB0C">
+                          <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M8.73617 2.81852L9.95445 5.25236C10.0738 5.49129 10.3043 5.65697 10.5716 5.69531L13.2969 6.0876C13.9702 6.18481 14.2382 7.00088 13.7509 7.46848L11.7801 9.36215C11.5864 9.54837 11.4983 9.81605 11.5441 10.0789L12.0092 12.7524C12.1237 13.4137 11.4198 13.9183 10.818 13.6054L8.38214 12.3423C8.14335 12.2184 7.85735 12.2184 7.61786 12.3423L5.182 13.6054C4.58015 13.9183 3.87626 13.4137 3.9915 12.7524L4.4559 10.0789C4.50171 9.81605 4.41355 9.54837 4.21988 9.36215L2.24912 7.46848C1.76181 7.00088 2.02976 6.18481 2.70311 6.0876L5.42843 5.69531C5.69569 5.65697 5.92685 5.49129 6.04625 5.25236L7.26383 2.81852C7.5651 2.21674 8.4349 2.21674 8.73617 2.81852Z"
+                              stroke="#FFDB0C" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+                          </path>
+                      </svg>
+                   @endfor
+                </div>
+              @endif
           </div>
           <a href="#" class="editor_btn" data-target="editor-{{ $comment['id'] }}">
               <img src="{{ asset('assets/img/options.svg') }}" alt="Options">
           </a>
           @if (auth()->check())
-              <div class="right_edit h-0 transition overflow-hidden" id="editor-{{ $comment['id'] }}"
+              <x-comment_menu :variables="$variables" :id="$comment['id']" :user_id="$comment['user_id']"></x-comment_menu>
+              {{-- <div class="right_edit h-0 transition overflow-hidden" id="editor-{{ $comment['id'] }}"
                   data-comment="{{ $comment['id'] }}">
                   <a href="#">{{ print_var('comment_report_message', $variables) }}</a>
 
@@ -21,7 +37,7 @@
                   @if (auth()->user()->hasRole('admin'))
                       <a href="#">{{ print_var('comment_delete_message', $variables) }}</a>
                   @endif
-              </div>
+              </div> --}}
           @endif
       </div>
       <div class="date">

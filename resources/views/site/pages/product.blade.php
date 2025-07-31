@@ -147,7 +147,7 @@
                             </div>
                             <div class="text_inf">
                                 <h4>Creator Refund Policy</h4>
-                                <p>14 days</p>
+                                <p>{{ $product->refund_policy }} days</p>
                             </div>
                         </div>
                     </div>
@@ -172,13 +172,13 @@
                                     <span>{{ $product->author->profile }}</span>
                                 </div>
                             </div>
-                            <div class="creator-description">{!! substr($product->author->description, 0, 300) . '...' !!}</div>
-                            <span class="show-more" onclick="toggleText()">Read More</span>
+                            <div class="creator-description read-more" data-text="Read More" data-color="#fff">{!! substr($product->author->description, 0, 300) . '...' !!}</div>
+                            {{-- <span class="read-more">Read More</span> --}}
                         </div>
                         <div class="share">
                             <h3>Share</h3>
                             <div class="connecting">
-                                <a href="#">
+                                <a href="{{ auth()->user()->makeReferalProductUrl('FB', $product) }}" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
                                         viewBox="0 0 30 30" fill="none" class="facebook">
                                         <path
@@ -189,7 +189,7 @@
                                             fill="white" />
                                     </svg>
                                 </a>
-                                <a href="#">
+                                <a href="{{ auth()->user()->makeReferalProductUrl('PI', $product) }}" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="31" height="30"
                                         viewBox="0 0 31 30" fill="none" class="pinterest">
                                         <path
@@ -200,7 +200,7 @@
                                             fill="white" />
                                     </svg>
                                 </a>
-                                <a href="#">
+                                <a href="{{ auth()->user()->makeReferalProductUrl('TW', $product) }}" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="31" height="30"
                                         viewBox="0 0 31 30" fill="none" class="twitter">
                                         <path
@@ -211,7 +211,7 @@
                                             fill="white" />
                                     </svg>
                                 </a>
-                                <a href="#">
+                                <a href="{{ auth()->user()->makeReferalProductUrl('GM', $product) }}" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="31" height="30"
                                         viewBox="0 0 31 30" fill="none" class="email">
                                         <path
@@ -222,7 +222,7 @@
                                             fill="white" />
                                     </svg>
                                 </a>
-                                <a href="#">
+                                <a href="{{ auth()->user()->makeReferalProductUrl('WA', $product) }}" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="31" height="30"
                                         viewBox="0 0 31 30" fill="none" class="whatsapp">
                                         <path
@@ -236,7 +236,7 @@
                                             fill="#FDFDFD" />
                                     </svg>
                                 </a>
-                                <a href="#">
+                                <a href="{{ auth()->user()->makeReferalProductUrl('TG', $product) }}" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
                                         viewBox="0 0 30 30" fill="none" class="telegram">
                                         <path
@@ -249,13 +249,13 @@
                                 </a>
                             </div>
                             <p>Get Free Products!</p>
-                            <a href="#" class="learn_more">Learn More</a>
+                            <a href="{{ route('referal') }}" class="learn_more">Learn More</a>
                         </div>
                     </div>
                     <div class="product_description">
                         <h3>Product Description</h3>
-                        <div>{{ $product->text }}</div>
-                        <span class="show-more" onclick="toggleText()">Read More</span>
+                        <div class="read-more" data-text="Read More" data-color="#f9f9f9">{{ $product->text }}</div>
+                        {{-- <span class="show-more" onclick="toggleText()">Read More</span> --}}
                     </div>
                 </div>
             </div>
@@ -323,43 +323,3 @@
     @endif
 @endsection
 
-@push('js')
-    <script>
-        window.addEventListener('DOMContentLoaded', function() {
-            [...document.querySelectorAll('.stars_filter')].map(stars => {
-                $(stars)
-                    .find('span')
-                    .each((key, elem) => {
-                        $(elem).off("click");
-                        $(elem).on("click", function() {
-                            $(this).addClass("active");
-                            const key = +$(this).data("value");
-                            $(this)
-                                .siblings()
-                                .each((k, sibling) => {
-                                    if (+$(sibling).data("value") <= key) {
-                                        $(sibling).addClass("active");
-                                    } else {
-                                        $(sibling).removeClass("active");
-                                    }
-                                });
-                            $(stars).find('input[name="rating"]').val(key);
-                        });
-                        $(elem).mouseenter(function() {
-                            const key = +$(this).data("value");
-                            $(this)
-                                .siblings()
-                                .each((k, sibling) => {
-                                    if (+$(sibling).data("value") <= key) {
-                                        $(sibling).addClass("hover");
-                                    }
-                                });
-                        });
-                        $(elem).mouseleave(function() {
-                            $(this).closest(".stars").find("span").removeClass("hover");
-                        });
-                    });
-            });
-        });
-    </script>
-@endpush

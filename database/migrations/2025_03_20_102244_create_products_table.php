@@ -23,6 +23,7 @@ return new class extends Migration
           $table->bigInteger('location_id')->unsigned()->index();
           $table->bigInteger('status_id')->unsigned()->index()->default(3);
           $table->float('rating')->default(0);
+          $table->integer('refund_policy')->default(90);
           $table->longText('text');
           $table->datetime('published_at')->index()->nullable();
           $table->timestamps();

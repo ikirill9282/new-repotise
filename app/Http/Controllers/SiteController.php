@@ -169,6 +169,10 @@ class SiteController extends Controller
       return (new FallbackController())($request);
     }
 
+    if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
+      Session::put('referal', $request->get('referal'));
+    }
+
     $product = Product::findByPid(request()->get('pid'));
     
     if (!$product) {
@@ -187,6 +191,7 @@ class SiteController extends Controller
       ->with('config')
       ->first();
 
+      
     if (is_null($page)) {
       return (new FallbackController())($request);
     }
@@ -291,6 +296,10 @@ class SiteController extends Controller
       ->with('config')
       ->first();
     
+    if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
+      Session::put('referal', $request->get('referal'));
+    }
+
     return view('site.pages.referal', [
       'page' => $page,
     ]);

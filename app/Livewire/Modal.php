@@ -182,12 +182,13 @@ class Modal extends Component
           'password' => $this->password,
         ]);
         
-        if ($this->currentRouteName == 'referal' && array_key_exists('token', $this->currentRouteParams)) {
+        if (Session::exists('referal')) {
           DB::transaction(function() use ($user) {
-            $id = CustomEncrypt::getId($this->currentRouteParams['token']);
+            $id = CustomEncrypt::getId(Session::get('referal'));
             $owner = User::find($id);
             UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $user->id]);
           });
+          Session::forget('referal');
         }
 
         History::userCreated($user);

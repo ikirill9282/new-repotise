@@ -226,6 +226,9 @@ class PagesConfigSeeder extends Seeder
           'comment_more_comments' => 'Load More Comments',
           'frequently_heading' => 'h2',
           'frequently_header' => 'Frequently Asked Questions',
+          'comment_report_message' => 'Report',
+          'comment_edit_message' => 'Edit',
+          'comment_delete_message' => 'Delete',
         ],
       ],
       [

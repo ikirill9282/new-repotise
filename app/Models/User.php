@@ -323,12 +323,33 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeReferalUrl(?string $source = null): string
     {
-      $url = url('/referal?token='. CustomEncrypt::generateUrlHash([
+      $url = url('/referal?referal='. CustomEncrypt::generateUrlHash([
         'id' => $this->id, 
         'created_at' => $this->created_at->format('Y-m-d'),
       ], false));
       $route_url = urlencode($url);
       $title = urlencode('Discover your next adventure together!');
+
+      return match($source) {
+        'FB' => "http://www.facebook.com/share.php?u=$route_url&title=$title",
+        'TW' => "https://twitter.com/intent/tweet?text=" . ($title." ".$route_url),
+        'PI' => "http://pinterest.com/pin/create/link/?url=$route_url&description=$title",
+        'GM' => "https://mail.google.com/mail/u/0/?ui=2&fs=1&tf=cm&su=$title&body=Link:+$route_url",
+        'WA' => "https://wa.me/?text=$title $route_url",
+        'TG' => "https://t.me/share/url?url=$route_url&text=$title",
+        default => $url
+      };
+    }
+
+    public function makeReferalProductUrl(?string $source = null, Product $product): string
+    {
+      $url = $product->makeUrl() . '&referal='. CustomEncrypt::generateUrlHash([
+        'id' => $this->id, 
+        'created_at' => $this->created_at->format('Y-m-d'),
+      ], false);
+      $route_url = urlencode($url);
+      $title = urlencode('Discover your next adventure together!');
+
 
       return match($source) {
         'FB' => "http://www.facebook.com/share.php?u=$route_url&title=$title",
@@ -440,7 +461,12 @@ class User extends Authenticatable implements HasName, FilamentUser
       }
     }
 
-    public function canWriteComment(Product $product, string $type = 'review'): bool
+    public function canWriteComment()
+    {
+      return Auth::check();
+    }
+
+    public function canWriteReview(Product $product, string $type = 'review'): bool
     {
 
       $orders = Order::query()

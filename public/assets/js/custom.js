@@ -442,26 +442,27 @@ const CommentForms = function () {
 
   this.setListeners = (obj) => {
       const form = $(obj);
-      const key = form.find('input[name="article"]').val();
+      const key = form.find('input[name="model"]').val();
       
       if (Object.keys(this.forms).includes(key)) {
         return ;
-      }
-
+      };
+      
       form.on("submit", (e) => {
           e.preventDefault();
 
           const formData = {
               _token: getCSRF(),
-              article: form.find('input[name="article"]').val(),
+              article: form.find('input[name="model"]').val(),
               text: form.find('textarea[name="text"]').val(),
               reply: form.find('input[name="reply"]').val(),
+              rating: document.querySelector('input[name="rating"]')?.value,
           };
           
           const url = form.data('type') === 'review' ? "/api/feedback/review" : "/api/feedback/comment";
-          if (form.data('type') === 'review') {
-            formData['rating'] = document.querySelector('input[name="rating"]').value;
-          }
+          // if (form.data('type') === 'review') {
+          //   formData['rating'] = document.querySelector('input[name="rating"]').value;
+          // }
           
           $.ajax({
               url: url,
@@ -485,7 +486,17 @@ const CommentForms = function () {
                   }
               })
               .catch((error) => {
-                  console.error("Error:", error);
+                  const errors = error.responseJSON?.errors;
+                  for (const key in errors) {
+                    const element = document.getElementById(`${key}-error`);
+                    console.log(`${key}-error`);
+                    
+                    if (element) {
+                      element.classList.remove('hidden');
+                      element.innerHTML = errors[key].join("\n");
+                    }
+                  }
+                  
                   // form.find('.feedback-form__message').text('An error occurred while submitting the comment.');
               });
       });
@@ -735,6 +746,7 @@ function discoverCartDropButtons(container=null)
 
 $(document).ready(function() {
   discoverCartDropButtons();
+  
   Livewire.hook('morphed',  ({ el, component }) => {
     discoverCartDropButtons(el);
   });
@@ -746,6 +758,80 @@ $(document).ready(function() {
         copyTextToClipboard(target.val())
       }
     })
+  });
+
+  [...document.querySelectorAll('.stars_filter')].map(stars => {
+    $(stars)
+      .find('span')
+      .each((key, elem) => {
+          $(elem).off("click");
+          $(elem).on("click", function() {
+              $(this).addClass("active");
+              const key = +$(this).data("value");
+              $(this)
+                  .siblings()
+                  .each((k, sibling) => {
+                      if (+$(sibling).data("value") <= key) {
+                          $(sibling).addClass("active");
+                      } else {
+                          $(sibling).removeClass("active");
+                      }
+                  });
+              $(stars).find('input[name="rating"]').val(key);
+              $(stars).find('input[name="rating"]').trigger('change');
+              $('#rating-error')?.addClass('hidden');
+          });
+          $(elem).mouseenter(function() {
+              const key = +$(this).data("value");
+              $(this)
+                  .siblings()
+                  .each((k, sibling) => {
+                      if (+$(sibling).data("value") <= key) {
+                          $(sibling).addClass("hover");
+                      }
+                  });
+          });
+          $(elem).mouseleave(function() {
+              $(this).closest(".stars").find("span").removeClass("hover");
+          });
+      });
+  });
+
+  const inputs = [...document.querySelectorAll('input'), ...document.querySelectorAll('textarea')];
+  inputs.forEach((input, key) => {
+    function hideError() {
+      const name = this.getAttribute('name')
+      const errorElement = document.querySelector(`#${name}-error`);
+      if (errorElement) errorElement.classList.add('hidden');
+    }
+
+    input.addEventListener('input', hideError);
+    input.addEventListener('change', hideError);
+  });
+
+  const readMore = [...document.querySelectorAll('.read-more')].forEach((elem, k) => {
+    const text = $('<div>', { class: "read-more-text", text: $(elem).text() });
+    const btnWrap = $('<div>', { 
+      class: "read-more-wrap",
+      style: `box-shadow: 0px 0px 30px 30px ${$(elem).data('color') ?? '#fff'}; background-color: ${$(elem).data('color') ?? '#fff'};`
+    });
+    const btn = $('<span>', { href: "#", class: 'read-more-btn', text: $(elem).data('text') ?? 'Read More' });
+    
+    btn.on('click', function() {
+      $(elem).toggleClass('read-more-open');
+
+      if (!$(elem).hasClass('read-more-open')) {
+        $(elem).css({ height: '150px' });
+      } else {
+        const height = text.outerHeight() + btn.outerHeight();
+        $(elem).css({ height: `${height}px` });
+      }
+    });
+
+    $(elem).empty();
+    $(elem).append(text);
+    btnWrap.append(btn);
+    $(elem).append(btnWrap);
   });
 });
 

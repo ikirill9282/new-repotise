@@ -22,7 +22,8 @@
     </section>
     <section class="comments_group">
         <div class="container">
-            @include('site.components.comments.wrap', ['model' => $article])
+            {{-- @dd($article) --}}
+            @include('site.components.comments.wrap', ['model' => $article, 'type' => 'article'])
         </div>
     </section>
     <section class="similar_materials">
