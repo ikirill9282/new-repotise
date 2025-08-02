@@ -6,7 +6,12 @@
                         src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
             </div>
             <div class="right_group_block gap-2">
-                <form class="search relative w-full max-w-full" method="GET" action="{{ url('/search') }}">
+                <x-search 
+                  placeholder="Search the site..."
+                  hits="header_hits"
+                  :button="false"
+                />
+                {{-- <form class="search relative w-full max-w-full" method="GET" action="{{ url('/search') }}">
                     <label for="search">
                         @include('icons.search')
                     </label>
@@ -14,7 +19,7 @@
                         autocomplete="off" data-hits="header_hits" data-autosubmit="true"
                         @if (request()->has('q') && (!isset(request()->route()->parameters['slug']) || request()->route()->parameters['slug'] != 'search')) value="{{ request()->get('q') }}" @endif>
                     @include('site.components.hits', ['id' => 'header_hits'])
-                </form>
+                </form> --}}
 
                 <div class="hamburger-menu" data-open="false">
                     <input id="menu__toggle" type="checkbox" class="w-0 h-0" />

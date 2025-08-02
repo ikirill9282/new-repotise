@@ -1,0 +1,31 @@
+@props([
+  'hits' => null,
+  'formClass' => '',
+  'formId' => '',
+  'button' => true,
+])
+
+<div class="search_group flex flex-col">
+  <form class="search_block relative search-form {{ $formClass }}" id="{{ $formId }}" method="GET" action="{{ url('/search') }}">
+    <div class="search-wrap relative">
+      <label for="search">
+        @include('icons.search', ['width' => 20, 'height' => 20])
+      </label>
+      <input 
+        type="search"
+        name="q"
+        class="search-input"
+        autocomplete="off"
+        data-hits="{{ $hits ?? 'search-hits' }}"
+        value="{{ request()->get('q') ?? '' }}"
+        {{ $attributes }}
+      >
+      @include('site.components.hits', ['id' => $hits ?? 'search-hits'])
+    </div>
+
+    @if($button)
+      <a href="#" class="search-button">Search</a>
+    @endif
+  </form>
+  {{ $slot }}
+</div>

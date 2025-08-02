@@ -263,6 +263,9 @@ header .about_block .right_group_block .cart svg:hover {
   color: #000 !important;
 }
 
+.wiki__hero .breadcrumb-item.active {
+  color: #fff;
+}
 
 .parallax {
     position: absolute;
@@ -312,6 +315,10 @@ header .about_block .right_group_block .cart svg:hover {
 
 .parallax-gift {
   background-image: url(../img/bg_gift.png);
+}
+
+.parallax-creators {
+  background-image: url(../img/wiki-catalog-hero.jpg);
 }
 
 .popular_products .about_block .products_item .item {
@@ -641,7 +648,7 @@ aside .login svg {
     background-image: url(../img/search_result_mobile.jpeg);
 }
 
-.search_result_home .about_block .input_group {
+ {
     max-width: 800px;
     margin: 0 auto;
 }
@@ -806,6 +813,13 @@ aside .login svg {
     .stars
     span {
     padding: 0 10px;
+}
+
+.filter_products .about_block .search_filter .search_top {
+  width: 100%;
+}
+.filter_products .about_block .search_filter .search_group {
+  max-width: none;
 }
 
 .filter_products .about_block .filter_products_group .filter {
@@ -1545,6 +1559,150 @@ footer .bottom_connecting_group .connecting a {
 .read-more-btn:hover {
   color: var(--black, #000);
   border-color: var(--black, #000);
+}
+
+.search_group {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem !important;
+}
+ .search_group .search_block {
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  gap: .75rem !important;
+  border: none !important;
+  border-radius: 8px;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.search_group .search-wrap {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--bg, #F9F9F9);
+  background: var(--white, #FFF);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem 1.25rem;
+}
+
+ .search_group .search_block label {
+  margin-bottom: 4px;
+}
+ .search_group .search_block input {
+  outline: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  color: var(--black, #212121);
+}
+.search_group .search_block input::-moz-placeholder {
+  color: var(--black, #212121);
+}
+.search_group .search_block input::-webkit-input-placeholder {
+  color: var(--black, #212121);
+}
+.search_group .search_block input:-ms-input-placeholder {
+  color: var(--black, #212121);
+}
+.search_group .search_block input::-ms-input-placeholder {
+  color: var(--black, #212121);
+}
+.search_group .search_block input::placeholder {
+  color: var(--black, #212121);
+}
+
+.search_group .search-button {
+  display: inline-block;
+  cursor: pointer;
+  padding: .75rem 1.25rem;
+  border-radius: 8px;
+  background: var(--main, #FC7361);
+  color: var(--white, #fff);
+}
+.search_group .name_tags {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem !important;
+  align-self: stretch;
+  width: 100% !important;
+  margin: 0 auto;
+}
+.search_group .name_tags a {
+  border-radius: 2000px;
+  background: var(--white, #FFF);
+  padding: 6px;
+  color: var(--gray, #A4A0A0);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 140%;
+  transition: 0.5s all ease;
+}
+.search_group .name_tags a:hover {
+  background: var(--main2, #484134);
+  color: var(--white, #FFF);
+}
+
+.home_tips input[name="q"]::-webkit-input-placeholder {
+  color: #f9f9f9;
+}
+
+.home_tips input[name="q"]::-moz-placeholder {
+  color: #f9f9f9;
+}
+
+.home_tips input[name="q"]:-ms-input-placeholder {
+  color: #f9f9f9;
+}
+
+.home_tips input[name="q"]::-ms-input-placeholder {
+  color: #f9f9f9;
+}
+
+.home_tips input[name="q"]::placeholder {
+  color: var(--gray, #A4A0A0);
+}
+
+header .search_group {
+  max-width: 400px;
+  margin: 0;
+}
+
+header .search_group .search-wrap {
+  background: #f9f9f9;
+  color: var(--gray, #A4A0A0);
+}
+
+header .search_group input[name="q"]::-webkit-input-placeholder {
+  color: var(--gray, #A4A0A0);
+}
+
+header .search_group input[name="q"]::-moz-placeholder {
+  color: var(--gray, #A4A0A0);
+}
+
+header .search_group input[name="q"]:-ms-input-placeholder {
+  color: var(--gray, #A4A0A0);
+}
+
+header .search_group input[name="q"]::-ms-input-placeholder {
+  color: var(--gray, #A4A0A0);
+}
+
+header .search_group input[name="q"]::placeholder {
+  color: var(--gray, #A4A0A0);
 }
 
 @media (min-width: 1140px) {
@@ -2327,6 +2485,10 @@ footer .bottom_connecting_group .connecting a {
 
     .filter_products .about_block .search_filter .search_top .add_products a {
       padding: 6px 20px;
+    }
+
+    header .search_group {
+      display: none;
     }
 }
 

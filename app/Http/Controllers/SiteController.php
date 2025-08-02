@@ -40,6 +40,15 @@ class SiteController extends Controller
     return view('site.pages.home', ['page' => $page]);
   }
 
+  public function creators()
+  {
+    $page = Page::where('slug', 'creators')
+      ->with('config')
+      ->first();
+
+    return view('site.pages.creators', ['page' => $page]);
+  }
+
   public function insights(Request $request)
   {
     $page = Page::where('slug', 'insights')

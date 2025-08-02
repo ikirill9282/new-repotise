@@ -13,10 +13,7 @@
                 @include('site.components.heading', ['variables' => $variables->filter(fn($var) => str_contains($var->name, 'page'))])
                 @include('site.components.breadcrumbs')
                 <div class="input_group flex-wrap !justify-start">
-                    @include('site.components.search', [
-                        'placeholder' => print_var('search_placeholder', $variables ?? null),
-                    ])
-
+                  <x-search placeholder="Search for travel guides, maps, itineraries...">
                     @if (isset($tags) && !empty($tags))
                         <div div class="name_tags">
                             @foreach ($tags as $tag)
@@ -24,6 +21,10 @@
                             @endforeach
                         </div>
                     @endif
+                  </x-search>
+                    {{-- @include('site.components.search', [
+                        'placeholder' => print_var('search_placeholder', $variables ?? null),
+                    ]) --}}
                 </div>
             </div>
         </div>

@@ -22,7 +22,7 @@ window.addEventListener('DOMContentLoaded', function() {
           const formatted = [...items]
             .map((item) => {
               const span = $('<span>', {
-                class: 'text-gray-700 px-4 py-2 hover:ring-2 ring-[#FC7361] hover:text-[#FC7361] hover:bg-[#FC7361]/10 cursor-pointer block transition',
+                class: 'text-left text-gray-700 px-4 py-2 hover:ring-2 ring-[#FC7361] hover:text-[#FC7361] hover:bg-[#FC7361]/10 cursor-pointer block transition',
                 text: item.label,
               });
   

@@ -1,3 +1,8 @@
+@props([
+  'class' => '',
+  'listClass' => '',
+])
+
 @php
     $breadcrumbs = \App\Helpers\Breadcrumbs::make(
       request()->route(), 
@@ -6,9 +11,9 @@
     );
 @endphp
 
-<section class="breadcrumb_block">
+<section class="breadcrumb_block {{ $class }}">
     <div class="container">
-        <ol class="breadcrumb">
+        <ol class="breadcrumb {{ $listClass }}">
             @foreach ($breadcrumbs as $name => $breadcrumb)
                 @if (array_key_last($breadcrumbs) !== $name)
                   <li class="breadcrumb-item">

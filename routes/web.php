@@ -78,6 +78,8 @@ Route::get('/search', [SiteController::class, 'search'])->name('search');
 Route::get('/insights', [SiteController::class, 'insights'])->name('insights');
 Route::get('/insights/{article}', [SiteController::class, 'feed'])->name('feed');
 
+Route::get('/creators', [SiteController::class, 'creators'])->name('creators');
+
 Route::get('/policies', [SiteController::class, 'policies'])->name('policies');
 Route::get('/policies/{slug}', [SiteController::class, 'policies']);
 

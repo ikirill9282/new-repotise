@@ -1,4 +1,4 @@
-<div class="input_group">
+<div class="search_group">
   <form class="search_block relative search-form {{ isset($form_class) ? $form_class : '' }}" {{ isset($form_id) ? " id=$form_id" : '' }} method="GET" action="{{ url('/search') }}">
       @if (!isset($template))
         <label for="search">
@@ -85,4 +85,5 @@
         </div>
       @endif
   </form>
+  {{ $slot ?? '' }}
 </div>

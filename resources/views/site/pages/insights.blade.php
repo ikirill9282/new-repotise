@@ -7,7 +7,9 @@
         <div class="about_block">
             @include('site.components.heading', ['variables' => $page->config->where(fn($item) => str_contains($item->name, 'page_'))])
             @include('site.components.breadcrumbs')
-            @include('site.components.search')
+            {{-- @include('site.components.search') --}}
+
+            <x-search placeholder="Search by keywords and tags..." />
         </div>
     </div>
   </section>

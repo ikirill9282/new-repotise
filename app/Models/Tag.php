@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Helpers\Slug;
 
 class Tag extends Model
 {
+    
     protected static function boot()
     {
       parent::boot();
@@ -27,5 +29,10 @@ class Tag extends Model
     public function articles()
     {
       return $this->belongsToMany(Article::class, 'article_tags', 'tag_id', 'article_id', 'id', 'id');
+    }
+
+    private function generateSlug()
+    {
+      $this->slug = Slug::makeEn($this->title);
     }
 }
