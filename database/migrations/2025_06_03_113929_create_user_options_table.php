@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('sales_treshold')->nullable();
             $table->decimal('space')->nullable();
 
-            $table->string('avatar')->default('/storage/images/default_avatar.svg');
+            $table->string('avatar')->default('/storage/images/default_avatar.png');
             $table->text('description')->nullable();
 
             $table->string('full_name')->nullable();
