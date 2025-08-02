@@ -46,7 +46,17 @@ class SiteController extends Controller
       ->with('config')
       ->first();
 
-    return view('site.pages.creators', ['page' => $page]);
+    $tags = User::whereHas('roles', fn($query) => $query->where('name', 'creator'))
+      ->orderByDesc('id')
+      ->select('username')
+      ->get()
+      ->pluck('username')
+      ->map(fn($val) => ['title' => "@$val"]);
+    
+    return view('site.pages.creators', [
+      'page' => $page,
+      'tags' => $tags,
+    ]);
   }
 
   public function insights(Request $request)
