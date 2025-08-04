@@ -9,7 +9,7 @@
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ route('products') }}">All Products</a></li>
                         <li><a href="{{ route('favorites') }}" class="{{ auth()->check() ? '' : 'open_auth' }}">Favorite</a></li>
-                        <li><a href="{{ url('/creators') }}">Creators</a></li>
+                        <li><a href="{{ route('creators') }}">Creators</a></li>
                         <li><a href="{{ route('insights') }}">Travel Insights</a></li>
                     </ul>
                 </div>
@@ -17,8 +17,8 @@
                     <h3 class="flex justify-between !mb-4"><span>Partnerships</span> <span
                             class="stroke-[#A4A0A0] rotate-180 transition md:hidden">@include('icons.arrow_footer')</span></h3>
                     <ul class="overflow-hidden">
-                        <li><a href="{{ url('/partner/creators') }}">For Creators</a></li>
-                        <li><a href="{{ url('/partner/investors') }}">For Investors & Partners</a></li>
+                        <li><a href="{{ route('sellers') }}">For Creators</a></li>
+                        <li><a href="{{ route('investments') }}">For Investors & Partners</a></li>
                         <li><a href="{{ route('referal') }}">Referral Program</a></li>
                         <li><a href="{{ route('help-center') }}">Help Center</a></li>
                     </ul>
@@ -63,10 +63,10 @@
         </div>
         <nav class="menu_bottom">
             <ul>
-                <li><a href="{{ url('/partner/terms-and-conditions') }}">Terms and Conditions</a></li>
-                <li><a href="{{ url('/partner/privacy-policy') }}">Privacy Policy</a></li>
-                <li><a href="{{ url('/partner/cookie-policy') }}">Cookie Policy</a></li>
-                <li><a href="{{ url('/partner/all-policies') }}">More Policies</a></li>
+                <li><a href="{{ url('/policies/terms-and-conditions') }}">Terms and Conditions</a></li>
+                <li><a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a></li>
+                <li><a href="{{ url('/policies/cookie-policy') }}">Cookie Policy</a></li>
+                <li><a href="{{ url('/policies') }}">More Policies</a></li>
             </ul>
         </nav>
         <div class="bottom_by_des">

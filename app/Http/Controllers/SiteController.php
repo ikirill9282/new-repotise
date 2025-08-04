@@ -298,13 +298,13 @@ class SiteController extends Controller
     ]);
   }
 
-  public function invite(Request $request)
+  public function sellers(Request $request)
   {
-    $page = Page::where('slug', 'invite')
+    $page = Page::where('slug', 'sellers')
       ->with('config')
       ->first();
     
-    return view('site.pages.invite', [
+    return view('site.pages.sellers', [
       'page' => $page,
     ]);
   }
@@ -341,6 +341,17 @@ class SiteController extends Controller
     return view('site.pages.gift', [
       'page' => $page,
       'order' => $order,
+    ]);
+  }
+  
+  public function investments(Request $request)
+  {
+    $page = Page::where('slug', 'investments')
+      ->with('config')
+      ->first();
+
+    return view('site.pages.investments', [
+      'page' => $page,
     ]);
   }
 }

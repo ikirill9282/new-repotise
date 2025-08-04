@@ -162,7 +162,7 @@ class CabinetController extends Controller
       return redirect('/unknown');
     }
 
-    return view('site.pages.public-profile', [
+    return view('site.pages.profile', [
       'user' => $user,
     ]);
   }
@@ -216,6 +216,23 @@ class CabinetController extends Controller
     
     return redirect()->route('checkout');
   }
+
+  public function createArticle(Request $request)
+  {
+    return view('site.pages.create-article');
+  }
+
+
+  public function createProduct(Request $request)
+  {
+    return view('site.pages.create-product');
+  }
+
+  public function createProduct2(Request $request)
+  {
+    return view('site.pages.create-product2');
+  }
+
 
   protected function getUser(string $slug)
   {

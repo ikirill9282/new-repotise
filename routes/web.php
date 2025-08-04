@@ -49,10 +49,14 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/referal', [CabinetController::class, 'referal'])->name('profile.referal');
   Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
   Route::get('/profile/checkout', [CabinetController::class, 'checkout'])->name('profile.checkout');
-
-
-  Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
 });
+
+Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
+// FOR TESTING
+Route::get('/create-article', [CabinetController::class, 'createArticle'])->name('create.article');
+Route::get('/create-product', [CabinetController::class, 'createProduct'])->name('create.article');
+Route::get('/create-product2', [CabinetController::class, 'createProduct2'])->name('create.article');
+
 
 Route::post('/hook/stripe', function(Request $request) {
   Log::channel('stripe_events')->debug('Stripe Event', ['data' => $request->attributes->get('stripe_event')]);
@@ -88,9 +92,11 @@ Route::get('/products/{country}', [SiteController::class, 'products'])->name('pr
 Route::get('/products/{country}/{product}', [SiteController::class, 'product'])->name('products.country.product');
 
 Route::get('/payment', [SiteController::class, 'payment'])->name('payment');
-Route::get('/invite', [SiteController::class, 'invite'])->name('invite');
+Route::get('/sellers', [SiteController::class, 'sellers'])->name('sellers');
 Route::get('/referal', [SiteController::class, 'referal'])->name('referal');
 Route::get('/gift', [SiteController::class, 'gift'])->name('gift');
+Route::get('/investments', [SiteController::class, 'investments'])->name('investments');
+
 // Products
 // Route::get('/{slug}/{country}', SiteController::class);
 // Route::get('/{slug}/{country}/{product}', SiteController::class);

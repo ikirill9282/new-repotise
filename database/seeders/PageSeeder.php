@@ -110,8 +110,8 @@ class PageSeeder extends Seeder
         'slug' => 'profile-verify',
       ]);
       $invite = Page::firstOrCreate([
-        'title' => 'Invite',
-        'slug' => 'invite',
+        'title' => 'Sellers',
+        'slug' => 'sellers',
       ]);
       $invite_referal = Page::firstOrCreate([
         'title' => 'Referal invite',
@@ -132,6 +132,18 @@ class PageSeeder extends Seeder
       $gift = Page::firstOrCreate([
         'title' => 'Gift',
         'slug' => 'gift',
+      ]);
+      $investments = Page::firstOrCreate([
+        'title' => 'Investments',
+        'slug' => 'investments',
+      ]);
+      $createArticle = Page::firstOrCreate([
+        'title' => 'Create Article',
+        'slug' => 'create-article',
+      ]);
+      $createArticle = Page::firstOrCreate([
+        'title' => 'Create Product',
+        'slug' => 'create-product',
       ]);
     }
 }

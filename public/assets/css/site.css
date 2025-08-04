@@ -321,6 +321,10 @@ header .about_block .right_group_block .cart svg:hover {
   background-image: url(../img/wiki-catalog-hero.jpg);
 }
 
+.parallax-investments {
+  background-image: url(../img/hero-investors.jpg);
+}
+
 .popular_products .about_block .products_item .item {
     max-width: none;
 }
