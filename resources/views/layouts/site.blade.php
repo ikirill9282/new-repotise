@@ -60,7 +60,8 @@
 
       @include('site.footer')
 
-      @livewire('modal')
+      {{-- @livewire('modal') --}}
+      @livewire('modals')
 
     {{-- @include('site.sections.accept_cookie') --}}
     <script src="{{ asset('/assets/js/custom.js') }}"></script>

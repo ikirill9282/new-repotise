@@ -1,4 +1,8 @@
 <div class="left_name_text">
+    @php
+      $group = \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $article->author->id]);
+      $resource = \Illuminate\Support\Facades\Crypt::encrypt($article->author->id);
+    @endphp
     <h2>{{ $article->title }}</h2>
     <div class="theme_articles">
       <div class="talmaev">
@@ -11,9 +15,11 @@
         </div>
         <a 
           href="{{ $article->author->makeSubscribeUrl() }}" 
-          class="follow {{ auth()->check() ? '' : 'open_auth' }}"
+          class="follow follow-btn {{ auth()->check() ? '' : 'open_auth' }}"
+          data-resource="{{ $resource }}"
+          data-group="{{ $group }}"
         >
-          {{ print_var('subscribe_button', $variables) }}
+          {{ $article->author->hasFollower(auth()->user()?->id) ? 'Unsubscribe' : 'Subscribe' }}
         </a>
       </div>
       <div class="block_date">
@@ -26,9 +32,11 @@
         @include('site.components.heading', ['title' => 'subscribe'])
         <a 
           href="{{ $article->author->makeSubscribeUrl() }}"
-          class="{{ auth()->check() ? '' : 'open_auth' }}"
+          class="follow-btn {{ auth()->check() ? '' : 'open_auth' }}"
+          data-resource="{{ $resource }}"
+          data-group="{{ $group }}"
         >
-          {{ print_var('subscribe_button', $variables) }}
+          {{ $article->author->hasFollower(auth()->user()?->id) ? 'Unsubscribe' : 'Subscribe' }}
         </a>
     </div>
     <div class="bottom_group">
@@ -48,10 +56,11 @@
                     @endforeach
                 </div>
             @endif
+            @php
+              $hash_id = \App\Helpers\CustomEncrypt::generateUrlHash([$article->id]);
+            @endphp
+
             <div class="like">
-                @php
-                  $hash_id = \App\Helpers\CustomEncrypt::generateUrlHash([$article->id]);
-                @endphp
                 <a 
                   href="/feedback/likes"
                   class="feedback_button {{ auth()->check() ? '' : 'open_auth' }} {{ is_liked('article', $article->id) ? 'liked' : '' }}"

@@ -521,25 +521,30 @@ const ReplyButtons = function() {
   this.buttons = [];
 
   this.setListeners = (button) => {
-    $(button).on('click', function(evt) {
-      evt.preventDefault();
-      const input = $(this).closest('.about_block').find('.reply-input');
-      const textarea = $(this).closest('.about_block').find('textarea');
-      const value = $(this).data('reply');
-      const text = $(this).closest('.commend').find('.review').clone();
-      const reply = $(this).closest('.about_block').find('.reply-block');
+    if (!this.buttons.includes(button)) {
+      $(button).on('click', function(evt) {
+        console.log('ok123');
+        
+        evt.preventDefault();
+        const input = $(this).closest('.about_block').find('.reply-input');
+        const textarea = $(this).closest('.about_block').find('textarea');
+        const value = $(this).data('reply');
+        const text = $(this).closest('.commend').find('.review').clone();
+        const reply = $(this).closest('.about_block').find('.reply-block');
 
-      $('html, body').animate({
-        scrollTop: $(this).closest('.about_block').offset().top,
-      }, 100, 'swing');
+        $('html, body').animate({
+          scrollTop: $(this).closest('.about_block').offset().top,
+        }, 100, 'swing');
 
-      input.val(value);
-      reply.find('.reply-text').html(text);
+        input.val(value);
+        reply.find('.reply-text').html(text);
 
-      if (reply.hasClass('hidden')) {
-        reply.removeClass('hidden');
-      }
-    });
+        if (reply.hasClass('hidden')) {
+          reply.removeClass('hidden');
+        }
+      });
+      this.buttons.push(button);
+    }
   }
 
   this.discover = () => {
@@ -580,6 +585,45 @@ const DropReplyButtons = function() {
   }
 }
 
+const FollowButtons = function() {
+  this.buttons = [];
+
+  this.discover = () => {
+    [...document.querySelectorAll('.follow-btn')].forEach((button, key) => {
+      
+      if (!this.buttons.includes(button)) {
+        button.addEventListener('click', function(evt) {
+          evt.preventDefault();
+          const hash = this.getAttribute('data-resource');
+          const group = this.getAttribute('data-group');
+
+          $.ajax({
+            method: 'POST',
+            url: '/api/feedback/follow',
+            data: {
+              _token: getCSRF(),
+              resource: hash,
+              type: 'article',
+            }
+          }).then(response => {
+            const btns = document.querySelectorAll(`[data-group="${group}"]`)
+            if (btns.length) {
+              btns.forEach((btn, k) => {
+                if (response.sub) {
+                  btn.innerHTML = 'Unsubscribe';
+                } else {
+                  btn.innerHTML = 'Subscribe';
+                }
+              })
+            }
+          });
+        });
+        this.buttons.push(button);
+      }
+    });
+  }
+}
+
 const header = $('header');
 const headerHeight = header.outerHeight();
 // const start = (document.querySelector('.parallax')) ? $('.parallax').outerHeight() : headerHeight;
@@ -588,12 +632,14 @@ window.CartButtons = new CartButtons();
 window.CommentForms = new CommentForms();
 window.ReplyButtons = new ReplyButtons()
 window.DropReplyButtons = new DropReplyButtons();
+window.FollowButtons = new FollowButtons();
 
 window.FavoriteButtons.discover('body');
 window.CartButtons.discover('body');
 window.CommentForms.discover();
 window.ReplyButtons.discover();
 window.DropReplyButtons.discover();
+window.FollowButtons.discover();
 
 let lastPoint = 0;
 
@@ -746,7 +792,7 @@ function discoverCartDropButtons(container=null)
 
 $(document).ready(function() {
   discoverCartDropButtons();
-  
+
   Livewire.hook('morphed',  ({ el, component }) => {
     discoverCartDropButtons(el);
   });
@@ -834,19 +880,3 @@ $(document).ready(function() {
     $(elem).append(btnWrap);
   });
 });
-
-// document.addEventListener('click', function(event) {
-//   const icon = event.target.closest('[data-target]');
-//   if (!icon) return;
-
-//   const targetSelector = icon.getAttribute('data-target');
-//   if (!targetSelector) return;
-
-//   const sourceElement = document.querySelector(targetSelector);
-//   if (!sourceElement) return;
-
-//   const textToCopy = sourceElement.innerText || sourceElement.textContent;
-//   if (!textToCopy) return;
-
-//   copyTextToClipboard(textToCopy);
-// });

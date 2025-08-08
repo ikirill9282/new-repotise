@@ -11,11 +11,12 @@ use Laravel\Cashier\Cashier;
 use Stripe\PaymentIntent;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\ProcessOrder;
+use App\Traits\HasAuthor;
 use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
-    use HasStatus;
+    use HasStatus, HasAuthor;
 
     protected static int $tax = 5;
 

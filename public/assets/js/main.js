@@ -365,7 +365,7 @@ function initModal() {
   if (open_auth_items.length) {
     open_auth_items.map((item) => item.addEventListener('click', (evt) => {
       evt.preventDefault();
-      Livewire.dispatch('modal.openAuth');
+      Livewire.dispatch('openModal', { modalName: 'auth' });
     }));
   }
   const open_reset_password = [...document.querySelectorAll('.reset_password')];

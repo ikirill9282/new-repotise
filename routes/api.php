@@ -28,6 +28,7 @@ Route::prefix('api')->group(function() {
     Route::post('/comment', 'comment');
     Route::post('/review', 'review');
     Route::post('/favorite', 'favorite');
+    Route::post('/follow', 'follow');
   });
 
   // Route::prefix('/user')->middleware('auth:web')->controller(UserController::class)->group(function() {

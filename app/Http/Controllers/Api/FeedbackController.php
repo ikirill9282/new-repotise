@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\CustomEncrypt;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Article;
 use App\Models\Likes;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Comment;
+use App\Models\Follower;
 use App\Models\UserFavorite;
 use App\Models\Review;
+use Illuminate\Support\Facades\Crypt;
 
 class FeedbackController extends Controller
 {
@@ -119,5 +122,22 @@ class FeedbackController extends Controller
       }
 
       return response()->json(['status' => 'success', 'comment' => $review]);
+    }
+
+    public function follow(Request $request)
+    {
+      $valid = $request->validate(['resource' => 'required|string']);
+      $id = Crypt::decrypt($valid['resource']);
+      
+      $condition = ['author_id' => $id, 'subscriber_id' => $request->user()->id];
+      $exists = Follower::where($condition)->exists();
+
+      if (Follower::where($condition)->exists()) {
+        Follower::where($condition)->delete();
+      } else {
+        Follower::create($condition);
+      }
+
+      return response()->json(['sub' => intval(!$exists)]);
     }
 }

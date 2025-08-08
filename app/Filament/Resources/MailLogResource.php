@@ -20,7 +20,11 @@ class MailLogResource extends Resource
 {
     protected static ?string $model = MailLog::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
+
+
+    protected static ?string $navigationGroup = 'Marketing';
+    // protected static ?string $navigationLabel = 'Product List';
 
     public static function form(Form $form): Form
     {
@@ -34,6 +38,7 @@ class MailLogResource extends Resource
     {
         return $table
             ->recordUrl(fn() => null)
+            ->query(static::getEloquentQuery()->orderByDesc('id'))
             ->columns([
                 TextColumn::make('recipient')
                   ->searchable()
@@ -54,6 +59,8 @@ class MailLogResource extends Resource
                     'new' => Color::Gray,
                     'append' => Color::Amber,
                     'delivered' => Color::Emerald,
+                    'failed' => Color::Rose,
+                    'accepted' => Color::Blue,
                   })
                   ->searchable()
                   ->toggleable()

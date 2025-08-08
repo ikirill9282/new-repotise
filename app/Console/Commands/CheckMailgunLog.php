@@ -50,7 +50,7 @@ class CheckMailgunLog extends Command
       }
     } while (isset($resp['pagination']) && isset($resp['pagination']['next']));
 
-    foreach (MailLog::where('status', 'new')->get() as $mailLog) {
+    foreach (MailLog::whereNotIn('status', ['accepted', 'failed'])->get() as $mailLog) {
       $found = [];
       foreach ($data as $item) {
         $messageId = preg_replace('/^(.*?)@.*$/is', "$1", $item['message']['headers']['message-id']);

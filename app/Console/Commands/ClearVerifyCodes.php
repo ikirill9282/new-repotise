@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\UserVerify;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ClearVerifyCodes extends Command
 {
@@ -28,8 +29,10 @@ class ClearVerifyCodes extends Command
     public function handle()
     {
       foreach (UserVerify::all() as $verify) {
-        $alive = Carbon::now()->timestamp - Carbon::parse($verify->created_at)->timestamp;
-        if ($alive >= 3600) $verify->delete();
+        if (!Carbon::parse($verify->created_at)->addHour()->isFuture()) {
+          $verify->delete();
+          Log::info('Verify code cleared: ' . $verify->code . ' for user: ' . $verify->user->email);
+        }
       }
     }
 }

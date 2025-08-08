@@ -181,7 +181,7 @@ class ArticleResource extends Resource
                     }
                   })
                   ,
-                DateRangeFilter::make('created_at') // поле модели для фильтрации по дате
+                DateRangeFilter::make('created_at')
                   ->label('Filter by Date created')
                   ->query(function ($query, array $data) {
                     if (!empty($data['created_at'])) {
@@ -192,7 +192,7 @@ class ArticleResource extends Resource
                     }
                   })
                   ,
-                DateRangeFilter::make('updated_at') // поле модели для фильтрации по дате
+                DateRangeFilter::make('updated_at')
                   ->label('Filter by Date updated')
                   ->query(function ($query, array $data) {
                     if (!empty($data['updated_at'])) {

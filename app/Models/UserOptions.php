@@ -12,6 +12,17 @@ class UserOptions extends Model
     protected float $default_space = 0.3;
     protected float $default_sales_treshold = 100;
 
+    public static function boot()
+    {
+      parent::boot();
+
+      parent::created(function(Model $model) {
+        if (empty($model->avatar)) {
+          $model->update(['avatar' => '/storage/images/default_avatar.png	']);
+        }
+      });
+    }
+
     public function user()
     {
       return $this->belongsTo(User::class);

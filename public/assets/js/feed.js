@@ -127,6 +127,7 @@ $(document).ready(function() {
                     window.CommentForms.discover();
                     window.ReplyButtons.discover();
                     window.DropReplyButtons.discover();
+                    window.FollowButtons.discover();
                 });
             }
         }

@@ -652,9 +652,91 @@ aside .login svg {
     background-image: url(../img/search_result_mobile.jpeg);
 }
 
- {
-    max-width: 800px;
-    margin: 0 auto;
+
+/* Фон модального окна */
+.modal-fade-in {
+    -webkit-animation: fadeInBackdrop 0.3s forwards;
+            animation: fadeInBackdrop 0.3s forwards;
+}
+
+.modal-fade-out {
+    -webkit-animation: fadeOutBackdrop 0.3s forwards;
+            animation: fadeOutBackdrop 0.3s forwards;
+}
+
+/* Само окно */
+.modal-slide-in {
+    -webkit-animation: slideInModal 0.3s forwards;
+            animation: slideInModal 0.3s forwards;
+}
+
+.modal-slide-out {
+    -webkit-animation: slideOutModal 0.3s forwards;
+            animation: slideOutModal 0.3s forwards;
+}
+
+@-webkit-keyframes fadeInBackdrop {
+    from { background-color: rgba(0,0,0,0); }
+    to { background-color: rgba(0,0,0,0.5); }
+}
+
+@keyframes fadeInBackdrop {
+    from { background-color: rgba(0,0,0,0); }
+    to { background-color: rgba(0,0,0,0.5); }
+}
+
+@-webkit-keyframes fadeOutBackdrop {
+    from { background-color: rgba(0,0,0,0.5); }
+    to { background-color: rgba(0,0,0,0); }
+}
+
+@keyframes fadeOutBackdrop {
+    from { background-color: rgba(0,0,0,0.5); }
+    to { background-color: rgba(0,0,0,0); }
+}
+
+@-webkit-keyframes slideInModal {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInModal {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@-webkit-keyframes slideOutModal {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes slideOutModal {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
 }
 
 .search_result_home .about_block .name_tags a {
@@ -1209,6 +1291,31 @@ footer .bottom_connecting_group .connecting a {
   background-color: #e65946;
 }
 
+.popUp-wrap::-webkit-scrollbar {
+  width: 4px;
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+}
+.popUp-wrap::-webkit-scrollbar-track {
+  background: var(--tg-line, rgba(42, 41, 46, 0.1));
+}
+.popUp-wrap::-webkit-scrollbar-thumb {
+  background-color: var(--main, #FC7361);
+  border-radius: 10px;
+} 
+.popUp-wrap::-webkit-scrollbar-thumb:hover {
+  background-color: #e65946;
+}
+
+.modal-fade-out .popUp-wrap::-webkit-scrollbar {
+  width: 0px;
+  opacity: 0 !important;
+}
+/* .popUp-wrap {
+  scrollbar-color: #FC7361 #FC7361;
+  scrollbar-width: 4px !important;
+} */
+
 .cart-modal .costs {
   display: flex;
   flex-direction: column;
@@ -1630,6 +1737,8 @@ footer .bottom_connecting_group .connecting a {
 .search_group .search_block input::placeholder {
   color: var(--black, #212121);
 }
+
+
 
 .search_group .search-button {
   display: inline-block;

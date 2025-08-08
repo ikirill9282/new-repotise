@@ -26,6 +26,53 @@ class SessionExpire
     return null;
   }
 
+  public static function expire(string $session_key): bool
+  {
+    if (Session::exists($session_key) && Carbon::now()->greaterThanOrEqualTo(Carbon::parse(Session::get($session_key)['expires']))) {
+      Session::forget($session_key);
+      return true;
+    }
+
+    return false;
+  }
+
+  public static function exists(string $session_key): bool
+  {
+    return Session::exists($session_key) && !Carbon::now()->greaterThanOrEqualTo(Carbon::parse(Session::get($session_key)['expires']));
+  }
+
+  public static function get(string $session_key)
+  {
+    if (!static::expire($session_key)) {
+      $data = Session::get($session_key);
+      if (isset($data['value'])) {
+        return $data['value'];
+      }
+    }
+    return null;
+  }
+
+  public static function getExpire(string $session_key)
+  {
+    if (!static::expire($session_key)) {
+      $data = Session::get($session_key);
+      if (isset($data['expires'])) {
+        return $data['expires'];
+      }
+    }
+    return null;
+  }
+
+  public static function set(string $session_key, $value, ?Carbon $expire = null): void
+  {
+    Session::put($session_key, ['value' => $value, 'expires' => $expire ? $expire : Carbon::now()->addDay()]);
+  }
+
+  
+
+
+  // TODO: Rework on Session facade.
+
   public static function saveCart(string $session_key, array $data): void
   {
     $current = Session::get($session_key);

@@ -149,10 +149,10 @@ class Discount extends Model
         $promocode = static::create($formatted);
         Mail::to($user->email)->send(new Promocode($promocode));
         History::info()->create([
-          'type' => 'referal',
+          'type' => 'info',
           'user_id' => $user->id,
           'action' => Action::REFERAL_PROMOCODE_CREATED,
-          'message' => 'Create promocode by referal registration.',
+          'message' => 'Create promocode.',
           'value' => $promocode->code,
         ]);
       }

@@ -1,0 +1,1 @@
+<span class="text-red-500 mt-2 inline-block">{{ $slot ?? '' }}</span>

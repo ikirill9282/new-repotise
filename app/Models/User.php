@@ -236,6 +236,13 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->belongsToMany(User::class, 'followers', 'author_id', 'subscriber_id', 'id', 'id');
     }
 
+    public function hasFollower(?int $user_id): bool
+    {
+      if (is_null($user_id)) return false;
+
+      return $this->followers()->where('subscriber_id', $user_id)->exists();
+    }
+
     public function favorite_authors()
     {
       return $this->hasManyThrough(User::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')
@@ -403,6 +410,7 @@ class User extends Authenticatable implements HasName, FilamentUser
       MailVerify::dispatch($this);
     }
 
+    // TODO: Rework code generation to this method.
     public function sendResetCode()
     {
       $mail = new ResetCode($this);
@@ -429,12 +437,23 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function getResetCode(): int
     {
+      $code = random_int(100000, 999999);
+      
       if ($this->verify()->where('type', 'reset')->exists()) {
-        return $this->verify()->where('type', 'reset')->first()?->code;
+        $model = $this->verify()->where('type', 'reset')->first();
+        $model->update(['code' => $code]);
+      } else {
+        $model = $this->verify()->firstOrCreate(
+          ['code' => $code], 
+          [
+            'created_at' => Carbon::now()->timestamp, 
+            'type' => 'reset'
+          ]
+        );
       }
 
-      $code = random_int(100000, 999999);
-      $model = $this->verify()->firstOrCreate(['code' => $code], ['created_at' => Carbon::now()->timestamp, 'type' => 'reset']);
+      SessionExpire::set('reset_password_email', $this->email, Carbon::now()->addHour());
+      SessionExpire::set('reset_password_code', $this->code, Carbon::now()->addMinutes(3));
 
       return $model->code;
     }
