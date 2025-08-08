@@ -21,7 +21,7 @@
                 </div>
               @endif
           </div>
-          <a href="#" class="editor_btn" data-target="editor-{{ $comment['id'] }}">
+          <a href="#" class="editor_btn {{ auth()->check() ? '' : 'open_auth' }}" data-target="editor-{{ $comment['id'] }}">
               <img src="{{ asset('assets/img/options.svg') }}" alt="Options">
           </a>
           @if (auth()->check())
