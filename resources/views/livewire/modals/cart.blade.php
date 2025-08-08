@@ -17,7 +17,7 @@
       }
   </style>
   <div class="md:basis-1/4 order-2 md:!order-1 relative md:!pr-2 max-h-screen">
-      <div id="cart-slider" class="md:max-w-[280px] h-full max-h-screen overflow-hidden md:rounded-lg relative">
+      <div id="cart-slider" class="md:max-w-[280px] h-full overflow-hidden md:rounded-lg relative">
           <div class="swiper-wrapper">
               @foreach ($trending_products as $product)
                   <div class="swiper-slide">
