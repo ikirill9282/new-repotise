@@ -773,6 +773,7 @@ function discoverCartDropButtons(container=null)
                 $('.empty-container').css({opacity: 0});
                 $('.empty-container').removeClass('hidden');
                 $('.empty-container').animate({opacity: 1});
+
               });
               
             } else {

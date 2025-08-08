@@ -398,6 +398,9 @@ function initModal() {
 
 function initCartSlider() {
     const heigth = window.innerHeight;
+    const siblingHeight = $('.cart-order').outerHeight();
+    $('#cart-slider').css({ maxHeight: siblingHeight + 'px' })
+
     let perView = 4.5;
 
     switch (true) {
