@@ -399,7 +399,7 @@ function initModal() {
 function initCartSlider() {
     const heigth = window.innerHeight;
     const siblingHeight = $('.cart-order').outerHeight();
-    $('#cart-slider').css({ height: siblingHeight + 'px !important' })
+    $('#cart-slider').css({ height: siblingHeight + 'px' })
 
     let perView = 4.5;
 
