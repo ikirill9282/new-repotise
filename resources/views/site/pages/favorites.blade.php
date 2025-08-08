@@ -40,7 +40,7 @@
                         aria-labelledby="pills-home-tab">
                         <div class="favorites-content">
                           <div class="top_group_fav favorites_second">
-                            <div class="right_select">
+                            <div class="right_select {{ !$hasProducts ? '!hidden' : '' }}">
                                 <span>Sort by:</span>
                                 <select>
                                     <option>Top Rated</option>
@@ -57,9 +57,10 @@
                                 @endforeach
                             </div>
                         </div>
-                        @include('site.components.favorite.empty', [
-                            'class' => auth()->user()->favorite_products->isEmpty() ? '' : 'hidden',
-                        ])
+                        <x-empty 
+                          :class="$hasProducts ? 'hidden' : ''" 
+                          title="Your Favorites list is currently emply. Start adding products you love!"
+                        />
                         </div>
 
                         @include('site.components.recomend.wrapper', [
@@ -69,7 +70,7 @@
                     </div>
                     <div class="tab-pane fade {{ (!$hasProducts && $hasAuthors) ? 'show active' : '' }}" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
                         <div class="favorites-content">
-                          <div class="top_group_fav favorites_second">
+                          <div class="top_group_fav favorites_second {{ !$hasAuthors ? '!hidden' : '' }}">
                             <div class="right_select">
                                 <span>Sort by:</span>
                                 <select>
@@ -88,9 +89,10 @@
                             </div>
                         </div>
 
-                        @include('site.components.favorite.empty', [
-                            'class' => auth()->user()->favorite_authors->isEmpty() ? '' : 'hidden',
-                        ])
+                        <x-empty 
+                          :class="$hasAuthors ? 'hidden' : ''" 
+                          title="You're not following any authors yet. Discover creators and follow your favorites!"
+                        />
                         </div>
 
                         @include('site.components.recomend.wrapper', [

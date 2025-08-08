@@ -26,18 +26,6 @@
           </a>
           @if (auth()->check())
               <x-comment_menu :variables="$variables" :id="$comment['id']" :user_id="$comment['user_id']"></x-comment_menu>
-              {{-- <div class="right_edit h-0 transition overflow-hidden" id="editor-{{ $comment['id'] }}"
-                  data-comment="{{ $comment['id'] }}">
-                  <a href="#">{{ print_var('comment_report_message', $variables) }}</a>
-
-                  @if (auth()->user()->id == $comment['user_id'] || auth()->user()->hasRole('admin'))
-                      <a href="#">{{ print_var('comment_edit_message', $variables) }}</a>
-                  @endif
-
-                  @if (auth()->user()->hasRole('admin'))
-                      <a href="#">{{ print_var('comment_delete_message', $variables) }}</a>
-                  @endif
-              </div> --}}
           @endif
       </div>
       <div class="date">

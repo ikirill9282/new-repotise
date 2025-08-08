@@ -5,21 +5,12 @@
                 <a href="{{ route('home') }}"><img class="max-w-18 sm:!max-w-none"
                         src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
             </div>
-            <div class="right_group_block gap-2">
+            <div x-data="{}" class="right_group_block gap-2">
                 <x-search 
                   placeholder="Search the site..."
                   hits="header_hits"
                   :button="false"
                 />
-                {{-- <form class="search relative w-full max-w-full" method="GET" action="{{ url('/search') }}">
-                    <label for="search">
-                        @include('icons.search')
-                    </label>
-                    <input type="search" name="q" placeholder="Search the site..." class="search-input"
-                        autocomplete="off" data-hits="header_hits" data-autosubmit="true"
-                        @if (request()->has('q') && (!isset(request()->route()->parameters['slug']) || request()->route()->parameters['slug'] != 'search')) value="{{ request()->get('q') }}" @endif>
-                    @include('site.components.hits', ['id' => 'header_hits'])
-                </form> --}}
 
                 <div class="hamburger-menu" data-open="false">
                     <input id="menu__toggle" type="checkbox" class="w-0 h-0" />
@@ -44,7 +35,7 @@
                     </ul>
                 </nav>
                 @if (!auth()->check())
-                    <a href="#" class="cart open_cart">
+                    <a @click.prevent="$dispatch('openModal', {modalName: 'cart'})" href="#" class="cart">
                         @include('icons.cart')
                         <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
                     </a>
@@ -69,11 +60,7 @@
                         @include('icons.favorite')
                         <span class="favorite-counter @if (!auth()->user()->favorite_count) hidden @endif" >{{ auth()->user()->favorite_count }}</span>
                     </a>
-                    {{-- <a href="{{ url('/cart') }}" class="basket rection_groups">
-                        @include('icons.cart')
-                        <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
-                    </a> --}}
-                    <a href="#" class="basket rection_groups open_cart">
+                    <a @click.prevent="$dispatch('openModal', {modalName: 'cart'})" href="#" class="basket rection_groups">
                         @include('icons.cart')
                         <span class="cart-counter @if (!$cart->getCartCount()) hidden @endif">{{ $cart->getCartCount() }}</span>
                     </a>

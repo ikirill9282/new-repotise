@@ -52,6 +52,7 @@ class Modals extends Component
         $this->modal = false;
     }
 
+    
 
     public function render()
     {

@@ -32,15 +32,15 @@
                         <li><a href="{{ url('/policies') }}">More Policies</a></li>
                     </ul>
                 </div>
-                <div class="group mb-4 md:mb-0">
+                <div x-data="{}" class="group mb-4 md:mb-0">
                     <h3 class="flex justify-between !mb-4"><span>My Account</span> <span
                             class="stroke-[#A4A0A0] rotate-180 transition md:hidden">@include('icons.arrow_footer')</span></h3>
                     <ul class="overflow-hidden">
                         @if (auth()->check())
                           <li><a href="{{ auth()->user()->makeProfileUrl() }}" class="">My Profile</a></li>
                         @else
-                          <li><a href="#" class="open_auth">Join / Sign In</a></li>
-                          <li><a wire:click.prevent="openReset" href="#" class="reset_password">Forgot Password?</a></li>
+                          <li><a @click.prevent="$dispatch('openModal', {modalName: 'auth'})"  href="#">Join / Sign In</a></li>
+                          <li><a @click.prevent="$dispatch('openModal', {modalName: 'reset-password'})" href="#" class="reset_password">Forgot Password?</a></li>
                         @endif
                     </ul>
                 </div>

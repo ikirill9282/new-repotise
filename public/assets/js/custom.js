@@ -768,7 +768,12 @@ function discoverCartDropButtons(container=null)
               $('.cart-counter').fadeOut(function() {
                 $(this).addClass('hidden');
               });
-              $(this).closest('.order-view').fadeOut(() => $('.empty-container').fadeIn());
+              $(this).closest('.order-view').fadeOut(() => {
+                
+                $('.empty-container').css({opacity: 0});
+                $('.empty-container').removeClass('hidden');
+                $('.empty-container').animate({opacity: 1});
+              });
               
             } else {
               $('.cart-counter').html(response.count);
