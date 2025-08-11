@@ -7,13 +7,13 @@
 <div class="bg-[#F9F9F9]">
   <div class="container">
     <div class="w-full bg-white p-2 sm:!p-6 lg:!p-10 rounded-xl">
-      <h2 class="font-bold text-xl flex justify-start items-end gap-3 mb-4">
+      <h2 class="font-bold text-xl flex justify-start items-end gap-3 mb-4 !p-2 sm:!p-0">
         <span>Reviews</span>
         <span class="text-[#A4A0A0] text-3xl">{{ $model->reviews_count }}</span>
       </h2>
 
       <div 
-        class="w-full py-2 text-end"
+        class="w-full py-2 !px-2 sm:!px-0 text-end"
         x-data="messenger()" 
         x-on:input="checkInput($event.target)"
         >
@@ -44,7 +44,7 @@
               </div>
             </div>
           </div>
-          <button class="p-2 sm:!p-4 flex flex-col sm:block bg-[#FC7361] hover:bg-[#484134] transition rounded text-white !text-xs sm:!text-base"><span>Post</span> <span>Review</span></button>
+          <button class="!p-2 sm:!p-4 flex flex-col sm:block bg-[#FC7361] hover:bg-[#484134] transition rounded text-white !text-xs sm:!text-base"><span>Post</span> <span>Review</span></button>
         </div>
       </div>
     </div>

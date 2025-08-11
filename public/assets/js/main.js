@@ -397,7 +397,9 @@ function initModal() {
 }
 
 function initCartSlider() {
-    const heigth = window.innerHeight;
+    const heigth = $('.cart-order').outerHeight();
+    console.log(heigth);
+    
     const siblingHeight = $('.cart-order').outerHeight();
     if (window.outerWidth >= 768) {
       $('#cart-slider').css({ height: siblingHeight + 'px' });
