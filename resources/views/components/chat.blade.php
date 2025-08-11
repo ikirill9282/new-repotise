@@ -6,14 +6,14 @@
 
 <div class="bg-[#F9F9F9]">
   <div class="container">
-    <div class="w-full bg-white p-2 sm:!p-6 lg:!p-10 rounded-xl">
-      <h2 class="font-bold text-xl flex justify-start items-end gap-3 mb-4 !p-2 sm:!p-0">
+    <div class="w-full bg-white !p-0 sm:!p-6 lg:!p-10 rounded-xl">
+      <h2 class="font-bold text-xl flex justify-start items-end gap-3 mb-4 !p-3 sm:!p-0">
         <span>Reviews</span>
         <span class="text-[#A4A0A0] text-3xl">{{ $model->reviews_count }}</span>
       </h2>
 
       <div 
-        class="w-full py-2 !px-2 sm:!px-0 text-end"
+        class="w-full py-2 !px-3 sm:!px-0 text-end"
         x-data="messenger()" 
         x-on:input="checkInput($event.target)"
         >
@@ -25,7 +25,7 @@
 
         <div class="w-full flex justify-start items-start gap-2 sm:gap-3">
           <div class="relative grow flex">
-            <textarea name="review" id="" rows="1" class="chat-textarea ps-1 py-3 sm:!ps-3 !pe-20 sm:!pe-28 bg-[#F9F9F9] transition rounded-lg w-full !text-xs sm:!text-base" placeholder="Write your review..."></textarea>
+            <textarea name="review" id="" rows="1" class="chat-textarea !pl-3 py-3 sm:!ps-3 !pe-20 sm:!pe-29 bg-[#F9F9F9] transition rounded-lg w-full !text-xs sm:!text-base" placeholder="Write your review..."></textarea>
             <div class="absolute top-0 right-0 text-[#A4A0A0]">
               <div class="flex justify-center items-center py-3 px-2 sm:!px-3 gap-1 sm:!gap-3">
                 <div class="text-xs sm:text-base"><span x-text="symbols"></span>/1000</div>
