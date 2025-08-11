@@ -2134,10 +2134,6 @@ header .search_group input[name="q"]::placeholder {
       width: 100%;
     }
 
-    .product_page_home .about_block .product_description {
-      max-width: 70%;
-    }
-
     .product_page_home .about_block .group_right .meet_creator {
       flex-grow: 1;
     }
@@ -2863,6 +2859,7 @@ header .search_group input[name="q"]::placeholder {
 
     .product_page_home .about_block .group_right .share .connecting {
       gap: 5px;
+      flex-wrap: wrap;
     }
 
     .product_page_home .about_block .group_right .share .connecting a svg {
@@ -2873,6 +2870,11 @@ header .search_group input[name="q"]::placeholder {
     .popUp {
       padding: 15px;
       border-radius: 8px;
+    }
+
+    .product_page_home .about_block .group_right .creator {
+      flex-direction: column;
+      align-items: flex-start !important;
     }
 }
 
@@ -2970,6 +2972,12 @@ header .search_group input[name="q"]::placeholder {
 
     .product_page_home .about_block .group_left .group_right {
       max-width: 100%;
+    }
+
+
+    .product_page_home .about_block .group_right .creator {
+      flex-direction: row;
+      align-items: flex-start !important;
     }
 }
 
