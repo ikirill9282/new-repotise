@@ -1,3 +1,7 @@
+@props([
+  'type' => 'comment',
+])
+
 <div class="about_block">
     <div class="title_block">
         @include('site.components.heading', [
@@ -97,7 +101,7 @@
     </div>
     <div class="block_commends">
         @foreach ($model->comments as $comment)
-            @include('site.components.comments.comment', ['comment' => $comment , 'type' => (isset($type) ? $type : 'comment')])
+            @include('site.components.comments.comment', ['comment' => $comment , 'type' => $type])
         @endforeach
 
         @if (isset($comments_count))

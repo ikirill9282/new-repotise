@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('status_id')->unsigned()->index()->default(3);
             $table->foreign('status_id')->references('id')->on('statuses');
             $table->tinyInteger('rating')->index()->default(0);
+            $table->tinyInteger('edited')->default(0);
 
             $table->longText('text');
             $table->timestamps();

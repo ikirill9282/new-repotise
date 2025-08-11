@@ -50,7 +50,8 @@ class UserSeeder extends Seeder
             // 'avatar' => '/storage/images/man.png',
           ],
         );
-        if (!$admin->hasRole('admin')) $admin->assignRole(Role::findByName('super-admin'));
+        if (!$admin->hasRole('super-admin')) $admin->assignRole(Role::findByName('super-admin'));
+        if (!$admin->hasRole('admin')) $admin->assignRole(Role::findByName('admin'));
       }
 
       $seller = User::firstOrCreate(

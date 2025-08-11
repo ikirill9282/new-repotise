@@ -36,7 +36,8 @@ class AuthController extends Controller
     public function signout(Request $request)
     {
       Auth::logout();
-      $request->session()->regenerate();
+      Session::forget('cart');
+      Session::regenerate(true);
       
       return redirect('/');
     }

@@ -53,7 +53,8 @@ class Auth extends Component
         }
         if (AuthFacade::attempt(['email' => $state['email'], 'password' => $state['password']], $state['remember'])) {
           Session::regenerate(true);
-          return redirect('/');
+          $url = str_ireplace('&modal=auth', '', url()->previous());
+          return redirect($url);
         }
 
         $this->addError('form.email', 'Invalid email or password. Please try again.');

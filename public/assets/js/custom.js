@@ -725,7 +725,6 @@ $('.search-button').on('click', function(evt) {
   $('.search-form').submit();
 });
 
-
 $('[data-input="integer"]').on('input', function(evt) {
   $(this).val(evt.target.value.replace(/[^0-9]+/is, ''));
 });
@@ -882,6 +881,12 @@ $(document).ready(function() {
 
     $(elem).empty();
     $(elem).append(text);
+
+    if (text.outerHeight() <= 150) {
+      $(elem).css({height: 'auto'});
+      return ;
+    };
+
     btnWrap.append(btn);
     $(elem).append(btnWrap);
   });

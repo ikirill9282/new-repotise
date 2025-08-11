@@ -65,10 +65,6 @@ Route::post('/hook/stripe', function(Request $request) {
   ->middleware(StripeWebhook::class)
   ->withoutMiddleware([VerifyCsrfToken::class]);;
 
-// Route::get('/', SiteController::class)->name('home');
-// Route::get('/{slug}', SiteController::class);
-// Route::get('/insights/{slug}/{article}', SiteController::class);
-
 
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('checkout');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment-success');

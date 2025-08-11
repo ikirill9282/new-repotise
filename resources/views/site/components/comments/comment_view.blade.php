@@ -2,7 +2,6 @@
   
   <img src="{{ $comment['author']['options']['avatar'] }}" alt="Avatar" class="img_commendor">
 
-
   <div class="right_text_group">
       <div class="name_commendor">
           <div class="left_text flex-row items-center gap-2">

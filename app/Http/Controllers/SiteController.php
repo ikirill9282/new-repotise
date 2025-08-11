@@ -180,6 +180,10 @@ class SiteController extends Controller
 
   public function product(Request $request, string $country, string $product)
   {
+    if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
+      SessionExpire::set('referal', $request->get('referal'), Carbon::now()->addHours(24));
+    }
+
     $page = Page::where('slug', 'product')
       ->with('config')
       ->first();
@@ -300,6 +304,10 @@ class SiteController extends Controller
 
   public function sellers(Request $request)
   {
+    if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
+      SessionExpire::set('referal', $request->get('referal'), Carbon::now()->addHours(24));
+    }
+
     $page = Page::where('slug', 'sellers')
       ->with('config')
       ->first();
@@ -311,13 +319,13 @@ class SiteController extends Controller
 
   public function referal(Request $request)
   {
+    if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
+      SessionExpire::set('referal', $request->get('referal'), Carbon::now()->addHours(24));
+    }
+
     $page = Page::where('slug', 'referal')
       ->with('config')
       ->first();
-    
-    if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
-      Session::put('referal', $request->get('referal'));
-    }
 
     return view('site.pages.referal', [
       'page' => $page,

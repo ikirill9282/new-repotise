@@ -23,7 +23,7 @@
                   <div class="swiper-slide">
                       <a href="{{ $product->makeUrl() }}">
                           <div class="flex flex-col justify-start items-stretch h-full">
-                              <div class="mb-auto h-[180px] md:h-[140px] md:!mb-2 rounded-lg md:overflow-hidden">
+                              <div class="mb-0 md:mb-auto h-[180px] md:h-[140px] md:!mb-2 rounded-lg md:overflow-hidden">
                                   <img src="{{ url($product->preview->image) }}" alt="Preview"
                                       class="w-full h-full object-cover">
                               </div>

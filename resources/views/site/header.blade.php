@@ -18,7 +18,7 @@
                         <span></span>
                     </div>
                 </div>
-                <a href="{{ url('/products') }}" class="all_products">
+                <a href="{{ route('products') }}" class="all_products">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="transparent">
                     <path d="M5 10H7C9 10 10 9 10 7V5C10 3 9 2 7 2H5C3 2 2 3 2 5V7C2 9 3 10 5 10Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M17 10H19C21 10 22 9 22 7V5C22 3 21 2 19 2H17C15 2 14 3 14 5V7C14 9 15 10 17 10Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
@@ -30,8 +30,8 @@
                 <nav class="menu">
                     <ul class="justify-end">
                         <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
-                        <li><a class="text-nowrap" href="{{ url('/creators') }}">Creators</a></li>
-                        <li><a class="text-nowrap" href="{{ url('/insights') }}">Travel Insights</a></li>
+                        <li><a class="text-nowrap" href="{{ route('creators') }}">Creators</a></li>
+                        <li><a class="text-nowrap" href="{{ route('insights') }}">Travel Insights</a></li>
                     </ul>
                 </nav>
                 @if (!auth()->check())
@@ -45,7 +45,7 @@
                     </a>
                 @else
                     <a href="{{ route('profile') }}" class="profile">
-                        <img src="{{ auth()->user()?->avatar ? url(auth()->user()->avatar) : '' }}" alt="avatar"
+                        <img src="{{ auth()->user()?->avatar }}" alt="avatar"
                             class="profile_img">{{-- rounded-full w-8 --}}
                         <div class="right_text">
                             <div class="name flex flex-col">
@@ -56,7 +56,7 @@
                         </div>
                     </a>
 
-                    <a href="{{ url('/favorites') }}" class="like rection_groups">
+                    <a href="{{ route('favorites') }}" class="like rection_groups">
                         @include('icons.favorite')
                         <span class="favorite-counter @if (!auth()->user()->favorite_count) hidden @endif" >{{ auth()->user()->favorite_count }}</span>
                     </a>
@@ -76,7 +76,7 @@
             <div class="menu__btn self-end !static menu_open" id="close_menu">
                 <span></span>
             </div>
-            <form class="search relative" method="GET" action="{{ url('/search') }}">
+            <form class="search relative" method="GET" action="{{ route('search') }}">
                 <label for="search">
                     @include('icons.search')
                 </label>
@@ -86,15 +86,15 @@
             </form>
             <ul class="mob_menu">
                 <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
-                <li><a class="text-nowrap" href="{{ url('/products') }}">All Products</a></li>
-                <li><a class="text-nowrap" href="{{ url('/creators') }}">Creators</a></li>
+                <li><a class="text-nowrap" href="{{ route('products') }}">All Products</a></li>
+                <li><a class="text-nowrap" href="{{ route('creators') }}">Creators</a></li>
                 <li class="last_menu">
-                    <a class="text-nowrap" href="{{ url('/insights') }}">Travel Insights</a>
+                    <a class="text-nowrap" href="{{ route('insights') }}">Travel Insights</a>
                 </li>
             </ul>
             @if (auth()->check())
                 <a href="{{ route('profile') }}" class="profile flex items-center gap-2">
-                    <img src="{{ asset('/assets/img/avatar.svg') }}" alt="" class="profile_img">
+                    <img src="{{ auth()->user()?->avatar }}" alt="" class="profile_img">
                     <div class="right_text">
                         <div class="name flex flex-col">
                             <h3>{{ auth()->user()?->profile }}</h3>
@@ -115,7 +115,7 @@
                         </svg>My Account
                     </a>
 
-                    <a href="{{ url('/profile/puchases') }}" class="bottom_profile">
+                    <a href="{{ route('profile.purchases') }}" class="bottom_profile">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                             fill="none">
                             <path fill-rule="evenodd" clip-rule="evenodd"

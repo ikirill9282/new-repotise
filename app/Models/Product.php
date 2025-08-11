@@ -143,7 +143,7 @@ class Product extends Model
   public function getChildren($review, int $max_level = 1)
   {
     $this->level++;
-    $review->load('likes.author', 'author.options');
+    $review->load('likes.author.options', 'author.options');
     $review->loadCount('likes', 'children');
 
     if ($this->level > $max_level) {
@@ -157,7 +157,7 @@ class Product extends Model
         if ($child->children()->exists()) {
           $this->getChildren($child);
         } else {
-          $child->load('likes.author', 'author.options');
+          $child->load('likes.author.options', 'author.options');
           $child->loadCount('likes');
           $this->level = 0;
         }

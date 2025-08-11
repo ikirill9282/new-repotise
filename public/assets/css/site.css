@@ -1933,6 +1933,53 @@ header .search_group input[name="q"]::placeholder {
   right: 0;
 }
 
+.product_page_home .about_block {
+  flex-wrap: nowrap;
+}
+
+.product_page_home .about_block .img_products {
+  max-width: 50%;
+}
+
+.product_page_home .group_left {
+  max-width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.product_page_home .about_block .information_product {
+  max-width: 47%;
+}
+
+.product_page_home .about_block .img_products .mySwiper14 .swiper-slide img {
+  width: 100%;
+}
+
+.product_page_home .about_block .img_products .mySwiper13 .swiper-slide img {
+  width: 100%;
+}
+
+.product_page_home .about_block .group_right .share .connecting {
+  gap: 7px;
+}
+
+.product_page_home .about_block .group_right {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 80px;
+  right: 0;
+  max-width: none;
+}
+
+.product_page_home .group_left .group_right {
+  display: none;
+}
+
+.product_page_home .group_middle {
+  display: none;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -2065,6 +2112,34 @@ header .search_group input[name="q"]::placeholder {
 
     .authorization_header .about_block .right_group_block .search {
         width: 100%;
+    }
+
+    .product_page_home .group_left {
+      max-width: 70%;
+    }
+
+    .product_page_home .about_block .img_products {
+      max-width: 100%;
+    }
+
+    .product_page_home .about_block .information_product {
+      max-width: 100%;
+    }
+
+    .product_page_home .about_block .img_products .mySwiper14 .swiper-slide img {
+      width: 100%;
+    }
+
+    .product_page_home .about_block .img_products .mySwiper13 .swiper-slide img {
+      width: 100%;
+    }
+
+    .product_page_home .about_block .product_description {
+      max-width: 70%;
+    }
+
+    .product_page_home .about_block .group_right .meet_creator {
+      flex-grow: 1;
     }
 }
 
@@ -2356,6 +2431,29 @@ header .search_group input[name="q"]::placeholder {
       right: 2px;
     }
 
+    .product_page_home .about_block {
+      max-width: none;
+    }
+
+    .product_page_home .about_block .product_description {
+      margin-top: 0;
+    }
+
+    .product_page_home .about_block .img_products {
+      max-width: 100%;
+    }
+
+    .product_page_home .about_block .information_product {
+      max-width: 100%;
+    }
+
+    .product_page_home .group_left {
+      max-width: 65%;
+    } 
+
+    .product_page_home .about_block {
+      gap: 15px;
+    }
 }
 
 @media (max-width: 992px) {
@@ -2718,6 +2816,64 @@ header .search_group input[name="q"]::placeholder {
     header .search_group {
       display: none;
     }
+
+    .product_page_home .about_block .group_right {
+      display: none;
+    }
+
+    .product_page_home .group_left .group_right {
+      display: flex;
+    }
+
+    .product_page_home .group_left {
+      max-width: 100%;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .product_page_home .group_middle {
+      display: flex;
+      flex-direction: column;
+      max-width: 65%;
+      gap: 15px;
+    }
+
+    .product_page_home .about_block .information_product {
+      display: none;
+    }
+    
+    .product_page_home .about_block .product_description {
+      /* order: 4; */
+      display: none;
+    }
+
+
+    .product_page_home .group_middle .information_product,
+    .product_page_home .group_middle .product_description
+     {
+      display: block;
+      max-width: none;
+    }
+    
+    .product_page_home .about_block .group_left .group_right {
+      /* order: 3; */
+      max-width: 33%;
+      display: flex;
+    }
+
+    .product_page_home .about_block .group_right .share .connecting {
+      gap: 5px;
+    }
+
+    .product_page_home .about_block .group_right .share .connecting a svg {
+      width: 4vw;
+      height: auto;
+    }
+
+    .popUp {
+      padding: 15px;
+      border-radius: 8px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -2789,6 +2945,31 @@ header .search_group input[name="q"]::placeholder {
 
     .verification-form__form form label.half {
       width: 100%;
+    }
+
+    .product_page_home .about_block .group_right {
+      max-width: 100%;
+    }
+
+    .product_page_home .about_block .information_product {
+      max-width: 100%;
+    }
+
+    .product_page_home .about_block .group_right .share .connecting a svg {
+      height: auto;
+      width: 10vw;
+    }
+
+    .product_page_home .group_left {
+      max-width: 100%;
+    }
+
+    .product_page_home .group_middle {
+      max-width: 100%;
+    }
+
+    .product_page_home .about_block .group_left .group_right {
+      max-width: 100%;
     }
 }
 

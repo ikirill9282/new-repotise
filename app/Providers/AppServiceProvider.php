@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
       Model::unguard();
 
       LogViewer::auth(function ($request) {
-        return $request->user() && $request->user()->hasRole('admin');
+        return $request->user() && ($request->user()->hasRole('admin') || $request->user()->hasRole('super-admin'));
       });
     
 

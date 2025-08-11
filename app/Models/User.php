@@ -156,7 +156,7 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-      return $this->hasRole('admin');
+      return $this->hasRole('admin') || $this->hasRole('super-admin');
     }
 
     public function funds()

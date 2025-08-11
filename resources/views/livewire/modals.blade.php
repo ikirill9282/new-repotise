@@ -1,7 +1,8 @@
 <div class="">
     <div class="fixed top-0 left-0 w-screen h-screen px-1.5 py-3 z-[1200] flex justify-center items-center bg-stone-900/50 overflow-y-scroll
                 {{ $isVisible ? 'modal-fade-in' : ($this->inited ? 'modal-fade-out' : 'hidden') }} @if ($this->inited && $this->modal == false) hidden @endif"
-        wire:keydown.escape="closeModal" tabindex="0" x-data="{}" x-init="window.addEventListener('modalClosing', () => {
+        wire:keydown.escape="closeModal" tabindex="0" x-data="{}" 
+        x-init="window.addEventListener('modalClosing', () => {
             setTimeout(() => {
                 @this.call('finalizeClose')
             }, 300)

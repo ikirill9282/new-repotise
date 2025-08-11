@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserReferal;
 use App\Helpers\CustomEncrypt;
+use App\Helpers\SessionExpire;
 use App\Models\History;
 
 class Register extends Component
@@ -60,31 +61,21 @@ class Register extends Component
       $this->addError('form.repeat_password', 'Passwords do not match. Please re-enter.');
       return ;
     }
-
     $user = User::create([
       'email' => $state['email'],
       'password' => $state['password'],
     ]);
-//     if ($this->password !== $this->repeat_password) {
-//       $this->addErrorText('reg.password', 'Passwords do not match. Please re-enter.');
-//       $this->addErrorText('reg.repeat_password', 'Passwords do not match. Please re-enter.');
-//       return ;
-//     }
+    
+    DB::transaction(function() use ($user) {
+      if (SessionExpire::exists('referal')) {
+          $id = CustomEncrypt::getId(SessionExpire::get('referal'));
+          $owner = User::find($id);
+          UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $user->id]);
+          Session::forget('referal');
+        }
+      History::userCreated($user);
+    });
 
-//     $user = User::create([
-//       'email' => $this->email,
-//       'password' => $this->password,
-//     ]);
-
-    if (Session::exists('referal')) {
-      DB::transaction(function() use ($user) {
-        $id = CustomEncrypt::getId(Session::get('referal'));
-        $owner = User::find($id);
-        UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $user->id]);
-      });
-      Session::forget('referal');
-    }
-    History::userCreated($user);
     $user->sendVerificationCode(seller: $state['as_seller']);
     $this->dispatch('openModal', 'register-success');
   }
