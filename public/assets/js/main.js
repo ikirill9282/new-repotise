@@ -362,16 +362,17 @@ const counterChanged = (elem, count) => {
 };
 
 function initModal() {
-    const open_auth_items = [...document.querySelectorAll(".open_auth")];
+    // const open_auth_items = [...document.querySelectorAll(".open_auth")];
 
-    if (open_auth_items.length) {
-        open_auth_items.map((item) =>
-            item.addEventListener("click", (evt) => {
-                evt.preventDefault();
-                Livewire.dispatch("openModal", { modalName: "auth" });
-            })
-        );
-    }
+    // if (open_auth_items.length) {
+    //     open_auth_items.map((item) =>
+    //         item.addEventListener("click", (evt) => {
+    //             evt.preventDefault();
+    //             Livewire.dispatch("openModal", { modalName: "auth" });
+    //         })
+    //     );
+    // }
+
     const open_reset_password = [
         ...document.querySelectorAll(".reset_password"),
     ];
@@ -398,7 +399,6 @@ function initModal() {
 
 function initCartSlider() {
     const heigth = $('.cart-order').outerHeight();
-    console.log(heigth);
     
     const siblingHeight = $('.cart-order').outerHeight();
     if (window.outerWidth >= 768) {

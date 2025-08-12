@@ -15,16 +15,19 @@ class LevelSeeder extends Seeder
     {
         $data = [
           [
+            'title' => 'Beginner',
             'fee' => 10,
             'space' => 0.3,
             'sales_treshold' => 100,
           ],
           [
+            'title' => 'Growth',
             'fee' => 8,
             'space' => 0.5,
             'sales_treshold' => 300,
           ],
           [
+            'title' => 'Pro',
             'fee' => 5,
             'space' => 0.5,
             'sales_treshold' => null,

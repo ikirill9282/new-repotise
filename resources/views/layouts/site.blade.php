@@ -12,6 +12,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/swiper-bundle.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('/assets/css/jquery.toast.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style2.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style3.css') }}">
@@ -72,6 +73,7 @@
       });
     </script>
     <script src="{{ asset('/assets/js/swiper-bundle.min.js') }}"></script>
+    <script src="{{ asset('/assets/js/jquery.toast.min.js') }}"></script>
     <script src="{{ asset('/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('/assets/js/search.js') }}"></script>
     <script src="{{ asset('/assets/js/main.js') }}"></script>

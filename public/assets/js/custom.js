@@ -169,22 +169,37 @@ const CommentWriters = function() {
 const Editors = function() {
   this.editors = [];
 
-  this.init = () => {
-    this.editors = [...$('.editor_btn')].map((editor) => {
-      $(editor).off('click');
-      $(editor).on('click', function(event) {
-        event.preventDefault();
-        const target = $(this).data('target');
-        $(`#${target}`).toggleClass('h-48');
-      });
+  this.discover = () => {
+    [...$('.editor_btn')].map((editor) => {
+      if (!this.editors.includes(editor)) {
+        $(editor).on('click', function(event) {
+          event.preventDefault();
+          if ($(this).hasClass('open_auth')) {
+            return ;
+          }
+
+          const target = $(this).data('target');
+          const list = $(`#${target}`);
+
+          if (target) {
+            list.toggleClass('opened');
+            if (list.hasClass('opened')) {
+              const height = list.find('.list').outerHeight();
+              list.css({ height: height + 'px' });
+            } else {
+              list.attr('style', '');
+            }
+          }
+        });
+
+        this.editors.push(editor);
+      }
     });
     return this;
   }
-
-  return this.init();
 }
 
-const LikeButtons = function(container) {
+const LikeButtons = function() {
   this.buttons = [];
 
   this.setListeners = (item) => {
@@ -261,89 +276,76 @@ const LikeButtons = function(container) {
     return null;
   }
 
-  this.discover = (container) => {
-    $(container).each((key, item) => {
-      const buttons = $(item).find('a.feedback_button');
-      buttons.each((key, element) => {
+  this.discover = () => {
+    const buttons = $(document).find('.feedback_button');
+    
+    buttons.each((key, element) => {
+      if (!this.buttons.includes(element)) {
         const button = this.prepareElement(element);
-        if (this.buttons.find(btn => btn.id == button.id) !== undefined) {
-          return;
-        }
-
+        
         if (button !== null) {
           this.setListeners(button);
-          this.buttons.push(button);
+          this.buttons.push(element);
         }
-        
-      })
+      }
     });
+
     return this;
   }
-
-  return this.discover(container);
 }
 
-const RepliesButtons = function(container) {
-  this.group = '.commends_group';
+const RepliesButtons = function() {
+  this.group = '.show-more';
   this.buttons = [];
   this.afterDiscover = null;
 
   this.addListeners = (button) => {
-    const elem = button.item;
+    const elem = $(button);
     
     elem.on('click', (evt) => {
       evt.preventDefault();
       $.ajax({
-        url: '/api/data/comments',
+        url: '/api/data/messages',
         method: 'POST',
         data: {
           _token: getCSRF(),
-          hash: button.hash,
+          resource: elem.data('resource'),
         }
       }).then(response => {
-        // elem.closest(this.group).html(response);
-        elem.parents(this.group).eq(0).append(response);
-        elem.detach();
-        
-        this.discover('.commend');
+        elem.parents(this.group).eq(0).replaceWith(response);
+        this.discover();
+
         new Editors();
         if (this.afterDiscover !== null) {
           this.afterDiscover();
         }
 
         window.ReplyButtons.discover();
+        window.ReadMoreButtons.discover();
+        window.LikeButtons.discover();
+        window.Editors.discover();
+        window.AuthButtons.discover();
       });
     });
   }
 
   this.onAfterDiscover = (callback) => this.afterDiscover = callback;
 
-  this.format = function(button) {    
-    const result = {
-      hash: button.data('item'),
-      item: button,
-    }
-    return result;
-  }
-
   this.button_exists = (button) => this.buttons.find((btn) => btn.hash === button.data('item')) !== undefined;
 
   this.discover = (container, callback = null) => {
-    $(container).each((key, item) => {
+    $(document).each((key, item) => {
       const buttons = $(item).find('.replies-button');
       
       buttons.each((key, btn) => {
         const button = $(btn);
-        if (!this.button_exists(button)) {
-          const formatted = this.format(button);
-          this.addListeners(formatted, callback);
-          this.buttons.push(formatted);
+        if (!this.buttons.includes(btn)) {
+          this.addListeners(btn, callback);
+          this.buttons.push(btn);
         }
       });
     });
   }
-
-  return this.discover(container);
 }
 
 const FavoriteButtons = function() {
@@ -460,45 +462,46 @@ const CommentForms = function () {
           };
           
           const url = form.data('type') === 'review' ? "/api/feedback/review" : "/api/feedback/comment";
-          // if (form.data('type') === 'review') {
-          //   formData['rating'] = document.querySelector('input[name="rating"]').value;
-          // }
           
           $.ajax({
               url: url,
               type: "POST",
               data: formData,
           })
-              .then((response) => {
-                  if (response.status === "success") {
-                      form[0].reset();
-                      const input = form.find('textarea');
-                      setTimeout(() => {
-                        if (!input.val().length && !input.is(':focus')) {
-                          $(input).animate({ 'height': '20px' });
-                          $(input).data('open', false);
-                        }
-                      }, 500);
-                      // form.find('textarea[name="comment"]').val("");
-                      // form.find('.feedback-form__message').text('Comment submitted successfully!');
-                  } else {
-                      // form.find('.feedback-form__message').text('Error submitting comment.');
-                  }
-              })
-              .catch((error) => {
-                  const errors = error.responseJSON?.errors;
-                  for (const key in errors) {
-                    const element = document.getElementById(`${key}-error`);
-                    console.log(`${key}-error`);
-                    
-                    if (element) {
-                      element.classList.remove('hidden');
-                      element.innerHTML = errors[key].join("\n");
-                    }
-                  }
-                  
-                  // form.find('.feedback-form__message').text('An error occurred while submitting the comment.');
-              });
+          .then((response) => {
+              if (response.status === "success") {
+                form.detach();
+                  // form[0].reset();
+                  // form.find('input[name="rating"]').val(null).trigger('change');
+                  // form.find('.stars').find('span').removeClass('active');
+
+                  // const input = form.find('textarea');
+                  // // setTimeout(() => {
+                  // //   if (!input.val().length && !input.is(':focus')) {
+                  // //     $(input).animate({ 'height': '20px' });
+                  // //     $(input).data('open', false);
+                  // //   }
+                  // // }, 500);
+                  // // form.find('textarea[name="comment"]').val("");
+                  // // form.find('.feedback-form__message').text('Comment submitted successfully!');
+              } else {
+                  // form.find('.feedback-form__message').text('Error submitting comment.');
+              }
+          })
+          .catch((error) => {
+              const errors = error.responseJSON?.errors;
+              for (const key in errors) {
+                const element = document.getElementById(`${key}-error`);
+                console.log(`${key}-error`);
+                
+                if (element) {
+                  element.classList.remove('hidden');
+                  element.innerHTML = errors[key].join("\n");
+                }
+              }
+              
+              // form.find('.feedback-form__message').text('An error occurred while submitting the comment.');
+          });
       });
 
       this.forms[key] = form;
@@ -523,8 +526,7 @@ const ReplyButtons = function() {
   this.setListeners = (button) => {
     if (!this.buttons.includes(button)) {
       $(button).on('click', function(evt) {
-        console.log('ok123');
-        
+
         evt.preventDefault();
         const input = $(this).closest('.about_block').find('.reply-input');
         const textarea = $(this).closest('.about_block').find('textarea');
@@ -624,6 +626,60 @@ const FollowButtons = function() {
   }
 }
 
+const ReadMoreButtons = function() {
+  this.buttons = [];
+
+  this.discover = () => {
+    [...document.querySelectorAll('.read-more')].forEach((elem, k) => {
+      if (!this.buttons.includes(elem)) {
+        const text = $('<div>', { class: "read-more-text", text: $(elem).text() });
+        const btnWrap = $('<div>', { 
+          class: "read-more-wrap",
+          style: `box-shadow: 0px 0px 30px 30px ${$(elem).data('color') ?? '#fff'}; background-color: ${$(elem).data('color') ?? '#fff'};`
+        });
+        const btn = $('<span>', { href: "#", class: 'read-more-btn', text: $(elem).data('text') ?? 'Read More' });
+        
+        btn.on('click', function() {
+          $(elem).toggleClass('read-more-open');
+
+          if (!$(elem).hasClass('read-more-open')) {
+            $(elem).css({ height: '150px' });
+          } else {
+            const height = text.outerHeight() + btn.outerHeight();
+            $(elem).css({ height: `${height}px` });
+          }
+        });
+
+        $(elem).empty();
+        $(elem).append(text);
+
+        if (text.outerHeight() <= 150) {
+          $(elem).css({height: 'auto'});
+          return ;
+        };
+
+        btnWrap.append(btn);
+        $(elem).append(btnWrap);
+      }
+    });
+  }
+}
+
+const AuthButtons = function() {
+  this.buttons = [];
+
+  this.discover = () => {
+    $('.open_auth').each((k, elem) => {
+      if (!this.buttons.includes(elem)) {
+        $(elem).on('click', function(evt) {
+          evt.preventDefault();
+          Livewire.dispatch("openModal", { modalName: "auth" });
+        });
+      }
+    });
+  }
+}
+
 const header = $('header');
 const headerHeight = header.outerHeight();
 // const start = (document.querySelector('.parallax')) ? $('.parallax').outerHeight() : headerHeight;
@@ -633,6 +689,11 @@ window.CommentForms = new CommentForms();
 window.ReplyButtons = new ReplyButtons()
 window.DropReplyButtons = new DropReplyButtons();
 window.FollowButtons = new FollowButtons();
+window.RepliesButtons = new RepliesButtons();
+window.ReadMoreButtons = new ReadMoreButtons();
+window.LikeButtons = new LikeButtons();
+window.Editors = new Editors();
+window.AuthButtons = new AuthButtons();
 
 window.FavoriteButtons.discover('body');
 window.CartButtons.discover('body');
@@ -640,6 +701,15 @@ window.CommentForms.discover();
 window.ReplyButtons.discover();
 window.DropReplyButtons.discover();
 window.FollowButtons.discover();
+window.RepliesButtons.discover();
+window.ReadMoreButtons.discover();
+window.LikeButtons.discover();
+window.Editors.discover();
+
+$(document).ready(function() {
+  window.AuthButtons.discover();
+});
+
 
 let lastPoint = 0;
 
@@ -781,7 +851,7 @@ function discoverCartDropButtons(container=null)
             }
 
             const key = $(this).data('key');
-            console.log(key,$(`a[data-key="${key}"]`));
+
             $(`a[data-key="${key}"]`).each((k, a) => {
               $(a).removeClass('in-cart');
               $(a).html('Add to cart');
@@ -858,36 +928,5 @@ $(document).ready(function() {
 
     input.addEventListener('input', hideError);
     input.addEventListener('change', hideError);
-  });
-
-  const readMore = [...document.querySelectorAll('.read-more')].forEach((elem, k) => {
-    const text = $('<div>', { class: "read-more-text", text: $(elem).text() });
-    const btnWrap = $('<div>', { 
-      class: "read-more-wrap",
-      style: `box-shadow: 0px 0px 30px 30px ${$(elem).data('color') ?? '#fff'}; background-color: ${$(elem).data('color') ?? '#fff'};`
-    });
-    const btn = $('<span>', { href: "#", class: 'read-more-btn', text: $(elem).data('text') ?? 'Read More' });
-    
-    btn.on('click', function() {
-      $(elem).toggleClass('read-more-open');
-
-      if (!$(elem).hasClass('read-more-open')) {
-        $(elem).css({ height: '150px' });
-      } else {
-        const height = text.outerHeight() + btn.outerHeight();
-        $(elem).css({ height: `${height}px` });
-      }
-    });
-
-    $(elem).empty();
-    $(elem).append(text);
-
-    if (text.outerHeight() <= 150) {
-      $(elem).css({height: 'auto'});
-      return ;
-    };
-
-    btnWrap.append(btn);
-    $(elem).append(btnWrap);
   });
 });

@@ -65,7 +65,7 @@
                             <div class="col">
                                 @if ($op->order->status_id >= 2)
                                   
-                                  @if($user->canWriteComment($op->product))
+                                  @if($user->canWriteReview($op->product))
                                     <a class="black" href="{{ $op->product->makeUrl() }}">Leave Review</a>
                                   @endif
 

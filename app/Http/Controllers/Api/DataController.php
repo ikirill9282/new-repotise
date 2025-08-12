@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Blade;
 use App\Models\Article;
 use App\Models\User;
 use App\Models\Page;
+use App\Models\Review;
 
 class DataController extends Controller
 {
@@ -40,24 +41,46 @@ class DataController extends Controller
     return $articles->implode("\n");
   }
 
-  public function comments(Request $request)
+  public function messages(Request $request)
   {
-    $result = [];
     $valid = $request->validate([
-      'hash' => 'required|string',
+      'resource' => 'required|string',
     ]);
-    $id = CustomEncrypt::getId($valid['hash']);
-    $comment = Comment::find($id);
-    $comment->getChildren();
+
+    $data = CustomEncrypt::decodeUrlHash($valid['resource']);
     
+    $query = match($data['resource']) {
+      'review' => Review::query(),
+      'comment' => Comment::query(),
+    };
+    $model = $query->find($data['id']);
+    $model->messagesOffset($data['offset'])->getMessages();
+    
+    $result = [];
     $variables = Page::where('slug', 'feed')->with('config')->first()->config->keyBy('name');
 
-    foreach ($comment->children as $child) {
-      $view = Blade::render('site.components.comments.comment', [
-        'comment' => $child->toArray(), 
+    foreach ($model->messages as $message) {
+      $view = Blade::render('components.chat.message', [
+        'child' => $data['type'] == 'child',
+        'message' => $message,
+        'resource' => $data['resource'],
         'variables' => $variables,
-        'class' => 'answers border_none_block',
       ]);
+      array_push($result, $view);
+    }
+
+    if ($model->getUnloadedMessagesCount() > 0) {
+      $view = Blade::render('components.chat.more', [
+        'resource' => \App\Helpers\CustomEncrypt::generateUrlHash([
+          'id' => $model->id,
+          'offset' => $model->getMessagesOffset(),
+          'type' => $data['type'],
+          'resource' => $data['resource'],
+        ]),
+        'class' => $data['type'] == 'child' ? '!flex w-full' : 'w-full text-center',
+        'slot' => "Show More Replies ({$model->getLoadingMessagesCount()} of {$model->getUnloadedMessagesCount()})"
+      ]);
+      // dd($view);
       array_push($result, $view);
     }
 

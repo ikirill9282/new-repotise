@@ -1425,6 +1425,15 @@ footer .bottom_connecting_group .connecting a {
 .stars_filter .stars span.hover svg path {
   fill: #ffdb0c !important;
 }
+.stars_filter .stars span:hover {
+  cursor: pointer;
+}
+.stars_filter .stars span:hover svg path {
+  fill: #ffdb0c !important;
+}
+.stars_filter .stars span.active svg path {
+  fill: #ffdb0c !important;
+}
 
 
 .invite-launch__items .item .text {
@@ -1980,6 +1989,11 @@ header .search_group input[name="q"]::placeholder {
   display: none;
 }
 
+.message .content {
+  min-width: 300px;
+  width: 100%;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -2433,6 +2447,7 @@ header .search_group input[name="q"]::placeholder {
 
     .product_page_home .about_block .product_description {
       margin-top: 0;
+      max-width: none;
     }
 
     .product_page_home .about_block .img_products {
@@ -2987,6 +3002,10 @@ header .search_group input[name="q"]::placeholder {
     justify-content: flex-start !important;
     align-items: flex-start !important;
   }
+
+  .message .content {
+    min-width: 280px;
+  }
 }
 
 @media (max-width: 420px) {
@@ -3023,5 +3042,9 @@ header .search_group input[name="q"]::placeholder {
     }
     .products_modal .items_group .item .order_img {
       width: 100%;
+    }
+
+    .message .content {
+      min-width: 225px;
     }
 }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('levels', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
             $table->decimal('fee')->default(10);
             $table->decimal('space')->default(0.3);
             $table->decimal('sales_treshold')->default(100)->nullable();

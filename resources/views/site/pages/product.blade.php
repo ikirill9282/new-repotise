@@ -5,7 +5,6 @@
     @if (isset($product))
         @php
             $variables = $page->variables;
-            $product = $product->getAllReviews();
         @endphp
         <section class="product_page_home">
             <section class="breadcrumb_block">
@@ -156,9 +155,8 @@
                             </div>
                         </div>
                         <div class="product_description">
-                            <h3>Product Description</h3>
+                            <h3 class="mb-3">Product Description</h3>
                             <div class="read-more" data-text="Read More" data-color="#f9f9f9">{{ $product->text }}</div>
-                            {{-- <span class="show-more" onclick="toggleText()">Read More</span> --}}
                         </div>
 
                         <div class="group_middle">
@@ -248,7 +246,7 @@
                             </div>
                           </div>
                           <div class="product_description">
-                              <h3>Product Description</h3>
+                              <h3 class="mb-3">Product Description</h3>
                               <div class="read-more" data-text="Read More" data-color="#f9f9f9">{{ $product->text }}</div>
                               {{-- <span class="show-more" onclick="toggleText()">Read More</span> --}}
                           </div>
@@ -544,7 +542,7 @@
         </section>
 
         @push('js')
-            <script src="{{ asset('assets/js/product.js') }}"></script>
+          <script src="{{ asset('assets/js/product.js') }}"></script>
         @endpush
     @endif
 @endsection

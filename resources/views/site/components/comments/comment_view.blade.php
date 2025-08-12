@@ -67,7 +67,7 @@
                     data-item="{{ hash_like((isset($type) ? $type : 'comment'), $comment['id']) }}" 
                     data-id="{{ $hash_id }}"
                   >
-                    @include('icons.like_comment')
+                    @include('icons.thumb')
                   </a>
                   <span data-counter="{{ $hash_id }}">{{ $comment['likes_count'] }}</span>
               </div>

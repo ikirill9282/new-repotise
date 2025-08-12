@@ -54,6 +54,7 @@ class Auth extends Component
         if (AuthFacade::attempt(['email' => $state['email'], 'password' => $state['password']], $state['remember'])) {
           Session::regenerate(true);
           $url = str_ireplace('&modal=auth', '', url()->previous());
+          $url = str_ireplace('?modal=auth', '', $url);
           return redirect($url);
         }
 

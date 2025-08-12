@@ -21,7 +21,6 @@
         placeholder="{{ trim(print_var('comment_add_message', $variables)) }}" {{ auth()->check() ? '' : 'disabled' }}></textarea>
 
 
-        
     <div class="right_stickers">
         <a href="#"
             class="numbers pointer-events-none {{ auth()->check() ? '' : 'unlinked' }}">0/1000</a>

@@ -7,6 +7,7 @@ use App\Helpers\CustomEncrypt;
 use App\Helpers\Slug;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
+use App\Traits\HasMessages;
 use App\Traits\HasPrice;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,7 @@ use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-  use HasAuthor, HasGallery, Searchable, HasFactory, HasStatus;
+  use HasAuthor, HasGallery, Searchable, HasFactory, HasStatus, HasMessages;
 
   public function toSearchableArray(): array
   {
@@ -54,7 +55,7 @@ class Product extends Model
       return $this->generateSlug(true);
     }
   }
-
+  
   public function categories()
   {
     return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_id', 'id', 'id');
@@ -75,6 +76,11 @@ class Product extends Model
     return $this->hasMany(Review::class);
   }
 
+  public function messages()
+  {
+    return $this->hasMany(Review::class);
+  }
+
   public function prepareRatingImages()
   {
     return rating_images($this->rating);
@@ -82,10 +88,12 @@ class Product extends Model
 
   public function reviewsCount(): Attribute
   {
+    $reviews = $this->messages()->whereNull('parent_id')->count();
     return Attribute::make(
-      get: fn($value) => ($value == 0) ? 0 : Collapse::make($value),
+      get: fn($value) => ($reviews == 0) ? 0 : Collapse::make($reviews),
     );
   }
+
   public function countComments(): int
   {
     return $this->reviews_count ?? 0;
@@ -113,10 +121,10 @@ class Product extends Model
   public function getAllReviews(?int $limit = 10)
   {
     $this->limit = $limit;
-    $this->comments_loading = true;
+    $this->messages_loading = true;
     $this->level = 0;
 
-    $this->comments = Review::query()
+    $this->messages = Review::query()
       ->where('product_id', $this->id)
       ->whereNull('parent_id')
       ->with('likes', function($query) {
@@ -126,16 +134,18 @@ class Product extends Model
       ->when(!is_null($limit), fn($q) => $q->limit($limit))
       ->withCount('likes')
       ->with('author.options')
-      ->get(); 
+      ->get();
 
+    // dd($this->messages);
     
-    foreach ($this->comments as $key => &$comment) {
-      if ($this->comments_loading && $comment->children()->exists()) {
-        $comment->children = $this->getChildren($comment);
+    foreach ($this->messages as $key => &$comment) {
+      if ($this->messages_loading && $comment->children()->exists()) {
+        $this->getChildren($comment);
       }
     }
 
-    $this->comments = $this->comments->toArray();
+    // $this->messages = $this->messages->toArray();
+    
     return $this;
   }
 

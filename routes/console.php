@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\CustomEncrypt;
 use App\Jobs\DeliveryGift;
 use App\Jobs\PayReward;
 use App\Jobs\ProcessOrder;
@@ -28,39 +29,7 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $a = MailLog::all();
-  foreach ($a as $i) {
-    $data = [
-      'message-id' => $i->message_id,
-      'limit' => 100,
-    ];
-    $url = 'https://api.mailgun.net/v3/trekguider.com/events';
-    $events = [];
-    do {
-      $resp = Http::withBasicAuth('api', env('MAILGUN_API_KEY'))
-        ->withBody(json_encode($data))
-        ->get($url);
-      $events = array_merge($events, $resp->json('items') ?? []);
-      $url = $resp->json('paging.next') ?? null;
-    } while ($resp->ok() && $url && !empty($resp->json('items')));
-    
-    $event = collect($events)->sortByDesc('timestamp')->first();
-    $i->update(['status' => $event['event'], 'mailgun_id' => $event['id']]);
-  }
-
-  // Mail::to(User::find(7)->email)->send(new Gift(User::find(7), Order::find(100229), ['password' => '123']));
-  
-  // $t = new PayReward(Order::find(100206));
-  // $t->handle();
-
-  // Discount::createForUsers([7], [
-  //   'visibility' => 'public',
-  //   'type' => 'freeproduct',
-  //   'group' => 'referal',
-  //   'target' => 'cart',
-  //   // 'percent' => 15,
-  //   'max' => 50,
-  // ]);
+  dd(CustomEncrypt::getId('Q2dOcnVpZD0x'));
 });
 
 Artisan::command('ttm', function() {
