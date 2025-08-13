@@ -12,6 +12,7 @@ use App\Models\Article;
 use App\Models\User;
 use App\Models\Page;
 use App\Models\Review;
+use App\Models\Product;
 
 class DataController extends Controller
 {
@@ -43,20 +44,40 @@ class DataController extends Controller
 
   public function messages(Request $request)
   {
+    $result = [];
     $valid = $request->validate([
       'resource' => 'required|string',
     ]);
 
     $data = CustomEncrypt::decodeUrlHash($valid['resource']);
-    
-    $query = match($data['resource']) {
-      'review' => Review::query(),
-      'comment' => Comment::query(),
-    };
+
+    if ($data['type'] == 'parent') {
+      $query = match($data['resource']) {
+        'review' => Product::query(),
+        'comment' => Article::query(),
+      };
+    } else {
+      $query = match($data['resource']) {
+        'review' => Review::query(),
+        'comment' => Comment::query(),
+      };
+    }
+
+
     $model = $query->find($data['id']);
-    $model->messagesOffset($data['offset'])->getMessages();
-    
-    $result = [];
+    $model->messagesType($data['type'])->messagesOffset($data['offset'])->getMessages();
+
+
+    if ($data['type'] == 'parent') {
+      $author_id = $model->author->id;
+    } else {
+      $author_id = match($data['resource']) {
+        'review' => $model->product->author->id,
+        'comment' => $model->article->author->id,
+      };
+    }
+
+
     $variables = Page::where('slug', 'feed')->with('config')->first()->config->keyBy('name');
 
     foreach ($model->messages as $message) {
@@ -65,6 +86,8 @@ class DataController extends Controller
         'message' => $message,
         'resource' => $data['resource'],
         'variables' => $variables,
+        'author_id' => $author_id,
+        'level' => $data['level'],
       ]);
       array_push($result, $view);
     }
@@ -76,6 +99,7 @@ class DataController extends Controller
           'offset' => $model->getMessagesOffset(),
           'type' => $data['type'],
           'resource' => $data['resource'],
+          'level' => $data['level'],
         ]),
         'class' => $data['type'] == 'child' ? '!flex w-full' : 'w-full text-center',
         'slot' => "Show More Replies ({$model->getLoadingMessagesCount()} of {$model->getUnloadedMessagesCount()})"

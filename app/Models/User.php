@@ -144,6 +144,16 @@ class User extends Authenticatable implements HasName, FilamentUser
         return $array;
     }
 
+    public function reviews()
+    {
+      return $this->hasMany(Review::class);
+    }
+
+    public function comments()
+    {
+      return $this->hasMany(Comment::class);
+    }
+
     public function articles()
     {
       return $this->hasMany(Article::class);
@@ -492,7 +502,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         ->where('orders.status_id', '>=', 1)
         ->whereHas('order_products', fn($query) => $query->where('order_products.product_id', $product->id))
         ->where(fn($query) => $query->where('orders.user_id', $this->id)->orWhere('orders.recipient', $this->email))
-        // ->ddRawSql();
+        // ->ddRawSql()
         ->get()
       ;
 
@@ -502,7 +512,6 @@ class User extends Authenticatable implements HasName, FilamentUser
 
       foreach ($orders as $order) {
         $result = false;
-
 
         if ($order->gift) {
           if ($order->recipient == $this->email) {
@@ -518,6 +527,7 @@ class User extends Authenticatable implements HasName, FilamentUser
           return !Review::where([
             'product_id' => $product->id,
             'user_id' => $this->id,
+            'parent_id' => null,
           ])
           ->exists();
         }

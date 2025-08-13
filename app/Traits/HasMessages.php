@@ -24,7 +24,12 @@ trait HasMessages
     $loaded = 0;
 
     $this->load(['messages' => function($query) use ($limit) {
-      $query->with('likes.author.options', 'author.options')
+      $query->with([
+        'likes' => function($query) {
+          $query->with('author.options')->limit(3)->orderByDesc('created_at');
+        },
+        'author.options',
+      ])
         ->withCount('likes', 'messages')
         ->when(
           $this->messages_type == 'parent',
@@ -45,11 +50,18 @@ trait HasMessages
         $message->load(
           [
             'messages' => function($query) use($limit) {
-              $query->with('likes.author.options', 'author.options')
+              $query->with([
+                'likes' => function($query) {
+                  $query->with('author.options')->limit(3)->orderByDesc('created_at');
+                },
+                'author.options'
+              ])
                 ->withCount('likes', 'messages')
                 ->limit($limit);
             }, 
-            'likes.author.options', 
+            'likes' => function($query) {
+              $query->with('author.options')->limit(3)->orderByDesc('created_at');
+            }, 
             'author.options'
           ]
         );
@@ -82,11 +94,11 @@ trait HasMessages
   public function getLoadingMessagesCount()
   {
     $limit = $this->getLimit();
-    $loaded = $this->getLoadedMessagesCount();
+    // $loaded = $this->getLoadedMessagesCount();
     $unloaded = $this->getUnloadedMessagesCount();
-    $loaded += $limit;
+    // $loaded += $limit;
 
-    return $loaded > $unloaded ? $unloaded : $limit;
+    return $limit > $unloaded ? $unloaded : $limit;
   }
 
   public function getLoadedMessagesCount()

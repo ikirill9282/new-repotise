@@ -11,6 +11,11 @@ class Review extends Model
 {
   use HasAuthor, HasStatus, HasMessages;
   
+  public function product()
+  {
+    return $this->belongsTo(Product::class);
+  }
+
   public function likes()
   {
     return $this->hasMany(Likes::class, 'model_id')->where('type', 'review');

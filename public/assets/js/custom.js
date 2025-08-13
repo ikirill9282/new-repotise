@@ -2,7 +2,6 @@ $('a.disabled').on('click', (evt) => evt.preventDefault());
 
 const getCSRF = () => $('meta[name="csrf"]').attr('content');
 
-
 function copyTextToClipboard(text) {
   if (!text) return;
 
@@ -184,7 +183,7 @@ const Editors = function() {
           if (target) {
             list.toggleClass('opened');
             if (list.hasClass('opened')) {
-              const height = list.find('.list').outerHeight();
+              const height = list.find('.editor-buttons').outerHeight();
               list.css({ height: height + 'px' });
             } else {
               list.attr('style', '');
@@ -195,7 +194,57 @@ const Editors = function() {
         this.editors.push(editor);
       }
     });
-    return this;
+  }
+}
+
+const EditorButtons = function() {
+  this.buttons = [];
+
+  this.setListeners = (elem) => {
+    
+    $(elem).on('click', function(evt) {
+      evt.preventDefault();
+      const action = $(this).data('action');
+      
+      if (action === 'report') {
+        Livewire.dispatch('openModal', { modalName: 'report' });
+      }
+
+      if (action === 'edit') {
+        const textarea = $(elem).closest('.chat').find('textarea');
+        const textBlock = $(elem).closest('.content').find('.message-text');
+        const text = textBlock.find('.read-more-text') ? textBlock.find('.read-more-text').text() : textBlock.text();
+        const hash = $(elem).closest('.editor-wrap').data('model');
+
+        const event = new Event('input', {
+          bubbles: true,
+          cancelable: true,
+        });
+        
+        textarea.val(text);
+        textarea.eq(0).get(0).dispatchEvent(event);
+
+        $(elem).closest('.chat').find('input[name="edit"]').val(hash);
+      }
+
+      const eventClick = new Event('click', {
+        bubbles: true,
+        cancelable: true,
+      });
+      $(elem).closest('.settings').find('.editor_btn').eq(0).get(0).dispatchEvent(eventClick);
+    });
+  }
+
+  this.discover = () => {
+    $('.editor-buttons').each((k, elem) => {
+      if (!this.buttons.includes(elem)) {
+        $(elem).find('a').each((k, el) => {
+          this.setListeners(el);
+        });
+
+        this.buttons.push(elem);
+      }
+    });
   }
 }
 
@@ -439,7 +488,7 @@ const CartButtons = function() {
   }
 }
 
-const CommentForms = function () {
+const ReviewForms = function () {
   this.forms = {};
 
   this.setListeners = (obj) => {
@@ -455,9 +504,10 @@ const CommentForms = function () {
 
           const formData = {
               _token: getCSRF(),
-              article: form.find('input[name="model"]').val(),
+              model: form.find('input[name="model"]').val(),
               text: form.find('textarea[name="text"]').val(),
               reply: form.find('input[name="reply"]').val(),
+              edit: form.find('input[name="edit"]').val(),
               rating: document.querySelector('input[name="rating"]')?.value,
           };
           
@@ -471,6 +521,13 @@ const CommentForms = function () {
           .then((response) => {
               if (response.status === "success") {
                 form.detach();
+                const name = formData.reply ? 'reply' : 'review';
+                $.toast({
+                  text: `Your ${name} has been received and is now awaiting moderation.`,
+                  icon: 'success',
+                  heading: 'Success',
+                  position: 'top-right',
+                })
                   // form[0].reset();
                   // form.find('input[name="rating"]').val(null).trigger('change');
                   // form.find('.stars').find('span').removeClass('active');
@@ -521,21 +578,23 @@ const CommentForms = function () {
 };
 
 const ReplyButtons = function() {
+  this.wrap = '.chat';
+  this.group = '.message';
   this.buttons = [];
 
   this.setListeners = (button) => {
-    if (!this.buttons.includes(button)) {
-      $(button).on('click', function(evt) {
-
+    // if (!this.buttons.includes(button)) {
+      $(button).on('click', (evt) => {
+        
         evt.preventDefault();
-        const input = $(this).closest('.about_block').find('.reply-input');
-        const textarea = $(this).closest('.about_block').find('textarea');
-        const value = $(this).data('reply');
-        const text = $(this).closest('.commend').find('.review').clone();
-        const reply = $(this).closest('.about_block').find('.reply-block');
-
+        const input = $(button).closest(this.wrap).find('.reply-input');
+        const textarea = $(button).closest(this.wrap).find('textarea');
+        const value = $(button).data('reply');
+        const reply = $(button).closest(this.wrap).find('.reply-block');
+        const text = $(button).closest('.content').find('.message-text').clone();
+        
         $('html, body').animate({
-          scrollTop: $(this).closest('.about_block').offset().top,
+          scrollTop: $(button).closest(this.wrap).offset().top,
         }, 100, 'swing');
 
         input.val(value);
@@ -544,19 +603,24 @@ const ReplyButtons = function() {
         if (reply.hasClass('hidden')) {
           reply.removeClass('hidden');
         }
+
+        window.DropReplyButtons.discover();
       });
       this.buttons.push(button);
-    }
+    // }
   }
 
   this.discover = () => {
     $('.reply-button').each((key, btn) => {
+      if (!this.buttons.includes(btn));
       this.setListeners(btn);
     });
   }
 }
 
 const DropReplyButtons = function() {
+  this.wrap = '.chat';
+  this.group = '.message';
   this.buttons = [];
 
   this.setListeners = (btn) => {
@@ -565,25 +629,26 @@ const DropReplyButtons = function() {
     if (Object.keys(this.buttons).includes(button.data('key'))) {
       return;
     }
-    button.on('click', function(evt) {
+    button.on('click', (evt) => {
       evt.preventDefault();
-      const input = $(this).closest('.about_block').find('.reply-input');
-      const textarea = $(this).closest('.about_block').find('textarea');
-      const reply = $(this).closest('.about_block').find('.reply-block');
+      const input = $(button).closest(this.wrap).find('.reply-input');
+      const textarea = $(button).closest(this.wrap).find('textarea');
+      const reply = $(button).closest(this.wrap).find('.reply-block');
 
       input.val('');
       textarea.val(''); 
       reply.addClass('hidden');
     });
+
+    this.buttons.push(btn);
   }
 
   this.discover = () => {
     $('.drop-reply').each((key, btn) => {
-      this.setListeners(btn);
+      if (!this.buttons.includes(btn)) {
+        this.setListeners(btn);
+      }
     });
-  }
-  return {
-    discover: this.discover,
   }
 }
 
@@ -682,10 +747,10 @@ const AuthButtons = function() {
 
 const header = $('header');
 const headerHeight = header.outerHeight();
-// const start = (document.querySelector('.parallax')) ? $('.parallax').outerHeight() : headerHeight;
+
 window.FavoriteButtons = new FavoriteButtons();
 window.CartButtons = new CartButtons();
-window.CommentForms = new CommentForms();
+window.ReviewForms = new ReviewForms();
 window.ReplyButtons = new ReplyButtons()
 window.DropReplyButtons = new DropReplyButtons();
 window.FollowButtons = new FollowButtons();
@@ -693,20 +758,21 @@ window.RepliesButtons = new RepliesButtons();
 window.ReadMoreButtons = new ReadMoreButtons();
 window.LikeButtons = new LikeButtons();
 window.Editors = new Editors();
+window.EditorButtons = new EditorButtons();
 window.AuthButtons = new AuthButtons();
 
-window.FavoriteButtons.discover('body');
-window.CartButtons.discover('body');
-window.CommentForms.discover();
-window.ReplyButtons.discover();
-window.DropReplyButtons.discover();
-window.FollowButtons.discover();
-window.RepliesButtons.discover();
-window.ReadMoreButtons.discover();
-window.LikeButtons.discover();
-window.Editors.discover();
-
 $(document).ready(function() {
+  window.FavoriteButtons.discover('body');
+  window.CartButtons.discover('body');
+  window.ReviewForms.discover();
+  window.ReplyButtons.discover();
+  window.DropReplyButtons.discover();
+  window.FollowButtons.discover();
+  window.RepliesButtons.discover();
+  window.ReadMoreButtons.discover();
+  window.LikeButtons.discover();
+  window.Editors.discover();
+  window.EditorButtons.discover();
   window.AuthButtons.discover();
 });
 

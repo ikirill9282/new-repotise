@@ -18,6 +18,10 @@
     }
 }
 
+.emojiPickerIconWrap {
+  line-height: 0;
+}
+
 .tooltip {
   --bs-tooltip-zindex: 100;
 }
@@ -1994,6 +1998,72 @@ header .search_group input[name="q"]::placeholder {
   width: 100%;
 }
 
+.message .message-text {
+  word-break: break-all;
+}
+
+.progresss span {
+  display: block;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #A4A0A0;
+  box-sizing: border-box;
+}
+
+.progresss .progresss-item {
+    padding-top: 18px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.progresss .progresss-item i.active {
+    background-color: #FC7361;
+}
+
+.progresss .progresss-item i {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: 12px;
+  background-color: #F9F9F9;
+  box-sizing: border-box;
+  margin-right: 6px;
+  position: relative;
+}
+
+.progresss .progresss-item i.last::before {
+  display: none;
+}
+
+.progresss .progresss-item i {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: 12px;
+    background-color: #F9F9F9;
+    box-sizing: border-box;
+    margin-right: 6px;
+    position: relative;
+}
+
+.progresss .progresss-item .active.last .active-percent {
+    position: absolute;
+    left: 50%;
+    top: -19px;
+    width: 25px !important;
+    height: 18px !important;
+    background-color: #FC7361;
+    color: #fff;
+    border-radius: 5px 5px 5px 0;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (min-width: 1140px) {
 }
 
@@ -3016,6 +3086,11 @@ header .search_group input[name="q"]::placeholder {
     .empty-block .bottom_text {
       flex-direction: column;
     }
+
+
+    .message .content {
+      min-width: 225px;
+    }
 }
 
 @media (max-width: 375px) {
@@ -3042,9 +3117,5 @@ header .search_group input[name="q"]::placeholder {
     }
     .products_modal .items_group .item .order_img {
       width: 100%;
-    }
-
-    .message .content {
-      min-width: 225px;
     }
 }

@@ -13,6 +13,7 @@ use App\Models\Follower;
 use App\Models\UserFavorite;
 use App\Models\Review;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Product;
 
 class FeedbackController extends Controller
 {
@@ -73,7 +74,7 @@ class FeedbackController extends Controller
     {
       $valid = $request->validate([
         'article' => 'required|string',
-        'text' => 'required|string',
+        'text' => 'required|string|max:1000',
         'reply' => 'nullable|string',
       ]);
 
@@ -99,26 +100,51 @@ class FeedbackController extends Controller
     public function review(Request $request)
     {
       $valid = $request->validate([
-        'article' => 'required|string',
-        'text' => 'required|string',
+        'model' => 'required|string',
+        'model' => function($attribute, $value, $parameters, $validator) {
+          $model_id = CustomEncrypt::getId($value);
+          $data = $validator->getData();
+          $product = Product::find($model_id);
+          
+          if (!isset($data['reply']) && !isset($data['edit']) && !Auth::user()->canWriteReview($product)) {
+            $text = 'You already wrote review on this product.';
+
+            if (
+              Auth::user()->hasRole(['admin', 'super-admin']) 
+              && !Auth::user()->reviews()->whereNull('parent_id')->where('product_id', $model_id)->exists()
+            ) {
+              $text = 'Only customers who have purchased the product are eligible to write reviews.';
+            }
+
+            $validator->errors()->add('model', $text);
+          }
+        },
+        'text' => 'required|string|max:1000',
         'reply' => 'nullable|string',
-        'rating' => 'required|integer',
+        'edit' => 'nullable|string',
+        'rating' => 'required_without_all:reply,edit',
       ]);
 
-      try {
-        $valid['product_id'] = CustomEncrypt::getId($valid['article']);
-        $valid['user_id'] = Auth::user()->id;
-        $valid['text'] = clean($valid['text'], 'user_comment');
-        
-        if (isset($valid['reply']) && $valid['reply']) {
-          $valid['parent_id'] = CustomEncrypt::getId($valid['reply']);
-        }
+      if (isset($valid['edit']) && $valid['edit']) {
+        $review_id = CustomEncrypt::getId($valid['edit']);
+        $review = Review::find($review_id);
+        $review->update(['text' => $valid['text']]);
+      } else {
+        try {
+          $valid['product_id'] = CustomEncrypt::getId($valid['model']);
+          $valid['user_id'] = Auth::user()->id;
+          $valid['text'] = clean($valid['text'], 'user_comment');
+          
+          if (isset($valid['reply']) && $valid['reply']) {
+            $valid['parent_id'] = CustomEncrypt::getId($valid['reply']);
+          }
 
-        unset($valid['article'], $valid['reply']);
-        
-        $review = Review::create($valid);
-      } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+          unset($valid['model'], $valid['reply'], $valid['edit']);
+          
+          $review = Review::create($valid);
+        } catch (\Exception $e) {
+          return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
       }
 
       return response()->json(['status' => 'success', 'comment' => $review]);

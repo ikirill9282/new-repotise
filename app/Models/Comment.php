@@ -12,6 +12,11 @@ class Comment extends Model
 {
   use HasAuthor, HasStatus;
 
+  public function article()
+  {
+    return $this->belongsTo(Article::class);
+  }
+
   public function parent()
   {
     return $this->belongsTo(Comment::class, 'parent_id');

@@ -51,7 +51,6 @@
                 <span>
                   Next Free Product Reward Progress:
                 </span>
-                <!-- здесь просто указать от 0 до 10 с шагом по 1 -->
                 <div data-progress="3" class="progresss-item">
                   @php
                     $referals_count = $user->referal_buyers()->count();
