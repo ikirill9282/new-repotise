@@ -20,12 +20,18 @@
             </div>
         </div>
     </section>
-    <section class="comments_group">
+
+    {{-- <section class="comments_group">
         <div class="container">
-            {{-- @dd($article) --}}
             @include('site.components.comments.wrap', ['model' => $article, 'type' => 'article'])
         </div>
-    </section>
+    </section> --}}
+
+    <x-chat
+      title="Comments"
+      :model="$article"
+    ></x-chat>
+    
     <section class="similar_materials">
         <div class="container">
             <div class="about_block">

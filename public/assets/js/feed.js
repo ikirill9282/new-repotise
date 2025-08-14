@@ -2,16 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
   history.scrollRestoration = 'manual';
 });
 
-$.fn.isInViewport = function() {
-  let elementTop = $(this).offset().top;
-  let elementBottom = elementTop + $(this).outerHeight();
-
-  let viewportTop = $(window).scrollTop();
-  let viewportBottom = viewportTop + $(window).height();
-
-  return elementBottom > viewportTop && elementTop < viewportBottom;
-};
-
 const InitSliders = function() {
   const items = document.querySelectorAll('div[id*="analogs-swiper-"]');
 
@@ -91,13 +81,8 @@ const InitSliders = function() {
 }
 
 $(document).ready(function() {
-  let sli = InitSliders();
-  let writers = new CommentWriters();
-  let editors = new Editors();
-  const likers = new LikeButtons('.feed-item');
-  const repliers = new RepliesButtons('.commend');
+  InitSliders();
   
-  repliers.onAfterDiscover(() => likers.discover('.feed-item'));
   $(window).scroll((event) => {
     $('.stopper').each(function(i, el) {
         if ($(this).isInViewport()) {
@@ -117,17 +102,18 @@ $(document).ready(function() {
                     feed.append(clone);
                     feed.append(response);
 
-                    sli = InitSliders();
-                    writers = new CommentWriters();
-                    editors = new Editors();
-                    
-                    likers.discover('.feed-item');
-                    repliers.discover('.commend');
+                    InitSliders();
                     initModal();
-                    window.CommentForms.discover();
+                    window.ReviewForms.discover();
                     window.ReplyButtons.discover();
                     window.DropReplyButtons.discover();
                     window.FollowButtons.discover();
+                    window.LikeButtons.discover();
+                    window.Editors.discover();
+                    window.EditorButtons.discover();
+                    window.RepliesButtons.discover();
+                    window.EmojiButtons.discover();
+                    window.ReadMoreButtons.discover();
                 });
             }
         }
@@ -138,5 +124,4 @@ $(document).ready(function() {
 
 window.addEventListener('refresh-page', event => {
   window.location.reload(false);
-  //  scrollTo({top: 0, behavior: 'instant'});
 })

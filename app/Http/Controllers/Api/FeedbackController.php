@@ -73,25 +73,32 @@ class FeedbackController extends Controller
     public function comment(Request $request)
     {
       $valid = $request->validate([
-        'article' => 'required|string',
+        'model' => 'required|string',
         'text' => 'required|string|max:1000',
         'reply' => 'nullable|string',
+        'edit' => 'nullable|string',
       ]);
 
-      try {
-        $valid['article_id'] = CustomEncrypt::getId($valid['article']);
-        $valid['user_id'] = Auth::user()->id;
-        $valid['text'] = clean($valid['text'], 'user_comment');
-        
-        if (isset($valid['reply']) && $valid['reply']) {
-          $valid['parent_id'] = CustomEncrypt::getId($valid['reply']);
-        }
+      if (isset($valid['edit']) && $valid['edit']) {
+        $comment_id = CustomEncrypt::getId($valid['edit']);
+        $comment = Comment::find($comment_id);
+        $comment->update(['text' => $valid['text'], 'edited' => 1]);
+      } else {
+        try {
+          $valid['article_id'] = CustomEncrypt::getId($valid['model']);
+          $valid['user_id'] = Auth::user()->id;
+          $valid['text'] = clean($valid['text'], 'user_comment');
+          
+          if (isset($valid['reply']) && $valid['reply']) {
+            $valid['parent_id'] = CustomEncrypt::getId($valid['reply']);
+          }
 
-        unset($valid['article'], $valid['reply']);
-        
-        $comment = Comment::create($valid);
-      } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+          unset($valid['model'], $valid['reply'], $valid['edit']);
+          
+          $comment = Comment::create($valid);
+        } catch (\Exception $e) {
+          return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
       }
 
       return response()->json(['status' => 'success', 'comment' => $comment]);
@@ -107,7 +114,7 @@ class FeedbackController extends Controller
           $product = Product::find($model_id);
           
           if (!isset($data['reply']) && !isset($data['edit']) && !Auth::user()->canWriteReview($product)) {
-            $text = 'You already wrote review on this product.';
+            $text = 'You have already submitted a review for this product.';
 
             if (
               Auth::user()->hasRole(['admin', 'super-admin']) 
@@ -128,7 +135,7 @@ class FeedbackController extends Controller
       if (isset($valid['edit']) && $valid['edit']) {
         $review_id = CustomEncrypt::getId($valid['edit']);
         $review = Review::find($review_id);
-        $review->update(['text' => $valid['text']]);
+        $review->update(['text' => $valid['text'], 'edited' => 1]);
       } else {
         try {
           $valid['product_id'] = CustomEncrypt::getId($valid['model']);

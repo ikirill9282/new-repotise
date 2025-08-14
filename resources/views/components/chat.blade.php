@@ -5,12 +5,18 @@
     'variables' => collect([]),
 ])
 
+@php
+  $can_write = ($type == 'review') ? auth()->user()->canWriteReview($model) : auth()->user()->canWriteComment($model);
+  $message_exists = ($type == 'review' ) ? auth()->user()->reviews()->where('product_id', $model->id)->exists() : true;
+  $count = ($type == 'review') ? $model->reviews_count : $model->messages()->count();
+@endphp
+
 <div class="bg-light">
     <div class="container">
         <div class="chat w-full bg-white !px-0 !py-6 sm:!p-6 lg:!p-7 rounded-xl">
             <h2 class="font-bold sm:text-xl flex justify-start items-end gap-3 mb-0 sm:mb-4 !p-2 sm:!p-3 sm:!p-0">
                 <span>{{ $title }}</span>
-                <span class="text-gray sm:text-3xl">{{ $model->reviews_count }}</span>
+                <span class="text-gray sm:text-3xl">{{ $count }}</span>
             </h2>
 
             <div class="w-full py-2 !px-3 sm:!px-0 text-end" 
@@ -22,15 +28,11 @@
                     <a @click.prevent="$dispatch('openModal', {modalName: 'auth'})" href="#"
                         class="!text-gray hover:!text-active border-b border-dashed pb-0.5 inline-block !mb-4 transition">Login
                         to review</a>
-                @elseif (
-                        auth()->user()->canWriteReview($model) ||
+                @elseif ( 
+                        $can_write||
                         auth()->user()->id == $model->author->id ||
                         auth()->user()->hasRole(['admin', 'super-admin']) ||
-                        (
-                          $type == 'review' 
-                            ? auth()->user()->reviews()->where('product_id', $model->id)->exists()
-                            : auth()->user()->comments()->where('article_id', $model->id)->exists()
-                        )
+                        $message_exists
                       )
 
                     <form action="" class="feedback-form mb-4" data-type="{{ $type }}">
@@ -39,7 +41,6 @@
 
                         <input type="hidden" name="model"
                             value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}">
-
 
                         <div class="reply-block italic text-left flex justify-start items-stretch !p-4 pr-8 rounded-xl bg-sky-600/5 !mb-5 relative hidden">
                             <div class="text-gray-400 rotate-180 !mr-4 h-full flex justify-start items-start">
@@ -69,7 +70,7 @@
                             </div>
                         </div>
                             
-                        @if ($type == 'review' && auth()->user()?->canWriteReview($model))
+                        @if ($can_write && $type == 'review')
                             <div class="stars_filter w-full flex gap-2 justify-start items-center mb-2">
                                 <input type="hidden" name="rating">
                                 <span class="numbers">0</span>
@@ -86,18 +87,21 @@
                         @endif
 
 
-                        @if (!auth()->user()->canWriteReview($model))
+                        @if ($can_write)
                           <div class="block sm:hidden text-left mb-2">{{ auth()->user()->profile }}</div>
                         @endif
                         <div class="w-full flex justify-start items-start gap-2 sm:gap-3">
                             <div
                                 class="relative grow flex items-center justify-start gap-2 sm:gap-3 bg-light rounded-lg !pl-3 py-3 sm:!ps-3 !pe-20 sm:!pe-2">
                                 
-                                @if (!auth()->user()->canWriteReview($model))
+                                @if (!$can_write)
                                   <div class="hidden sm:block">{{ auth()->user()->profile }}</div>
                                 @endif
-
-                                <textarea name="text" id="" rows="1"
+                                
+                                @php
+                                  $emoji_hash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id])
+                                @endphp
+                                <textarea name="text" id="{{ $emoji_hash }}" rows="1"
                                     class="chat-textarea transition w-full !text-xs sm:!text-base leading-normal outline-0"
                                     placeholder="Write your review..."></textarea>
 
@@ -107,7 +111,7 @@
                                             <span x-text="symbols"></span>/1000
                                         </div>
                                         <div class="emoji-btn hover:cursor-pointer p-1 !bg-white rounded transition hover:text-black"
-                                            id="emoji-btn-1">
+                                            data-target="{{ $emoji_hash }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 16 16"
                                                 fill="none">
                                                 <g clip-path="url(#clip0_1731_30973)">
@@ -123,7 +127,7 @@
                                             </svg>
                                         </div>
 
-                                        @if (!auth()->user()->canWriteReview($model))
+                                        @if (!$can_write || $type == 'comment')
                                             <button class="p-1 !bg-white rounded transition hover:text-black">
                                                 @include('icons.arrow_right')
                                             </button>
@@ -132,7 +136,7 @@
                                 </div>
 
                             </div>
-                            @if (auth()->user()->canWriteReview($model))
+                            @if ($can_write && $type == 'review')
                                 <button
                                     class="!p-2 sm:!p-4 flex flex-col sm:block bg-active hover:bg-secondary transition rounded text-white !text-xs sm:!text-base">
                                     <span>Post</span>
@@ -195,16 +199,7 @@
         }
 
         $(document).ready(function() {
-            const picker = $('.chat-textarea').emojiPicker({
-                width: ($(window).outerWidth() > 576) ? '300px' : '200px',
-                height: ($(window).outerWidth() > 576) ? '200px' : '100px',
-                button: false,
-                recentCount: 10,
-                container: $('#emoji-btn-1'),
-            });
-
-            $('#emoji-btn-1').on('click', () => picker.emojiPicker('toggle'));
-            $('.chat-textarea').on('focusout', () => picker.emojiPicker('close'));
+            
         });
     </script>
 @endpush

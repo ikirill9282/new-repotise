@@ -6,12 +6,18 @@ use App\Traits\HasAuthor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Helpers\Collapse;
+use App\Traits\HasMessages;
 use App\Traits\HasStatus;
 
 class Comment extends Model
 {
-  use HasAuthor, HasStatus;
+  use HasAuthor, HasStatus, HasMessages;
 
+  public function messages()
+  {
+    return $this->hasMany(static::class, 'parent_id');
+  }
+  
   public function article()
   {
     return $this->belongsTo(Article::class);

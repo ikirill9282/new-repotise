@@ -1,3 +1,14 @@
+$.fn.isInViewport = function() {
+  let elementTop = $(this).offset().top;
+  let elementBottom = elementTop + $(this).outerHeight();
+
+  let viewportTop = $(window).scrollTop();
+  let viewportBottom = viewportTop + $(window).height();
+
+  return elementBottom > viewportTop && elementTop < viewportBottom;
+};
+
+
 $('a.disabled').on('click', (evt) => evt.preventDefault());
 
 const getCSRF = () => $('meta[name="csrf"]').attr('content');
@@ -7,9 +18,9 @@ function copyTextToClipboard(text) {
 
   if (navigator.clipboard && window.isSecureContext) {
     return navigator.clipboard.writeText(text).then(() => {
-      console.log('Текст успешно скопирован через Clipboard API');
+      
     }).catch(err => {
-      console.error('Ошибка копирования через Clipboard API:', err);
+      
       fallbackCopyTextToClipboard(text);
     });
   } else {
@@ -95,74 +106,36 @@ const makeParallax = function() {
   return this.init();
 }
 
-const CommentWriters = function() {
-  this.writers = [];
-  
-  this.prepareOjbect = (object) => {
-    const obj = $(object);
-    const input = obj.find('textarea');
-    const container = input.data('emojibtn');
-    const btn = obj.find(container);
+const EmojiButtons = function() {
+  this.buttons = [];
+  this.pickers = [];
 
-    if (input) {
-      this.setInputListeners(input);
-      input.emojiPicker({
+  this.setListeners = (elem) => {
+    const item = $(elem);
+    const target = $(elem).data('target');
+    const textarea = $(`#${target}`);
+
+    const picker = textarea.emojiPicker({
         width: ($(window).outerWidth() > 576) ? '300px' : '200px',
         height: ($(window).outerWidth() > 576) ? '200px' : '100px',
         button: false,
         recentCount: 10,
-        container: container,
-      });
-    }
+        container: item,
+    });
 
-    if (btn) {
-      btn.off('click');
-      btn.on('click', (event) => {
-        event.preventDefault();
-        input.emojiPicker('toggle');
-      })
-    }
-
-    return obj;
+    item.on('click', () => picker.emojiPicker('toggle'));
+    textarea.on('focusout', () => picker.emojiPicker('close'));
+    this.pickers.push(picker);
   }
 
-  this.setInputListeners = (input) => {
-    input.on('input', function(event) {
-      let length = $(this).val().length;
-      
-      if (length > 1000) {
-        $(this).val($(this).val().slice(0, 1000));
-        return;
+  this.discover = () => {
+    $('.emoji-btn').each((k, elem) => {
+      if (!this.buttons.includes(elem)) {
+        this.setListeners(elem);
+        this.buttons.push(elem);
       }
-
-      $(this).data('length', length);
-      input.prevObject.find('a.numbers').text(`${length}/1000`);
-    });
-
-    input.on('focus', () => {
-      $(input).animate({ 'height': '240px' });
-      $(input).data('open', true);
-    });
-
-    input.on('focusout', (evt) => {
-      // setTimeout(() => {
-        if (!input.val().length && !input.is(':focus')) {
-          $(input).animate({ 'height': '20px' });
-          $(input).data('open', false);
-        }
-      // }, 500);
     });
   }
-
-  this.init = () => {
-    this.writers = [...$('.write_comment')].map((writer) => {
-      return this.prepareOjbect(writer);
-    });
-
-    return this;
-  }
-
-  return this.init();
 }
 
 const Editors = function() {
@@ -212,19 +185,34 @@ const EditorButtons = function() {
 
       if (action === 'edit') {
         const textarea = $(elem).closest('.chat').find('textarea');
+        const replyInput = $(elem).closest('.chat').find('.reply-input');
+        const replyBlock = $(elem).closest('.chat').find('.reply-block');
         const textBlock = $(elem).closest('.content').find('.message-text');
         const text = textBlock.find('.read-more-text') ? textBlock.find('.read-more-text').text() : textBlock.text();
         const hash = $(elem).closest('.editor-wrap').data('model');
-
+        
         const event = new Event('input', {
           bubbles: true,
           cancelable: true,
         });
+
+        if (replyInput.val().length) {
+          replyBlock.find('.drop-reply').click();
+          replyInput.val(null);
+          textarea.val(null);
+          textarea.empty(); 
+        }
         
         textarea.val(text);
         textarea.eq(0).get(0).dispatchEvent(event);
 
         $(elem).closest('.chat').find('input[name="edit"]').val(hash);
+        
+        if (!textarea.isInViewport()) {
+          $('html, body').animate({
+            scrollTop: $(elem).closest('.chat').offset().top,
+          }, 100, 'swing');
+        }
       }
 
       const eventClick = new Event('click', {
@@ -373,6 +361,7 @@ const RepliesButtons = function() {
         window.ReadMoreButtons.discover();
         window.LikeButtons.discover();
         window.Editors.discover();
+        window.EditorButtons.discover();
         window.AuthButtons.discover();
       });
     });
@@ -588,14 +577,11 @@ const ReplyButtons = function() {
         
         evt.preventDefault();
         const input = $(button).closest(this.wrap).find('.reply-input');
+        const inputEdit = $(button).closest(this.wrap).find('.edit-input');
         const textarea = $(button).closest(this.wrap).find('textarea');
         const value = $(button).data('reply');
         const reply = $(button).closest(this.wrap).find('.reply-block');
         const text = $(button).closest('.content').find('.message-text').clone();
-        
-        $('html, body').animate({
-          scrollTop: $(button).closest(this.wrap).offset().top,
-        }, 100, 'swing');
 
         input.val(value);
         reply.find('.reply-text').html(text);
@@ -604,6 +590,16 @@ const ReplyButtons = function() {
           reply.removeClass('hidden');
         }
 
+        if (!reply.isInViewport()) {
+          $('html, body').animate({
+            scrollTop: $(button).closest(this.wrap).offset().top,
+          }, 100, 'swing');
+        }
+        if (inputEdit.val()) {
+          inputEdit.val(0);
+          textarea.val(null);
+          textarea.empty();
+        }
         window.DropReplyButtons.discover();
       });
       this.buttons.push(button);
@@ -760,6 +756,7 @@ window.LikeButtons = new LikeButtons();
 window.Editors = new Editors();
 window.EditorButtons = new EditorButtons();
 window.AuthButtons = new AuthButtons();
+window.EmojiButtons = new EmojiButtons();
 
 $(document).ready(function() {
   window.FavoriteButtons.discover('body');
@@ -774,6 +771,8 @@ $(document).ready(function() {
   window.Editors.discover();
   window.EditorButtons.discover();
   window.AuthButtons.discover();
+  
+  setTimeout(() => window.EmojiButtons.discover(), 100);
 });
 
 

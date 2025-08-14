@@ -6,6 +6,9 @@
     'level' => 1,
 ])
 
+@php
+  $type = $message instanceof \App\Models\Review ? 'review' : 'comment';
+@endphp
 
 <div class="message text-sm sm:text-base py-3 flex justify-start items-stretch gap-1 sm:gap-3 w-full overflow-x-scroll {{ $child ? '' : 'border-b border-gray/50 border-collapse' }}">
     <div class="avatar flex flex-col justify-center items-center gap-2 select-none">
@@ -86,9 +89,9 @@
                       href="/feedback/likes"
                       class="text-transparent hover:cursor-pointer feedback_button group 
                              {{ auth()->check() ? '' : 'open_auth' }}
-                             {{ is_liked('review', $message->id) ? 'liked' : '' }}
+                             {{ is_liked($type, $message->id) ? 'liked' : '' }}
                             " 
-                      data-item="{{ hash_like('review', $message->id) }}"
+                      data-item="{{ hash_like($type, $message->id) }}"
                       data-id="{{ $like_id }}"
                       >
                         @include('icons.thumb', ['width' => 20, 'height' => 20])
@@ -103,12 +106,14 @@
                   :message_author_id="$message->author->id"
                 >
                 </x-chat.editor>
-                <div class="flex items-center justify-start mt-auto ml-[-0.25rem] select-none">
-                    <div class="text-yellow">
-                        @include('icons.star', ['width' => 20, 'height' => 20])
-                    </div>
-                    {{ $message->rating }}
-                </div>
+                @if($message instanceof App\Models\Review)
+                  <div class="flex items-center justify-start mt-auto ml-[-0.25rem] select-none">
+                      <div class="text-yellow">
+                          @include('icons.star', ['width' => 20, 'height' => 20])
+                      </div>
+                      {{ $message->rating }}
+                  </div>
+                @endif
             </div>
         </div>
         

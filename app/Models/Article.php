@@ -12,11 +12,12 @@ use Laravel\Scout\Searchable;
 use App\Traits\HasKeywords;
 use App\Helpers\Slug;
 use App\Helpers\SessionExpire;
+use App\Traits\HasMessages;
 use App\Traits\HasStatus;
 
 class Article extends Model
 {
-  use HasAuthor, HasGallery, Searchable, HasKeywords, HasStatus;
+  use HasAuthor, HasGallery, Searchable, HasKeywords, HasStatus, HasMessages;
 
   protected Collection|array $all_comments = [];
 
@@ -27,6 +28,11 @@ class Article extends Model
   public static function selectShort()
   {
     return static::query()->select(['id', 'title', 'user_id', 'annotation']);
+  }
+
+  public function messages()
+  {
+    return $this->hasMany(Comment::class);
   }
   
   public function tags()

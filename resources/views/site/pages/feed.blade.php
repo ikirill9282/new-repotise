@@ -4,11 +4,11 @@
 
   <div id="feed">
     @php
-        // $articles = $articles->items();
         if (isset($first_article) && $first_article) {
             array_unshift($articles, $first_article);
         }
     @endphp
+
     @foreach ($articles as $key => $article)
         @if ($key == array_key_last($articles) - 1)
             <div class="stopper"></div>
