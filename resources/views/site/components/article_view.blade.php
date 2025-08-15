@@ -7,7 +7,7 @@
     <div class="theme_articles">
       <div class="talmaev">
         <div class="profile">
-            <img src="{{ $article->author->avatar }}" alt="Avatar">
+            <img src="{{ $article->author->avatar }}" class="!w-10 !h-10 object-cover" alt="Avatar">
             <p>
               <span>{{ $article->author->name }}</span>
               <a class="author-link !text-md" href="{{ $article->author->makeProfileUrl() }}">{{ $article->author->profile }}</a>
@@ -51,8 +51,10 @@
             @if ($article->likes_count > 0)
                 <div class="avatar">
                     @foreach ($article->likes as $k => $like)
-                      <img class="@if ($k > 0) last_img @endif"
+                      <a href="{{ $like->author->makeProfileUrl() }}" class="inline-block @if ($k > 0) last_img @endif !w-4 !h-4 sm:!w-6 sm:!h-6">
+                        <img class="object-cover"
                           src="{{ $like->author->avatar }}" alt="Avatar">
+                      </a>
                     @endforeach
                 </div>
             @endif
@@ -75,16 +77,19 @@
                 </span>
             </div>
             <div class="connects">
-                <a href="#" class="first_connect hover:!text-blue-500">
+                <a href="{{ auth()->user()->makeReferalArticleUrl('FB', $article) }}" target="_blank" class="first_connect hover:!text-blue-500">
                   @include('icons.facebook-sm')
                 </a>
-                <a href="#" class="second_connect hover:!text-black">
+                <a href="{{ auth()->user()->makeReferalArticleUrl('TW', $article) }}" target="_blank" class="second_connect hover:!text-black">
                   @include('icons.twitter-sm')
                 </a>
-                <a href="#" class="third_connect hover:!text-black">
+                <a href="{{ auth()->user()->makeReferalArticleUrl('RD', $article) }}" target="_blank" class="third_connect hover:!text-black">
                   @include('icons.reddit-sm')
                 </a>
-                <a href="#" class="share">{{ print_var('share_message', $variables) }}</a>
+                <a href="#" class="share copyToClipboard" data-target="{{ $hash_id }}">
+                  <input data-copyId="{{ $hash_id }}" type="hidden" value="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}"></input>
+                  {{ print_var('share_message', $variables) }}
+                </a>
             </div>
         </div>
     </div>

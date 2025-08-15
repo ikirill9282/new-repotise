@@ -18,9 +18,13 @@ function copyTextToClipboard(text) {
 
   if (navigator.clipboard && window.isSecureContext) {
     return navigator.clipboard.writeText(text).then(() => {
-      
+      $.toast({
+        text: 'Copied!',
+        icon: 'success',
+        heading: 'Success',
+        position: 'top-right',
+      });
     }).catch(err => {
-      
       fallbackCopyTextToClipboard(text);
     });
   } else {
@@ -42,12 +46,27 @@ function fallbackCopyTextToClipboard(text) {
   try {
     const successful = document.execCommand('copy');
     if (successful) {
-      console.log('Текст успешно скопирован через execCommand');
+      $.toast({
+        text: 'Copied!',
+        icon: 'success',
+        heading: 'Success',
+        position: 'top-right',
+      });
     } else {
-      console.error('Не удалось скопировать текст через execCommand');
+      $.toast({
+        text: 'Something went wront...',
+        icon: 'error',
+        heading: 'error',
+        position: 'top-right',
+      });
     }
   } catch (err) {
-    console.error('Ошибка копирования через execCommand:', err);
+    $.toast({
+      text: 'Something went wront...',
+      icon: 'error',
+      heading: 'error',
+      position: 'top-right',
+    });
   }
   document.body.removeChild(textArea);
 }
@@ -677,7 +696,23 @@ const FollowButtons = function() {
                 } else {
                   btn.innerHTML = 'Subscribe';
                 }
-              })
+              });
+
+              if (response.sub) {
+                $.toast({
+                  text: 'Success! You’re now following and won’t miss any updates.',
+                  icon: 'success',
+                  heading: 'Success',
+                  position: 'top-right',
+                });
+              } else {
+                $.toast({
+                  text: 'Success! You have unfollowed the user\'s updates.',
+                  icon: 'success',
+                  heading: 'Success',
+                  position: 'top-right',
+                });
+              }
             }
           });
         });
@@ -741,6 +776,25 @@ const AuthButtons = function() {
   }
 }
 
+const CopyToClipboard = function() {
+  this.buttons = [];
+
+  this.discover = () => {
+    $('.copyToClipboard').each((k, el) => {
+      if (!this.buttons.includes(el)) {
+        $(el).on('click', function(evt) {
+          evt.preventDefault();
+          const target = $(`[data-copyId='${$(this).data('target')}']`);
+          if (target) {
+            copyTextToClipboard(target.val())
+          }
+        });
+        this.buttons.push(el);
+      }
+    });
+  }
+}
+
 const header = $('header');
 const headerHeight = header.outerHeight();
 
@@ -757,6 +811,7 @@ window.Editors = new Editors();
 window.EditorButtons = new EditorButtons();
 window.AuthButtons = new AuthButtons();
 window.EmojiButtons = new EmojiButtons();
+window.CopyToClipboard = new CopyToClipboard();
 
 $(document).ready(function() {
   window.FavoriteButtons.discover('body');
@@ -771,6 +826,7 @@ $(document).ready(function() {
   window.Editors.discover();
   window.EditorButtons.discover();
   window.AuthButtons.discover();
+  window.CopyToClipboard.discover();
   
   setTimeout(() => window.EmojiButtons.discover(), 100);
 });
@@ -872,8 +928,7 @@ $('[data-input="phone"]').on('input', function(evt) {
 
 const dropButtons = [];
 
-function discoverCartDropButtons(container=null)
-{
+function discoverCartDropButtons(container=null) {
   const base = (container == null) ? 'body' : container;
 
   $(base).find('.cart-drop').each((k, btn) => {
@@ -935,15 +990,6 @@ $(document).ready(function() {
 
   Livewire.hook('morphed',  ({ el, component }) => {
     discoverCartDropButtons(el);
-  });
-
-  $('.copyToClipboard').each((k, el) => {
-    $(el).on('click', function() {
-      const target = $(`[data-copyId='${$(this).data('target')}']`);
-      if (target) {
-        copyTextToClipboard(target.val())
-      }
-    })
   });
 
   [...document.querySelectorAll('.stars_filter')].map(stars => {

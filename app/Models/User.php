@@ -367,6 +367,26 @@ class User extends Authenticatable implements HasName, FilamentUser
       $route_url = urlencode($url);
       $title = urlencode('Discover your next adventure together!');
 
+      return match($source) {
+        'FB' => "http://www.facebook.com/share.php?u=$route_url&title=$title",
+        'TW' => "https://twitter.com/intent/tweet?text=" . ($title." ".$route_url),
+        'PI' => "http://pinterest.com/pin/create/link/?url=$route_url&description=$title",
+        'GM' => "https://mail.google.com/mail/u/0/?ui=2&fs=1&tf=cm&su=$title&body=Link:+$route_url",
+        'WA' => "https://wa.me/?text=$title $route_url",
+        'TG' => "https://t.me/share/url?url=$route_url&text=$title",
+        'RD' => "http://www.reddit.com/submit?url=$route_url&title=$title",
+        default => $url
+      };
+    }
+
+    public function makeReferalArticleUrl(?string $source = null, Article $article): string
+    {
+      $url = $article->makeFeedUrl() . '&referal='. CustomEncrypt::generateUrlHash([
+        'id' => $this->id, 
+        'created_at' => $this->created_at->format('Y-m-d'),
+      ], false);
+      $route_url = urlencode($url);
+      $title = urlencode('Discover your next adventure together!');
 
       return match($source) {
         'FB' => "http://www.facebook.com/share.php?u=$route_url&title=$title",
@@ -375,6 +395,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         'GM' => "https://mail.google.com/mail/u/0/?ui=2&fs=1&tf=cm&su=$title&body=Link:+$route_url",
         'WA' => "https://wa.me/?text=$title $route_url",
         'TG' => "https://t.me/share/url?url=$route_url&text=$title",
+        'RD' => "http://www.reddit.com/submit?url=$route_url&title=$title",
         default => $url
       };
     }

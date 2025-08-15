@@ -27,7 +27,6 @@ class ArticleSeeder extends Seeder
               'user_id' => $i,
               'title' => $title,
               'subtitle' => null,
-              'slug' => Slug::make("Article Title"),
               'views' => 0,
               'text' => '<h3>Among the manufacturers of prestigious Swiss watches</h3>
                             <h4>Among the manufacturers of prestigious Swiss watches, there are recognized leaders - Breguet</h4>

@@ -87,14 +87,14 @@
                         @endif
 
 
-                        @if ($can_write)
+                        @if ($can_write || $type == 'comment')
                           <div class="block sm:hidden text-left mb-2">{{ auth()->user()->profile }}</div>
                         @endif
                         <div class="w-full flex justify-start items-start gap-2 sm:gap-3">
                             <div
                                 class="relative grow flex items-center justify-start gap-2 sm:gap-3 bg-light rounded-lg !pl-3 py-3 sm:!ps-3 !pe-20 sm:!pe-2">
                                 
-                                @if (!$can_write)
+                                @if (!$can_write || $type == 'comment')
                                   <div class="hidden sm:block">{{ auth()->user()->profile }}</div>
                                 @endif
                                 
@@ -103,7 +103,7 @@
                                 @endphp
                                 <textarea name="text" id="{{ $emoji_hash }}" rows="1"
                                     class="chat-textarea transition w-full !text-xs sm:!text-base leading-normal outline-0"
-                                    placeholder="Write your review..."></textarea>
+                                    placeholder="{{ $type == 'review' ? 'Write your review...' : 'Write your comment...'  }}"></textarea>
 
                                 <div class="absolute top-0 right-0 text-gray">
                                     <div class="flex justify-center items-center py-3 px-2 sm:!px-3 gap-1 sm:!gap-2">

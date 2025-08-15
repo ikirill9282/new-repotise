@@ -106,7 +106,7 @@
                   :message_author_id="$message->author->id"
                 >
                 </x-chat.editor>
-                @if($message instanceof App\Models\Review)
+                @if($message instanceof App\Models\Review && $level == 1)
                   <div class="flex items-center justify-start mt-auto ml-[-0.25rem] select-none">
                       <div class="text-yellow">
                           @include('icons.star', ['width' => 20, 'height' => 20])

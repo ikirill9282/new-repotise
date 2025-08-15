@@ -114,6 +114,7 @@ $(document).ready(function() {
                     window.RepliesButtons.discover();
                     window.EmojiButtons.discover();
                     window.ReadMoreButtons.discover();
+                    window.CopyToClipboard.discover();
                 });
             }
         }
