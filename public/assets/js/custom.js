@@ -528,8 +528,14 @@ const ReviewForms = function () {
           })
           .then((response) => {
               if (response.status === "success") {
-                form.detach();
-                const name = formData.reply ? 'reply' : 'review';
+                
+                if (form.data('type') == 'review') {
+                  form.detach();
+                } else {
+                  form.eq(0).get(0).reset();
+                }
+                
+                const name = formData.reply ? 'reply' : (form.data('type') == 'review' ? 'review' : 'comment');
                 $.toast({
                   text: `Your ${name} has been received and is now awaiting moderation.`,
                   icon: 'success',

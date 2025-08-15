@@ -7,7 +7,9 @@
     <div class="theme_articles">
       <div class="talmaev">
         <div class="profile">
-            <img src="{{ $article->author->avatar }}" class="!w-10 !h-10 object-cover" alt="Avatar">
+            <a href="{{ $article->author->makeProfileUrl() }}" class="inline-block">
+              <img src="{{ $article->author->avatar }}" class="!w-10 !h-10 object-cover" alt="Avatar">
+            </a>
             <p>
               <span>{{ $article->author->name }}</span>
               <a class="author-link !text-md" href="{{ $article->author->makeProfileUrl() }}">{{ $article->author->profile }}</a>
