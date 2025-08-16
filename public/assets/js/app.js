@@ -855,8 +855,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 	// Инициализация счетчиков символов
 	initCharCounters()
-
-	// ... остальной код чипс-инпутов ...
 })
 
 function initCharCounters() {
@@ -910,9 +908,6 @@ function initCharCounters() {
 		// Инициализация при загрузке
 		updateCounter(editor, counter, editorConfig.limit)
 	})
-
-	// УБРАНО: Создание счетчиков для скрытых textarea
-	// (их обработка перенесена в раздел ниже)
 
 	// Для скрытых textarea - только ограничение длины без создания счетчика
 	const hiddenTextareas = [
