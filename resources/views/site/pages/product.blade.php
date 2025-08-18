@@ -543,9 +543,5 @@
                 </div>
             </div>
         </section>
-
-        @push('js')
-          <script src="{{ asset('assets/js/product.js') }}"></script>
-        @endpush
     @endif
 @endsection
