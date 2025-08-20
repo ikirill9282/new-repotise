@@ -87,54 +87,64 @@
                                 <p>${{ $product->price }}</p>
                                 <span>${{ $product->old_price }}</span>
                             </div>
-                            {{-- <div class="cards_monthly_group">
-                                    <div class="card_monthly">
-                                        <h3>Monthly</h3>
-                                        <p>$20/month</p>
-                                        <div class="subscribe">
-                                            <a href="#">Subscribe</a>
-                                            <span>Perfect for trying it out</span>
-                                        </div>
-                                    </div>
-                                    <div class="card_monthly">
-                                        <h3>Quarterly</h3>
-                                        <p>$15/ month</p>
-                                        <div class="subscribe">
-                                            <a href="#">Subscribe</a>
-                                            <span>Billed Quarterly</span>
-                                        </div>
-                                    </div>
-                                    <div class="card_monthly">
-                                        <h3>Yearly</h3>
-                                        <p>$10/ month</p>
-                                        <div class="subscribe">
+                            @if($product->subscription)
+                              <div class="cards_monthly_group">
+                                  <div class="card_monthly ">
+                                      <h3>Monthly</h3>
+                                      <p class="text-center">${{ $product->subprice->month }} / month</p>
+                                      <div class="subscribe justify-center items-end">
+                                          <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
                                             <span>Billed Annually</span>
-                                        </div>
-                                        <span class="best_value">BEST VALUE</span>
-                                    </div>
-                                </div> --}}
-                            <div class="add_to_card_block">
-                                <a href="#"
-                                    class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
-                                    data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
-                                        viewBox="0 0 20 21" fill="none">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
-                                            fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
-                                            fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                        <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
-                                            stroke="white" stroke-width="1.5" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-                                    {{ auth()->user()?->inCart($product->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
-                                </a>
-                                <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
-                                    checkout</span>
-                            </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="card_monthly ">
+                                      <h3>Quarterly</h3>
+                                      <p class="text-center">${{ $product->subprice->quarter }} / month</p>
+                                      <div class="subscribe justify-center items-end">
+                                          <div class="flex flex-col gap-1">
+                                            <a href="#">Subscribe</a>
+                                            <span>Billed Annually</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="card_monthly ">
+                                      <h3>Yearly</h3>
+                                      <p class="text-center">${{ $product->subprice->year }} / month</p>
+                                      <div class="subscribe justify-center items-end">
+                                          <div class="flex flex-col gap-1">
+                                            <a href="#">Subscribe</a>
+                                            <span>Billed Annually</span>
+                                          </div>
+                                      </div>
+                                      <span class="best_value !h-6 !leading-5 !px-3 bg-active after:content-[''] after:absolute after:top-0 after:right-0 after:border-12 after:border-active after:!border-r-transparent after:translate-x-[100%]">BEST VALUE</span>
+                                  </div>
+                              </div>
+                            @else
+                              <div class="add_to_card_block">
+                                  <a href="#"
+                                      class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
+                                      data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
+                                          viewBox="0 0 20 21" fill="none">
+                                          <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
+                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                          <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
+                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                          <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
+                                              stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round" />
+                                      </svg>
+                                      {{ auth()->user()?->inCart($product->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                  </a>
+                                  <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
+                                      checkout</span>
+                              </div>
+                            @endif
+
                             <div class="bottom_informations">
                                 <div class="text_inf">
                                     <h4>Product Type</h4>
@@ -178,54 +188,63 @@
                                 <p>${{ $product->price }}</p>
                                 <span>${{ $product->old_price }}</span>
                             </div>
-                            {{-- <div class="cards_monthly_group">
-                                    <div class="card_monthly">
-                                        <h3>Monthly</h3>
-                                        <p>$20/month</p>
-                                        <div class="subscribe">
-                                            <a href="#">Subscribe</a>
-                                            <span>Perfect for trying it out</span>
-                                        </div>
-                                    </div>
-                                    <div class="card_monthly">
-                                        <h3>Quarterly</h3>
-                                        <p>$15/ month</p>
-                                        <div class="subscribe">
-                                            <a href="#">Subscribe</a>
-                                            <span>Billed Quarterly</span>
-                                        </div>
-                                    </div>
-                                    <div class="card_monthly">
-                                        <h3>Yearly</h3>
-                                        <p>$10/ month</p>
-                                        <div class="subscribe">
+                            @if($product->subscription)
+                              <div class="cards_monthly_group">
+                                  <div class="card_monthly">
+                                      <h3>Monthly</h3>
+                                      <p class="text-center">${{ $product->subprice->month }} / month</p>
+                                      <div class="subscribe justify-center items-end">
+                                          <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
                                             <span>Billed Annually</span>
-                                        </div>
-                                        <span class="best_value">BEST VALUE</span>
-                                    </div>
-                                </div> --}}
-                            <div class="add_to_card_block">
-                                <a href="#"
-                                    class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
-                                    data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
-                                        viewBox="0 0 20 21" fill="none">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
-                                            fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
-                                            fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                        <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
-                                            stroke="white" stroke-width="1.5" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-                                    {{ auth()->user()?->inCart($product->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
-                                </a>
-                                <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
-                                    checkout</span>
-                            </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="card_monthly ">
+                                      <h3>Quarterly</h3>
+                                      <p class="text-center">${{ $product->subprice->quarter }} / month</p>
+                                      <div class="subscribe justify-center items-end">
+                                          <div class="flex flex-col gap-1">
+                                            <a href="#">Subscribe</a>
+                                            <span>Billed Annually</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="card_monthly ">
+                                      <h3>Yearly</h3>
+                                      <p class="text-center">${{ $product->subprice->year }} / month</p>
+                                      <div class="subscribe justify-center items-end">
+                                          <div class="flex flex-col gap-1">
+                                            <a href="#">Subscribe</a>
+                                            <span>Billed Annually</span>
+                                          </div>
+                                      </div>
+                                      <span class="best_value !h-6 !leading-5 !px-3 bg-active after:content-[''] after:absolute after:top-0 after:right-0 after:border-12 after:border-active after:!border-r-transparent after:translate-x-[100%]">BEST VALUE</span>
+                                  </div>
+                              </div>
+                            @else
+                              <div class="add_to_card_block">
+                                  <a href="#"
+                                      class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
+                                      data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
+                                          viewBox="0 0 20 21" fill="none">
+                                          <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
+                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                          <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
+                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                          <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
+                                              stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round" />
+                                      </svg>
+                                      {{ auth()->user()?->inCart($product->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                  </a>
+                                  <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
+                                      checkout</span>
+                              </div>
+                            @endif
                             <div class="bottom_informations">
                                 <div class="text_inf">
                                     <h4>Product Type</h4>

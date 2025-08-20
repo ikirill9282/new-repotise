@@ -126,7 +126,8 @@ class FeedbackController extends Controller
             $validator->errors()->add('model', $text);
           }
         },
-        'text' => 'required|string|max:1000',
+        // 'text' => 'required|string|max:1000',
+        'text' => 'sometimes|string|max:1000',
         'reply' => 'nullable|string',
         'edit' => 'nullable|string',
         'rating' => 'required_without_all:reply,edit',

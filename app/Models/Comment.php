@@ -7,15 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Helpers\Collapse;
 use App\Traits\HasMessages;
+use App\Traits\HasReport;
 use App\Traits\HasStatus;
 
 class Comment extends Model
 {
-  use HasAuthor, HasStatus, HasMessages;
+  use HasAuthor, HasStatus, HasMessages, HasReport;
 
   public function messages()
   {
-    return $this->hasMany(static::class, 'parent_id');
+    return $this->hasMany(static::class, 'parent_id')->orderByDesc('id');
   }
   
   public function article()

@@ -1,4 +1,9 @@
 <div>
+
+    @push('head')
+      <script src="https://js.stripe.com/v3/"></script>
+    @endpush
+
     @if ($order?->products && $order->products->isNotEmpty())
         <section class="placing_order">
             @include('site.components.breadcrumbs', [

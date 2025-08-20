@@ -197,9 +197,11 @@ const EditorButtons = function() {
     $(elem).on('click', function(evt) {
       evt.preventDefault();
       const action = $(this).data('action');
+      const hash = $(elem).closest('.editor-wrap').data('model');
+      const resource = $(elem).closest('.editor-wrap').data('resource');
       
       if (action === 'report') {
-        Livewire.dispatch('openModal', { modalName: 'report' });
+        Livewire.dispatch('openModal', { modalName: 'report', args: { model: hash, resource: resource } });
       }
 
       if (action === 'edit') {
@@ -208,7 +210,6 @@ const EditorButtons = function() {
         const replyBlock = $(elem).closest('.chat').find('.reply-block');
         const textBlock = $(elem).closest('.content').find('.message-text');
         const text = textBlock.find('.read-more-text') ? textBlock.find('.read-more-text').text() : textBlock.text();
-        const hash = $(elem).closest('.editor-wrap').data('model');
         
         const event = new Event('input', {
           bubbles: true,
@@ -1045,5 +1046,16 @@ $(document).ready(function() {
 
     input.addEventListener('input', hideError);
     input.addEventListener('change', hideError);
+  });
+
+
+  Livewire.on('toastSuccess', params => {
+    const message = params[0]?.message;
+    $.toast({
+      text: message,
+      icon: 'success',
+      heading: 'Success',
+      position: 'top-right',
+    });
   });
 });

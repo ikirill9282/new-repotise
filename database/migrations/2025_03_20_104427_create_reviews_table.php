@@ -22,7 +22,7 @@ return new class extends Migration
             $table->tinyInteger('rating')->index()->default(0);
             $table->tinyInteger('edited')->default(0);
 
-            $table->longText('text');
+            $table->longText('text')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

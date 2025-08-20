@@ -10,8 +10,34 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
     --color-gray: #A4A0A0;
     --color-active: #FC7361;
-    --color-secondary: #484134;
+    --color-second: #484134;
     --color-light: #f9f9f9;
     --color-red: #FF2C0C;
     --color-yellow: #FFDB0C;
+}
+
+
+@layer utilities {
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: #f9f9f9;
+    border-radius: 10px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #FC7361;
+    border-radius: 10px;
+    -webkit-transition: 0.3s;
+    transition: 0.3s;
+  }
+
+  @media (min-width: 768px) {
+    .scrollbar-custom::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  }
 }

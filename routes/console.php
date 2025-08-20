@@ -29,7 +29,10 @@ Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  dd(CustomEncrypt::getId('Q2dOcnVpZD0x'));
+  $user = User::find(1);
+  dd($user->defaultPaymentMethod());
+  $sub = $user->newSubscription('default', 18)->create('seti_1RxnVwFkz2A7XNTiD8xqCTzM');
+  dd($sub);
 });
 
 Artisan::command('ttm', function() {

@@ -29,31 +29,17 @@ class ProductFactory extends Factory
    */
   public function definition(): array
   {
-    // $users = User::all()
-    //   ->filter(fn($user) => $user->can('create-products'))
-    //   ->pluck('id')
-    //   ->shuffle()
-    //   ->toArray();
-
-    // $types = Type::all()
-    //   ->pluck('id')
-    //   ->shuffle()
-    //   ->toArray();
-
-    // $locations = Location::all()
-    //   ->pluck('id')
-    //   ->shuffle()
-    //   ->toArray();
 
     $users = User::whereIn('id', [0,2,3])->get();
     $types_count = Type::count();
     $locations_count = Location::count();
+    $sub = fake()->numberBetween(0, 1);
 
     return [
       'user_id' => $users->shuffle()->first()->id,
       'title' => collect(fake()->words(3))->map(fn($word) => ucfirst($word))->join(' '),
       'price' => fake()->numberBetween(10, 200),
-      // 'model' => fake()->randomElement([ProductModel::PRODUCT, ProductModel::SUBSCRIPTION]),
+      'subscription' => $sub,
       'old_price' => fake()->numberBetween(300, 2000),
       'type_id' => fake()->numberBetween(1, $types_count),
       'location_id' => fake()->numberBetween(1, $locations_count),
@@ -70,6 +56,13 @@ class ProductFactory extends Factory
       $count = fake()->numberBetween(1, 5);
       $cat = array_slice($categories, 0, $count);
       $product->categories()->sync($cat);
+      if ($product->subscription) {
+        $product->subprice()->create([
+          'month' => $m = fake()->numberBetween(20, 40),
+          'quarter' => $q = fake()->numberBetween(14, ($m-1)),
+          'year' => fake()->numberBetween(10, ($q-1)),
+        ]);
+      }
     });
   }
 }

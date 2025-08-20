@@ -40,7 +40,7 @@
 
             <div class="likes flex justify-start items-center gap-2">
                 @if($resource == 'review' && $level == 1)
-                  @if((auth()->user() && auth()->user()->id == $author_id) || auth()->user()->hasRole(['admin', 'super-admin']))
+                  @if((auth()->user() && (auth()->user()?->id == $author_id) || auth()->user()?->hasRole(['admin', 'super-admin'])))
                     <div class="reply reply-button" data-reply="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $message->id]) }}">
                         <a href=""
                             class="!text-gray border-b border-dashed pb-0.5 transition hover:!text-active"
@@ -49,7 +49,7 @@
                           </a>
                     </div>
                   @endif
-                @elseif($resource == 'review' && $level == 2 && auth()->user()->hasRole(['admin', 'super-admin']))
+                @elseif($resource == 'review' && $level == 2 && auth()->user()?->hasRole(['admin', 'super-admin']))
                   <div class="reply reply-button" data-reply="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $message->id]) }}">
                         <a href=""
                             class="!text-gray border-b border-dashed pb-0.5 transition hover:!text-active"
@@ -103,6 +103,7 @@
             <div class="settings flex flex-col absolute top-0 right-0 h-full">
                 <x-chat.editor 
                   target="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $message->id]) }}"
+                  :resource="$resource"
                   :message_author_id="$message->author->id"
                 >
                 </x-chat.editor>

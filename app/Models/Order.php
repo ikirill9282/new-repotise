@@ -27,14 +27,20 @@ class Order extends Model
       parent::booted();
 
       static::creating(function($model) {
+        $ephemeralKey = \Stripe\EphemeralKey::create(
+          ['customer' => $model->user->asStripeCustomer()->id],
+          ['stripe_version' => '2022-11-15']
+        );
         $transaction = Cashier::stripe()->paymentIntents->create([
           'amount' => ($model->cost * 100),
           'currency' => 'usd',
           'automatic_payment_methods' => ['enabled' => true],
           'customer' => $model->user->asStripeCustomer()->id,
+          // 'payment_method_types' => ['card'],
           'metadata' => [
             'initiator' => ($model->user?->id ?? 0 == 0) ? 'system' : 'customer',
             'inititator_id' => $model->user?->id ?? 0,
+            'ephermal' => $ephemeralKey->secret,
             'type' => 'order',
           ],
         ]);

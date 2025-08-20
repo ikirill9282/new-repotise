@@ -55,6 +55,11 @@ class Product extends Model
       return $this->generateSlug(true);
     }
   }
+
+  public function subprice()
+  {
+    return $this->hasOne(Subprice::class);
+  }
   
   public function categories()
   {
@@ -78,7 +83,7 @@ class Product extends Model
 
   public function messages()
   {
-    return $this->hasMany(Review::class);
+    return $this->hasMany(Review::class)->orderByDesc('id');
   }
 
   public function prepareRatingImages()

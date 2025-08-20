@@ -216,7 +216,7 @@
         </div>
       </section>
 
-      <section class="invite-honest">
+      <section class="invite-honest" id="levels">
         <div class="container">
           <div class="invite-honest__title">
             <h2 class="section-title">Honest & Transparent Partnership</h2>

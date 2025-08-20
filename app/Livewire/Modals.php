@@ -12,6 +12,8 @@ class Modals extends Component
     public $inited = false;
     public $args = [];
 
+    public $oneTime = ['report'];
+
     public function mount()
     {
       $this->modal = request()->get('modal', null);
@@ -25,13 +27,15 @@ class Modals extends Component
     }
 
     #[On('openModal')]
-    public function openModal($modalName, array $args = [])
+    public function openModal($modalName, $args = [])
     {
       $this->args = $args;
       $this->modal = $modalName;
       $this->inited = true;
       $this->startShowAnimation();
-      $this->dispatch('modal-opened', ['modal' => $modalName]);
+      if (!in_array($modalName, $this->oneTime)) {
+        $this->dispatch('modal-opened', ['modal' => $modalName]);
+      }
     }
 
     #[On('closeModal')]

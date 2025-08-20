@@ -1,56 +1,71 @@
 @push('css')
-  <style>
-    body {
-      background: var(--bg, #F9F9F9);
-    }
-  </style>
+    <style>
+        body {
+            background: var(--bg, #F9F9F9);
+        }
+    </style>
 @endpush
-<div class="the-content-wrap">
-      <div class="container">
-          <div class="the-profile__sidebar">
-            <div class="the-profile__accord-button">
-              <button>Menu</button>
-            </div>
-            <div class="the-profile__wrap">
-              <a class="{{ (request()->route()->getName() === 'profile.purchases') ? 'active' : '' }}" href="{{ route('profile.purchases') }}">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                          d="M9.00091 11.1142C11.4432 11.1079 13.5198 12.2293 14.2831 14.6432C12.7446 15.5811 10.9336 15.9423 9.00091 15.9376C7.06826 15.9423 5.25727 15.5811 3.71875 14.6432C4.48293 12.2267 6.55602 11.1079 9.00091 11.1142Z"
-                          stroke-width="1.5" stroke-linecap="square" />
-                      <circle cx="9.0023" cy="5.3773" r="3.3148" stroke-width="1.5" stroke-linecap="square" />
-                  </svg>
-                  My Purchases
-              </a>
-              <a class="{{ (request()->route()->getName() === 'profile.referal') ? 'active' : '' }}" href="{{ route('profile.referal') }}">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <g clip-path="url(#clip0_3066_70773)">
-                          <path
-                              d="M15 5.25H13.6965C14.1206 4.8762 14.4572 4.41366 14.6824 3.8952C14.9077 3.37674 15.0161 2.81506 15 2.25C15 2.05109 14.921 1.86032 14.7803 1.71967C14.6397 1.57902 14.4489 1.5 14.25 1.5C14.0511 1.5 13.8603 1.57902 13.7197 1.71967C13.579 1.86032 13.5 2.05109 13.5 2.25C13.5 4.2165 11.7218 4.8975 10.3695 5.13075C10.8686 4.24579 11.1691 3.26278 11.25 2.25C11.25 1.65326 11.0129 1.08097 10.591 0.65901C10.169 0.237053 9.59674 0 9 0C8.40326 0 7.83097 0.237053 7.40901 0.65901C6.98705 1.08097 6.75 1.65326 6.75 2.25C6.83093 3.26278 7.13139 4.24579 7.6305 5.13075C6.27825 4.8975 4.5 4.2165 4.5 2.25C4.5 2.05109 4.42098 1.86032 4.28033 1.71967C4.13968 1.57902 3.94891 1.5 3.75 1.5C3.55109 1.5 3.36032 1.57902 3.21967 1.71967C3.07902 1.86032 3 2.05109 3 2.25C2.98388 2.81506 3.09231 3.37674 3.31758 3.8952C3.54285 4.41366 3.87945 4.8762 4.3035 5.25H3C2.20435 5.25 1.44129 5.56607 0.87868 6.12868C0.316071 6.69129 0 7.45435 0 8.25L0 9C0 9.39782 0.158035 9.77936 0.43934 10.0607C0.720644 10.342 1.10218 10.5 1.5 10.5V14.25C1.50119 15.2442 1.89666 16.1973 2.59966 16.9003C3.30267 17.6033 4.2558 17.9988 5.25 18H12.75C13.7442 17.9988 14.6973 17.6033 15.4003 16.9003C16.1033 16.1973 16.4988 15.2442 16.5 14.25V10.5C16.8978 10.5 17.2794 10.342 17.5607 10.0607C17.842 9.77936 18 9.39782 18 9V8.25C18 7.45435 17.6839 6.69129 17.1213 6.12868C16.5587 5.56607 15.7956 5.25 15 5.25ZM9 1.5C9.19891 1.5 9.38968 1.57902 9.53033 1.71967C9.67098 1.86032 9.75 2.05109 9.75 2.25C9.65946 3.04712 9.40405 3.81668 9 4.50975C8.59595 3.81668 8.34054 3.04712 8.25 2.25C8.25 2.05109 8.32902 1.86032 8.46967 1.71967C8.61032 1.57902 8.80109 1.5 9 1.5ZM1.5 8.25C1.5 7.85218 1.65804 7.47064 1.93934 7.18934C2.22064 6.90804 2.60218 6.75 3 6.75H8.25V9H1.5V8.25ZM3 14.25V10.5H8.25V16.5H5.25C4.65326 16.5 4.08097 16.2629 3.65901 15.841C3.23705 15.419 3 14.8467 3 14.25ZM15 14.25C15 14.8467 14.7629 15.419 14.341 15.841C13.919 16.2629 13.3467 16.5 12.75 16.5H9.75V10.5H15V14.25ZM9.75 9V6.75H15C15.3978 6.75 15.7794 6.90804 16.0607 7.18934C16.342 7.47064 16.5 7.85218 16.5 8.25V9H9.75Z" />
-                      </g>
-                      <defs>
-                          <clipPath id="clip0_3066_70773">
-                              <rect width="18" height="18" fill="white" />
-                          </clipPath>
-                      </defs>
-                  </svg>
 
-                  purch Program
-              </a>
-              <a class="{{ (request()->route()->getName() === 'profile.settings') ? 'active' : '' }}" href="{{ route('profile.settings') }}">
-                  <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path fill-rule="evenodd" clip-rule="evenodd"
-                          d="M14.6031 5.71765L14.1363 4.90758C13.7414 4.22214 12.8661 3.98568 12.1798 4.37898V4.37898C11.853 4.57145 11.4632 4.62605 11.0961 4.53075C10.7291 4.43545 10.4151 4.19808 10.2232 3.87097C10.0998 3.66305 10.0335 3.42623 10.031 3.18447V3.18447C10.0422 2.79686 9.89592 2.42124 9.62563 2.14319C9.35534 1.86514 8.98401 1.70834 8.59624 1.7085H7.65573C7.27583 1.70849 6.91159 1.85987 6.64361 2.12915C6.37562 2.39842 6.22599 2.76338 6.22782 3.14328V3.14328C6.21656 3.92763 5.57747 4.55755 4.79303 4.55747C4.55127 4.55496 4.31445 4.48865 4.10653 4.36525V4.36525C3.42015 3.97195 2.54494 4.20841 2.15001 4.89385L1.64887 5.71765C1.25442 6.40223 1.48766 7.27689 2.17061 7.67417V7.67417C2.61453 7.93047 2.88801 8.40413 2.88801 8.91673C2.88801 9.42934 2.61453 9.903 2.17061 10.1593V10.1593C1.48853 10.5539 1.25503 11.4264 1.64887 12.109V12.109L2.12255 12.9259C2.30759 13.2598 2.61806 13.5062 2.98525 13.6105C3.35245 13.7149 3.74609 13.6686 4.07907 13.482V13.482C4.40642 13.2909 4.7965 13.2386 5.16261 13.3366C5.52873 13.4346 5.84053 13.6747 6.02873 14.0037C6.15213 14.2116 6.21844 14.4484 6.22095 14.6902V14.6902C6.22095 15.4826 6.86332 16.125 7.65573 16.125H8.59624C9.38597 16.125 10.0272 15.4868 10.031 14.6971V14.6971C10.0292 14.316 10.1798 13.95 10.4492 13.6805C10.7187 13.411 11.0847 13.2604 11.4658 13.2623C11.707 13.2687 11.9428 13.3348 12.1523 13.4545V13.4545C12.8369 13.8489 13.7115 13.6157 14.1088 12.9328V12.9328L14.6031 12.109C14.7944 11.7806 14.8469 11.3894 14.749 11.0222C14.6511 10.655 14.4108 10.342 14.0814 10.1524V10.1524C13.7519 9.96291 13.5116 9.64987 13.4137 9.28265C13.3158 8.91542 13.3683 8.5243 13.5596 8.19591C13.684 7.97869 13.8641 7.79859 14.0814 7.67417V7.67417C14.7602 7.27711 14.9929 6.40756 14.6031 5.72451V5.72451V5.71765Z"
-                          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      <circle cx="8.12946" cy="8.91675" r="1.97712" stroke-width="1.5" stroke-linecap="round"
-                          stroke-linejoin="round" />
-                  </svg>
+@php
+    $routes = auth()->user()->hasRole('creator')
+        ? [
+            'profile.dashboard' => ['url' => route('profile.dashboard'), 'icon' => 'dashboard', 'label' => 'Dashboard'],
+            'profile' => ['url' => route('profile'), 'icon' => 'monitor', 'label' => 'Creator Page'],
+            'profile.products' => ['url' => route('profile.products'), 'icon' => 'pic', 'label' => 'My Products'],
+            'profile.articles' => ['url' => route('profile.articles'), 'icon' => 'document', 'label' => 'My Articles'],
+            'profile.reviews' => ['url' => route('profile.reviews'), 'icon' => 'stari', 'label' => 'Reviews & Refunds'],
+            'profile.sales' => ['url' => route('profile.sales'), 'icon' => 'graph', 'label' => 'Sales Analytics'],
+            'profile.referal' => ['url' => route('profile.referal'), 'icon' => 'gift', 'label' => 'Referal Program'],
+            'profile.purchases' => ['url' => route('profile.purchases'), 'icon' => 'bag', 'label' => 'My Purchases'],
+            'profile.settings' => ['url' => route('profile.settings'), 'icon' => 'cog', 'label' => 'Account Settings'],
+        ]
+        : [
+            'profile.purchases' => ['url' => route('profile.purchases'), 'icon' => null, 'label' => 'My Purchases'],
+            'profile.referal' => ['url' => route('profile.referal'), 'icon' => null, 'label' => 'Referal Program'],
+            'profile.settings' => ['url' => route('profile.settings'), 'icon' => null, 'label' => 'Account Settings'],
+        ];
+@endphp
 
-                  Settings
-              </a>
+<div class="the-content-wrap profile-wrap">
+    <div class="container !block">
+        <div class="grid grid-cols-1 lg:grid-cols-[210px_1fr] gap-3">
+            <div class="col-span-1 accordion the-profile__sidebar w-full !p-0 group" id="accordionExample2">
+                <div class="accordion-item p-3  !bg-active group-has-[.show]:!bg-white lg:!bg-white transition">
+                    <div class="accordion-header the-profile__accord-button px-2 !bg-transparent">
+                        <button 
+                            class="accordion-button !text-white group-has-[.show]:!text-black !brightness-200 group-has-[.show]:!brightness-100
+                                  lg:!brightness-100 lg:!text-black
+                                  "
+                            type="button" 
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Menu
+                        </button>
+                    </div>
+                    <div id="collapseOne" class="accordion-collapse collapse show the-profile__wrap">
+                        <div class="profile-menu-list pt-3">
+                            @foreach ($routes as $name => $route)
+                                <a class="{{ request()->route()->getName() === $name ? 'active' : '' }}"
+                                    href="{{ $route['url'] }}">
+                                    {{-- <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.00091 11.1142C11.4432 11.1079 13.5198 12.2293 14.2831 14.6432C12.7446 15.5811 10.9336 15.9423 9.00091 15.9376C7.06826 15.9423 5.25727 15.5811 3.71875 14.6432C4.48293 12.2267 6.55602 11.1079 9.00091 11.1142Z"
+                                        stroke-width="1.5" stroke-linecap="square" />
+                                    <circle cx="9.0023" cy="5.3773" r="3.3148" stroke-width="1.5"
+                                        stroke-linecap="square" />
+                                </svg> --}}
+                                    @includeIf('icons.' . $route['icon'])
+                                    {{ $route['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          {{ $slot }}
-      </div>
+            <div class="col-span-1 overflow-scroll">
+              {{ $slot }}
+            </div>
+        </div>
+    </div>
 </div>

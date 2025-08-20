@@ -47,7 +47,7 @@
                       </div>
                     @endif
                     @if (view()->exists('livewire.modals.' . $this->modal))
-                        @livewire('modals.' . $this->modal, key($this->modal), ['args' => $this->args])
+                        @livewire('modals.' . $this->modal, key($this->modal), [...$this->args])
                     @endif
               </dialog>
             </div>

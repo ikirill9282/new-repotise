@@ -1,7 +1,7 @@
 @props(['message' => '', 'class' => ''])
 
 @push('css')
-  <style>
+<style>
   .tooltip {
     position: relative;
     display: inline-block;
@@ -41,7 +41,11 @@
 </style>
 @endpush
 
-<div class="tooltip {{ $class }}">
-  {{ $slot }}
+<div class="tooltip !absolute top-[50%] right-0 translate-y-[-50%] z-20 !opacity-100 {{ $class }}">
+  @if(!$slot->isEmpty())
+    {{ $slot }}
+  @else
+    @include('icons.shield')
+  @endif
   <div class="tooltip-text">{{ $message }}</div>
 </div>

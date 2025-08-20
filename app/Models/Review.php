@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Traits\HasAuthor;
 use App\Traits\HasMessages;
+use App\Traits\HasReport;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-  use HasAuthor, HasStatus, HasMessages;
+  use HasAuthor, HasStatus, HasMessages, HasReport;
   
   public function product()
   {
@@ -28,7 +29,7 @@ class Review extends Model
 
   public function messages()
   {
-    return $this->hasMany(static::class, 'parent_id');
+    return $this->hasMany(static::class, 'parent_id')->orderByDesc('id');
   }
 
   // public function getChildren()

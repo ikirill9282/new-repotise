@@ -1,4 +1,5 @@
 @props([
+  'resource' => null,
   'target' => null,
   'message_author_id' => null,
 ])
@@ -12,12 +13,17 @@
       >
       @include('icons.options', ['width' => 40, 'height' => 40])
   </div>
-  <div class="editor-wrap absolute top-0 left-0 z-20 translate-x-[-100%] h-0 overflow-hidden transition select-none" id="editor-{{ $target }}" data-model="{{ $target }}">
+  <div 
+      id="editor-{{ $target }}" 
+      data-model="{{ $target }}"
+      data-resource="{{ $resource }}"
+      class="editor-wrap absolute top-0 left-0 z-20 translate-x-[-100%] h-0 overflow-hidden transition select-none" 
+    >
       <div class="editor-buttons list flex flex-col items-stretch justify-center text-center gap-1">
         
         <x-chat.editor-item data-action="report">Report</x-chat.editor-item>
 
-        @if(auth()->user()?->hasRole(['admin', 'super-admin']) || auth()->user()->id == $message_author_id)
+        @if(auth()->user()?->hasRole(['admin', 'super-admin']) || auth()->user()?->id == $message_author_id)
           <x-chat.editor-item data-action="edit">Edit</x-chat.editor-item>
         @endif
         

@@ -45,17 +45,28 @@ Route::middleware('auth:web')->group(function() {
   Route::post('/profile/verify', [CabinetController::class, 'verificate']);
   Route::get('/profile/verify/complete', [CabinetController::class, 'verifyComplete']);
   Route::get('/profile/verify/cancel', [CabinetController::class, 'verifyCancel']);
-  Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('profile.purchases');
-  Route::get('/profile/referal', [CabinetController::class, 'referal'])->name('profile.referal');
-  Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
   Route::get('/profile/checkout', [CabinetController::class, 'checkout'])->name('profile.checkout');
+  
+
+  Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('profile.purchases');
+  Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
+  Route::get('/profile/referal', [CabinetController::class, 'referal'])->name('profile.referal');
+  
+  Route::get('/profile/dashboard', [CabinetController::class, 'dashboard'])->name('profile.dashboard');
+  Route::get('/profile/products', [CabinetController::class, 'products'])->name('profile.products');
+  Route::get('/profile/articles', [CabinetController::class, 'articles'])->name('profile.articles');
+  Route::get('/profile/reviews', [CabinetController::class, 'reviews'])->name('profile.reviews');
+  Route::get('/profile/sales', [CabinetController::class, 'sales'])->name('profile.sales');
+
 });
 
+// Public Profile
 Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
+
 // FOR TESTING
 Route::get('/create-article', [CabinetController::class, 'createArticle'])->name('create.article');
-Route::get('/create-product', [CabinetController::class, 'createProduct'])->name('create.article');
-Route::get('/create-product2', [CabinetController::class, 'createProduct2'])->name('create.article');
+Route::get('/create-product', [CabinetController::class, 'createProduct'])->name('create.product');
+Route::get('/create-product2', [CabinetController::class, 'createProduct2'])->name('create.product2');
 
 
 Route::post('/hook/stripe', function(Request $request) {

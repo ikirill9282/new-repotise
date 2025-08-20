@@ -6,8 +6,8 @@
 ])
 
 @php
-  $can_write = ($type == 'review') ? auth()->user()->canWriteReview($model) : auth()->user()->canWriteComment($model);
-  $message_exists = ($type == 'review' ) ? auth()->user()->reviews()->where('product_id', $model->id)->exists() : true;
+  $can_write = ($type == 'review') ? auth()->user()?->canWriteReview($model) : auth()->user()?->canWriteComment($model);
+  $message_exists = ($type == 'review' ) ? auth()->user()?->reviews()->where('product_id', $model->id)->exists() : true;
   $count = ($type == 'review') ? $model->reviews_count : $model->messages()->count();
 @endphp
 

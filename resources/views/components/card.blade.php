@@ -1,0 +1,1 @@
+<div class="bg-white rounded-lg p-4 {{ $attributes->get('class') }}">{{ $slot }}</div>

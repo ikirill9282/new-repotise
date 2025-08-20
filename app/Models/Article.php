@@ -32,7 +32,7 @@ class Article extends Model
 
   public function messages()
   {
-    return $this->hasMany(Comment::class);
+    return $this->hasMany(Comment::class)->orderByDesc('id');
   }
   
   public function tags()

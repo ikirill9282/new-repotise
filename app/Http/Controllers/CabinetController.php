@@ -21,6 +21,12 @@ use Illuminate\Support\Facades\Session;
 
 class CabinetController extends Controller
 {
+
+  public function dashboard()
+  {
+    return view('site.pages.profile-dashboard');
+  }
+
   public function verify(Request $request)
   {
     $user = Auth::user();

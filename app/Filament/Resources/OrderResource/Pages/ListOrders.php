@@ -209,7 +209,7 @@ class ListOrders extends ListRecords
       'total_discount_amount' => $query->sum('discount_amount'),
       'total_stripe_fee' => $query->sum('stripe_fee'),
       'total_seller_reward' => $query->sum('seller_reward'),
-      'total_referal_reward' => $query->sum('platform_reward'),
+      'total_referal_reward' => $query->sum('referal_reward'),
     ];
   }
 
