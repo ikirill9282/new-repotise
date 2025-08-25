@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
 @section('content')
-    <x-profile.wrap>
+    <x-profile.wrap colClass="overflow-hidden">
         <div class="dashboard-content max-w-full">
             <x-profile.complete-verify class="mb-4" />
             <x-profile.resend-verify class="mb-4" />
@@ -68,13 +68,47 @@
                           You need $[оставшийся объем] more in sales to reach Level [следующий уровень] and unlock [сниженная комиссия и увеличенный объем хранения].
                         </div>
                         
-                        <x-link href="{{ url('/sellers#levels') }}">Learn More</x-link>
+                        <div x-data="{}" class="">
+                          <x-link x-on:click.prevent="() => Livewire.dispatch('openModal', { modalName: 'levels' })">Learn More</x-link>
+                        </div>
 
                     </x-card>
                 </div>
             </div>
 
-            @livewire('profile.tables')
+            @livewire('profile.tables', [
+              'tables' => [
+                [
+                  'name' => 'sales',
+                  'title' => 'Sales Snapshot',
+                ],
+                [
+                  'name' => 'product',
+                  'title' => 'Product Performance',
+                ],
+                [
+                  'name' => 'insights',
+                  'title' => 'Content Insights',
+                ],
+                [
+                  'name' => 'donation',
+                  'title' => 'Donation Summary',
+                ],
+                [
+                  'name' => 'refunds',
+                  'title' => 'Refunds Summary',
+                ],
+                [
+                  'name' => 'reviews',
+                  'title' => 'Recent Reviews',
+                ],
+                [
+                  'name' => 'referal',
+                  'title' => 'Referral Program Summary',
+                ],
+              ],
+              'active' => 'sales',
+            ])
         </div>
     </x-profile.wrap>
 @endsection

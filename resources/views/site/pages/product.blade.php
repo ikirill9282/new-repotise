@@ -273,7 +273,7 @@
                         <div class="group_right">
                             <div class="meet_creator">
                                 <h3>Meet the Creator</h3>
-                                <div class="creator">
+                                <a href="{{ $product->author->makeProfileUrl() }}" class="creator">
                                     <img src="{{ $product->author->avatar }}" alt="Avatar" class="profile_img">
                                     <div class="name_creator">
                                         <h4>
@@ -290,7 +290,7 @@
                                         </h4>
                                         <span>{{ $product->author->profile }}</span>
                                     </div>
-                                </div>
+                                </a>
                                 <div class="creator-description read-more" data-text="Read More" data-color="#fff">
                                     {!! $product->author->description !!}</div>
                                 {{-- <span class="read-more">Read More</span> --}}
@@ -394,7 +394,7 @@
                     <div class="group_right">
                         <div class="meet_creator">
                             <h3>Meet the Creator</h3>
-                            <div class="creator">
+                            <a href="{{ $product->author->makeProfileUrl() }}" class="creator">
                                 <img src="{{ $product->author->avatar }}" alt="Avatar" class="profile_img">
                                 <div class="name_creator">
                                     <h4>
@@ -411,9 +411,9 @@
                                     </h4>
                                     <span>{{ $product->author->profile }}</span>
                                 </div>
-                            </div>
+                            </a>
                             <div class="creator-description read-more" data-text="Read More" data-color="#fff">
-                                {!! $product->author->description !!}</div>
+                                {!! $product->author->getShortDescription() !!}</div>
                             {{-- <span class="read-more">Read More</span> --}}
                         </div>
                         <div class="share">

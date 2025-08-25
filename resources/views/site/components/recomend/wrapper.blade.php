@@ -28,7 +28,8 @@ while($models->count() < $max) {
                       <path d="M17 14L22.81 19.785L17 25.57" stroke="white"
                           stroke-width="1.5" stroke-linecap="round" />
                   </g>
-              </svg></div>
+              </svg>
+          </div>
           <div class="swiper-button-prev"><svg xmlns="http://www.w3.org/2000/svg"
                   width="40" height="40" viewBox="0 0 40 40" fill="none">
                   <g opacity="0.6">
@@ -39,7 +40,8 @@ while($models->count() < $max) {
                       <path d="M17 14L22.81 19.785L17 25.57" stroke="white"
                           stroke-width="1.5" stroke-linecap="round" />
                   </g>
-              </svg></div>
+              </svg>
+          </div>
       </div>
   </div>
 </div>

@@ -22,6 +22,10 @@ return new class extends Migration
 
             $table->string('avatar')->nullable();
             $table->text('description')->nullable();
+            $table->tinyInteger('collaboration')->default(0);
+            $table->string('banner')->nullable();
+            $table->json('products')->nullable();
+            $table->json('articles')->nullable();
 
             $table->string('full_name')->nullable();
             $table->string('street')->nullable();

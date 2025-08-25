@@ -223,6 +223,30 @@ class CabinetController extends Controller
     return redirect()->route('checkout');
   }
 
+  public function products(Request $request)
+  {
+    $user = Auth::user();
+    
+    return view('site.pages.profile-products', [
+      'user' => $user,
+    ]);
+  }
+
+  public function articles(Request $request)
+  {
+    $user = Auth::user();
+
+    return view('site.pages.profile-articles', [
+      'user' => $user,
+    ]);
+  }
+
+
+
+
+
+
+
   public function createArticle(Request $request)
   {
     return view('site.pages.create-article');

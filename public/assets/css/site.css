@@ -155,6 +155,7 @@ header .about_block .right_group_block .rection_groups span {
 
 .in-cart {
   background: #A4A0A0 !important;
+  border: #a4a0a0 !important;
 }
 
 .in-cart:hover {
@@ -1646,6 +1647,10 @@ footer .bottom_connecting_group .connecting a {
   transition: 0.5s;
 }
 
+.read-more-300 {
+  height: 300px;
+}
+
 .read-more.read-more-open {
   /* overflow: visible; */
 }
@@ -2102,6 +2107,10 @@ header .search_group input[name="q"]::placeholder {
 
 .the-profile__sidebar svg path, .the-profile__sidebar svg g {
   stroke-width: 0px !important;
+}
+
+.creatorPage .container .creatorPage-wrapper .creatorPage__aside {
+  min-width: auto;
 }
 
 @media (min-width: 1140px) {

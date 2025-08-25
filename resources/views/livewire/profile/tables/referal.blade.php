@@ -23,7 +23,7 @@
 
     <div class="relative overflow-x-scroll max-w-full scrollbar-custom mb-5">
 
-        <table class="table">
+        {{-- <table class="table">
             <thead>
                 <tr class="">
                     <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Date & Time</th>
@@ -36,14 +36,14 @@
                 @for ($i = 0; $i < 10; $i++)
                     <tr>
                         <td class="!border-b-gray/15 !py-4 text-nowrap">10.10.2025 10:00</td>
-                        <td class="!border-b-gray/15 !py-4">Donor Name</td>
+                        <td class="!border-b-gray/15 !py-4 text-nowrap">Donor Name</td>
                         <td class="!border-b-gray/15 !py-4">$30</td>
                         <td class="!border-b-gray/15 !py-4 text-nowrap">A Guide to Getting to Know North Korea</td>
                     </tr>
                 @endfor
             </tbody>
             <tfoot></tfoot>
-        </table>
+        </table> --}}
     </div>
 
     <div class="text-right">

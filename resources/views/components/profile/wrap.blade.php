@@ -1,3 +1,7 @@
+@props([
+  'colClass' => '',
+])
+
 @push('css')
     <style>
         body {
@@ -63,7 +67,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-span-1 overflow-scroll">
+            <div class="col-span-1 {{ $colClass }}">
               {{ $slot }}
             </div>
         </div>

@@ -56,7 +56,7 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('favorites') }}" class="like rection_groups">
+                    <a href="{{ route('favorites') }}" class="like rection_groups !text-transparent">
                         @include('icons.favorite')
                         <span class="favorite-counter @if (!auth()->user()->favorite_count) hidden @endif" >{{ auth()->user()->favorite_count }}</span>
                     </a>

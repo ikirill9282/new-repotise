@@ -69,9 +69,17 @@ class SiteController extends Controller
       return (new FallbackController())($request);
     }
 
+    $valid = $request->validate([
+      'author' => 'sometimes|nullable|string',
+    ]);
+
     return view('site.pages.insights', [
       'page' => $page,
       'articles' => Article::query()
+        ->when(
+          isset($valid['author']),
+          fn($q) => $q->whereHas('author', fn($sq) => $sq->where('users.username', str_ireplace('@', '', $valid['author']))),
+        )
         ->orderByDesc('id')
         ->paginate(9),
     ]);
@@ -241,6 +249,7 @@ class SiteController extends Controller
       'locations' => 'sometimes|nullable|string',
       'sale' => 'sometimes|nullable|integer',
       'type' => 'sometimes|nullable|string',
+      'author' => 'sometimes|nullable|string',
       'q' => 'sometimes|nullable|string',
     ]);
 
@@ -277,6 +286,10 @@ class SiteController extends Controller
       ->when(
         isset($valid['locations']),
         fn($q) => $q->whereHas('location', fn($sq) => $sq->whereIn('locations.slug', $valid['locations'])),
+      )
+      ->when(
+        isset($valid['author']),
+        fn($q) => $q->whereHas('author', fn($sq) => $sq->where('users.username', str_ireplace('@', '', $valid['author']))),
       )
       ->when(
         isset($valid['q']),

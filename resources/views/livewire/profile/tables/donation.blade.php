@@ -35,7 +35,7 @@
           @for($i = 0; $i < 10; $i++)
             <tr>
               <td class="!border-b-gray/15 !py-4 text-nowrap">10.10.2025 10:00</td>
-              <td class="!border-b-gray/15 !py-4">Donor Name</td>
+              <td class="!border-b-gray/15 !py-4 text-nowrap">Donor Name</td>
               <td class="!border-b-gray/15 !py-4 text-nowrap !text-gray">$300</td>
               <td class="!border-b-gray/15 !py-4">
                 <div class="flex items-center gap-2 hover:!text-active {{ $i % 2 == 0 ? '!text-gray' : 'text-active' }}">

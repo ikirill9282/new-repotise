@@ -311,6 +311,15 @@ const swiper14 = new Swiper(".mySwiper14", {
     },
 });
 
+// const swiperProfileProducts = new Swiper("#profile-product-slider", {
+//     slidesPerView: 3,
+//     spaceBetween: 10,
+    // navigation: {
+    //     nextEl: ".swiper-button-next",
+    //     prevEl: ".swiper-button-prev",
+    // },
+// });
+
 function toggleText() {
     let hiddenText = document.querySelector(".hidden-text");
     let dots = document.querySelector(".dots");

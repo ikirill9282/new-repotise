@@ -3,34 +3,35 @@
                 {{ $isVisible ? 'modal-fade-in' : ($this->inited ? 'modal-fade-out' : 'hidden') }} @if ($this->inited && $this->modal == false) hidden @endif"
         wire:keydown.escape="closeModal" tabindex="0" x-data="{}" 
         x-init="window.addEventListener('modalClosing', () => {
-            setTimeout(() => {
-                @this.call('finalizeClose')
-            }, 300)
-        });
-        window.addEventListener('modal-closing-clean-url', () => {
-            const url = new URL(window.location.href);
-            url.searchParams.delete('modal');
-            window.history.replaceState({}, document.title, url.toString());
-        });
-        Livewire.on('startShowAnimation', () => {
-            @this.call('startShowAnimation')
-        });
-        Livewire.on('modal-opened', event => {
-            const modalName = event[0].modal;
-            const url = new URL(window.location.href);
-            url.searchParams.set('modal', modalName);
-            window.history.replaceState({}, document.title, url.toString());
-            setTimeout(() => {
-              initCartSlider();
-            }, 10);
-        });">
+                    setTimeout(() => {
+                        @this.call('finalizeClose')
+                    }, 300)
+                });
+                window.addEventListener('modal-closing-clean-url', () => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('modal');
+                    window.history.replaceState({}, document.title, url.toString());
+                });
+                Livewire.on('startShowAnimation', () => {
+                    @this.call('startShowAnimation')
+                });
+                Livewire.on('modal-opened', event => {
+                    const modalName = event[0].modal;
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('modal', modalName);
+                    window.history.replaceState({}, document.title, url.toString());
+                    setTimeout(() => {
+                      initCartSlider();
+                    }, 10);
+                });"
+        >
         <div class="popUp-wrap flex justify-center items-center h-full min-w-full sm:min-w-lg">
             <div class="popUp-wrap w-full max-h-full overflow-y-scroll">
                 <dialog
                   class="popUp__edit-contact popUp !gap-[10px] sm:!gap-[20px] lg:!gap-[30px] mx-auto
                   {{ $isVisible ? 'modal-slide-in' : 'modal-slide-out' }}
                   overflow-hidden
-                  {{ $this->modal == 'cart' ? '!max-w-none' : '' }}
+                  {{ ($this->modal == 'cart' || $this->modal == 'levels') ? '!max-w-none' : '' }}
                   "
                 >
                     <div wire:click.prevent="closeModal" class="popUp__cross w-5 h-5">
@@ -40,7 +41,7 @@
                             </path>
                         </svg>
                     </div>
-                    @if(!in_array($this->modal, ['cart']))
+                    @if(!in_array($this->modal, ['cart', 'levels']))
                       <div class="logo text-center">
                           <a href="{{ route('home') }}"><img class="inline-block w-25 sm:!max-w-none"
                                   src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>

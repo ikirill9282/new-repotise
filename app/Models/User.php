@@ -17,7 +17,6 @@ use Filament\Panel;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use App\Traits\HasCart;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
@@ -25,17 +24,17 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmRegitster;
 use App\Events\MailVerify;
 use App\Mail\ResetCode;
-use App\Models\Options;
 use App\Events\MailReset;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Cashier;
 use App\Helpers\CustomEncrypt;
+use App\Traits\HasGallery;
 use Stripe\Identity\VerificationSession;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, Searchable, HasCart, Billable;
+    use HasFactory, Notifiable, HasRoles, Searchable, HasCart, Billable, HasGallery;
 
     protected $guarded = ['id'];
 
@@ -417,6 +416,11 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function getName(): string
     {
       return $this->name;
+    }
+
+    public function getShortDescription(int $length = 250): string
+    {
+      return (strlen($this->description) > $length) ? substr($this->description, 0, $length) . '...' : $this->description;
     }
 
     public function hasFavorite(int $id, string $type)

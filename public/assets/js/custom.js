@@ -735,7 +735,7 @@ const ReadMoreButtons = function() {
   this.discover = () => {
     [...document.querySelectorAll('.read-more')].forEach((elem, k) => {
       if (!this.buttons.includes(elem)) {
-        const text = $('<div>', { class: "read-more-text", text: $(elem).text() });
+        const text = $('<div>', { class: "read-more-text inline-block", html: $(elem).html() });
         const btnWrap = $('<div>', { 
           class: "read-more-wrap",
           style: `box-shadow: 0px 0px 30px 30px ${$(elem).data('color') ?? '#fff'}; background-color: ${$(elem).data('color') ?? '#fff'};`
@@ -746,7 +746,8 @@ const ReadMoreButtons = function() {
           $(elem).toggleClass('read-more-open');
 
           if (!$(elem).hasClass('read-more-open')) {
-            $(elem).css({ height: '150px' });
+            const height = $(elem).hasClass('read-more-300') ? 300 : 150;
+            $(elem).css({ height: `${height}px` });
           } else {
             const height = text.outerHeight() + btn.outerHeight();
             $(elem).css({ height: `${height}px` });

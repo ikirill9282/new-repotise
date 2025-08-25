@@ -6,46 +6,39 @@ use Livewire\Component;
 
 class Tables extends Component
 {
-    public $tables = [
-      [
-        'name' => 'sales',
-        'title' => 'Sales Snapshot',
-      ],
-      [
-        'name' => 'product',
-        'title' => 'Product Performance',
-      ],
-      [
-        'name' => 'insights',
-        'title' => 'Content Insights',
-      ],
-      [
-        'name' => 'donation',
-        'title' => 'Donation Summary',
-      ],
-      [
-        'name' => 'refunds',
-        'title' => 'Refunds Summary',
-      ],
-      [
-        'name' => 'reviews',
-        'title' => 'Recent Reviews',
-      ],
-      [
-        'name' => 'referal',
-        'title' => 'Referral Program Summary',
-      ],
-    ];
+    public $tables;
 
-    public $activeTable = 'referal';
+    public $activeTable;
+
+    public $sortable = false;
+    public $sorting = null;
+
+    public function mount(
+      array $tables = [], 
+      ?string $active = null, 
+      ?string $sortable = null
+    )
+    {
+      $this->tables = $tables;
+      $this->activeTable = $active;
+      $this->sortable = $sortable ?? false;
+    }
 
     public function setActive(string $name)
     {
       $this->activeTable = $name;
     }
 
+    public function getTableName()
+    {
+      if (str_contains($this->activeTable, 'products-')) {
+        return "profile.tables.profile-product";
+      }
+      return "profile.tables.". $this->activeTable;
+    }
+
     public function render()
     {
-        return view('livewire.profile.tables');
+      return view('livewire.profile.tables');
     }
 }
