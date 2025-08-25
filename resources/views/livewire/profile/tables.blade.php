@@ -1,11 +1,16 @@
 <div class="">
-    <div class="overflow-x-scroll scrollbar-custom mb-4 flex items-center justify-between">
-      <div class="flex justify-start items-center rounded-lg flex-wrap sm:!flex-nowrap">
+    <div 
+      class="overflow-x-scroll scrollbar-custom mb-4 flex items-center justify-between
+        @if($this->sortable) flex-col sm:flex-row !items-start sm:!items-center !gap-4 sm:!gap-0 scrollbar-custom-white @endif
+      "
+      >
+      <div 
+        class="flex justify-start items-center rounded-lg flex-wrap sm:!flex-nowrap">
         @foreach($this->tables as $table)
           <div 
             wire:click="setActive('{{ $table['name'] }}')" 
             class="text-center text-nowrap transition
-              !px-1 lg:!px-2.5 !py-2.5 text-sm sm:text-[10px] lg:text-sm
+              !px-1 lg:!px-2.5 !py-2.5 text-sm
               hover:cursor-pointer hover:bg-second hover:text-light
               basis-1/2 last:basis-full sm:basis-auto last:sm:basis-auto
               border-second sm:border-r-1 sm:border-t border-b
@@ -21,7 +26,7 @@
         @endforeach
       </div>
       @if($this->sortable)
-        <div class="ml-auto">
+        <div class="sm:ml-auto">
           <label class="text-gray" for="sorting-{{ $table['name'] }}">Sort By:</label>
           <select
             wire:model.live="sorting" 

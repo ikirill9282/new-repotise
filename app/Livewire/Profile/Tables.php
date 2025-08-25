@@ -34,6 +34,9 @@ class Tables extends Component
       if (str_contains($this->activeTable, 'products-')) {
         return "profile.tables.profile-product";
       }
+      if (str_contains($this->activeTable, 'articles-')) {
+        return "profile.tables.profile-article";
+      }
       return "profile.tables.". $this->activeTable;
     }
 

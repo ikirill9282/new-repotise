@@ -28,6 +28,10 @@
     border-radius: 10px;
   }
 
+  .scrollbar-custom-white::-webkit-scrollbar-track {
+    background: #fff !important;
+  }
+
   .scrollbar-custom::-webkit-scrollbar-thumb {
     background-color: #FC7361;
     border-radius: 10px;

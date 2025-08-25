@@ -3,7 +3,6 @@
       <div class="text-lg text-center">There are no sales yet.</div>
     @else
     @endif --}}
-
     <div class="mb-4">
       <x-form.checkbox 
         label="Choose a product to showcase on your Creator's Page"
@@ -11,7 +10,7 @@
       />
     </div>
     <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
-      <div class="flex flex-col items-stretch justify-start gap-4">
+      <div class="flex flex-col items-stretch justify-start gap-4 !pb-3">
         @for($i = 0; $i < 10; $i++)
           <div class="grid grid-cols-[2rem_10rem_minmax(16rem,100%)_minmax(0,5rem)] md:grid-cols-[2rem_12rem_minmax(0,100%)_minmax(0,16rem)] items-center !gap-4 !mb-4 last:!mb-0 max-w-full">
             <div class="">
@@ -21,7 +20,7 @@
               />
             </div>
             <div class="rounded-lg overflow-hidden h-24 md:h-30">
-              <img class="w-full h-full object-cover" src="/storage/images/product_19.webp" alt="">
+              <img class="w-full h-full object-cover" src="/storage/images/img_articles.png" alt="">
             </div>
             <div class="flex justify-start items-start md:items-center flex-col md:flex-row w-full !gap-16 overflow-hidden">
               <div class="w-full md:w-auto md:overflow-hidden">

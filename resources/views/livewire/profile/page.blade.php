@@ -1,7 +1,7 @@
 <div>
     <section class="creatorPage">
         <div class="container">
-            <div class="grid grid-cols-1 gap-3 items-start md:grid-cols-[1fr_1fr_250px] xl:grid-cols-3">
+            <div class="grid grid-cols-1 md:!gap-3 items-start md:grid-cols-[1fr_1fr_250px] xl:grid-cols-3">
                 <div class="order-2 md:!order-1 col-span-2">
 
                   {{-- PROFILE --}}
@@ -122,7 +122,8 @@
                                         $hash_id = \App\Helpers\CustomEncrypt::generateUrlHash([$article->id]);
                                       @endphp
 
-                                      <a
+                                      <x-like :id="$article->id" :count="$article->likes()->count()"></x-like>
+                                      {{-- <a
                                         href="/feedback/likes"
                                         class="feedback_button flex items-center justify-start gap-0.5 sm:gap-1
                                               !text-gray
@@ -141,7 +142,7 @@
                                             {{ $article->likes()->count() }}
                                           </span>
                                         </span>
-                                      </a>
+                                      </a> --}}
 
                                       <div class="flex justify-start items-center gap-1 text-sm">
                                           <a href="{{ auth()->user()->makeReferalArticleUrl('FB', $article) }}" target="_blank" class="first_connect !text-gray hover:!text-blue-500">
