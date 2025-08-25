@@ -163,7 +163,7 @@
                           </div>
                         @endforeach
                     </div>
-                    <div class="text-center">
+                    <div class="text-center mt-10">
                       <x-link href="{{ route('insights') . '?author=' . $article->author->profile }}">Show More</x-link>
                     </div>
                   </x-card>
