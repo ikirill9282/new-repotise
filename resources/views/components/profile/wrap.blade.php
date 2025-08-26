@@ -67,7 +67,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-span-1 {{ $colClass }}">
+            <div class="col-span-1 min-w-0 {{ $colClass }}">
               {{ $slot }}
             </div>
         </div>

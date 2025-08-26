@@ -241,6 +241,15 @@ class CabinetController extends Controller
     ]);
   }
 
+  public function reviews(Request $request)
+  {
+    $user = Auth::user();
+
+    return view('site.pages.profile-reviews', [
+      'user' => $user,
+    ]);
+  }
+
 
 
 

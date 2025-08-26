@@ -7,8 +7,8 @@
                   {{-- PROFILE --}}
                   <x-card class="mb-8">
                     <div class="creatorPage__content-author author-page-content">
-                      <div class="flex justify-start items-start gap-2 sm:gap-4 !text-sm sm:!text-base lg:!text-lg mb-4">
-                          <div class="!w-14 !h-14 sm:!w-18 sm:!h-18 lg:!w-26 lg:!h-26 rounded-full overflow-hidden">
+                      <div class="flex justify-start items-start gap-2 sm:gap-4 !text-sm sm:!text-base mb-4">
+                          <div class="!w-14 !h-14 sm:!w-18 sm:!h-18 rounded-full overflow-hidden">
                             <img class="object-cover" src="{{ $user->avatar }}" alt="Avatart"
                               class="creatorPage__content-author-avatar" />
                           </div>
