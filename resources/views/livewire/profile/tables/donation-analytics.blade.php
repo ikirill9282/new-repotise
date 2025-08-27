@@ -43,7 +43,7 @@
                   <td class="!border-b-gray/15 !py-4 text-nowrap">$3 000</td>
                   <td class="!border-b-gray/15 !py-4 ">$3</td>
                   <td class="!border-b-gray/15 !py-4 ">$3 000</td>
-                  <td class="!border-b-gray/15 !py-4 ">A Guide to Getting to Know North Korea</td>
+                  <td class="!border-b-gray/15 !py-4 min-w-3xs">A Guide to Getting to Know North Korea</td>
                   <td class="!border-b-gray/15 !py-4 ">Recurring</td>
                 </tr>
               @endfor
