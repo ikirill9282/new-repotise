@@ -11,7 +11,6 @@
     visibility: hidden;
     width: max-content;
     max-width: 200px;
-    background-color: #333;
     color: #fff;
     text-align: center;
     padding: 6px 8px;
@@ -32,7 +31,6 @@
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #333 transparent transparent transparent;
   }
   .tooltip:hover .tooltip-text {
     visibility: visible;
@@ -47,5 +45,10 @@
   @else
     @include('icons.shield')
   @endif
-  <div class="tooltip-text">{{ $message }}</div>
+  <div class="tooltip-text bg-second 
+      after:!border-s-transparent after:!border-t-second 
+      after:!border-r-transparent after:!border-b-transparent
+      "
+    >
+    {{ $message }}</div>
 </div>

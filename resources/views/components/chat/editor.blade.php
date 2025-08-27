@@ -19,16 +19,20 @@
       data-resource="{{ $resource }}"
       class="editor-wrap absolute top-0 left-0 z-20 translate-x-[-100%] h-0 overflow-hidden transition select-none" 
     >
-      <div class="editor-buttons list flex flex-col items-stretch justify-center text-center gap-1">
+      <div class="editor-buttons list flex flex-col items-stretch justify-center text-center gap-1 {{ $attributes->get('wrapClass') }}">
         
-        <x-chat.editor-item data-action="report">Report</x-chat.editor-item>
+        @if($slot->isEmpty())
+          <x-chat.editor-item data-action="report">Report</x-chat.editor-item>
 
-        @if(auth()->user()?->hasRole(['admin', 'super-admin']) || auth()->user()?->id == $message_author_id)
-          <x-chat.editor-item data-action="edit">Edit</x-chat.editor-item>
-        @endif
-        
-        @if(auth()->user()?->hasRole(['super-admin']))
-          <x-chat.editor-item data-action="delete">Delete</x-chat.editor-item>
+          @if(auth()->user()?->hasRole(['admin', 'super-admin']) || auth()->user()?->id == $message_author_id)
+            <x-chat.editor-item data-action="edit">Edit</x-chat.editor-item>
+          @endif
+          
+          @if(auth()->user()?->hasRole(['super-admin']))
+            <x-chat.editor-item data-action="delete">Delete</x-chat.editor-item>
+          @endif
+        @else
+          {{ $slot }}
         @endif
       </div>
   </div>
