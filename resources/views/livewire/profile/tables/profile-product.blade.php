@@ -11,7 +11,7 @@
       />
     </div>
     <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
-      <div class="flex flex-col items-stretch justify-start gap-4">
+      <div class="flex flex-col items-stretch justify-start gap-4 pb-2">
         @for($i = 0; $i < 10; $i++)
           <div class="grid grid-cols-[2rem_10rem_minmax(16rem,100%)_minmax(0,5rem)] md:grid-cols-[2rem_12rem_minmax(0,100%)_minmax(0,16rem)] items-center !gap-4 !mb-4 last:!mb-0 max-w-full">
             <div class="">

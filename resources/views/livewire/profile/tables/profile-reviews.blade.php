@@ -15,7 +15,7 @@
     </div>
   </div>
   <div class="overflow-x-scroll scrollbar-custom mb-4">
-    <table class="table">
+    <table class="table text-sm md:text-base">
       <thead>
         <tr>
           <td>&nbsp;</td>

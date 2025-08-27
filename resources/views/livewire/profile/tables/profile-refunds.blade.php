@@ -15,7 +15,7 @@
     </div>
   </div>
   <div class="overflow-x-scroll scrollbar-custom mb-4">
-    <table class="table !text-[12px]">
+    <table class="table text-sm md:text-base">
       <thead>
         <tr>
           <td>&nbsp;</td>
@@ -37,7 +37,7 @@
               </div>
             </td>
             <td class="align-middle">
-              <div class="max-w-xs">Product doesn't match description or preview</div>
+              <div class="min-w-2xs md:min-w-auto">Product doesn't match description or preview</div>
             </td>
             <td class="text-nowrap align-middle">28 days left</td>
             <td class="!border-b-gray/15 !py-4 ">
@@ -45,13 +45,13 @@
                 <div class="!w-14 !h-22 rounded overflow-hidden shrink-0">
                   <img class="w-full h-full object-cover" src="http://localhost:9990/storage/images/product_2.jpg" alt="Image">
                 </div>
-                <div class="">
+                <div class="min-w-2xs md:min-w-auto">
                   <p>A Guide to Getting to Know North Korea</p>
                 </div>
               </div>
             </td>
             <td class="!border-b-gray/15 !py-4 text-nowrap align-middle ">
-              <div class="flex flex-col gap-2">
+              <div class="flex flex-col justify-start items-start gap-2">
                 <x-link>Approve Refund</x-link>
                 <x-link>Reject Refund</x-link>
               </div>

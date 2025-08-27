@@ -250,7 +250,14 @@ class CabinetController extends Controller
     ]);
   }
 
+  public function sales(Request $request)
+  {
+    $user = Auth::user();
 
+    return view('site.pages.profile-sales', [
+      'user' => $user,
+    ]);
+  }
 
 
 

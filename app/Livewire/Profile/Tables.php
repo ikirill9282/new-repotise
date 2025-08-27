@@ -27,6 +27,7 @@ class Tables extends Component
     public function setActive(string $name)
     {
       $this->activeTable = $name;
+      $this->dispatch('tableChanged', $this->activeTable);
     }
 
     public function getTableName()

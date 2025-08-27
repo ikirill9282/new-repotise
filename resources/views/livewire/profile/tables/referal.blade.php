@@ -21,9 +21,8 @@
         </div>
     </div>
 
-    <div class="relative overflow-x-scroll max-w-full scrollbar-custom mb-5">
-
-        {{-- <table class="table">
+    {{-- <div class="relative overflow-x-scroll max-w-full scrollbar-custom mb-5">
+        <table class="table">
             <thead>
                 <tr class="">
                     <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Date & Time</th>
@@ -43,14 +42,8 @@
                 @endfor
             </tbody>
             <tfoot></tfoot>
-        </table> --}}
-    </div>
-
-    <div class="text-right">
-        <x-btn wire:click.prevent="loadAll" outlined class="!border-active hover:!border-second !w-auto !px-12">
-            View All Referal Bonuses
-        </x-btn>
-    </div>
+        </table>
+    </div> --}}
 
     <div class="flex items-end">
         <div class="link basis-1/2">
@@ -63,7 +56,7 @@
                 <span class="text-gray">@includeIf('icons.copy')</span>
             </div>
         </div>
-        <div class="socials basis-1/2">
+        <div class="socials basis-1/2 mb-2">
             <ul class="flex justify-end flex-wrap gap-3">
                 <li class="!mr-0">
                     <a href="{{ $user->makeReferalUrl('FB') }}" target="_blank"
@@ -103,5 +96,12 @@
                 </li>
             </ul>
         </div>
+    </div>
+
+
+    <div class="text-right mt-4">
+        <x-btn href="{{ route('referal') }}" outlined class="!border-active hover:!border-second !w-auto !px-12">
+          Learn More
+        </x-btn>
     </div>
 </div>
