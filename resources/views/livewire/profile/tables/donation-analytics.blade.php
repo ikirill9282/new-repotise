@@ -21,7 +21,7 @@
             </div>
           </div>
         </div>
-        <table class="table text-sm md:text-base">
+        <table class="table text-sm md:text-[15px]">
             <thead>
               <tr class="">
                 <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Donor Name</th>
