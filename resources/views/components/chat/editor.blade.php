@@ -8,6 +8,7 @@
   <div class="editor rotate-90 hover:cursor-pointer editor_btn transition
             text-gray hover:text-active
             {{ auth()->check() ? '' : 'open_auth' }}
+             {{ $attributes->get('baseClass') }}
             " 
         data-target="editor-{{ $target }}"
       >
@@ -17,7 +18,7 @@
       id="editor-{{ $target }}" 
       data-model="{{ $target }}"
       data-resource="{{ $resource }}"
-      class="editor-wrap absolute top-0 left-0 z-20 translate-x-[-100%] h-0 overflow-hidden transition select-none" 
+      class="editor-wrap absolute top-0 left-0 z-20 translate-x-[-100%] h-0 overflow-hidden transition select-none {{ $attributes->get('containerClass') }}" 
     >
       <div class="editor-buttons list flex flex-col items-stretch justify-center text-center gap-1 {{ $attributes->get('wrapClass') }}">
         

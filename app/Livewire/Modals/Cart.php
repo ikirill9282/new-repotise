@@ -10,6 +10,28 @@ use App\Services\Cart as CartService;
 
 class Cart extends Component
 {
+
+    public function incrementProductCount(int $product_id): void
+    {
+      $product = $this->order->products->where('id', $product_id)->first();
+      $product->pivot->update(['count' => ($product->pivot->count + 1)]);
+
+      $this->order->recalculate();
+      $this->updatePaymentIntent();
+    }
+
+    public function decrementProductCount(int $product_id): void
+    {
+      $product = $this->order->products->where('id', $product_id)->first();
+      if ($product->pivot->count > 1) {
+        $product->pivot->update(['count' => ($product->pivot->count - 1)]);
+
+        $this->order->recalculate();
+        $this->updatePaymentIntent();
+      }
+    }
+
+
     public function moveCheckout()
     {
       $cart = new CartService();

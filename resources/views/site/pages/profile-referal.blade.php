@@ -23,8 +23,8 @@
               </div>
             </div>
             <div class="actions">
-              <button class="main-btn">Withdraw Funds</button>
-              <button class="main-btn trans-btn">Add Funds</button>
+              <x-btn>Withdraw Funds</x-btn>
+              <x-btn outlined>Add Funds</x-btn>
             </div>
           </div>
           <div class="rp-top__info">
@@ -99,7 +99,8 @@
               </li>
 
             </ul>
-            <a href="{{ route('referal') }}">Learn more</a>
+
+            <x-link href="{{ route('referal') }}">Learn more</x-link>
 
           </div>
           <div class="col">
@@ -123,8 +124,8 @@
               </li>
 
             </ul>
-            <a href="{{ route('sellers') }}">Learn more</a>
 
+            <x-link href="{{ route('sellers') }}" class="mt-2">Learn more</x-link>
           </div>
         </div>
         <div class="rp-share__action">
@@ -140,32 +141,32 @@
           <div class="socials basis-1/2">
             <ul class="flex-wrap gap-3">
               <li class="!mr-0">
-                <a href="{{ $user->makeReferalUrl('FB') }}" target="_blank" class="transition !text-gray-700 hover:!text-blue-600">
+                <a href="{{ $user->makeReferalUrl('FB') }}" target="_blank" class="transition !text-second hover:!text-blue-600">
                   @include('icons.facebook')
                 </a>
               </li>
               <li class="!mr-0">
-                <a href="{{ $user->makeReferalUrl('PI') }}" class="transition !text-gray-700 hover:!text-rose-600" target="_blank">
+                <a href="{{ $user->makeReferalUrl('PI') }}" class="transition !text-second hover:!text-rose-600" target="_blank">
                   @include('icons.pinterest')
                 </a>
               </li>
               <li class="!mr-0">
-                <a href="{{ $user->makeReferalUrl('TW') }}" target="_blank" class="transition !text-gray-700 hover:!text-gray-900">
+                <a href="{{ $user->makeReferalUrl('TW') }}" target="_blank" class="transition !text-second hover:!text-gray-900">
                   @include('icons.twitter')
                 </a>
               </li>
               <li class="!mr-0">
-                <a href="{{ $user->makeReferalUrl('GM') }}" class="transition !text-gray-700 hover:!text-orange-600" target="_blank">
+                <a href="{{ $user->makeReferalUrl('GM') }}" class="transition !text-second hover:!text-orange-600" target="_blank">
                   @include('icons.mail')
                 </a>
               </li>
               <li class="!mr-0">
-                <a href="{{ $user->makeReferalUrl('WA') }}" class="transition !text-gray-700 hover:!text-emerald-600" target="_blank">
+                <a href="{{ $user->makeReferalUrl('WA') }}" class="transition !text-second hover:!text-emerald-600" target="_blank">
                   @include('icons.whatsapp')
                 </a>
               </li>
               <li class="!mr-0">
-                <a href="{{ $user->makeReferalUrl('TG') }}" class="transition !text-gray-700 hover:!text-sky-600" target="_blank">
+                <a href="{{ $user->makeReferalUrl('TG') }}" class="transition !text-second hover:!text-sky-600" target="_blank">
                   @include('icons.telegram')
                 </a>
               </li>

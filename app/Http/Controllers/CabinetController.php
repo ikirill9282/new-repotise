@@ -155,6 +155,11 @@ class CabinetController extends Controller
 
   public function profile(Request $request)
   {
+    $user = Auth::user();
+    if (!$user->hasRole('creator')) {
+      return redirect()->route('profile.purchases');
+    }
+
     return view('site.pages.profile', [
       'user' => Auth::user(),
     ]);

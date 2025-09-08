@@ -803,6 +803,38 @@ const CopyToClipboard = function() {
   }
 }
 
+const CartCounter = function() {
+  this.buttons = [];
+
+  this.discover = () => {
+    document.querySelectorAll(".counter").forEach((counter) => {
+        if (!this.buttons.includes(counter)) {
+          const minusBtn = counter.querySelector(".minus");
+          const plusBtn = counter.querySelector(".plus");
+          const countEl = counter.querySelector(".count");
+
+          let count = parseInt(countEl.textContent);
+
+          plusBtn.addEventListener("click", function () {
+              count++;
+              countEl.textContent = count;
+              counterChanged(this.closest(".counter"), count);
+          });
+
+          minusBtn.addEventListener("click", function () {
+              if (count > 1) {
+                  count--;
+                  countEl.textContent = count;
+                  counterChanged(this.closest(".counter"), count);
+              }
+          });
+
+          this.buttons.push(counter);
+        }
+    });
+  }
+}
+
 const header = $('header');
 const headerHeight = header.outerHeight();
 
@@ -820,6 +852,7 @@ window.EditorButtons = new EditorButtons();
 window.AuthButtons = new AuthButtons();
 window.EmojiButtons = new EmojiButtons();
 window.CopyToClipboard = new CopyToClipboard();
+window.CartCounter = new CartCounter();
 
 $(document).ready(function() {
   window.FavoriteButtons.discover('body');
@@ -835,6 +868,7 @@ $(document).ready(function() {
   window.EditorButtons.discover();
   window.AuthButtons.discover();
   window.CopyToClipboard.discover();
+  window.CartCounter.discover();
   
   setTimeout(() => window.EmojiButtons.discover(), 100);
 });

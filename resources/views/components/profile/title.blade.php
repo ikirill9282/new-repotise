@@ -1,0 +1,1 @@
+<div class="font-bold text-2xl mr-4">{{ $slot }}</div>

@@ -24,9 +24,9 @@
             'profile.settings' => ['url' => route('profile.settings'), 'icon' => 'cog', 'label' => 'Account Settings'],
         ]
         : [
-            'profile.purchases' => ['url' => route('profile.purchases'), 'icon' => null, 'label' => 'My Purchases'],
-            'profile.referal' => ['url' => route('profile.referal'), 'icon' => null, 'label' => 'Referal Program'],
-            'profile.settings' => ['url' => route('profile.settings'), 'icon' => null, 'label' => 'Account Settings'],
+            'profile.purchases' => ['url' => route('profile.purchases'), 'icon' => 'bag', 'label' => 'My Purchases'],
+            'profile.referal' => ['url' => route('profile.referal'), 'icon' => 'gift', 'label' => 'Referal Program'],
+            'profile.settings' => ['url' => route('profile.settings'), 'icon' => 'cog', 'label' => 'Account Settings'],
         ];
 @endphp
 
@@ -47,10 +47,13 @@
                         </button>
                     </div>
                     <div id="collapseOne" class="accordion-collapse collapse show the-profile__wrap">
-                        <div class="profile-menu-list pt-3">
+                        <div class="profile-menu-list pt-3 w-full flex flex-wrap lg:flex-col gap-1">
                             @foreach ($routes as $name => $route)
-                                <a class="{{ request()->route()->getName() === $name ? 'active' : '' }}"
-                                    href="{{ $route['url'] }}">
+                                <a class=" lg:w-full
+                                    {{ request()->route()->getName() === $name ? 'active' : '' }}
+                                    "
+                                    href="{{ $route['url'] }}"
+                                  >
                                     @includeIf('icons.' . $route['icon'])
                                     {{ $route['label'] }}
                                 </a>

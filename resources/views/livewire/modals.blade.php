@@ -22,6 +22,7 @@
                     window.history.replaceState({}, document.title, url.toString());
                     setTimeout(() => {
                       initCartSlider();
+                      window.CartCounter.discover();
                     }, 10);
                 });"
         >
@@ -55,3 +56,13 @@
         </div>
     </div>
 </div>
+
+
+@script()
+  <script>
+    Livewire.hook('morphed', function() {
+      console.log('morphed');
+      
+    })
+  </script>
+@endscript

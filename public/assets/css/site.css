@@ -18,6 +18,14 @@
     }
 }
 
+
+.accordion-button::after {
+  background-image: url(../img/accardion_arrow.svg);
+}
+.accordion-button:not(.collapsed)::after {
+    background-image: url(../img/accardion_arrow1.svg);
+}
+
 .emojiPickerIconWrap {
   line-height: 0;
 }
@@ -2090,11 +2098,12 @@ header .search_group input[name="q"]::placeholder {
   min-width: auto !important;
 }
 
-.accordion-button::after {
+.profile-wrap .accordion-button::after {
   font-size: 14px;
   background-image: url(../img/accardion_arrow2.svg) !important;
   rotate: 180deg;
 }
+
 
 .card_monthly {
   display: -ms-grid !important;

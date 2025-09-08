@@ -12,9 +12,7 @@
               global audience. It's simple, profitable, and built for creators
               like you.
             </p>
-            <x-btn 
-              {{-- class="{{ auth()->check() ? '' : 'open_auth' }}"  --}}
-              {{-- href="{{ auth()->check() ? route('profile') : '#' }}" --}}
+            <x-btn
               x-on:click.prevent="Livewire.dispatch('modal.openReg')"
             >
               Get Started
@@ -32,8 +30,8 @@
               Estimate Only. Your actual income will depend on your sales.
             </h2>
           </div>
-          <div class="invite-launch__items">
-            <div class="item">
+          <div class="invite-launch__items !grid !grid-cols-1 lg:!grid-cols-3 gap-3 !m-0">
+            <div class="item !m-0 !w-full">
               <div class="num">
                 <span>1</span>
               </div>
@@ -43,13 +41,15 @@
                   Create your seller account in minutes and get instantly
                   verified.
                 </p>
-                <a 
+                <x-link
                   class="{{ auth()->check() ? '' : 'open_auth' }}" 
                   href="{{ auth()->check() ? route('profile') : '#' }}"
-                > Sign Up </a>
+                >
+                  Sign Up
+                </x-link>
               </div>
             </div>
-            <div class="item">
+            <div class="item !m-0 !w-full">
               <div class="num">
                 <span>2</span>
               </div>
@@ -59,13 +59,13 @@
                   Upload your content, set your prices, discounts, and
                   customize your listings.
                 </p>
-                <a
+                <x-link
                   class="{{ auth()->check() ? '' : 'open_auth' }}" 
                   href="{{ auth()->check() ? route('profile') : '#' }}"
-                > Upload Products </a>
+                > Upload Products </x-link>
               </div>
             </div>
-            <div class="item">
+            <div class="item !m-0 !w-full">
               <div class="num">
                 <span>3</span>
               </div>
@@ -76,10 +76,10 @@
                   brand with your Creator Page.
                 </p>
                 
-                <a 
+                <x-link 
                   class="{{ auth()->check() ? '' : 'open_auth' }}" 
                   href="{{ auth()->check() ? route('profile') : '#' }}"
-                > Start Earning </a>
+                > Start Earning </x-link>
               </div>
             </div>
           </div>
@@ -230,7 +230,7 @@
                     d="M8.92021 0.98092L10.4431 4.02321C10.5923 4.32188 10.8804 4.52898 11.2145 4.5769L14.6211 5.06726C15.4628 5.18878 15.7977 6.20887 15.1886 6.79337L12.7252 9.16045C12.4831 9.39322 12.3729 9.72783 12.4301 10.0564L13.0115 13.3983C13.1547 14.2249 12.2748 14.8557 11.5225 14.4646L8.47768 12.8857C8.17918 12.7308 7.82168 12.7308 7.52232 12.8857L4.4775 14.4646C3.72519 14.8557 2.84533 14.2249 2.98937 13.3983L3.56987 10.0564C3.62714 9.72783 3.51694 9.39322 3.27485 9.16045L0.8114 6.79337C0.202263 6.20887 0.537201 5.18878 1.37889 5.06726L4.78554 4.5769C5.11961 4.52898 5.40856 4.32188 5.55781 4.02321L7.07979 0.98092C7.45638 0.228691 8.54362 0.228691 8.92021 0.98092Z"
                     fill="#FFDB0C" stroke="#FFDB0C" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <h2>Level 1: Beginner</h2>
+                <h2 class="!text-2xl">Level 1: Beginner</h2>
               </div>
               <div class="text">
                 <p>Commission: 10%</p>
@@ -259,7 +259,7 @@
                   </defs>
                 </svg>
 
-                <h2>Level 2: Growth</h2>
+                <h2 class="!text-2xl">Level 2: Growth</h2>
               </div>
               <div class="text">
                 <p>Commission: 8%</p>
@@ -277,7 +277,7 @@
                     fill="#FC7361" />
                 </svg>
 
-                <h2>Level 3: Pro</h2>
+                <h2 class="!text-2xl">Level 3: Pro</h2>
                 <span class="subtitle">New Seller Bonus for 30 Days!</span>
               </div>
               <div class="text">
@@ -304,7 +304,7 @@
                   </defs>
                 </svg>
 
-                <h2>Level 4: Exclusive</h2>
+                <h2 class="!text-2xl">Level 4: Exclusive</h2>
               </div>
               <div class="text">
                 <p>Contact Us for Exclusive Commission</p>
@@ -312,7 +312,7 @@
                   <li>Best Rates for Top Sellers</li>
                   <li>Unlimited</li>
                 </ul>
-                <a href="#"> Contact Us </a>
+                <x-link>Contact us</x-link>
               </div>
             </div>
           </div>
@@ -341,116 +341,514 @@
       <section class="faq" id="faq">
         <div class="container decor-container">
           <div class="faq__title">
-            <h2 class="section-title">Frequently Asked Questions</h2>
+            <h2 class="section-title !text-3xl !mb-8">Frequently Asked Questions</h2>
           </div>
-          <div class="faq__items">
-            <p class="faq-subtitle">Getting Started</p>
-            <div class="faq__item">
-              <button>Who can become a seller on TrekGuider?</button>
-              <div class="faq__text">
-                <p>
-                  Anyone who creates travel content and is 18 years of age or
-                  older can become a seller on TrekGuider, regardless of
-                  citizenship or country of residence. We welcome both U.S.
-                  residents and non-U.S. residents, as well as creators from
-                  most countries worldwide. The only exceptions are regions
-                  currently under international sanctions. For detailed
-                  registration requirements and a list of excluded regions,
-                  please refer to our [link to Terms and Conditions] Terms and
-                  Conditions.
-                </p>
+          <div class="accordion faq__items" id="accordion">
+            <div class="!mb-10">
+              <p class="faq-subtitle !text-2xl font-bold !mb-2">Getting Started</p>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-1"
+                    aria-controls="collapse-1"
+                    aria-expanded="true"
+                  >
+                    Who can become a seller on TrekGuider?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-1" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-2"
+                    aria-controls="collapse-2"
+                    aria-expanded="true"
+                  >
+                    How do I get verified on TrekGuider?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-2" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
               </div>
             </div>
-            <p class="faq-subtitle">Selling Your Content</p>
-            <div class="faq__item">
-              <button>What kind of content can I sell on TrekGuider?</button>
-              <div class="faq__text">
-                <p>
-                  Anyone who creates travel content and is 18 years of age or
-                  older can become a seller on TrekGuider, regardless of
-                  citizenship or country of residence. We welcome both U.S.
-                  residents and non-U.S. residents, as well as creators from
-                  most countries worldwide. The only exceptions are regions
-                  currently under international sanctions. For detailed
-                  registration requirements and a list of excluded regions,
-                  please refer to our [link to Terms and Conditions] Terms and
-                  Conditions.
-                </p>
+
+            <div class="!mb-10">
+              <p class="faq-subtitle !text-2xl font-bold !mb-2">Selling Your Content</p>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-3"
+                    aria-controls="collapse-3"
+                    aria-expanded="true"
+                  >
+                    What kind of content can I sell on TrekGuider?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-3" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-4"
+                    aria-controls="collapse-4"
+                    aria-expanded="true"
+                  >
+                    How does TrekGuider protect my content and copyrights?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-4" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-5"
+                    aria-controls="collapse-5"
+                    aria-expanded="true"
+                  >
+                    How do refunds work on TrekGuider, and how can I manage them?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-5" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
               </div>
             </div>
-            <div class="faq__item">
-              <button>
-                How does TrekGuider protect my content and copyrights?
-              </button>
-              <div class="faq__text">
-                <p>
-                  Anyone who creates travel content and is 18 years of age or
-                  older can become a seller on TrekGuider, regardless of
-                  citizenship or country of residence. We welcome both U.S.
-                  residents and non-U.S. residents, as well as creators from
-                  most countries worldwide. The only exceptions are regions
-                  currently under international sanctions. For detailed
-                  registration requirements and a list of excluded regions,
-                  please refer to our [link to Terms and Conditions] Terms and
-                  Conditions.
-                </p>
+
+            <div class="!mb-10">
+              <p class="faq-subtitle !text-2xl font-bold !mb-2">Your Creator Page & Features</p>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-6"
+                    aria-controls="collapse-6"
+                    aria-expanded="true"
+                  >
+                    What is a TrekGuider Creator Page and why do I need one?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-6"
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-7"
+                    aria-controls="collapse-7"
+                    aria-expanded="true"
+                  >
+                    How do I accept tips (donations) from fans on my Creator Page?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-7" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
               </div>
             </div>
-            <div class="faq__item">
-              <button>
-                How do refunds work on TrekGuider, and how can I manage them?
-              </button>
-              <div class="faq__text">
-                <p>
-                  Anyone who creates travel content and is 18 years of age or
-                  older can become a seller on TrekGuider, regardless of
-                  citizenship or country of residence. We welcome both U.S.
-                  residents and non-U.S. residents, as well as creators from
-                  most countries worldwide. The only exceptions are regions
-                  currently under international sanctions. For detailed
-                  registration requirements and a list of excluded regions,
-                  please refer to our [link to Terms and Conditions] Terms and
-                  Conditions.
-                </p>
+
+            <div class="!mb-10">
+              <p class="faq-subtitle !text-2xl font-bold !mb-2">Earnings, Payouts & Fees</p>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-8"
+                    aria-controls="collapse-8"
+                    aria-expanded="true"
+                  >
+                    How much can I earn on TrekGuider?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-8"
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-9"
+                    aria-controls="collapse-9"
+                    aria-expanded="true"
+                  >
+                    In which countries can I sell and accept payments on TrekGuider?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-9" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-10"
+                    aria-controls="collapse-10"
+                    aria-expanded="true"
+                  >
+                    How quickly and easily can I withdraw my earnings from TrekGuider?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-10" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-11"
+                    aria-controls="collapse-11"
+                    aria-expanded="true"
+                  >
+                    What fees and commissions does TrekGuider charge?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-11" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-13"
+                    aria-controls="collapse-13"
+                    aria-expanded="true"
+                  >
+                    How can I reduce my TrekGuider platform commission?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-13"
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
               </div>
             </div>
-            <p class="faq__subtitle">Your Creator Page & Features</p>
-            <div class="faq__item">
-              <button>
-                What is a TrekGuider Creator Page and why do I need one?
-              </button>
-              <div class="faq__text">
-                <p>
-                  Anyone who creates travel content and is 18 years of age or
-                  older can become a seller on TrekGuider, regardless of
-                  citizenship or country of residence. We welcome both U.S.
-                  residents and non-U.S. residents, as well as creators from
-                  most countries worldwide. The only exceptions are regions
-                  currently under international sanctions. For detailed
-                  registration requirements and a list of excluded regions,
-                  please refer to our [link to Terms and Conditions] Terms and
-                  Conditions.
-                </p>
+
+            <div class="!mb-10">
+              <p class="faq-subtitle !text-2xl font-bold !mb-2">Legal & Support</p>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-14"
+                    aria-controls="collapse-14"
+                    aria-expanded="true"
+                  >
+                    Who is responsible for licenses, taxes, and legal permits?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-14" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-15"
+                    aria-controls="collapse-15"
+                    aria-expanded="true"
+                  >
+                    Does TrekGuider provide tax forms and reporting for sellers?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-15" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
+              </div>
+              <div class="accordion-item !border-t-0 !border-x-0 border-b-1 !rounded-none group has-[.show]:!border-active">
+                <div class="accordion-header">
+                  <button 
+                    class="accordion-button collapsed !px-0 !text-lg
+                          !shadow-none !bg-inherit !text-gray group-has-[.show]:!text-dark
+                          "
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-16"
+                    aria-controls="collapse-16"
+                    aria-expanded="true"
+                  >
+                    How do I get help and support from TrekGuider?
+                  </button>
+                </div>
+                <div 
+                  id="collapse-16" 
+                  class="accordion-collapse collapse pb-3 
+                        !text-gray group-has-[.show]:!text-dark
+                        " 
+                  data-bs-parent="#accordion"
+                >
+                  <p>
+                    Anyone who creates travel content and is 18 years of age or
+                    older can become a seller on TrekGuider, regardless of
+                    citizenship or country of residence. We welcome both U.S.
+                    residents and non-U.S. residents, as well as creators from
+                    most countries worldwide. The only exceptions are regions
+                    currently under international sanctions. For detailed
+                    registration requirements and a list of excluded regions,
+                    please refer to our [link to Terms and Conditions] Terms and
+                    Conditions.
+                  </p>
+                </div>
               </div>
             </div>
-            <div class="faq__item">
-              <button>
-                How do I accept tips (donations) from fans on my Creator Page?
-              </button>
-              <div class="faq__text">
-                <p>
-                  Anyone who creates travel content and is 18 years of age or
-                  older can become a seller on TrekGuider, regardless of
-                  citizenship or country of residence. We welcome both U.S.
-                  residents and non-U.S. residents, as well as creators from
-                  most countries worldwide. The only exceptions are regions
-                  currently under international sanctions. For detailed
-                  registration requirements and a list of excluded regions,
-                  please refer to our [link to Terms and Conditions] Terms and
-                  Conditions.
-                </p>
-              </div>
-            </div>
+
           </div>
         </div>
       </section>
