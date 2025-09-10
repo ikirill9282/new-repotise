@@ -1,7 +1,11 @@
 @props([
   'name' => null,
   'label' => null,
-  'options' => [],
+  'options' => [
+    10 => '10 Days',
+    20 => '20 Days',
+    30 => '30 Days',
+  ],
 ])
 
 <div 
@@ -20,9 +24,9 @@
         dropdown.style.height = `${height}px`;
       }
     },
-    setVal(val) {
+    setVal(val, label = null) {
       this.value = val;
-      this.label = `${val} days`;
+      this.label = label ? label : '';
       this.toggle();
       this.$refs.placeholder.classList.add('!text-black')
     }
@@ -40,7 +44,9 @@
             "
       >
       <span x-html="label">{{ $label }}</span>
-      <span class="transition group-has-[.opened]:rotate-180">@include('icons.arrow_down', ['width' => 18, 'height' => 18])</span>
+      <span class="transition group-has-[.opened]:rotate-180">
+        @include('icons.arrow_down', ['width' => 18, 'height' => 18])
+      </span>
       <x-tooltip message="tooltip" class=""></x-tooltip>
     </div>
   </div>
@@ -52,9 +58,9 @@
           "
         >
       <div x-ref="dropdownContent" class="flex flex-col text-gray">
-        <div x-on:click="setVal(10)" class="px-4 py-2 hover:cursor-pointer hover:text-black">10 days</div>
-        <div x-on:click="setVal(20)" class="px-4 py-2 hover:cursor-pointer hover:text-black">30 days</div>
-        <div x-on:click="setVal(30)" class="px-4 py-2 hover:cursor-pointer hover:text-black">90 days</div>
+        @foreach($options as $val => $label)
+          <div x-on:click="setVal('{{$val}}', '{{ $label }}')" class="px-4 py-2 hover:cursor-pointer hover:text-black">{{ $label }}</div>
+        @endforeach
       </div>
     </div>
   </div>

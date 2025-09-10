@@ -56,7 +56,32 @@ class Modals extends Component
         $this->modal = false;
     }
 
-    
+    public function modalHasLogo()
+    {
+      $arr = [
+        'cart', 
+        'levels', 
+        'product', 
+        'refund',
+        'refund-accept',
+        'cancelsub',
+        'cancelsub-accept',
+      ];
+      return !in_array($this->modal, $arr);
+    }    
+
+    public function modalMaxWidth()
+    {
+      if (in_array($this->modal, ['cart', 'levels'])) return '!max-w-none';
+
+      if (in_array($this->modal, ['product'])) return '!max-w-4xl';
+
+      if (in_array($this->modal, ['refund', 'cancelsub'])) return '!max-w-2xl';
+
+      if (in_array($this->modal, ['refund-accept', 'cancelsub-accept'])) return '!max-w-2xl';
+
+      return '';
+    }    
 
     public function render()
     {

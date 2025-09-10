@@ -90,6 +90,7 @@
                         @if ($can_write || $type == 'comment')
                           <div class="block sm:hidden text-left mb-2">{{ auth()->user()->profile }}</div>
                         @endif
+                        
                         <div class="w-full flex justify-start items-start gap-2 sm:gap-3">
                             <div
                                 class="relative grow flex items-center justify-start gap-2 sm:gap-3 bg-light rounded-lg !pl-3 py-3 sm:!ps-3 !pe-20 sm:!pe-2">

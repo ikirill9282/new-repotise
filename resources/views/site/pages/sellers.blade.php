@@ -330,9 +330,9 @@
               </p>
             </div>
             <div class="action">
-              <a data-goto href="#faq" class="white-btn">
+              <x-btn data-goto href="#faq" class="hover:!text-light hover:!border-second" outlined>
                 Detailed Fee Information in FAQ.
-              </a>
+              </x-btn>
             </div>
           </div>
         </div>

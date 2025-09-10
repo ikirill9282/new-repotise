@@ -2,18 +2,22 @@
 
 @section('content')
   <x-profile.wrap>
-    <div class="the-content__content">
-      <div class="rp-top">
+    <div class="the-content__content profile-referal-page">
+      <x-card class="rp-top">
+        {{-- TITLE --}}
         <div class="rp-top__title">
           <h2>
             Referral Program
           </h2>
           <img src="{{ asset('assets/img/gift.png') }}" alt="Gift">
         </div>
-        <div class="rp-top__body">
-          <div class="rp-top__balance">
+
+        <div class="rp-top__body !gap-6 lg:!gap-3 xl:!gap-6 justify-between items-end flex-col lg:flex-row">
+          
+          {{-- BALANCE --}}
+          <div class="rp-top__balance !w-auto grow lg:max-w-lg">
             <div class="balance-input">
-              <span>
+              <span class="inline-block !mb-2">
                 Referral Balance
               </span>
               <div class="balance-input__input">
@@ -22,13 +26,15 @@
                 </span>
               </div>
             </div>
-            <div class="actions">
-              <x-btn>Withdraw Funds</x-btn>
-              <x-btn outlined>Add Funds</x-btn>
+            <div class="actions !gap-2">
+              <x-btn class="!text-sm sm:!text-base referal-btn">Withdraw Funds</x-btn>
+              <x-btn class="!text-sm sm:!text-base referal-btn" outlined>Add Funds</x-btn>
             </div>
           </div>
-          <div class="rp-top__info">
-            <div class="col">
+
+          {{-- REWARDS --}}
+          <div class="rp-top__info flex-col sm:flex-row !w-auto !gap-0 sm:!gap-12 lg:!gap-0">
+            <div class="col !grow-0 lg:!grow">
               <p>
                 <span>Referred Users:</span>
                 <b>{{ $user->referals()->count() }}</b>
@@ -46,7 +52,7 @@
                 <b>{{ currency($user->referal_income()->sum('sum')) }}</b>
               </p>
             </div>
-            <div class="col">
+            <div class="col !grow-0 lg:!grow">
               <div class="progresss">
                 <span>
                   Next Free Product Reward Progress:
@@ -66,9 +72,12 @@
             </div>
           </div>
         </div>
-      </div>
+      </x-card>
 
-      <div class="rp-share">
+      {{-- REFERAL TEXT --}}
+      <div class="rp-share mb-10">
+
+        {{-- HEADING --}}
         <div class="rp-share__title">
           <h2>
             Earn Rewards by Sharing!
@@ -77,8 +86,10 @@
             Share your link and start earning fantastic rewards! Here's how it works:
           </p>
         </div>
-        <div class="rp-share__cols">
-          <div class="col">
+
+        {{-- CONTENT --}}
+        <div class="rp-share__cols !flex-col !gap-4 md:!flex-row w-full">
+          <div class="col !p-0 !flex-auto !w-full !border-0">
             <h3>
               Earn Rewards by Sharing!
             </h3>
@@ -100,10 +111,12 @@
 
             </ul>
 
-            <x-link href="{{ route('referal') }}">Learn more</x-link>
+            <x-link href="{{ route('referal') }}" class="mt-2">Learn more</x-link>
 
           </div>
-          <div class="col">
+          <div class="w-[1px] bg-gray md:!mx-2"></div>
+
+          <div class="col !p-0 !flex-auto !w-full !border-0 ">
             <h3>
               Refer Sellers & Earn 25% Commission Share!
             </h3>
@@ -128,6 +141,8 @@
             <x-link href="{{ route('sellers') }}" class="mt-2">Learn more</x-link>
           </div>
         </div>
+
+        {{-- SOCIAL --}}
         <div class="rp-share__action">
           <div class="link basis-1/2">
             <span>
@@ -139,35 +154,35 @@
             </div>
           </div>
           <div class="socials basis-1/2">
-            <ul class="flex-wrap gap-3">
-              <li class="!mr-0">
+            <ul class="flex-wrap justify-between max-w-sm">
+              <li class="!mr-0 max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('FB') }}" target="_blank" class="transition !text-second hover:!text-blue-600">
-                  @include('icons.facebook')
+                  @include('icons.facebook', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0">
+              <li class="!mr-0 max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('PI') }}" class="transition !text-second hover:!text-rose-600" target="_blank">
-                  @include('icons.pinterest')
+                  @include('icons.pinterest', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0">
+              <li class="!mr-0 max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('TW') }}" target="_blank" class="transition !text-second hover:!text-gray-900">
-                  @include('icons.twitter')
+                  @include('icons.twitter', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0">
+              <li class="!mr-0 max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('GM') }}" class="transition !text-second hover:!text-orange-600" target="_blank">
-                  @include('icons.mail')
+                  @include('icons.mail', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0">
+              <li class="!mr-0 max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('WA') }}" class="transition !text-second hover:!text-emerald-600" target="_blank">
-                  @include('icons.whatsapp')
+                  @include('icons.whatsapp', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0">
+              <li class="!mr-0 max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('TG') }}" class="transition !text-second hover:!text-sky-600" target="_blank">
-                  @include('icons.telegram')
+                  @include('icons.telegram', ['class' => 'max-w-full'])
                 </a>
               </li>
             </ul>
@@ -175,34 +190,8 @@
         </div>
       </div>
 
-
-      <div class="rp-table">
-        <div class="rp-table__head">
-          <div class="head-user">
-            Referred User
-          </div>
-          <div class="head-reff">
-            Referral Date
-          </div>
-          <div class="head-type">
-            Referral Type
-          </div>
-          <div class="head-status">
-            Status
-          </div>
-          <div class="head-promo">
-            Promo Codes
-          </div>
-          <div class="head-comm">
-            Commission Earned
-          </div>
-        </div>
-        <div class="rp-table__empty">
-          <p>
-            No referrals to display yet. Start sharing your referral link!
-          </p>
-        </div>
-      </div>
+      {{-- TABLE --}}
+      @livewire('profile.tables.profile-referal')
     </div>
   </x-profile.wrap>    
 @endsection

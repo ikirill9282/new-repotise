@@ -1,44 +1,5 @@
 @props(['message' => '', 'class' => ''])
 
-@push('css')
-<style>
-  .tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-  }
-  .tooltip .tooltip-text {
-    visibility: hidden;
-    width: max-content;
-    max-width: 200px;
-    color: #fff;
-    text-align: center;
-    padding: 6px 8px;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .tooltip .tooltip-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-  }
-  .tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-  }
-</style>
-@endpush
-
 <div class="tooltip !absolute top-[50%] right-0 translate-y-[-50%] z-20 !opacity-100 {{ $class }}">
   @if(!$slot->isEmpty())
     {{ $slot }}

@@ -49,7 +49,7 @@
     @endphp
 </head>
 
-<body>
+<body class="text-dark">
       @stack('before_header')
       
       @include('site.header')

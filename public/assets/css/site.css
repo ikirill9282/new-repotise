@@ -3208,4 +3208,19 @@ header .search_group input[name="q"]::placeholder {
     .products_modal .items_group .item .order_img {
       width: 100%;
     }
+
+    .product-popup-images__item {
+      flex-direction: column-reverse !important;
+      padding-right: 8px;
+      gap: .75rem !important;
+    }
+
+    .product-popup-images__button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .profile-referal-page .referal-btn {
+      padding: 11.5px 10px;
+    }
 }

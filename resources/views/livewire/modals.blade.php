@@ -23,6 +23,7 @@
                     setTimeout(() => {
                       initCartSlider();
                       window.CartCounter.discover();
+                      window.CopyToClipboard.discover();
                     }, 10);
                 });"
         >
@@ -32,7 +33,8 @@
                   class="popUp__edit-contact popUp !gap-[10px] sm:!gap-[20px] lg:!gap-[30px] mx-auto
                   {{ $isVisible ? 'modal-slide-in' : 'modal-slide-out' }}
                   overflow-hidden
-                  {{ ($this->modal == 'cart' || $this->modal == 'levels') ? '!max-w-none' : '' }}
+                  {{ $this->modalMaxWidth() }}
+                  @yield('maxWidth', '')
                   "
                 >
                     <div wire:click.prevent="closeModal" class="popUp__cross w-5 h-5">
@@ -42,7 +44,7 @@
                             </path>
                         </svg>
                     </div>
-                    @if(!in_array($this->modal, ['cart', 'levels']))
+                    @if($this->modalHasLogo())
                       <div class="logo text-center">
                           <a href="{{ route('home') }}"><img class="inline-block w-25 sm:!max-w-none"
                                   src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>

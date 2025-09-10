@@ -786,15 +786,19 @@ const AuthButtons = function() {
 
 const CopyToClipboard = function() {
   this.buttons = [];
-
+  
   this.discover = () => {
+    
     $('.copyToClipboard').each((k, el) => {
+      
       if (!this.buttons.includes(el)) {
         $(el).on('click', function(evt) {
+          
           evt.preventDefault();
           const target = $(`[data-copyId='${$(this).data('target')}']`);
+          
           if (target) {
-            copyTextToClipboard(target.val())
+            copyTextToClipboard(target.val() || target.text())
           }
         });
         this.buttons.push(el);
@@ -869,6 +873,7 @@ $(document).ready(function() {
   window.AuthButtons.discover();
   window.CopyToClipboard.discover();
   window.CartCounter.discover();
+  
   
   setTimeout(() => window.EmojiButtons.discover(), 100);
 });

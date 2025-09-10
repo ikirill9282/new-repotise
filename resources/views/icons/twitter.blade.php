@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="{{ $width ?? 50 }}px" height="{{ $height ?? 51 }}px" viewBox="0 0 50 51" fill="none">
+<svg class="{{ $class ?? '' }}" xmlns="http://www.w3.org/2000/svg" width="{{ $width ?? 50 }}px" height="{{ $height ?? 51 }}px" viewBox="0 0 50 51" fill="none">
     <g class="">
         <path
             d="M49.9965 25.0074C49.9965 37.6372 40.6373 48.0786 28.4788 49.7729C27.342 49.9306 26.1789 50.013 24.9982 50.013C23.6354 50.013 22.2972 49.9044 20.9939 49.6941C9.09123 47.7772 0 37.4532 0 25.0074C0 11.1965 11.1932 0 25 0C38.8068 0 50 11.1965 50 25.0074H49.9965Z"
