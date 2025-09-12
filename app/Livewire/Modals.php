@@ -66,6 +66,20 @@ class Modals extends Component
         'refund-accept',
         'cancelsub',
         'cancelsub-accept',
+        'funds',
+        'funds-success',
+        'funds-error',
+        'withdraw',
+        'withdraw-accept',
+        'change-email',
+        'change-email-accept',
+        'twofa',
+        'twofa-accept',
+        'twofa-disable',
+        'twofa-disable-accept',
+        'payout-method',
+        'delete-account',
+        'delete-account-accept',
       ];
       return !in_array($this->modal, $arr);
     }    
@@ -74,11 +88,30 @@ class Modals extends Component
     {
       if (in_array($this->modal, ['cart', 'levels'])) return '!max-w-none';
 
-      if (in_array($this->modal, ['product'])) return '!max-w-4xl';
+      if (in_array($this->modal, ['product', 'twofa'])) return '!max-w-4xl';
 
-      if (in_array($this->modal, ['refund', 'cancelsub'])) return '!max-w-2xl';
+      if (in_array($this->modal, ['delete-account'])) return '!max-w-3xl';
 
-      if (in_array($this->modal, ['refund-accept', 'cancelsub-accept'])) return '!max-w-2xl';
+      if (in_array($this->modal, [
+        'refund',
+        'cancelsub',
+        'withdraw',
+        'twofa-accept',
+        'twofa-disable-accept',
+        'delete-account-accept',
+      ])) return '!max-w-2xl';
+
+      if (in_array($this->modal, [
+        'refund-accept',
+        'cancelsub-accept',
+        'withdraw-accept',
+        'change-email',
+        'change-email-accept',
+        'twofa-disable',
+        'delete-account',
+      ])) return '!max-w-2xl';
+      
+      if (in_array($this->modal, ['funds'])) return '!max-w-xl';
 
       return '';
     }    

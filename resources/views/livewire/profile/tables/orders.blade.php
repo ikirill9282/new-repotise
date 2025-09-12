@@ -6,42 +6,47 @@
 
 
     <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
-      
-      <table class="table !mb-0">
+      <table class="table !mb-0 ">
         <thead>
           <tr class="">
-            <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Date</th>
-            <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Order</th>
-            <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Product</th>
-            <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Actions</th>
-            <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Price</th>
+            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Date</th>
+            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Order</th>
+            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Product</th>
+            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Actions</th>
+            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Price</th>
           </tr>
         </thead>
         <tbody>
           @for($i = 0; $i < 10; $i++)
-            <tr>
-              <td class="!text-gray">05.28.2025</td>
-              <td class="!text-gray">#123454567</td>
-              <td class="!border-b-gray/15 !text-gray">
-                <div class="flex justify-start items-start gap-3 group">
-                  <div class="w-20 h-24 rounded overflow-hidden">
+            <tr class="">
+              <td class="bg-clip-content !px-0 !text-gray !border-light !rounded-tl-2xl !rounded-bl-2xl">
+                <div class="!p-3 rounded-tl-lg rounded-bl-lg ">05.28.2025</div>
+              </td>
+              <td class="bg-clip-content !px-0 !text-gray !border-light">
+                <div class="!p-3 ">#123454567</div>
+              </td>
+              <td class="bg-clip-content !px-0 !text-gray !border-light">
+                <div class="!p-3 flex justify-start items-start gap-3 group ">
+                  <div class="w-20 h-24 rounded overflow-hidden shrink-0">
                     <img class="w-full h-full object-cover" src="http://localhost:9990/storage/images/product_2.jpg" alt="Image">
                   </div>
-                  <x-link class="!border-0 group-has-[a]:!text-black">A Guide to Getting to Know North Korea</x-link>
+                  <x-link class="!border-0 group-has-[a]:!text-black text-nowrap">A Guide to Getting to Know North Korea</x-link>
                 </div>
               </td>
-              <td class="!border-b-gray/15 text-nowrap">
-                <div class="flex items-start justify-start gap-4 group">
+              <td class="bg-clip-content !px-0 text-nowrap !border-light">
+                <div class="!p-3 flex items-start justify-start gap-4 group ">
                   <div class="flex">
-                    <x-link class="group-has-[a]:!text-active">View & Download</x-link>
+                    <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'product' })">View & Download</x-link>
                   </div>
                   <div class="flex flex-col items-start justify-start gap-2">
-                    <x-link class="group-has-[a]:hover:!text-black">Leave Review</x-link>
-                    <x-link class="group-has-[a]:hover:!text-black">Refund</x-link>
+                    <x-link class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Leave Review</x-link>
+                    <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'refund' })" class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Refund</x-link>
                   </div>
                 </div>
               </td>
-              <td class="!border-b-gray/15 !py-4">$50.00</td>
+              <td class="bg-clip-content !px-0 !border-light !rounded-tr-2xl !rounded-br-2xl">
+                <div class="!p-3 ">$50.00</div>
+              </td>
             </tr>
           @endfor
         </tbody>

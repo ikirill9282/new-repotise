@@ -10,7 +10,13 @@
           <p>
             Your influence is your asset. Turn your network into net worth. Share your unique link now and watch your rewards multiply! Enjoy exclusive discounts, free products, and earn passive income with up to 25% of seller commissions. Every share boosts your income!
           </p>
-          <a x-on:click.prevent="Livewire.dispatch('modal.openReg')" class="main-btn" href="#">Get Started</a>
+
+          @if(auth()->check())
+            <x-btn href="{{ route('profile.referal') }}">Start Now</x-btn>
+          @else
+            <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'register' })">Start Now</x-btn>
+          @endif
+
         </div>
       </div>
     </section>

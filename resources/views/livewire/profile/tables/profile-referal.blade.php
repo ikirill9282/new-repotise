@@ -48,15 +48,31 @@
         </thead>
         <tbody class="">
           @for($i = 0; $i < 10; $i++)
-            <tr class="first:[&_td:first-child]:!rounded-tl-xl first:[&_td:last-child]:!rounded-tr-xl
-                      last:[&_td:first-child]:!rounded-bl-xl last:[&_td:last-child]:!rounded-br-xl"
+            <tr class="[&_td:first-child]:!rounded-tl-xl [&_td:last-child]:!rounded-tr-xl
+                      [&_td:first-child]:!rounded-bl-xl  [&_td:last-child]:!rounded-br-xl border-y-[20px]"
                       >
-              <td class="!bg-white !px-4 !py-4 !border-b-gray/15 text-nowrap">talmaev1</td>
-              <td class="!bg-white !px-4 !py-4 !border-b-gray/15 text-nowrap !text-gray">05.28.2025</td>
-              <td class="!bg-white !px-4 !py-4 !border-b-gray/15">Buyer - First Purchase</td>
-              <td class="!bg-white !px-4 !py-4 !border-b-gray/15 text-nowrap">Registered</td>
-              <td class="!bg-white !px-4 !py-4 !border-b-gray/15">
-                <div class="flex flex-col copyToClipboard transition hover:cursor-pointer group" data-target="discount{{ $i }}">
+              <td class="!border-none !bg-white !bg-clip-content !py-1 text-nowrap !rounded-tl-2xl !rounded-bl-2xl">
+                <div class="!px-4 !py-6">
+                  talmaev1
+                </div>
+              </td>
+              <td class="!border-none !bg-white !bg-clip-content !py-1  text-nowrap !text-gray">
+                <div class="!px-4 !py-6">
+                  05.28.2025
+                </div>
+              </td>
+              <td class="!border-none !bg-white !bg-clip-content !py-1 ">
+                <div class="!px-4 !py-6">
+                  Buyer - First Purchase
+                </div>
+              </td>
+              <td class="!border-none !bg-white !bg-clip-content !py-1  text-nowrap">
+                <div class="!px-4 !py-6">
+                  Registered
+                </div>
+              </td>
+              <td class="!border-none !bg-white !bg-clip-content !py-1 ">
+                <div class="!px-4 !py-6 flex flex-col copyToClipboard transition hover:cursor-pointer group" data-target="discount{{ $i }}">
                   <div class="text-lg font-bold transition group-hover:!text-active" data-copyId="discount{{ $i }}">NEWYEAR26</div>
                   <div class="flex justify-start items-center gap-2">
                     <span>Discount 15%</span>
@@ -64,7 +80,11 @@
                   </div>
                 </div>
               </td>
-              <td class="!bg-white !px-4 !py-4 !border-b-gray/15 text-nowrap">$50.00</td>
+              <td class="!border-none !bg-white !bg-clip-content !py-1  text-nowrap  !rounded-tr-2xl !rounded-br-2xl">
+                <div class="!px-4 !py-6">
+                  $50.00
+                </div>
+              </td>
             </tr>
           @endfor
         </tbody>

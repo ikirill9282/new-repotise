@@ -1,13 +1,14 @@
 @props([
   'id' => "checkbox-" . uniqid(),
   'label' => '',
+  'tooltip' => false,
 ])
 
 <div class="group relative">
   <input 
     type="checkbox" 
     id="{{ $id }}"
-    class="w-0 h-0 opacity-0"
+    class="w-0 h-0 opacity-0 absolute"
     {{ $attributes }}
   >
   <label 
@@ -23,5 +24,9 @@
         @include('icons.check')
       </div>
       {{ $label }}
-    </label>
+  </label>
+
+  @if($tooltip)
+    <x-tooltip message="tooltip" class="right-4" />
+  @endif
 </div>

@@ -3,6 +3,7 @@
   'name' => uniqid(),
   'label' => null,
   'value' => null,
+  'tooltip' => true,
 ])
 
 <div class="relative w-full group {{ $attributes->get('class') }}">
@@ -19,6 +20,8 @@
       value="{{ $value }}"
       {{ $attributes }}
     >
-    <x-tooltip class="!right-4" message="tooltip"></x-tooltip>
+    @if($tooltip)
+      <x-tooltip class="!right-4" message="tooltip"></x-tooltip>
+    @endif
   </div>
 </div>

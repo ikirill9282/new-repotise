@@ -1,7 +1,7 @@
 <div class="text-center">
 
     {{-- HEADER --}}
-    <div class="text-2xl font-semibold !mb-2">Refund Request Submitted</div>
+    <div class="text-2xl font-semibold !mb-2 max-w-xs mx-auto sm:max-w-none">Payment Initiated Successfully</div>
 
     {{-- LOGO --}}
     <div class="!mb-2">
@@ -11,12 +11,12 @@
     {{-- TEXT --}}
     <div class="mb-4">
       <p>
-        Your refund request has been successfully sent to the seller. They have up to 30 days to review it. We will notify you of the outcome.
+        Your payment was successful! The funds should now be reflected in your available balance.
       </p>
     </div>
 
     {{-- BUTTON --}}
-    <div class="max-w-24 mx-auto">
+    <div class="mx-auto max-w-2xs">
       <x-btn wire:click.prevent="$dispatch('closeModal')" class="uppercase">Done</x-btn>
     </div>
 </div>

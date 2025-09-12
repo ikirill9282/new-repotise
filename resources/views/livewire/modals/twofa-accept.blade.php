@@ -1,7 +1,7 @@
 <div class="text-center">
 
     {{-- HEADER --}}
-    <div class="text-2xl font-semibold !mb-2">Refund Request Submitted</div>
+    <div class="text-2xl font-semibold !mb-2">Two-Factor Authentication Enabled!</div>
 
     {{-- LOGO --}}
     <div class="!mb-2">
@@ -11,12 +11,12 @@
     {{-- TEXT --}}
     <div class="mb-4">
       <p>
-        Your refund request has been successfully sent to the seller. They have up to 30 days to review it. We will notify you of the outcome.
+        Success! 2FA is now active on your account. You will be asked for a verification code during future logins. Remember to keep your Backup Reset Code safe in case you lose access to your authenticator app.
       </p>
     </div>
 
     {{-- BUTTON --}}
-    <div class="max-w-24 mx-auto">
+    <div class="max-w-38 mx-auto">
       <x-btn wire:click.prevent="$dispatch('closeModal')" class="uppercase">Done</x-btn>
     </div>
 </div>

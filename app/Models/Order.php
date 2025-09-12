@@ -27,7 +27,7 @@ class Order extends Model
       parent::booted();
 
       static::creating(function($model) {
-        $ephemeralKey = \Stripe\EphemeralKey::create(
+        $ephemeralKey = Cashier::stripe()->ephemeralKeys->create(
           ['customer' => $model->user->asStripeCustomer()->id],
           ['stripe_version' => '2022-11-15']
         );

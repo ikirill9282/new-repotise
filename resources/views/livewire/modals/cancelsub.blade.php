@@ -19,7 +19,7 @@
 
   {{-- BUTTONS --}}
   <div class="flex justify-center items-center gap-2 flex-col sm:flex-row">
-    <x-btn class="!text-sm sm:!text-base" wire:click.prevent="$dispatch('closeModal')">Submit Refund Request</x-btn>
+    <x-btn class="!text-sm sm:!text-base" wire:click.prevent="$dispatch('closeModal')">Keep Subscription</x-btn>
     <x-btn class="!text-sm sm:!text-base" outlined>Yes, Cancel Subscription</x-btn>
   </div>
 </div>

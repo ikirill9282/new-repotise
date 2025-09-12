@@ -3,7 +3,7 @@
 @section('content')
   <x-profile.wrap>
     <div class="the-content__content profile-referal-page">
-      <x-card class="rp-top">
+      <x-card class="rp-top mb-10">
         {{-- TITLE --}}
         <div class="rp-top__title">
           <h2>
@@ -26,9 +26,9 @@
                 </span>
               </div>
             </div>
-            <div class="actions !gap-2">
-              <x-btn class="!text-sm sm:!text-base referal-btn">Withdraw Funds</x-btn>
-              <x-btn class="!text-sm sm:!text-base referal-btn" outlined>Add Funds</x-btn>
+            <div x-data="{}" class="actions !gap-2">
+              <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'withdraw' })" class="!text-sm sm:!text-base referal-btn">Withdraw Funds</x-btn>
+              <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'funds' })" class="!text-sm sm:!text-base referal-btn" outlined>Add Funds</x-btn>
             </div>
           </div>
 
@@ -75,7 +75,7 @@
       </x-card>
 
       {{-- REFERAL TEXT --}}
-      <div class="rp-share mb-10">
+      <x-card class=" mb-10">
 
         {{-- HEADING --}}
         <div class="rp-share__title">
@@ -143,8 +143,8 @@
         </div>
 
         {{-- SOCIAL --}}
-        <div class="rp-share__action">
-          <div class="link basis-1/2">
+        <div class="rp-share__action !flex-col md:!flex-row !items-stretch md:!items-center">
+          <div class="link md:basis-1/2">
             <span>
               Your Referral Link
             </span>
@@ -153,34 +153,34 @@
               {{ $user->makeReferalUrl() }}
             </div>
           </div>
-          <div class="socials basis-1/2">
-            <ul class="flex-wrap justify-between max-w-sm">
-              <li class="!mr-0 max-w-12 lg:max-w-none">
+          <div class="socials md:basis-1/2">
+            <ul class="flex-wrap justify-between max-w-sm !w-full">
+              <li class="!mr-0 max-w-10 sm:max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('FB') }}" target="_blank" class="transition !text-second hover:!text-blue-600">
                   @include('icons.facebook', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0 max-w-12 lg:max-w-none">
+              <li class="!mr-0 max-w-10 sm:max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('PI') }}" class="transition !text-second hover:!text-rose-600" target="_blank">
                   @include('icons.pinterest', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0 max-w-12 lg:max-w-none">
+              <li class="!mr-0 max-w-10 sm:max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('TW') }}" target="_blank" class="transition !text-second hover:!text-gray-900">
                   @include('icons.twitter', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0 max-w-12 lg:max-w-none">
+              <li class="!mr-0 max-w-10 sm:max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('GM') }}" class="transition !text-second hover:!text-orange-600" target="_blank">
                   @include('icons.mail', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0 max-w-12 lg:max-w-none">
+              <li class="!mr-0 max-w-10 sm:max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('WA') }}" class="transition !text-second hover:!text-emerald-600" target="_blank">
                   @include('icons.whatsapp', ['class' => 'max-w-full'])
                 </a>
               </li>
-              <li class="!mr-0 max-w-12 lg:max-w-none">
+              <li class="!mr-0 max-w-10 sm:max-w-12 lg:max-w-none">
                 <a href="{{ $user->makeReferalUrl('TG') }}" class="transition !text-second hover:!text-sky-600" target="_blank">
                   @include('icons.telegram', ['class' => 'max-w-full'])
                 </a>
@@ -188,7 +188,7 @@
             </ul>
           </div>
         </div>
-      </div>
+      </x-card>
 
       {{-- TABLE --}}
       @livewire('profile.tables.profile-referal')

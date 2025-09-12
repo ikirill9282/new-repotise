@@ -34,7 +34,6 @@
                   {{ $isVisible ? 'modal-slide-in' : 'modal-slide-out' }}
                   overflow-hidden
                   {{ $this->modalMaxWidth() }}
-                  @yield('maxWidth', '')
                   "
                 >
                     <div wire:click.prevent="closeModal" class="popUp__cross w-5 h-5">

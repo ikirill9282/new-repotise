@@ -5,7 +5,7 @@
       "
       >
       <div 
-        class="flex justify-start items-center rounded-lg flex-wrap sm:!flex-nowrap">
+        class="flex justify-start items-center rounded-lg @if (count($this->tables) > 2)  flex-wrap sm:!flex-nowrap @endif">
         @foreach($this->tables as $table)
           <div 
             wire:click="setActive('{{ $table['name'] }}')" 
@@ -15,9 +15,14 @@
               basis-1/2 last:basis-full sm:basis-auto last:sm:basis-auto
               border-second sm:border-r-1 sm:border-t border-b
               sm:first:!border-l-1 sm:first:rounded-tl-lg sm:first:rounded-bl-lg sm:last:rounded-tr-lg sm:last:rounded-br-lg sm:last:rounded-bl-none
-              border-r odd:border-l sm:odd:border-l-0 firs:border-l last:border-r last:rounded-br-lg last:rounded-bl-lg
+              border-r odd:border-l sm:odd:border-l-0 firs:border-l last:border-r last:rounded-bl-lg
               [&:nth-child(2)]:border-t [&:nth-child(1)]:border-t [&:nth-child(2)]:rounded-tr-lg [&:nth-child(1)]:rounded-tl-lg
-              @if (count($this->tables) > 2) sm:[&:nth-child(2)]:rounded-tr-none @endif
+              @if (count($this->tables) > 2) 
+                sm:[&:nth-child(2)]:rounded-tr-none
+              @else
+                first:!rounded-bl-lg
+                last:!rounded-br-lg last:!rounded-bl-none
+              @endif
               @if($this->activeTable == $table['name']) bg-second text-light @endif
             "
           >
