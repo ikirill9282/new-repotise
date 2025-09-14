@@ -1,12 +1,16 @@
 @props([
   'outlined' => false,
   'second' => false,
+  'gray' => false,
 ])
+
+
 <a 
-  class="main-btn py-2.5 
+  class="main-btn !p-2.5 !rounded !text-sm sm:!text-base
         {{ $attributes->get('class') }} 
         {{ $outlined ? 'main-btn-outlined' : '' }} 
         {{ $second ? '!bg-second !border-second hover:!bg-active hover:!border-active' : '' }}
+        {{ $gray ? '!bg-light !text-gray !border-light hover:!border-gray hover:!text-second hover:!shadow-none ' : '' }}
         " 
   href="{{ $attributes->get('href') ?? '#' }}"
   {{ $attributes }}

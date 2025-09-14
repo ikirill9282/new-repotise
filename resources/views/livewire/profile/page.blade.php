@@ -226,7 +226,7 @@
                         </div>
                     </div>
                     
-                    <x-btn class="!py-2 !max-w-none !flex items-center justify-center gap-2 group" outlined>
+                    <x-btn wire:click.prevent="$dispatch('openModal', { modalName: 'donate' })" class="!py-2 !max-w-none !flex items-center justify-center gap-2 group" outlined>
                       <span class="text-red">
                         <svg width="20" height="18" viewBox="0 0 20 18" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -275,10 +275,10 @@
                                 </label>
                             </div>
                         </div>
-                        <x-link class="inline-block">Add Social Link</x-link>
+                        <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social' })" class="inline-block">Add Social Link</x-link>
                     </div>
                     
-                    <x-btn class="!py-2 !max-w-none">Contact Creator</x-btn>
+                    <x-btn wire:click.prevent="$dispatch('openModal', { modalName: 'contact' })" class="!py-2 !max-w-none">Contact Creator</x-btn>
                 </aside>
             </div>
         </div>

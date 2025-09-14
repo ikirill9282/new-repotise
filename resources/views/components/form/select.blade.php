@@ -1,6 +1,8 @@
 @props([
-  'name' => null,
+  'name' => uniqid(),
+  'title' => null,
   'label' => null,
+  'value' => null,
   'options' => [
     10 => '10 Days',
     20 => '20 Days',
@@ -27,13 +29,22 @@
     setVal(val, label = null) {
       this.value = val;
       this.label = label ? label : '';
-      this.toggle();
       this.$refs.placeholder.classList.add('!text-black')
     }
   }"
-  class="w-full group"
+  x-init="() => {
+    if (value === null) {
+      setVal('{{ array_key_first($options) }}', '{{ $options[array_key_first($options)] }}');
+    }
+  }"
+  class="w-full group text-sm sm:text-base"
 >
   <input x-bind:value="value" type="hidden" name="{{ $name }}" {{ $attributes }}>
+
+  @if($title)
+    <label class="text-sm sm:text-base text-gray mb-1.5" for="{{ $name }}">{{ $title }}</label>
+  @endif
+
   <div class="w-full !p-4 rounded bg-light">
     <div 
       x-ref="placeholder"
@@ -59,7 +70,15 @@
         >
       <div x-ref="dropdownContent" class="flex flex-col text-gray">
         @foreach($options as $val => $label)
-          <div x-on:click="setVal('{{$val}}', '{{ $label }}')" class="px-4 py-2 hover:cursor-pointer hover:text-black">{{ $label }}</div>
+          <div 
+            x-on:click="() => {
+              setVal('{{$val}}', '{{ $label }}');
+              toggle();
+            }" 
+            class="px-4 py-2 hover:cursor-pointer hover:text-black"
+          >
+            {{ $label }}
+          </div>
         @endforeach
       </div>
     </div>

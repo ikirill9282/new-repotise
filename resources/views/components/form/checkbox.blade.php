@@ -4,7 +4,7 @@
   'tooltip' => false,
 ])
 
-<div class="group relative">
+<div class="group relative text-sm sm:text-base">
   <input 
     type="checkbox" 
     id="{{ $id }}"
@@ -13,9 +13,9 @@
   >
   <label 
     for="{{ $id }}"
-    class="text-gray transition hover:cursor-pointer hover:text-active pl-8 select-none
+    class="text-gray transition hover:cursor-pointer hover:text-active pl-6 select-none
       before:content-[''] before:absolute before:w-4 before:h-4 before:top-[50%] before:translate-y-[-50%] before:transition
-      before:left-2 before:border before:rounded before:border-gray hover:before:border-active
+      before:left-0 before:border before:rounded before:border-gray hover:before:border-active
       group-has-checked:before:bg-active group-has-checked:before:border-active
       {{ $attributes->get('class') }}
     "

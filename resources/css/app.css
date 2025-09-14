@@ -6,6 +6,7 @@
 @source '../**/*.js';
 
 @theme {
+    --breakpoint-xs: 375px;
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --color-gray: #A4A0A0;
@@ -25,12 +26,16 @@
   }
 
   .scrollbar-custom::-webkit-scrollbar-track {
-    background: #f9f9f9;
+    background: transparent;
     border-radius: 10px;
   }
 
   .scrollbar-custom-white::-webkit-scrollbar-track {
-    background: #fff !important;
+    background: transparent !important;
+  }
+
+  .scrollbar-custom-gray::-webkit-scrollbar-track {
+    background: #e6e6e6 !important;
   }
 
   .scrollbar-custom::-webkit-scrollbar-thumb {
@@ -77,9 +82,17 @@
     opacity: 1;
   }
 
-  @media (min-width: 768px) {
-    .scrollbar-custom::-webkit-scrollbar-track {
-      background: transparent;
-    }
+  .emojiPicker {
+    right: 0 !important;
+    left: auto !important;
+    transform: translate(0, -100%) !important;
+  }
+
+  .emojiPickerIconWrap {
+    display: block !important;
+  }
+
+  .emojiPickerIconWrap textarea {
+    padding-right: 0 !important;
   }
 }

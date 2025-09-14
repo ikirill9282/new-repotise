@@ -1,6 +1,6 @@
 <div>
   {{-- HEADER --}}
-  <div class="text-2xl font-semibold !mb-2 text-center mx-auto max-w-xs sm:max-w-none">Withdrawal Request Submitted</div>
+  <div class="text-2xl font-semibold !mb-2 mx-auto max-w-xs sm:max-w-none">Are You Sure You Want to Delete Your Account?</div>
 
   {{-- IMAGE --}}
   <div class="flex justify-center items-center py-5">
@@ -21,6 +21,7 @@
   {{-- INPUTS --}}
   <div class="mb-5">
     <x-form.input class="mb-4" label="Current Password" placeholder="Enter your current password"></x-form.input>
+    
     <div class="flex items-end justify-between gap-3 flex-col sm:flex-row">
       <x-form.input label="Email Verification Code" placeholder="Enter 6-digit code from email" data-input="integer"></x-form.input>
       <x-btn class="!text-sm sm:!text-base !py-4 !w-auto text-nowrap" outlined>Send Verification Code</x-btn>

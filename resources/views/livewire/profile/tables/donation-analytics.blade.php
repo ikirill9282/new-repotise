@@ -49,7 +49,7 @@
               @endfor
             </tbody>
             <tfoot></tfoot>
-          </table>
+        </table>
       </div>
     </x-card>
 </div>

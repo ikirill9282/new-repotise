@@ -3,7 +3,9 @@
 @section('content')
   <x-profile.wrap>
     <div class="the-content__content profile-referal-page">
-      <x-card class="rp-top mb-10">
+
+      {{-- REFERAL STATE --}}
+      <x-card class="mb-10">
         {{-- TITLE --}}
         <div class="rp-top__title">
           <h2>
@@ -15,7 +17,7 @@
         <div class="rp-top__body !gap-6 lg:!gap-3 xl:!gap-6 justify-between items-end flex-col lg:flex-row">
           
           {{-- BALANCE --}}
-          <div class="rp-top__balance !w-auto grow lg:max-w-lg">
+          <div class="rp-top__balance !w-full grow lg:max-w-lg">
             <div class="balance-input">
               <span class="inline-block !mb-2">
                 Referral Balance
@@ -33,7 +35,7 @@
           </div>
 
           {{-- REWARDS --}}
-          <div class="rp-top__info flex-col sm:flex-row !w-auto !gap-0 sm:!gap-12 lg:!gap-0">
+          <div class="rp-top__info flex-col sm:flex-row !w-full !gap-0 sm:!gap-12 lg:!gap-0 lg:flex-col xl:flex-row">
             <div class="col !grow-0 lg:!grow">
               <p>
                 <span>Referred Users:</span>

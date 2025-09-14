@@ -168,7 +168,7 @@ class CabinetController extends Controller
   public function public_profile(Request $request, string $slug)
   {
     $user = User::where('username', $slug)->first();
-
+    
     if (!$user) {
       return redirect('/unknown');
     }

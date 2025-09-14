@@ -746,8 +746,14 @@ const ReadMoreButtons = function() {
           $(elem).toggleClass('read-more-open');
 
           if (!$(elem).hasClass('read-more-open')) {
-            const height = $(elem).hasClass('read-more-300') ? 300 : 150;
-            $(elem).css({ height: `${height}px` });
+            const str = [...elem.classList].find(elem => /read-more-\d+/is.test(elem));
+            if (str) {
+              const height = str.replace(/read-more-(\d+)/is, "$1");
+              console.log(height);
+              
+              $(elem).css({ height: `${height}px` });
+            }
+            
           } else {
             const height = text.outerHeight() + btn.outerHeight();
             $(elem).css({ height: `${height}px` });

@@ -1303,7 +1303,7 @@ footer .bottom_connecting_group .connecting a {
 .cart-order-view::-webkit-scrollbar-thumb:hover {
   background-color: #e65946;
 }
-
+/* 
 .popUp-wrap::-webkit-scrollbar {
   width: 4px;
   -webkit-transition: 0.3s;
@@ -1318,7 +1318,7 @@ footer .bottom_connecting_group .connecting a {
 } 
 .popUp-wrap::-webkit-scrollbar-thumb:hover {
   background-color: #e65946;
-}
+} */
 
 .modal-fade-out .popUp-wrap::-webkit-scrollbar {
   width: 0px;
@@ -1657,6 +1657,18 @@ footer .bottom_connecting_group .connecting a {
 
 .read-more-300 {
   height: 300px;
+}
+
+.read-more-70 {
+  height: 70px;
+}
+
+.read-more-60 {
+  height: 60px;
+}
+
+.read-more-20 {
+  height: 20px;
 }
 
 .read-more.read-more-open {

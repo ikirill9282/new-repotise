@@ -8,11 +8,17 @@ use Illuminate\Support\Facades\Auth;
 
 class Page extends Component
 {
+
+  public User $user;
+
+  public function mount(User $user)
+  {
+    $this->user = $user;
+  }
+
   public function render()
   {
-
-    $user = Auth::user();
-    $articles = $user->articles()
+    $articles = $this->user->articles()
       ->with([
         'author',
         'tags',
@@ -25,7 +31,7 @@ class Page extends Component
       ;
 
     return view('livewire.profile.page', [
-      'user' => $user,
+      'user' => $this->user,
       'articles' => $articles,
     ]);
   }

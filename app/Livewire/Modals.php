@@ -80,6 +80,15 @@ class Modals extends Component
         'payout-method',
         'delete-account',
         'delete-account-accept',
+        'message',
+        'contact',
+        'social',
+        'donate',
+        'donate-accept',
+        'donate-sub-accept',
+        'donate-error',
+        'promocodes',
+        'order',
       ];
       return !in_array($this->modal, $arr);
     }    
@@ -87,6 +96,8 @@ class Modals extends Component
     public function modalMaxWidth()
     {
       if (in_array($this->modal, ['cart', 'levels'])) return '!max-w-none';
+
+      if (in_array($this->modal, ['promocodes'])) return '!max-w-7xl';
 
       if (in_array($this->modal, ['product', 'twofa'])) return '!max-w-4xl';
 
@@ -109,9 +120,12 @@ class Modals extends Component
         'change-email-accept',
         'twofa-disable',
         'delete-account',
+        'message',
+        'social',
+        'donate',
       ])) return '!max-w-2xl';
       
-      if (in_array($this->modal, ['funds'])) return '!max-w-xl';
+      if (in_array($this->modal, ['funds', 'contact'])) return '!max-w-xl';
 
       return '';
     }    

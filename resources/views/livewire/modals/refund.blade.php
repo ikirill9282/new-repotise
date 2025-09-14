@@ -10,23 +10,27 @@
   </div>
 
   {{-- FORM --}}
-  <form action="" class="flex flex-col gap-2 mb-4">
-      <x-form.select 
-        label="Reason for Refund" 
-        labelClass="text-gray"
-        class="group"
-        :options="[
-          'reason1' => 'Reason 1',
-          'reason2' => 'Reason 2',
-          'reason3' => 'Reason 3',
-        ]"
-      />
+  <form action="" class="flex flex-col gap-3 mb-4">
+      <div class="w-full">
+        <x-form.select 
+          label="Reason for Refund"
+          title="Dropdown Menu"
+          labelClass="text-gray"
+          class="group"
+          :options="[
+            'reason1' => 'Reason 1',
+            'reason2' => 'Reason 2',
+            'reason3' => 'Reason 3',
+          ]"
+        />
+      </div>
 
-      <div class="w-full flex justify-start items-start gap-2 sm:gap-3">
+      <div class="w-full flex flex-col justify-start items-stretch gap-1 group">
+          <label class="text-sm sm:text-base text-gray" for="textarea">Details</label>
           <div
               x-data="{
                 message: '',
-                max: 1000,
+                max: 100,
                 getSymbols() {
                   $refs.ta.style.height = 'auto';
                   $refs.ta.style.height = $refs.ta.scrollHeight + 'px';
@@ -44,17 +48,18 @@
                   }
                 });
               "
-              class="relative grow flex items-center justify-start gap-2 sm:gap-3 bg-light rounded-lg !pl-3 py-3 sm:!ps-3 !pe-20 sm:!pe-2">
+              class="relative w-full grow flex items-center justify-start gap-2 sm:gap-3 bg-light rounded-lg !pl-3 py-3 sm:!ps-3 !pe-20 sm:!pe-2">
               <textarea name="text" rows="1"
                   x-ref="ta"
                   x-model="message"
+                  id="textarea"
                   class="chat-textarea transition w-full leading-normal outline-0"
                   placeholder="Please provide more details"></textarea>
 
               <div class="absolute top-0 right-0 text-gray">
                   <div class="flex justify-center items-center py-3 px-2 sm:!px-3 gap-1 sm:!gap-2">
                       <div class="!text-xs sm:text-base p-1 rounded bg-white">
-                          <span x-text="getSymbols"></span>/1000
+                          <span x-text="getSymbols"></span>/<span x-text="max"></span>
                       </div>
                       <button class="p-1 !bg-white rounded transition hover:text-black">
                           @include('icons.arrow_right')

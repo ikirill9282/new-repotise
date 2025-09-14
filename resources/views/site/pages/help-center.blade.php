@@ -3,10 +3,19 @@
 @section('content')
     @php
         $variables = $page->variables;
-        $questions = \App\Models\FAQ::where('type', 'question')->with('answer')->get()->groupBy('group');
+        $questions = \App\Models\FAQ::where('type', 'question')
+          ->with('answer')
+          ->get()
+          ->groupBy('group')
+          ->map(fn($group) => $group->map(function($item) {
+            return ['title' => $item->text, 'text' => $item->answer->text];
+          }))
+          ;
+        // dd($questions);
     @endphp
 
 
+    {{-- HERO --}}
     <section class="home_help relative">
         @include('site.components.parallax', ['class' => 'parallax-help'])
         <div class="container !mx-auto relative z-40">
@@ -17,76 +26,45 @@
         </div>
     </section>
 
-    <section class="general_questions">
+    {{-- QUESTIONS --}}
+    <section class="bg-light !pt-8 !pb-4" id="faq">
         <div class="container !mx-auto">
-            <div class="about_block">
-                <div class="questions_group">
-                    <div class="accordion" id="accordionExample">
-                        @foreach ($questions as $group => $questions_group)
-                            @include('site.components.heading', ['variables' => $variables->filter(fn($item) => str_contains($item->name, $group))])
-                            @foreach ($questions_group as $item)
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="heading-{{ $item->id }}">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse-{{ $item->id }}" aria-expanded="true"
-                                            aria-controls="collapse-{{ $item->id }}">
-                                            {!! $item->text !!}
-                                        </button>
-                                    </h2>
-                                    <div id="collapse-{{ $item->id }}" class="accordion-collapse collapse"
-                                        data-bs-parent="#accordionExample" aria-labelledby="heading-{{ $item->id }}">
-                                        <div class="accordion-body">
-                                            <div class="text_answers">
-                                                {!! $item->answer->text !!}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endforeach
-                    </div>
-                </div>
-                @include('site.components.last_news')
+            <div class="flex justify-between items-start !gap-6 lg:!gap-8 flex-col md:flex-row">
+              
+              {{-- CONTENT --}}
+              <div class="basis-9/12 lg:basis-4/5">
+                  <x-card>
+                    @foreach ($questions as $group => $items)
+                      @php
+                        $title = match($group) {
+                          'general' => 'General Questions:',
+                          'customer' => 'For Customers:',
+                          'creator' => 'For Creators:',
+                          default => '',
+                        }
+                      @endphp
+                      <div class="!mb-8 last:!mb-0">
+                        <x-title class="!mb-6">{{ $title }}</x-title>
+                        <x-accordion parent="#faq" :items="$items"></x-accordion>
+                      </div>
+                    @endforeach
+                  </x-card>
+              </div>
+
+              {{-- LAST NEWS --}}
+              <div class="basis-3/12 lg:basis-1/5">
+                <x-title class="!font-normal !mb-4 sm:!mb-8">Travel News</x-title>
+                <x-last-news></x-last-news>
+              </div>
+
             </div>
         </div>
     </section>
 
-    @include('site.sections.callback_form')
+    {{-- CONTACT US --}}
+    <section class="bg-light !pt-4 !pb-8" id="contact-us">
+      <div class="container">
+        @livewire('forms.contact-us')
+      </div>
+    </section>
 @endsection
-
-
-@push('js')
-<script>
-    const init_slider = () => {
-        if ($(window).outerWidth() < 768) {
-            return new Swiper('#last_news_swiper', {
-                slidesPerView: 1.4,
-                spaceBetween: 20,
-                enabled: true,
-                breakpoints: {
-                    400: {
-                        slidesPerView: 1.6,
-                    },
-                    500: {
-                        slidesPerView: 1.9,
-                    },
-                    768: {
-                        enabled: false,
-                        slidesPerView: 4,
-                    },
-                    1200: {
-                        slidesPerView: 5,
-                    },
-                }
-            });
-        }
-        return null;
-    }
-    let slider = init_slider();
-    let resized = false;
-    let disabled = false;
-    $(window).on('resize', function() {
-        slider = init_slider();
-    });
-</script>
-@endpush

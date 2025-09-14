@@ -3,6 +3,6 @@
 
 @section('content')
     <x-profile.wrap>
-        @livewire('profile.page')
+        @livewire('profile.page', ['user' => $user])
     </x-profile.wrap>
 @endsection

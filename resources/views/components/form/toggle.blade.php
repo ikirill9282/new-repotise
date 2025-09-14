@@ -4,7 +4,7 @@
   'label' => null,
 ])
 
-<div class="relative w-full group {{ $attributes->get('class') }}">
+<div class="relative w-full text-sm sm:text-base group {{ $attributes->get('class') }}">
   <div class="relative flex justify-between items-center bg-light !p-4 !pr-8 rounded {{ $attributes->get('wrapClass') }}">
     <label 
       for="{{ $name }}" 
@@ -13,7 +13,7 @@
             {{ $attributes->get('labelClass') }}
             "
     >
-        <div class="">{{ $label }}</div>
+        <div class="px-1">{{ $label }}</div>
         <input type="checkbox" id="{{ $name }}" class="creatorPage__aside-connectSocials-item-checkbox">
         <span class="toggle-switch shrink-0"></span>
     </label>

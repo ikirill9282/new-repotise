@@ -1,1 +1,1 @@
-<span class="text-red-500 mt-2 inline-block">{{ $slot ?? '' }}</span>
+<span class="text-red-500 mt-2 inline-block text-sm sm:text-base">{{ $slot ?? '' }}</span>
