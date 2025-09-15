@@ -20,7 +20,7 @@
       {{ $attributes->get('class') }}
     "
     >
-      <div class="absolute left-[0.62rem] top-[50%] translate-y-[-50%] text-white !opacity-0 group-has-checked:!opacity-100">
+      <div class="absolute left-0 p-[2px] top-[50%] translate-y-[-50%] text-white !opacity-0 group-has-checked:!opacity-100">
         @include('icons.check')
       </div>
       {{ $label }}

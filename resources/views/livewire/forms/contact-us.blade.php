@@ -4,14 +4,14 @@
       <div class="basis-full lg:basis-1/2">
         <x-title class="!mb-4">Get in Touch</x-title>
         <div class="!mb-8">Have a question? We're here to assist. Send us a message.</div>
-        <div class="flex flex-col !gap-6">
+        <div class="flex flex-col !gap-3">
           <x-form.input name="name" placeholder="Your Name" />
 
           <x-form.input type="email" name="email" placeholder="Email" />
 
-          <x-form.select :options="['subject' => 'Subject', 'subject2' => 'Subject2', 'subject3' => 'Subject3',]" />
+          <x-form.select label="Select subject..." :options="['subject' => 'Subject', 'subject2' => 'Subject2', 'subject3' => 'Subject3',]" />
 
-          <x-form.textarea class="min-h-24" id="ta" label="Your Message<br> Please provide details about your request"></x-form.textarea>
+          <x-form.textarea class="min-h-24" id="ta" placeholder="Your Message<br> Please provide details about your request"></x-form.textarea>
 
           <x-form.files></x-form.files>
 

@@ -13,7 +13,7 @@
 <div 
   x-data="{
     value: null,
-    label: '{{ $label }}',
+    label: {{ $label ? "'$label'" : 'null' }},
     toggle() {
       const dropdown = this.$refs.dropdown;
       const height = this.$refs.dropdownContent?.offsetHeight ?? 0;

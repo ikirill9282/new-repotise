@@ -24,7 +24,7 @@
     
     <div class="flex items-end justify-between gap-3 flex-col sm:flex-row">
       <x-form.input label="Email Verification Code" placeholder="Enter 6-digit code from email" data-input="integer"></x-form.input>
-      <x-btn class="!text-sm sm:!text-base !py-4 !w-auto text-nowrap" outlined>Send Verification Code</x-btn>
+      <x-btn class="!text-sm sm:!text-base !w-auto text-nowrap" outlined>Send Verification Code</x-btn>
     </div>
   </div>
 

@@ -133,7 +133,7 @@
 
 
             {{-- DELETE --}}
-            <x-link>Delete Account</x-link>
+            <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'delete-account' })">Delete Account</x-link>
         </div>
 
         <div class="!w-25 !h-25 md:!w-45 md:!h-45 shrink-0 rounded-full overflow-hidden mr-10">
