@@ -749,10 +749,11 @@ const ReadMoreButtons = function() {
             const str = [...elem.classList].find(elem => /read-more-\d+/is.test(elem));
             if (str) {
               const height = str.replace(/read-more-(\d+)/is, "$1");
+              $(elem).css({ height: `${height}px` });
             } else {
               const height = 150;
+              $(elem).css({ height: `${height}px` });
             }
-            $(elem).css({ height: `${height}px` });
             
           } else {
             const height = text.outerHeight() + btn.outerHeight();
