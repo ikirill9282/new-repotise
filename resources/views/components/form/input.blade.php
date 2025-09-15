@@ -11,7 +11,7 @@
   @if($label) 
     <label for="{{ $name }}" class="!mb-2 text-gray hover:cursor-pointer">{{ $label }}</label>
   @endif
-  <div class="relative bg-light rounded !p-4 !pr-9 transition 
+  <div class="relative bg-light rounded !p-3 !pr-9 transition 
               {{ $inputWrapClass }}
             ">
     <input 

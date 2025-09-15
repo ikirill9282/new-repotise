@@ -46,8 +46,8 @@
         @endif
 
         <div class="bg-light w-full !grow rounded-lg !p-3 md:!p-0 !leading-0">
-          <textarea name="{{ $name }}" rows="1" x-ref="ta" x-model="message" id="{{ $id }}"
-              class="chat-textarea overflow-hidden transition w-full outline-0 !mt-0.75" placeholder="{{ $placeholder }}"></textarea>
+          <textarea name="{{ $name }}" rows="1" x-ref="ta" x-model="message" id="{{ $id }}" {{ $attributes }}
+              class="chat-textarea overflow-hidden transition w-full outline-0 !mt-0.75 {{ $attributes->get('class') }}" placeholder="{{ $placeholder }}"></textarea>
         </div>
         
         <div class="top-0 right-0 text-gray @if($author) w-full md:w-auto flex justify-between items-center md:!block @endif">

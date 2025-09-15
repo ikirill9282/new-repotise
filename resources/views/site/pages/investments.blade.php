@@ -1,18 +1,26 @@
 @extends('layouts.site')
 
 @section('content')
-    <section class="hero__investorsInvite relative">
+    <section class="hero__investorsInvite relative text-center">
       @include('site.components.parallax', ['class' => 'parallax-investments'])
-      <div class="container relative z-10">
-        <h1 class="hero__investorsInvite-title">
-          Partner with TrekGuider: Expand Your Reach & Revenue in the Digital Travel Market
-        </h1>
-        <h5 class="hero__investorsInvite-subtitle">
-          Reach a global audience of passionate travelers, boost your brand visibility, and unlock new revenue
-          streams. TrekGuider offers a powerful platform with cutting-edge tools, flexible monetization, and a
-          thriving community—your gateway to the future of digital travel.
-        </h5>
-        <button class="main-btn hero__investorsInvite-btn">Explore Partnership</button>
+      <div class="container relative z-10 text-light">
+        <div class="max-w-3xl mx-auto">
+          <h1 class="!font-normal !leading-12 max-w-3xl mx-auto">
+            Partner with TrekGuider: Expand Your Reach & Revenue in the Digital Travel Market
+          </h1>
+          <h5 class="!font-light !mb-10 !text-[17px] !leading-6">
+            Reach a global audience of passionate travelers, boost your brand visibility, and unlock new revenue
+            streams. TrekGuider offers a powerful platform with cutting-edge tools, flexible monetization, and a
+            thriving community—your gateway to the future of digital travel.
+          </h5>
+
+          <x-btn href="#partner-form" class="!w-auto mx-auto !max-w-3xs">Explore Partnership</x-btn>
+          {{-- @if(auth()->check())
+            <x-btn href="{{ route('profile') }}" class="!w-auto mx-auto !max-w-3xs">Explore Partnership</x-btn>
+          @else
+            <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'register' })" class="!w-auto mx-auto !max-w-3xs">Explore Partnership</x-btn>
+          @endif --}}
+        </div>
       </div>
     </section>
     <section class="classes">
@@ -62,50 +70,49 @@
     <section class="partner">
       <div class="container">
         <h4 class="partner__title section-title">Why Partner With Our Marketplace?</h4>
-        <ol class="partner__list">
-          <li class="partner__item">
+        <div class="partner__list !grid !grid-cols-1 lg:!grid-cols-6 lg:!grid-rows-2 !items-stretch">
+
+          <div class="partner__item lg:col-span-2 !h-auto !min-h-35 ">
             <h4 class="partner__item-title">Drive More Bookings & Leads</h4>
             <p class="partner__item-subtitle">
               Showcase your services to an audience ready to take action, from booking tours to purchasing digital
               products.
             </p>
-          </li>
-          <li class="partner__item">
+          </div>
+          <div class="partner__item lg:col-span-2 !h-auto !min-h-35 ">
             <h4 class="partner__item-title">Future-Proof Your <br />Business</h4>
             <p class="partner__item-subtitle">
               Benefit from our continuously evolving platform, with upcoming features like interactive maps, event
               bookings, and advanced business tools.
             </p>
-          </li>
-          <li class="partner__item">
+          </div>
+          <div class="partner__item lg:col-span-2 !h-auto !min-h-35 ">
             <h4 class="partner__item-title">Benefit From Advanced Analytics</h4>
             <p class="partner__item-subtitle">
               Make data-driven decisions with real-time insights on sales, user engagement, and conversion rates.
             </p>
-          </li>
-        </ol>
-        <ol class="partner__list-flex">
-          <li class="partner__item">
+          </div>
+          <div class="partner__item lg:col-span-3 !h-auto !min-h-35 ">
             <h4 class="partner__item-title">Reach Your Ideal Audience</h4>
             <p class="partner__item-subtitle">
               Access a global network of travelers actively seeking trusted information and memorable experiences.
             </p>
-          </li>
-          <li class="partner__item">
+          </div>
+          <div class="partner__item lg:col-span-3 !h-auto !min-h-35 ">
             <h4 class="partner__item-title">Build Brand Authority</h4>
             <p class="partner__item-subtitle">
               Elevate your brand alongside reputable travel content, strengthening credibility and consumer trust.
             </p>
-          </li>
-        </ol>
+          </div>
+        </div>
       </div>
     </section>
-    <section class="ways">
+    <section class="ways !bg-light">
       <div class="wrapper">
         <div class="container">
           <h4 class="ways__title section-title">Ways to Partner</h4>
-          <ul class="ways__list">
-            <li class="ways__item">
+          <div class="ways__list !grid !grid-cols-1 sm:!grid-cols-2">
+            <div class="ways__item max-lg:!p-6">
               <div class="ways__item-wrapper">
                 <p class="ways__item-title">Digital Product Showcases:</p>
                 <p class="ways__item-subtitle">
@@ -114,8 +121,8 @@
                 </p>
               </div>
               <img src="{{ asset('assets/img/icons/desktop.svg') }}" alt="" class="ways__item-icon" />
-            </li>
-            <li class="ways__item">
+            </div>
+            <div class="ways__item max-lg:!p-6">
               <div class="ways__item-wrapper">
                 <p class="ways__item-title">Custom Guides:</p>
                 <p class="ways__item-subtitle">
@@ -124,8 +131,8 @@
                 </p>
               </div>
               <img src="{{ asset('assets/img/icons/book.svg') }}" alt="" class="ways__item-icon" />
-            </li>
-            <li class="ways__item">
+            </div>
+            <div class="ways__item max-lg:!p-6">
               <div class="ways__item-wrapper">
                 <p class="ways__item-title">Platform Integrations:</p>
                 <p class="ways__item-subtitle">
@@ -134,8 +141,8 @@
                 </p>
               </div>
               <img src="{{ asset('assets/img/icons/integration.svg') }}" alt="" class="ways__item-icon" />
-            </li>
-            <li class="ways__item">
+            </div>
+            <div class="ways__item max-lg:!p-6">
               <div class="ways__item-wrapper">
                 <p class="ways__item-title">Sponsored Content:</p>
                 <p class="ways__item-subtitle">
@@ -144,8 +151,8 @@
                 </p>
               </div>
               <img src="{{ asset('assets/img/icons/content.svg') }}" alt="" class="ways__item-icon" />
-            </li>
-            <li class="ways__item">
+            </div>
+            <div class="ways__item max-lg:!p-6">
               <div class="ways__item-wrapper">
                 <p class="ways__item-title">Cross-Promotions:</p>
                 <p class="ways__item-subtitle">
@@ -154,8 +161,8 @@
                 </p>
               </div>
               <img src="{{ asset('assets/img/icons/sale.svg') }}" alt="" class="ways__item-icon" />
-            </li>
-            <li class="ways__item">
+            </div>
+            <div class="ways__item max-lg:!p-6">
               <div class="ways__item-wrapper">
                 <p class="ways__item-title">Investment Partnerships:</p>
                 <p class="ways__item-subtitle">
@@ -164,50 +171,15 @@
                 </p>
               </div>
               <img src="{{ asset('assets/img/icons/investment.svg') }}" alt="" class="ways__item-icon" />
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-    <section class="formConnect">
+
+    <section class="!py-12" id="partner-form">
       <div class="container">
-        <div class="formConnect-wrapper">
-          <div class="formConnect-content">
-            <h4 class="formConnect__title section-title">Let's Connect</h4>
-            <p class="formConnect__subtitle">
-              Ready to explore how partnering with TrekGuider can benefit your business? Reach out to our partnership
-              team today!
-            </p>
-            <form action="" class="formConnect__form">
-              <div class="formConnect__companyName-element">
-                <input type="text" class="formConnect__companyName" placeholder="Company name" />
-              </div>
-              <div class="formConnect__companyName-element">
-                <select name="" id="" class="formConnect__form-select">
-                  <option value="" selected hidden>Select a topic</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-              </div>
-              <div class="formConnect__companyName-element">
-                <textarea
-                  name=""
-                  id="messageTextarea"
-                  class="formConnect__massege"
-                  maxlength="500"
-                  placeholder="Text your message"
-                ></textarea>
-                <div class="counter">
-                  <span class="current">0</span>/
-                  <span class="max">500</span>
-                </div>
-              </div>
-              <button class="main-btn formConnect__form-btn">Start Partnership</button>
-            </form>
-          </div>
-          <img src="{{ asset('assets/img/formImage.png') }}" alt="" class="formConnect__image" />
-        </div>
+        @livewire('forms.invest')
       </div>
     </section>
 @endsection

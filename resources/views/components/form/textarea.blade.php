@@ -3,6 +3,7 @@
   'placeholder' => '',
   'name' => 'textarea',
   'id' => null,
+  'tooltip' => false,
 ])
 
 <div 
@@ -24,8 +25,8 @@
   @if($label)
     <label class="text-gray text-sm sm:text-base mb-1" for="{{ $id }}">{{ $label }}</label>
   @endif
-  <div class="relative bg-light rounded-lg !p-4">
-    <div x-ref="placeholder" class="absolute top-4 left-4 !text-gray transition">
+  <div class="relative bg-light rounded-lg !p-3 flex items-start justify-between @if($tooltip) !gap-3 @endif ">
+    <div x-ref="placeholder" class="absolute top-3 left-3 !text-gray transition">
       {!! $placeholder !!}
     </div>
     <textarea
@@ -37,5 +38,11 @@
       id="{{ $id }}"
       {{ $attributes }}
     >{{ $slot }}</textarea>
+    
+    @if($tooltip)
+      <div class="relative !w-4 !h-4">
+        <x-tooltip message="tooltip"></x-tooltip>
+      </div>
+    @endif
   </div>
 </div>

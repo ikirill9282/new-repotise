@@ -33,7 +33,7 @@
     }
   }"
   x-init="() => {
-    if (value === null) {
+    if (value === null && label === null) {
       setVal('{{ array_key_first($options) }}', '{{ $options[array_key_first($options)] }}');
     }
   }"
@@ -45,16 +45,16 @@
     <label class="text-sm sm:text-base text-gray mb-1.5" for="{{ $name }}">{{ $title }}</label>
   @endif
 
-  <div class="w-full !p-4 rounded bg-light">
+  <div class="w-full !p-3 rounded bg-light">
     <div 
       x-ref="placeholder"
       x-on:click="toggle()" 
-      class="transition flex justify-between items-center relative !pr-8 
+      class="transition flex justify-between items-center relative !pr-6 
             hover:cursor-pointer hover:text-black
             {{ $attributes->get('labelClass') }}
             "
       >
-      <span x-html="label">{{ $label }}</span>
+      <span x-html="label" x-bind:class="value === null ? '!text-gray' : ''">{{ $label }}</span>
       <span class="transition group-has-[.opened]:rotate-180">
         @include('icons.arrow_down', ['width' => 18, 'height' => 18])
       </span>
