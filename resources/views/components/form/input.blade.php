@@ -4,6 +4,8 @@
   'label' => null,
   'value' => null,
   'tooltip' => true,
+  'tooltipModal' => false,
+  'tooltipText' => 'tooltip',
   'inputWrapClass' => '',
 ])
 
@@ -24,7 +26,11 @@
       {{ $attributes }}
     >
     @if($tooltip)
-      <x-tooltip class="!right-3" message="tooltip"></x-tooltip>
+      <x-tooltip 
+        class="!right-3" 
+        :message="$tooltipText" 
+        :tooltipClass="$tooltipModal ? 'sm:!max-w-sm !transform-none !translate-x-[-100%] after:!hidden' : ''" 
+        ></x-tooltip>
     @endif
   </div>
 </div>

@@ -23,9 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
                   ['bold', 'italic', 'underline'],
                   ['link', 'image'],
                   [{ list: 'ordered'}, { list: 'bullet' }],
+                  [{ 'align': ['', 'center', 'right', 'justify'] }],
                   ['clean']
               ]
-          }
+          },
+          placeholder: editor.getAttribute('data-placeholder') ?? '',
       });
 
       quill.on('text-change', function() {

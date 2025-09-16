@@ -38,7 +38,7 @@
   {{-- BUTTONS --}}
   <div class="grid grid-cols-12 !gap-4 xl:!gap-6 !mb-6 xl:!mb-6">
     <div class="col-span-6 md:col-span-2">
-      <x-btn gray>Cancel</x-btn>
+      <x-btn wire:click.prevent="$dispatch('closeModal')" gray>Cancel</x-btn>
     </div>
     <div class="col-span-6 md:col-span-4">
       <x-btn outlined>Save</x-btn>

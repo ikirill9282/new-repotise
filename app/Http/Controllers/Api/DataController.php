@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Page;
 use App\Models\Review;
 use App\Models\Product;
+use App\Models\Tag;
 
 class DataController extends Controller
 {
@@ -109,6 +110,25 @@ class DataController extends Controller
     }
 
     return response(implode("\n", $result));
+  }
+
+
+  public function tags(Request $request)
+  {
+    $valid = $request->validate(['q' => 'sometimes|nullable|string']);
+    return Tag::query()
+      ->when(
+        !empty($valid['q']),
+        fn($query) => $query->where('title', 'like', "%{$valid['q']}%")
+          ->orWhere('slug', 'like', "%{$valid['q']}%")
+      )
+      ->get()
+      ->map(function($item) {
+        return [
+          'key' => $item->slug,
+          'label' => $item->title,
+        ];
+      });
   }
 
   public function favorite_author(Request $request)

@@ -89,6 +89,7 @@ class Modals extends Component
         'donate-error',
         'promocodes',
         'order',
+        'edit-contacts',
       ];
       return !in_array($this->modal, $arr);
     }    

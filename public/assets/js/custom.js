@@ -771,6 +771,7 @@ const ReadMoreButtons = function() {
 
         btnWrap.append(btn);
         $(elem).append(btnWrap);
+        this.buttons.push(elem);
       }
     });
   }
@@ -1086,9 +1087,12 @@ $(document).ready(function() {
   const inputs = [...document.querySelectorAll('input'), ...document.querySelectorAll('textarea')];
   inputs.forEach((input, key) => {
     function hideError() {
+      try {
       const name = this.getAttribute('name')
-      const errorElement = document.querySelector(`#${name}-error`);
+      const errorElement = document?.querySelector(`#${name}-error`);
       if (errorElement) errorElement.classList.add('hidden');
+      
+      } catch (error) {}
     }
 
     input.addEventListener('input', hideError);

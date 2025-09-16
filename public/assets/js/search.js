@@ -16,8 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
         const id = $(this).data('hits');
         if (id) {
           const hits = $(`#${id}`);
-          const items = response.data;
-          // console.log(response.data);
+          const items = response.data ?? [];
           
           const formatted = [...items]
             .map((item) => {
@@ -41,7 +40,23 @@ window.addEventListener('DOMContentLoaded', function() {
   
               return row;
           })
-  
+          
+          if (!formatted.length) {
+            const span = $('<span>', {
+              class: 'text-left text-gray-700 px-4 py-2 block',
+              text: 'No Search Results...',
+            });
+            const row = $('<div>', {
+              append: [span],
+            })
+
+            hits.empty();
+            hits.append(row);
+            hits.fadeIn();
+
+            return ;
+          }
+
           if (!$(this).val().length) {
             hits.fadeOut();
             return;

@@ -160,8 +160,8 @@ class CabinetController extends Controller
       return redirect()->route('profile.purchases');
     }
 
-    return view('site.pages.profile', [
-      'user' => Auth::user(),
+    return view('site.pages.profile-creator', [
+      'user' => $user,
     ]);
   }
 
@@ -264,17 +264,13 @@ class CabinetController extends Controller
     ]);
   }
 
-
-
-
-
-  public function createArticle(Request $request)
+  public function create_article(Request $request)
   {
     return view('site.pages.create-article');
   }
 
 
-  public function createProduct(Request $request)
+  public function create_product(Request $request)
   {
     return view('site.pages.create-product');
   }

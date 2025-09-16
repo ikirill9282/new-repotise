@@ -24,20 +24,16 @@
     width: 4px;
     height: 4px;
   }
-
   .scrollbar-custom::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 10px;
   }
-
   .scrollbar-custom-white::-webkit-scrollbar-track {
     background: transparent !important;
   }
-
   .scrollbar-custom-gray::-webkit-scrollbar-track {
     background: #e6e6e6 !important;
   }
-
   .scrollbar-custom::-webkit-scrollbar-thumb {
     background-color: #FC7361;
     border-radius: 10px;
@@ -87,12 +83,22 @@
     left: auto !important;
     transform: translate(0, -100%) !important;
   }
-
   .emojiPickerIconWrap {
     display: block !important;
   }
-
   .emojiPickerIconWrap textarea {
     padding-right: 0 !important;
+  }
+
+  .ql-toolbar.ql-snow {
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    padding: 8px;
+    background: #f9f9f9;
+    border: none !important;
+    display: inline-block;
+    border-radius: 8px;
+    margin-bottom: 5px;
   }
 }

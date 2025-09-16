@@ -3,7 +3,6 @@
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Location;
-use App\Models\News;
 use App\Models\Product;
 use App\Models\User;
 
@@ -194,7 +193,7 @@ return [
               ]
             ],
             User::class => [
-              'filterableAttributes' => ['id'],
+              'filterableAttributes' => ['id', 'username', 'name'],
               'searchableAttributes' => ['username', 'name', 'email'],
               'typoTolerance' => [
                 'enabled' => true,

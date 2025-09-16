@@ -5,9 +5,9 @@
     <x-card class="">
       <div class="flex justify-between items-start !gap-3 sm:!gap-0 sm:items-center flex-col sm:flex-row mb-12">
         <h2 class="font-bold text-2xl">Products & Subscriptions</h2>
-        <div class="flex justify-center items-center gap-2">
-          <x-btn class="!px-4 sm:!px-8 !py-1.5 text-nowrap" >Add Product</x-btn>
-          <x-btn class="!px-4 sm:!px-8 !py-1.5 text-nowrap"  outlined>Promo Codes</x-btn>
+        <div x-data="{}" class="flex justify-center items-center gap-2">
+          <x-btn href="{{ route('profile.products.create') }}" class="!px-4 sm:!px-8 !py-1.5 text-nowrap" >Add Product</x-btn>
+          <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'promocodes' })" class="!px-4 sm:!px-8 !py-1.5 text-nowrap"  outlined>Promo Codes</x-btn>
         </div>
       </div>
       @livewire('profile.tables', [

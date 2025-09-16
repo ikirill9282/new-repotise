@@ -58,15 +58,12 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/reviews', [CabinetController::class, 'reviews'])->name('profile.reviews');
   Route::get('/profile/sales', [CabinetController::class, 'sales'])->name('profile.sales');
 
+  Route::get('/profile/articles/create', [CabinetController::class, 'create_article'])->name('profile.articles.create');
+  Route::get('/profile/products/create', [CabinetController::class, 'create_product'])->name('profile.products.create');
 });
 
 // Public Profile
 Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
-
-// FOR TESTING
-Route::get('/create-article', [CabinetController::class, 'createArticle'])->name('create.article');
-Route::get('/create-product', [CabinetController::class, 'createProduct'])->name('create.product');
-Route::get('/create-product2', [CabinetController::class, 'createProduct2'])->name('create.product2');
 
 
 Route::post('/hook/stripe', function(Request $request) {

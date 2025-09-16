@@ -32,7 +32,6 @@ class Page extends Component
 
     return view('livewire.profile.page', [
       'user' => $this->user,
-      'articles' => $articles,
     ]);
   }
 }

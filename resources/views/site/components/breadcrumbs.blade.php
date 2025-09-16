@@ -1,14 +1,17 @@
 @props([
   'class' => '',
   'listClass' => '',
+  'breadcrumbs' => [],
 ])
 
 @php
-    $breadcrumbs = \App\Helpers\Breadcrumbs::make(
-      request()->route(), 
-      $current_name ?? null, 
-      $exclude ?? null
-    );
+    if (empty($breadcrumbs)) {
+      $breadcrumbs = \App\Helpers\Breadcrumbs::make(
+        request()->route(), 
+        $current_name ?? null, 
+        $exclude ?? null
+      );
+    }
 @endphp
 
 <section class="breadcrumb_block {{ $class }}">

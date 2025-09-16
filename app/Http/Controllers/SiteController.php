@@ -56,6 +56,8 @@ class SiteController extends Controller
     return view('site.pages.creators', [
       'page' => $page,
       'tags' => $tags,
+      // 'creators' => \App\Models\User::whereHas('roles', fn($q) => $q->where('name', 'creator'))->paginate(50),
+      'creators' => User::paginate(6),
     ]);
   }
 

@@ -64,14 +64,14 @@
         @include('site.components.hits', ['id' => 'search-hits'])
 
       @elseif($template === 'filters')
-        <div class="search_input">
-          <label for="search">
+        <div class="search_input {{ $wrapClass ?? '' }}">
+          <label class="{{ $labelClass ?? '' }}" for="search">
             @include('icons.search')
           </label>
           <input 
             type="search"
             name="q"
-            class="search-input"
+            class="search-input {{ $inputClass ?? '' }}"
             autocomplete="off"
             data-hits="{{ isset($hits) ? $hits : 'search-hits' }}"
             placeholder="{{ isset($placeholder) ? $placeholder : '' }}"

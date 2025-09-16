@@ -2,7 +2,7 @@
 
 
 @section('content')
-    <x-profile.wrap>
-        @livewire('profile.page', ['user' => $user])
-    </x-profile.wrap>
+    <div class="!py-6 bg-light">
+      @livewire('profile.page', ['user' => $user])
+    </div>
 @endsection

@@ -98,7 +98,12 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function toSearchableArray(bool $load_options = true): array
     {
+
+        if ($this->id == 0 || $this->hasRole('admin', 'super-admin')) return [];
+
         $array = $this->toArray();
+        unset($array['roles']);
+        
         $array['avatar'] = $this->avatar;
 
         if ($load_options) {
@@ -106,39 +111,6 @@ class User extends Authenticatable implements HasName, FilamentUser
         }
         $array['description'] = $this->description;
         $array['followers_count'] = $this->loadCount('followers')->followers_count;
-        
-        $products = $this->products()
-          ->with([
-            'categories' => function ($query) {
-              $query->select(['categories.id', 'categories.title']);
-            },
-            'location' => function ($query) {
-              $query->select(['locations.id', 'locations.title']);
-            },
-            'type' => function ($query) {
-              $query->select(['types.id', 'types.title']);
-            },
-          ])
-          ->select(['id', 'title', 'type_id', 'location_id', 'user_id'])
-          ->get()
-          ->toArray();
-        
-        $array['products'] = collect($products)->select('id', 'title')->toArray();
-        $array['categories'] = collect($products)->pluck('categories')
-          ->flatten(1)
-          ->select(['id', 'title'])
-          ->unique('id')
-          ->toArray()
-        ;
-        $array['types'] = collect($products)->pluck('type')
-          ->unique('id')
-          ->toArray()
-        ;
-        
-        $array['locations'] = collect($products)->pluck('location')
-          ->unique('id')
-          ->toArray()
-        ;
         
         return $array;
     }

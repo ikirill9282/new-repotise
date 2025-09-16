@@ -6,7 +6,7 @@
       <div class="flex justify-between items-center mb-12">
         <h2 class="font-bold text-2xl">Travel Insights</h2>
         <div class="flex justify-center items-center gap-2">
-          <x-btn class="!px-8 !py-1.5 text-nowrap" >Add Article</x-btn>
+          <x-btn href="{{ route('profile.articles.create') }}" class="!px-8 !py-1.5 text-nowrap" >Add Article</x-btn>
         </div>
       </div>
       @livewire('profile.tables', [

@@ -30,7 +30,7 @@
         ];
 @endphp
 
-<div class="the-content-wrap profile-wrap">
+<div class="the-content-wrap profile-wrap !py-6">
     <div class="container !block">
         <div class="grid grid-cols-1 lg:grid-cols-[210px_1fr] gap-3">
             <div class="col-span-1 accordion the-profile__sidebar w-full !p-0 group" id="accordionExample2">
@@ -51,6 +51,7 @@
                             @foreach ($routes as $name => $route)
                                 <a class=" lg:w-full
                                     {{ request()->route()->getName() === $name ? 'active' : '' }}
+                                    {{ ($name === 'profile.articles' && str_contains(request()->route()->getName(), 'profile.articles')) ? 'active' : '' }}
                                     "
                                     href="{{ $route['url'] }}"
                                   >

@@ -1,11 +1,11 @@
 <div>
-    <section class="creatorPage">
+    <section class="creatorPage bg-light">
         <div class="container">
-            <div class="grid grid-cols-1 md:!gap-3 items-start md:grid-cols-[1fr_1fr_250px] xl:grid-cols-3">
+            <div class="grid grid-cols-1 md:!gap-3 items-start md:grid-cols-[1fr_1fr_280px] lg:grid-cols-[1fr_1fr_380px]">
                 <div class="order-2 md:!order-1 col-span-2">
 
                   {{-- PROFILE --}}
-                  <x-card class="mb-8">
+                  <x-card size="sm" class="mb-8">
                     <div class="creatorPage__content-author author-page-content">
                       <div class="flex justify-start items-start gap-2 sm:gap-4 !text-sm sm:!text-base mb-4">
                           <div class="!w-14 !h-14 sm:!w-18 sm:!h-18 rounded-full overflow-hidden">
@@ -31,14 +31,16 @@
                               </p>
                               <p class="">
                                   <span class="text-gray">Country:</span>
-                                  <span>{{ $user->options->country }}</span>
+                                  <span>{{ $user->country }}</span>
                               </p>
                           </div>
                       </div>
                       <div class="creatorPage__content-infoBlok-list">
-                          <div class="h-48 lg:h-65 mb-4 rounded-lg overflow-hidden">
-                            <img class="object-cover h-full w-full" src="{{ $user->options->page_banner }}" alt="Banner">
-                          </div>
+                          @if($user->options->page_banner)
+                            <div class="h-48 lg:h-65 mb-4 rounded-lg overflow-hidden">
+                              <img class="object-cover h-full w-full" src="{{ $user->options->page_banner }}" alt="Banner">
+                            </div>
+                          @endif
                           <div class="">
                             {!! $user->options->description !!}
                           </div>
@@ -47,130 +49,133 @@
                   </x-card>
                   
                   {{-- PRODUCTS --}}
-                  <x-card class="mb-8">
+                  <x-card size="sm" class="mb-8">
                     <h4 class="creatorPage__content-title !mb-8">
-                        <span>Products</span>
+                        @if($user->products()->exists())
+                          <span>Products</span>
+                        @else
+                          <span>Potential Products</span>
+                        @endif
                         <span class="text-gray">({{ $user->products()->count() }})</span>
                     </h4>
 
-                    <div class="">
-                      <x-product.slider 
-                        :products="$user->products"
-                        id="profile-product-slider"
-                      ></x-product.slider>
-                    </div>
+                    @if($user->products()->exists())
+                      <div class="">
+                        <x-product.slider 
+                          :products="$user->products()->latest()->limit(6)->get()"
+                          id="profile-product-slider"
+                        ></x-product.slider>
+                      </div>
 
-                    <div class="creatorPage__content-products-moreBtn-wrapper">
-                        <x-link href="{{ route('products') . '?author=' . $user->profile }}">Show More</x-link>
-                    </div>
+                      <div class="creatorPage__content-products-moreBtn-wrapper">
+                          <x-link href="{{ route('products') . '?author=' . $user->profile }}">Show More</x-link>
+                      </div>
+                    @else
+                      <div class="max-w-lg text-center mx-auto">
+                        <b>{{ $user->getName() }}</b>'s travel products will be listed here once this profile is claimed on TrekGuider. Check back for unique guides and maps!
+                      </div>
+                    @endif
                   </x-card>
 
                   {{-- ARTICLES --}}
-                  <x-card>
+                  <x-card size="sm" >
                     <h4 class="!mb-8">
-                        <span>Travel Insights</span>
+                        @if($user->articles()->exists())
+                          <span>Travel Insights</span>
+                        @else
+                          <span>Potential Travel Insights</span>
+                        @endif
                         <span class="text-gray">({{ $user->articles()->count() }})</span>
                     </h4>
-                    <div class="w-full">
-                        @foreach ($articles as $article)
-                          <div class="flex flex-col mb-10 last:mb-0">
-                              <div class="flex items-center mb-2">
-                                  <div class="w-9 h-9 mr-1 rounded-full overflow-hidden">
-                                    <img src="{{ $article->author->avatar }}" alt="Avatar"
-                                      class="object-cover w-full h-full" />
-                                  </div>
-                                  <div class="text-gray text-sm leading-4">
-                                    <p>{{ $article->author->getName() }}</p>
-                                    <p>{{ $article->author->profile }}</p>
-                                  </div>
-                                  @if(auth()->user()?->id == $article->author->id)
-                                    <x-btn class="!flex items-center text-sm !w-auto gap-2 px-4 py-1 ml-3">
-                                      <span>@include('icons.edit')</span>
-                                      <span>Edit Insights</span>
-                                    </x-btn>
-                                  @endif
-                              </div>
-                              <div class="flex justify-start items-center gap-2 text-sm mb-4">
-                                  <p class="text-gray bg-light px-2 py-1 rounded-full">{{ \Illuminate\Support\Carbon::parse($article->created_at)->format('d.m.Y') }}</p>
-                                  <p class="text-gray bg-light px-2 py-1 rounded-full">{{ $article->views }} Views</p>
-                              </div>
-                              <div class="mb-4">
-                                  <h6 class="!text-2xl mb-4">{{ $article->title }}</h6>
-                                  <div class="text-gray read-more read-more-300">
-                                      {!! $article->text !!}
-                                  </div>
-                              </div>
-                              <div class="flex items-center justify-start flex-wrap gap-1">
-                                  @foreach ($article->tags as $tag)  
-                                    <a href="{{ route('search') . '?q=' . $tag->title }}" class="px-2.5 py-1 text-sm rounded-full transition
-                                            !text-gray !bg-light hover:!bg-second hover:!text-light hover:cursor-pointer"
-                                      >
-                                        {{ $tag->title }}
-                                      </a>
-                                  @endforeach
-                              </div>
-                              <div class="flex justify-start items-center !gap-1.5 sm:!gap-3 mt-4">
-                                  <div class="creatorPage__content-travel-post-interactive-avatars">
-                                      @foreach($article->likes as $like)
-                                        <a href="{{ $like->author->makeProfileUrl() }}" class="!w-5 !h-5 inline-block rounded-full overflow-hidden shadow-sm ml-[-8px] first:!ml-0">
-                                            <img class="object-cover w-full h-full" src="{{ $like->author->avatar }}" alt="" />
+
+                    @if ($user->articles()->exists())
+                      <div class="w-full">
+                          @foreach ($user->articles()->latest()->limit(6)->get() as $article)
+                            <div class="flex flex-col mb-10 last:mb-0">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-9 h-9 mr-1 rounded-full overflow-hidden">
+                                      <img src="{{ $article->author->avatar }}" alt="Avatar"
+                                        class="object-cover w-full h-full" />
+                                    </div>
+                                    <div class="text-gray text-sm !leading-5">
+                                      <p>{{ $article->author->getName() }}</p>
+                                      <p>{{ $article->author->profile }}</p>
+                                    </div>
+                                    @if(auth()->user()?->id == $article->author->id)
+                                      <x-btn class="!flex items-center text-sm !w-auto gap-2 px-4 py-1 ml-3">
+                                        <span>@include('icons.edit')</span>
+                                        <span>Edit Insights</span>
+                                      </x-btn>
+                                    @endif
+                                </div>
+                                <div class="flex justify-start items-center gap-2 text-sm mb-4">
+                                    <p class="text-gray bg-light px-2 py-1 rounded-full">{{ \Illuminate\Support\Carbon::parse($article->created_at)->format('d.m.Y') }}</p>
+                                    <p class="text-gray bg-light px-2 py-1 rounded-full">{{ $article->views }} Views</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="!text-2xl mb-4">{{ $article->title }}</h6>
+                                    <div class="text-gray read-more read-more-300">
+                                        {!! $article->text !!}
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-start flex-wrap gap-1">
+                                    @foreach ($article->tags as $tag)  
+                                      <a href="{{ route('search') . '?q=' . $tag->title }}" class="px-2.5 py-1 text-sm rounded-full transition
+                                              !text-gray !bg-light hover:!bg-second hover:!text-light hover:cursor-pointer"
+                                        >
+                                          {{ $tag->title }}
                                         </a>
-                                      @endforeach
-                                  </div>
-                                  <div class="flex justify-start items-center gap-1.5 sm:gap-3">
-                                      @php
-                                        $hash_id = \App\Helpers\CustomEncrypt::generateUrlHash([$article->id]);
-                                      @endphp
+                                    @endforeach
+                                </div>
+                                <div class="flex justify-start items-center !gap-1.5 sm:!gap-3 mt-4">
+                                    <div class="">
+                                        @foreach($article->likes()->latest()->limit(3)->get() as $like)
+                                          <a href="{{ $like->author->makeProfileUrl() }}" class="!w-5 !h-5 inline-block rounded-full overflow-hidden shadow-sm ml-[-8px] first:!ml-0">
+                                              <img class="object-cover w-full h-full" src="{{ $like->author->avatar }}" alt="" />
+                                          </a>
+                                        @endforeach
+                                    </div>
+                                    <div class="flex justify-start items-center gap-1.5 sm:gap-3">
+                                        @php
+                                          $hash_id = \App\Helpers\CustomEncrypt::generateUrlHash([$article->id]);
+                                        @endphp
 
-                                      <x-like :id="$article->id" :count="$article->likes()->count()"></x-like>
-                                      {{-- <a
-                                        href="/feedback/likes"
-                                        class="feedback_button flex items-center justify-start gap-0.5 sm:gap-1
-                                              !text-gray
-                                              {{ auth()->check() ? '' : 'open_auth' }} 
-                                              {{ is_liked('article', $article->id) ? 'liked' : '' }}
-                                              "
-                                        data-item="{{ hash_like('article', $article->id) }}"
-                                        data-id="{{ $hash_id }}"
-                                      >
-                                        <span>
-                                          @include('icons.like')
-                                        </span>
-                                        <span>
-                                          <span>Like</span>
-                                          <span class="!text-black" data-counter="{{ $hash_id }}">
-                                            {{ $article->likes()->count() }}
-                                          </span>
-                                        </span>
-                                      </a> --}}
+                                        <x-like :id="$article->id" :count="$article->likes()->count()"></x-like>
 
-                                      <div class="flex justify-start items-center gap-1 text-sm">
-                                          <a href="{{ auth()->user()->makeReferalArticleUrl('FB', $article) }}" target="_blank" class="first_connect !text-gray hover:!text-blue-500">
-                                            @include('icons.facebook-sm')
-                                          </a>
-                                          <a href="{{ auth()->user()->makeReferalArticleUrl('TW', $article) }}" target="_blank" class="second_connect !text-gray hover:!text-black">
-                                            @include('icons.twitter-sm')
-                                          </a>
-                                          <a href="{{ auth()->user()->makeReferalArticleUrl('RD', $article) }}" target="_blank" class="third_connect !text-gray hover:!text-black">
-                                            @include('icons.reddit-sm')
-                                          </a>
-                                          <x-link href="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}" class="share copyToClipboard ml-1" data-target="{{ $hash_id }}">
-                                            <input data-copyId="{{ $hash_id }}" type="hidden" value="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}"></input>
-                                            Share
-                                          </x-link>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                        @endforeach
-                    </div>
-                    <div class="text-center mt-10">
-                      <x-link href="{{ route('insights') . '?author=' . $article->author->profile }}">Show More</x-link>
-                    </div>
+                                        <div class="flex justify-start items-center gap-1 text-sm">
+                                            <a href="{{ auth()->user()->makeReferalArticleUrl('FB', $article) }}" target="_blank" class="first_connect !text-gray hover:!text-blue-500">
+                                              @include('icons.facebook-sm')
+                                            </a>
+                                            <a href="{{ auth()->user()->makeReferalArticleUrl('TW', $article) }}" target="_blank" class="second_connect !text-gray hover:!text-black">
+                                              @include('icons.twitter-sm')
+                                            </a>
+                                            <a href="{{ auth()->user()->makeReferalArticleUrl('RD', $article) }}" target="_blank" class="third_connect !text-gray hover:!text-black">
+                                              @include('icons.reddit-sm')
+                                            </a>
+                                            <x-link href="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}" class="share copyToClipboard ml-1" data-target="{{ $hash_id }}">
+                                              <input data-copyId="{{ $hash_id }}" type="hidden" value="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}"></input>
+                                              Share
+                                            </x-link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          @endforeach
+                      </div>
+                      <div class="text-center mt-10">
+                        <x-link href="{{ route('insights') . '?author=' . $user->profile }}">Show More</x-link>
+                      </div>
+                    @else
+                      <div class="max-w-lg text-center mx-auto">
+                        Travel insights and tips from <b>{{ $user->getName() }}</b> will be published here once this profile is claimed. Get ready for inspiring content!
+                      </div>
+                    @endif
                   </x-card>
                 </div>
 
-                <aside class="flex flex-col gap-4 order-1 md:!order-2 top-[80px] rightt-0 col-span-1 bg-white !p-2 sm:!p-4 rounded">
+
+                <aside class="flex flex-col gap-4 order-1 md:!order-2 
+                  top-[80px] rightt-0 col-span-1 bg-white !p-2 sm:!p-4 rounded">
                     @if(auth()->user()->id == $user->id)
                       <x-btn class="!py-2 !max-w-none">Edit Profile</x-btn>
                     @endif
@@ -275,7 +280,9 @@
                                 </label>
                             </div>
                         </div>
-                        <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social' })" class="inline-block">Add Social Link</x-link>
+                        @if(auth()->user()->id == $user->id)
+                          <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social' })" class="inline-block">Add Social Link</x-link>
+                        @endif
                     </div>
                     
                     <x-btn wire:click.prevent="$dispatch('openModal', { modalName: 'contact' })" class="!py-2 !max-w-none">Contact Creator</x-btn>

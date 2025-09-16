@@ -24,7 +24,7 @@
     </div>
 
     @if($button)
-      <a href="#" class="search-button">Search</a>
+      <x-btn href="#" class="!w-auto !p-3 !rounded-lg search-button hover:!bg-second">Search</x-btn>
     @endif
   </form>
   {{ $slot }}

@@ -18,6 +18,7 @@ Route::prefix('api')->group(function() {
 
   Route::prefix('/data')->controller(DataController::class)->group(function() {
     Route::get('/feed/{id}', 'feed');
+    Route::get('/tags', 'tags');
     // Route::post('/comments', 'comments');
     Route::post('/messages', 'messages');
     Route::post('/favorite-author', 'favorite_author');

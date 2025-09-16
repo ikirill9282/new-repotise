@@ -24,6 +24,7 @@ use App\Models\Discount;
 use App\Models\MailLog;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
+use App\Models\News;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
