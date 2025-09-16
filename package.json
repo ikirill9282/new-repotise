@@ -17,6 +17,7 @@
         "@algolia/autocomplete-js": "^1.18.1",
         "@algolia/autocomplete-theme-classic": "^1.18.1",
         "@meilisearch/autocomplete-client": "^0.6.0",
+        "air-datepicker": "^3.6.0",
         "algoliasearch": "^5.23.0",
         "quill": "^2.0.3"
     }

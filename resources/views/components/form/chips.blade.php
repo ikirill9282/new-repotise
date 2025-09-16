@@ -8,7 +8,7 @@
   x-data="{
     selected: [],
     options: [],
-    error: 'error 404',
+    error: null,
     load(query = '') {
       axios.get('/api/data/tags', { params: { q: query } })
         .then(response => {
@@ -80,15 +80,22 @@
     },
     isEmptyOptions() {
       return !this.options.filter(elem => elem.key !== 'empty').lenght;
-    }
+    },
+    setVal(val) {
+      this.$refs.value.value = val;
+    },
   }"
 
   x-init="() => {
     load();
+    $watch('selected', value => {
+      const val = value.map(elem => elem.key).join(',');
+      setVal(val);
+    })
   }"
   >
 
-  <input type="hidden" {{ $attributes }} >
+  <input x-ref="value" type="hidden" {{ $attributes }} >
 
   @if($label)
     <label class="text-gray !mb-2" for="{{ $id }}">{{ $label }}</label>
@@ -104,6 +111,7 @@
         x-ref="input"
         x-on:focus="showList()"
         x-on:input="(evt) => {
+          evt.target.value = evt.target.value.replace(',', '');
           load(evt.target.value);
         }"
         x-on:keydown.enter.prevent="(evt) => {

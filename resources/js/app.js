@@ -1,12 +1,16 @@
 import './bootstrap';
 import 'quill/dist/quill.snow.css';
 
-import { autocomplete } from '@algolia/autocomplete-js'
-import {
-  meilisearchAutocompleteClient,
-  getMeilisearchResults,
-} from '@meilisearch/autocomplete-client'
-import '@algolia/autocomplete-theme-classic'
+// import { autocomplete } from '@algolia/autocomplete-js'
+// import {
+//   meilisearchAutocompleteClient,
+//   getMeilisearchResults,
+// } from '@meilisearch/autocomplete-client'
+
+// import '@algolia/autocomplete-theme-classic'
+
+import AirDatepicker from 'air-datepicker';
+import 'air-datepicker/air-datepicker.css';
 
 import Quill from 'quill';
 
