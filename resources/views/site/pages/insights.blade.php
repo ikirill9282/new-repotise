@@ -16,10 +16,10 @@
   <section class="tips_news_group">
     <div class="container">
         <div class="about_block justify-betwee items-stretch !gap-12">
-            <x-card class="item_group basis-9/12 lg:basis-4/5">
+            <x-card size="sm" class="item_group basis-9/12 lg:basis-4/5">
                 <x-title tag="h3" class="!font-normal !mb-10">Travel Insights</x-title>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 !gap-6">
                   @foreach($articles as $item)
                     <div class="cards_group">
                         <a href="{{ $item->makeFeedUrl() }}">
