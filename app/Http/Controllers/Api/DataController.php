@@ -9,11 +9,14 @@ use App\Models\Admin\SectionVariables;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Blade;
 use App\Models\Article;
+use App\Models\Category;
+use App\Models\Location;
 use App\Models\User;
 use App\Models\Page;
 use App\Models\Review;
 use App\Models\Product;
 use App\Models\Tag;
+use App\Models\Type;
 
 class DataController extends Controller
 {
@@ -112,10 +115,17 @@ class DataController extends Controller
     return response(implode("\n", $result));
   }
 
+  public function favorite_author(Request $request)
+  {
+    $valid = $request->validate(['id' => 'required|integer']);
+    $model = User::find($valid['id']);
+    return response()->json(['status' => true, 'content' => Blade::render('site.components.favorite.author', ['author' => $model])]);
+  }
 
   public function tags(Request $request)
   {
     $valid = $request->validate(['q' => 'sometimes|nullable|string']);
+
     return Tag::query()
       ->when(
         !empty($valid['q']),
@@ -131,10 +141,60 @@ class DataController extends Controller
       });
   }
 
-  public function favorite_author(Request $request)
+  public function types(Request $request)
   {
-    $valid = $request->validate(['id' => 'required|integer']);
-    $model = User::find($valid['id']);
-    return response()->json(['status' => true, 'content' => Blade::render('site.components.favorite.author', ['author' => $model])]);
+    $valid = $request->validate(['q' => 'sometimes|nullable|string']);
+
+    return Type::query()
+      ->when(
+        !empty($valid['q']),
+        fn($query) => $query->where('title', 'like', "%{$valid['q']}%")
+          ->orWhere('slug', 'like', "%{$valid['q']}%")
+      )
+      ->get()
+      ->map(function($item) {
+        return [
+          'key' => $item->slug,
+          'label' => $item->title,
+        ];
+      });
+  }
+
+  public function locations(Request $request)
+  {
+    $valid = $request->validate(['q' => 'sometimes|nullable|string']);
+
+    return Location::query()
+      ->when(
+        !empty($valid['q']),
+        fn($query) => $query->where('title', 'like', "%{$valid['q']}%")
+          ->orWhere('slug', 'like', "%{$valid['q']}%")
+      )
+      ->get()
+      ->map(function($item) {
+        return [
+          'key' => $item->slug,
+          'label' => $item->title,
+        ];
+      });
+  }
+
+  public function categories(Request $request)
+  {
+    $valid = $request->validate(['q' => 'sometimes|nullable|string']);
+
+    return Category::query()
+      ->when(
+        !empty($valid['q']),
+        fn($query) => $query->where('title', 'like', "%{$valid['q']}%")
+          ->orWhere('slug', 'like', "%{$valid['q']}%")
+      )
+      ->get()
+      ->map(function($item) {
+        return [
+          'key' => $item->slug,
+          'label' => $item->title,
+        ];
+      });
   }
 }

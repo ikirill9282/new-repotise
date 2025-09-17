@@ -2,7 +2,7 @@
 
 @section('content')
   <x-profile.wrap>
-    <x-card class="">
+    <x-card size="sm" class="">
       <div class="flex justify-between items-center mb-12">
         <h2 class="font-bold text-2xl">Travel Insights</h2>
         <div class="flex justify-center items-center gap-2">

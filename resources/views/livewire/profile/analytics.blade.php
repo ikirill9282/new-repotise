@@ -1,6 +1,6 @@
 <div>
   <x-profile.wrap>
-    <x-card class="mb-4">
+    <x-card size="sm" class="mb-4">
       <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
         <div class="font-bold text-2xl">Sales Analytics</div>
         <div class="block">

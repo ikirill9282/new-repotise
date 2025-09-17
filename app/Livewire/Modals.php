@@ -90,6 +90,7 @@ class Modals extends Component
         'promocodes',
         'order',
         'edit-contacts',
+        'file-description',
       ];
       return !in_array($this->modal, $arr);
     }    

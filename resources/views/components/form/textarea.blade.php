@@ -26,7 +26,7 @@
     <label class="text-gray text-sm sm:text-base mb-1" for="{{ $id }}">{{ $label }}</label>
   @endif
   <div class="relative bg-light rounded-lg !p-3 flex items-start justify-between @if($tooltip) !gap-3 @endif ">
-    <div x-ref="placeholder" class="absolute top-3 left-3 !text-gray transition">
+    <div x-ref="placeholder" class="absolute top-3 left-3 max-w-5/6 !text-gray transition">
       {!! $placeholder !!}
     </div>
     <textarea

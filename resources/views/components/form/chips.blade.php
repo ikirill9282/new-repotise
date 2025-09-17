@@ -2,15 +2,17 @@
   'label' => null,
   'id' => uniqid(),
   'placeholder' => '',
+  'source' => null,
+  'max' => 5,
 ])
 
-<div class="relative dropdown"
+<div class="relative dropdown text-sm sm:text-base"
   x-data="{
     selected: [],
     options: [],
     error: null,
     load(query = '') {
-      axios.get('/api/data/tags', { params: { q: query } })
+      axios.get('/api/data/{{ $source }}', { params: { q: query } })
         .then(response => {
           this.options = response.data.length 
             ? response.data
@@ -19,7 +21,7 @@
         .catch(error => console.log(error));
     },
     pushVal(val) {
-      if (this.selected.length >= 5) {
+      if (this.selected.length >= {{ $max }}) {
         this.error = 'Maximum tags';
         return ;
       }
@@ -36,7 +38,7 @@
     },
     addVal(val) {
       if (val.key !== 'empty' && !this.hasVal(val)) {
-        if (this.selected.length >= 5) {
+        if (this.selected.length >= {{ $max }}) {
           this.error = 'Maximum tags';
           return ;
         }
@@ -102,7 +104,7 @@
   @endif
   
   {{-- INPUT --}}
-  <div class="bg-light relative rounded-lg flex justify-start items-center !mb-2">
+  <div class="bg-light relative rounded-lg flex justify-start items-center">
     <div class="!pl-4">
       @include('icons.search')
     </div>
@@ -134,9 +136,9 @@
           hideList();
           load();
         }" 
-        class="hidden text-gray mt-0.5 mr-1 transition hover:cursor-pointer hover:text-black"
+        class="hidden text-gray !mx-1 !mt-0.5 transition hover:cursor-pointer hover:text-black"
       >
-        @include('icons.close')
+        @include('icons.close', ['width' => 14, 'height' => 14])
       </div>
     </div>
 
@@ -154,7 +156,7 @@
   @endif
 
   {{-- OPTIONS --}}
-  <div x-ref="dropdown" class="absolute w-full bottom-0 left-0 translate-y-full bg-light 
+  <div x-ref="dropdown" class="absolute w-full bottom-0 left-0 translate-y-full bg-light z-120
       rounded-lg overflow-hidden !h-0 opacity-0 transition max-h-48 overflow-x-hidden overflow-y-auto
       scrollbar-custom"
     >
@@ -163,8 +165,8 @@
         x-bind:data-value="option.value"
         x-on:click="addVal(option)"
         x-bind:class="[
-          'group !p-3 transition hover:!text-black hover:cursor-pointer hover:bg-gray/50',
-          (hasVal(option)) ? '!bg-gray/25 !text-black' : '!text-gray',
+          'group !p-3 transition hover:ring-2 ring-active hover:!text-active hover:bg-active/10 cursor-pointer',
+          (hasVal(option)) ? '!bg-active/10 !text-active' : '!text-gray',
         ]"
       >
         <span x-text="option.label" class="!block w-full"></span>
@@ -173,11 +175,13 @@
   </div>
 
   {{-- SELECTED --}}
-  <div class="flex justify-start items-stretch flex-wrap !gap-2 !pb-2">
+  <div class="flex justify-start items-stretch flex-wrap !gap-2 !pb-2 !mt-2">
     <template x-for="item in selected">
       <div class="!px-2.5 !py-[3px] rounded-full text-sm text-light bg-gray flex justify-start items-center !gap-2">
         <span x-text="item.label"></span>
-        <span x-on:click="dropVal(item)" class="hover:cursor-pointer">@include('icons.close', ['width' => 8, 'height' => 8])</span>
+        <span x-on:click="dropVal(item)" class="hover:cursor-pointer">
+          @include('icons.close', ['width' => 8, 'height' => 8])
+        </span>
       </div>
     </template>
   </div>

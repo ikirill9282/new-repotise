@@ -1,4 +1,4 @@
-<x-card>
+<x-card size="sm">
   <div class="font-semibold text-2xl mb-5">Dashboard</div>
   <div class="flex justify-between items-center mb-4">
     <div class="text-lg">Balance & Payouts</div>

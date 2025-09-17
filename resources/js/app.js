@@ -11,10 +11,27 @@ import 'quill/dist/quill.snow.css';
 
 import AirDatepicker from 'air-datepicker';
 import 'air-datepicker/air-datepicker.css';
+import localeEn from 'air-datepicker/locale/en';
 
 import Quill from 'quill';
 
 window.Quill = Quill;
+window.AirDatepicker = AirDatepicker;
+window.createDatePicker = createDatePicker;
+
+function createDatePicker(selector)
+{
+  return new AirDatepicker(selector, {
+      locale: localeEn,
+      dateFormat(date) {
+        return date.toLocaleString('en-US', {
+          year: 'numeric',
+          day: '2-digit',
+          month: '2-digit',
+      });
+    }
+  });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   const editors = document.querySelectorAll('.quill-editor');
@@ -34,55 +51,15 @@ document.addEventListener('DOMContentLoaded', function () {
           placeholder: editor.getAttribute('data-placeholder') ?? '',
       });
 
-      quill.on('text-change', function() {
+      quill.on('text-change', () => {
           const content = quill.root.innerHTML;
           editor.value = content;
+          
+          const counter = editor.closest('.text-editor')?.querySelector('.text-counter');
+          if (counter) {
+            // @readthedoc
+            counter.innerHTML = quill.getLength() - 1;
+          }
       });
   });
-
-
-  // const token = '0EHXuNA1FV';
-
-  // const searchClient = meilisearchAutocompleteClient({
-  //   url: 'http://localhost:7700', // Host
-  //   apiKey: token,  // API key
-  // })
-        
-
-  // autocomplete({
-  //   container: '#autocomplete',
-  //   openOnFocus: true,
-  //   placeholder: 'Search for games',
-  //   getSources({ query }) {
-  //     if (!query) return [];
-  //     return [
-  //       {
-  //         sourceId: 'articles',
-  //         getItems() {
-  //           return getMeilisearchResults({
-  //             searchClient: searchClient,
-  //             queries: [
-  //               {
-  //                 indexName: 'articles',
-  //                 query,
-  //                 attributesToHighlight: [],
-  //               },
-  //             ],
-  //             transformResponse(data) {
-  //               console.log(data);
-                
-  //             }
-  //           })
-  //         },
-  //         templates: {
-  //           item({ item, components, html }) {
-  //             return html`<div>
-  //               <div>${item.title}</div>
-  //             </div>`
-  //           },
-  //         },
-  //       },
-  //     ]
-  //   },
-  // })
 });

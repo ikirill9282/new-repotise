@@ -92,7 +92,7 @@
                         @if (auth()->check() && auth()->user()->can('create-products'))
                             <x-slot name="buttons">
                                 <div class="add_products">
-                                    <a href="{{ auth()->user()->makeProfileUrl() . '/products/create' }}">Add product</a>
+                                    <a href="{{ route('profile.products.create') }}">Add product</a>
                                 </div>
                             </x-slot>
                         @endif

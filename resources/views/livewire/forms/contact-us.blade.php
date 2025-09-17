@@ -13,7 +13,7 @@
 
           <x-form.textarea class="min-h-24" id="ta" placeholder="Your Message<br> Please provide details about your request"></x-form.textarea>
 
-          <x-form.files></x-form.files>
+          <x-form.file></x-form.file>
 
           <x-btn class="!w-auto !px-18 self-start">Submit</x-btn>
         </div>

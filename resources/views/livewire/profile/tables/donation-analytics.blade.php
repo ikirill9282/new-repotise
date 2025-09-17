@@ -3,7 +3,7 @@
       <div class="text-lg text-center">There are no sales yet.</div>
     @else
     @endif --}}
-    <x-card>
+    <x-card size="sm">
       <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
         <div class="flex justify-start items-start xl:items-center flex-col xl:flex-row !gap-4 xl:!gap-8 !mb-10">
           <div class="font-bold text-2xl">Filters</div>

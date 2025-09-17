@@ -2,7 +2,7 @@
   $class = $attributes->get('class') ?? '';   
 @endphp
 
-<x-card class="border-1 border-active !rounded-2xl {{ $class }}">
+<x-card size="sm" class="border-1 border-active !rounded-2xl {{ $class }}">
   <div class="flex flex-col md:flex-row justify-start items-start md:items-center gap-3">
       <div class="">
         <div class="font-semibold text-2xl mb-3">Complete Verification Required</div>

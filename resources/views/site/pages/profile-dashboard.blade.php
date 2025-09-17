@@ -11,7 +11,7 @@
                     @livewire('profile.balances', ['class' => 'h-full'])
                 </div>
                 <div class="basis-1/2">
-                    <x-card class="h-full">
+                    <x-card size="sm" class="h-full">
                         <div class="text-2xl mb-5">Your Level & Benefits</div>
                         <div class="mb-4">
                             <div class="text-gray mb-1">Your Current Level:</div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <x-card>
+            <x-card size="sm">
               @livewire('profile.tables', [
                 'tables' => [
                   [

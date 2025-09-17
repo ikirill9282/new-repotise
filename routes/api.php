@@ -17,9 +17,14 @@ Route::prefix('api')->group(function() {
   });
 
   Route::prefix('/data')->controller(DataController::class)->group(function() {
+    Route::get('/', function() {
+      return response()->json([]);
+    });
     Route::get('/feed/{id}', 'feed');
     Route::get('/tags', 'tags');
-    // Route::post('/comments', 'comments');
+    Route::get('/types', 'types');
+    Route::get('/locations', 'locations');
+    Route::get('/categories', 'categories');
     Route::post('/messages', 'messages');
     Route::post('/favorite-author', 'favorite_author');
   });
