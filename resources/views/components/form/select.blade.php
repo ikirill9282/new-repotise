@@ -34,7 +34,11 @@
   }"
   x-init="() => {
     if (value === null && label === null) {
-      setVal('{{ array_key_first($options) }}', '{{ $options[array_key_first($options)] }}');
+      @if($value == null)
+        setVal('{{ array_key_first($options) }}', '{{ $options[array_key_first($options)] }}');
+      @else
+        setVal('{{ $value }}', '{{ $options[$value] ?? '' }}')
+      @endif
     }
   }"
   class="w-full group text-sm sm:text-base"

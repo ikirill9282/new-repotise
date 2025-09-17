@@ -36,6 +36,10 @@
 
                 {{-- SUBSCRIPTION --}}
                 <div class="">
+                  <div class="!mb-6">
+                    <x-form.select title="Refund Policy" value="90" :options="[30 => '30 days', 60 => '60 days', 90 => '90 days',]"></x-form.select>
+                  </div>
+
                   <div class="text-lg inline-block relative !pr-6 !mb-6">
                     Prepayment Discounts:
                     <x-tooltip message="tooltip"></x-tooltip>
