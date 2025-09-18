@@ -27,19 +27,21 @@ Route::prefix('api')->group(function() {
     Route::get('/categories', 'categories');
     Route::post('/messages', 'messages');
     Route::post('/favorite-author', 'favorite_author');
+
+    Route::middleware('auth:web')->post('/upload-image', 'uploadImage');
   });
 
-  Route::prefix('/feedback')->middleware('auth:web')->controller(FeedbackController::class)->group(function() {
-    Route::get('/views', 'views');
-    Route::post('/likes', 'likes');
-    Route::post('/comment', 'comment');
-    Route::post('/review', 'review');
-    Route::post('/favorite', 'favorite');
-    Route::post('/follow', 'follow');
+  // AUTH
+  Route::middleware('auth:web')->group(function() {
+    Route::prefix('/feedback')->controller(FeedbackController::class)->group(function() {
+      Route::get('/views', 'views');
+      Route::post('/likes', 'likes');
+      Route::post('/comment', 'comment');
+      Route::post('/review', 'review');
+      Route::post('/favorite', 'favorite');
+      Route::post('/follow', 'follow');
+    });
   });
-
-  // Route::prefix('/user')->middleware('auth:web')->controller(UserController::class)->group(function() {
-  // });
 
 
   Route::prefix('/cart')->controller(CartController::class)->group(function() {

@@ -10,6 +10,7 @@ use App\Models\Comment;
 use Illuminate\Support\Facades\Blade;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Gallery;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\Page;
@@ -17,10 +18,42 @@ use App\Models\Review;
 use App\Models\Product;
 use App\Models\Tag;
 use App\Models\Type;
+use Exception;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
 
+  public function uploadImage(Request $request)
+  {
+    $request->validate(['image' => 'required|image|max:2048']);
+    $image = $request->file('image');
+    
+    try {
+      $path = $image->store('images', 'public');
+      $gallery = Gallery::create([
+        'model_id' => 0,
+        'user_id' => $request->user()->id,
+        'type' => 'article',
+        'image' => "/storage$path",
+        'size' => $image->getSize(),
+        'scheduled_at' => Carbon::tomorrow()->endOfDay(),
+      ]);
+
+      return response()->json(['status' => 'success', 'message' => '', 'path' => $gallery->image]);
+    } catch (\Exception $e) {
+      if ($path && Storage::disk('public')->exists($path)) {
+        Storage::disk('public')->delete($path);
+      }
+      Log::error('Error while saving TMP image for article', [
+        'error' => $e->getMessage() . ' at ' . $e->getFile() . ' on line ' . $e->getLine(),
+      ]);
+      return response()->json(['status' => 'error', 'message' => 'Something went wrong...']);
+    }
+  }
+  
   public function feed(Request $request, $id)
   {
     $vars = Page::where('slug', 'feed')->with('config')->first()->config->keyBy('name');

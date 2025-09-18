@@ -17,7 +17,7 @@ return new class extends Migration
             $table->bigInteger('article_id')->unsigned()->index();
             $table->bigInteger('parent_id')->unsigned()->index()->nullable();
             $table->text('text');
-            $table->tinyInteger('edited');
+            $table->tinyInteger('edited')->default(0);
             $table->timestamps();
 
             $table->bigInteger('status_id')->unsigned()->index()->default(3);

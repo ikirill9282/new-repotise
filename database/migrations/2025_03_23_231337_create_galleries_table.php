@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('model_id')->unsigned();
             $table->char('type', 10)->index();
             $table->string('image');
             $table->tinyInteger('preview')->default(0);
+            $table->integer('size');
+            $table->timestamp('scheduled_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

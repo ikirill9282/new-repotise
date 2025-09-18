@@ -115,6 +115,11 @@ class User extends Authenticatable implements HasName, FilamentUser
         return $array;
     }
 
+    public function gallery()
+    {
+      return $this->hasMany(Gallery::class);
+    }
+
     public function reviews()
     {
       return $this->hasMany(Review::class);

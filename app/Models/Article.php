@@ -25,6 +25,37 @@ class Article extends Model
 
   public array|Collection $comments = [];
 
+  public static function boot()
+  {
+    parent::boot();
+
+    self::creating(function ($model) {
+      if (!isset($model->slug) || empty($model->slug)) {
+        $model->generateSlug();
+      }
+    });
+
+    self::updating(function ($model) {
+        if ($model->isDirty('title')) {
+            $model->generateSlug();
+        }
+    });
+  }
+
+  public function toSearchableArray(): array
+  {
+      $array = $this->toArray();
+
+      $array['tags'] = $this->tags->select(['id', 'title'])->toArray();
+      $array['preview'] = $this->preview?->image ?? '';
+      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+      $array['short'] = $this->short();
+      $array['keywords'] = $this->getKeywords();
+
+      return $array;
+  }
+
+
   public static function selectShort()
   {
     return static::query()->select(['id', 'title', 'user_id', 'annotation']);
@@ -48,37 +79,6 @@ class Article extends Model
   public function user()
   {
     return $this->belongsTo(User::class);
-  }
-
-
-  public function toSearchableArray(): array
-  {
-      $array = $this->toArray();
-
-      $array['tags'] = $this->tags->select(['id', 'title'])->toArray();
-      $array['preview'] = $this->preview?->image ?? '';
-      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
-      $array['short'] = $this->short();
-      $array['keywords'] = $this->getKeywords();
-
-      return $array;
-  }
-
-  protected static function boot()
-  {
-    parent::boot();
-
-    self::creating(function ($model) {
-      if (!isset($model->slug) || empty($model->slug)) {
-        $model->generateSlug();
-      }
-    });
-
-    self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
-    });
   }
 
   public function short(int $symbols = 200)

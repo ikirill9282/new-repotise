@@ -37,10 +37,12 @@
       }
     },
     addVal(val) {
-      if (val.key !== 'empty' && !this.hasVal(val)) {
-        if (this.selected.length >= {{ $max }}) {
-          this.error = 'Maximum tags';
-          return ;
+      if (!this.hasVal(val)) {
+        if (val.key !== 'empty') {
+          if (this.selected.length >= {{ $max }}) {
+            this.error = 'Maximum tags';
+            return ;
+          }
         }
         this.selected.push(val);
         this.error = null;
@@ -96,7 +98,6 @@
     })
   }"
   >
-
   <input x-ref="value" type="hidden" {{ $attributes }} >
 
   @if($label)

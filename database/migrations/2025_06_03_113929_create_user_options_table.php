@@ -38,12 +38,16 @@ return new class extends Migration
             $table->integer('tax_id')->nullable();
             $table->string('phone')->nullable();
 
+            // Social
             $table->string('youtube')->nullable();
             $table->string('tiktok')->nullable();
-            $table->string('google')->nullable();
             $table->string('facebook')->nullable();
             $table->string('instagram')->nullable();
-            $table->string('twitter')->nullable();
+            $table->string('google')->nullable();
+            $table->string('xai')->nullable();
+            $table->string('website')->nullable();
+            $table->string('other')->nullable();
+
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

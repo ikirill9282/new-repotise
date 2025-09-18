@@ -1,13 +1,14 @@
 <div>
   <div class="max-w-4xl">
+    @dump($this->fields)
     {{-- CONTENT --}}
     <h2 class="!font-bold !text-xl !mb-10">Create New Article</h2>
     <div class="flex flex-col justify-start items-stretch !mb-10">
       <div class="flex flex-col justify-start items-stretch !gap-6">
         
-        <x-form.input label="Article Title" placeholder="Enter your article title here..." />
+        <x-form.input wire:model="fields.title" label="Article Title" placeholder="Enter your article title here..." />
     
-        <x-form.text-editor label="Article Content" placeholder="Start writing your article here..."></x-form.text-editor>
+        <x-form.text-editor wire:model="fields.text" label="Article Content" placeholder="Start writing your article here..."></x-form.text-editor>
 
         <div class="">
           <x-form.chips source="tags" name="tags" label="Tags" placeholder="Search or create tags...(Up to 5)" />
@@ -41,7 +42,7 @@
     {{-- BUTTONS --}}
     <div class="flex justify-start items-stretch !gap-4">
       <x-btn class="sm:!w-auto !m-0 sm:!px-12" outlined>Save as Draft</x-btn>
-      <x-btn class="sm:!w-auto sm:!px-28" >Publish Now</x-btn>
+      <x-btn wire:click.prevent="submit" class="sm:!w-auto sm:!px-28" >Publish Now</x-btn>
     </div>
   </div>
 </div>

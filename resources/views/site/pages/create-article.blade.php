@@ -10,7 +10,9 @@
           'Create Article' => route('profile.articles.create'),
         ]" />
 
-        @livewire('forms.article')
+        @livewire('forms.article', [
+          'article' => \App\Models\Article::find(1)
+        ])
       </div>
   </section>
 @endsection

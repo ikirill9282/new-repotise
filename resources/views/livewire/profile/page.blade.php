@@ -1,11 +1,11 @@
 <div>
     <section class="creatorPage bg-light">
-        <div class="container">
+        <div class="container {{ $container }}">
             <div class="grid grid-cols-1 md:!gap-3 items-start md:grid-cols-[1fr_1fr_280px] lg:grid-cols-[1fr_1fr_380px]">
                 <div class="order-2 md:!order-1 col-span-2">
 
                   {{-- PROFILE --}}
-                  <x-card size="sm" class="mb-8">
+                  <x-card size="sm" class="!mb-3">
                     <div class="creatorPage__content-author author-page-content">
                       <div class="flex justify-start items-start gap-2 sm:gap-4 !text-sm sm:!text-base mb-4">
                           <div class="!w-14 !h-14 sm:!w-18 sm:!h-18 rounded-full overflow-hidden">
@@ -49,7 +49,7 @@
                   </x-card>
                   
                   {{-- PRODUCTS --}}
-                  <x-card size="sm" class="mb-8">
+                  <x-card size="sm" class="!mb-3">
                     <h4 class="creatorPage__content-title !mb-8">
                         @if($user->products()->exists())
                           <span>Products</span>

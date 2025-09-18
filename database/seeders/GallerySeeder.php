@@ -18,8 +18,10 @@ class GallerySeeder extends Seeder
       foreach (Article::all() as $article) {
         $article->gallery()->firstOrCreate([
           'image' => '/storage/images/img_articles.png',
+          'user_id' => $article->user_id,
           'preview' => 1,
-          'type' => 'articles'
+          'type' => 'articles',
+          'size' => 1000000,
         ]);
       }
 
@@ -40,15 +42,19 @@ class GallerySeeder extends Seeder
         shuffle($proucts);
         $product->gallery()->firstOrCreate([
           'image' => "/storage/images/{$proucts[0]}",
+          'user_id' => $product->user_id,
           'preview' => 1,
           'type' => 'products',
+          'size' => 1000000,
         ]);
 
         foreach (array_slice($proucts, 1, 5) as $img) {
           $product->gallery()->firstOrCreate([
             'image' => "/storage/images/$img",
+            'user_id' => $product->user_id,
             'preview' => 0,
             'type' => 'products',
+            'size' => 1000000,
           ]);
         }
       }

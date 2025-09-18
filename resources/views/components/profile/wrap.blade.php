@@ -32,7 +32,7 @@
 
 <div class="the-content-wrap profile-wrap !py-6">
     <div class="container !block">
-        <div class="grid grid-cols-1 lg:grid-cols-[210px_1fr] gap-3">
+        <div class="grid grid-cols-1 lg:grid-cols-[210px_1fr] !gap-3">
             <div class="col-span-1 accordion the-profile__sidebar w-full !p-0 group" id="accordionExample2">
                 <div wire:ignore class="accordion-item p-3 !bg-active group-has-[.show]:!bg-white lg:!bg-white transition">
                     <div class="accordion-header the-profile__accord-button px-2 !bg-transparent">

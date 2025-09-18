@@ -32,10 +32,10 @@
       </div>
     </div>
 
-    {{-- INSTAGRAM --}}
+    {{-- FACEBOOK --}}
     <div class="flex justify-start items-center !gap-2">
       <div class="">
-        <img class="!w-10" src="{{ asset('assets/img/icons/insta.svg') }}" alt="Instagram">
+        <img class="!w-10" src="{{ asset('assets/img/icons/facebook.svg') }}" alt="Facebook">
       </div>
       <div class="grow">
         <x-form.input 
@@ -46,10 +46,10 @@
       </div>
     </div>
 
-    {{-- FACEBOOK --}}
+    {{-- INSTAGRAM --}}
     <div class="flex justify-start items-center !gap-2">
       <div class="">
-        <img class="!w-10" src="{{ asset('assets/img/icons/facebook.svg') }}" alt="Facebook">
+        <img class="!w-10" src="{{ asset('assets/img/icons/insta.svg') }}" alt="Instagram">
       </div>
       <div class="grow">
         <x-form.input 

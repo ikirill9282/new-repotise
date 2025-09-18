@@ -10,26 +10,16 @@ class Page extends Component
 {
 
   public User $user;
+  public string $container;
 
-  public function mount(User $user)
+  public function mount(User $user, string $container = '')
   {
     $this->user = $user;
+    $this->container = $container;
   }
 
   public function render()
   {
-    $articles = $this->user->articles()
-      ->with([
-        'author',
-        'tags',
-        'likes' => function($query) {
-          $query->with('author.options')->limit(3);
-        }
-      ])
-      ->limit(4)
-      ->get()
-      ;
-
     return view('livewire.profile.page', [
       'user' => $this->user,
     ]);
