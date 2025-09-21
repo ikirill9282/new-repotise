@@ -29,20 +29,12 @@ class ProductFactory extends Factory
    */
   public function definition(): array
   {
-
-    $users = User::whereIn('id', [0,2,3])->get();
-    $types_count = Type::count();
-    $locations_count = Location::count();
-    $sub = fake()->numberBetween(0, 1);
-
     return [
-      'user_id' => $users->shuffle()->first()->id,
+      'user_id' => fake()->randomElement([0,2,3]),
       'title' => collect(fake()->words(3))->map(fn($word) => ucfirst($word))->join(' '),
       'price' => fake()->numberBetween(10, 200),
-      'subscription' => $sub,
+      'subscription' => fake()->boolean(),
       'old_price' => fake()->numberBetween(300, 2000),
-      'type_id' => fake()->numberBetween(1, $types_count),
-      'location_id' => fake()->numberBetween(1, $locations_count),
       'rating' => fake()->numberBetween(0, 5),
       'text' => collect(fake()->paragraphs(20))->map(fn($paragraph) => ucfirst($paragraph))->join("\n"),
     ];
@@ -51,16 +43,29 @@ class ProductFactory extends Factory
 
   public function configure()
   {
-    $categories = Category::all()->pluck('id')->shuffle()->toArray();
-    return $this->afterCreating(function (Model $product) use ($categories) {
-      $count = fake()->numberBetween(1, 5);
-      $cat = array_slice($categories, 0, $count);
+    $categories = Category::all()->pluck('id');
+    $types = Type::all()->pluck('id');
+    $locations = Location::all()->pluck('id');
+
+    return $this->afterCreating(function (Model $product) use($categories, $types, $locations) {
+      $categories = $categories->shuffle();
+      $types = $types->shuffle();
+      $locations = $locations->shuffle();
+
+      $cat = $categories->slice(0, fake()->numberBetween(1, 5));
       $product->categories()->sync($cat);
+
+      $typ = $types->slice(0, fake()->numberBetween(1, 5));
+      $product->types()->sync($typ);
+
+      $loc = $locations->slice(0, fake()->numberBetween(1, 5));
+      $product->locations()->sync($loc);
+
       if ($product->subscription) {
-        $product->subprice()->create([
-          'month' => $m = fake()->numberBetween(20, 40),
-          'quarter' => $q = fake()->numberBetween(14, ($m-1)),
-          'year' => fake()->numberBetween(10, ($q-1)),
+        $product->subprice()->update([
+          'month' => $m = fake()->numberBetween(0, 10),
+          'quarter' => $q = fake()->numberBetween($m, ($m+5)),
+          'year' => fake()->numberBetween($q, ($q+5)),
         ]);
       }
     });

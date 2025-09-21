@@ -30,9 +30,12 @@ class StatusSeeder extends Seeder
           ],
           [
             'title' => 'Scheduled',
-          ]
+          ],
+          [
+            'title' => 'Deleted',
+          ],
         ];
-
+        
         foreach ($data as $item) {
           \App\Models\Status::create($item);
         }

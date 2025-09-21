@@ -263,6 +263,22 @@ header .about_block .right_group_block .rection_groups span {
     /* background-size: auto 100%; */
 }
 
+.main-btn {
+    text-align: center;
+    color: #fff;
+    background-color: #fc7361;
+    border-radius: 8px;
+    padding: 11.5px 15px;
+    display: inline-block;
+    width: 100%;
+    max-width: 550px;
+    text-decoration: none;
+    border: none;
+    transition: 0.35s ease;
+    cursor: pointer;
+    border: 1px solid #fc7361;
+}
+
 .main-btn-outlined {
   color: var(--black, #212121);
   text-align: center;

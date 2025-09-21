@@ -19,8 +19,9 @@ class Slug
       );
       $value = mb_strtolower($str);
       $value = strtr($value, $converter);
-      $value = mb_ereg_replace('[^-0-9a-z]', '-', $value);
-      $value = mb_ereg_replace('[-]+', '-', $value);
+      $value = preg_replace('/[^-0-9a-z]/is', '-', $value);
+      $value = preg_replace('/[-]+/is', '-', $value);
+      
       $value = trim($value, '-');
       
       return $value;
@@ -28,6 +29,10 @@ class Slug
 
   public static function makeEn(string $str)
   {
-    return preg_replace('/[\s]/is', '-', strtolower($str));
+    $str = preg_replace('/[\s]/is', '-', strtolower($str));
+    $str = preg_replace('/[^-0-9a-z]/is', '-', $str);
+    $str = preg_replace('/[-]+/is', '-', $str);
+
+    return $str;
   }
 }

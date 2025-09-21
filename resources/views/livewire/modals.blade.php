@@ -25,10 +25,6 @@
                     window.history.replaceState({}, document.title, url.toString());
                     setTimeout(() => {
                       initCartSlider();
-                      window.CartCounter.discover();
-                      window.CopyToClipboard.discover();
-                      window.EmojiButtons.discover();
-                      window.ReadMoreButtons.discover();
                     }, 10);
                 });"
         >
@@ -69,8 +65,6 @@
 @script()
   <script>
     Livewire.hook('morphed', function() {
-      console.log('morphed');
-      
-    })
+    });
   </script>
 @endscript

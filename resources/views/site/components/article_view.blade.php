@@ -28,7 +28,7 @@
           <span>{{ \Illuminate\Support\Carbon::parse($article->created_at)->format('d.m.Y') }}</span>
           <span>{{ $article->views }} Views</span>
       </div>
-      {!! $article->text !!}
+      {!! $article->getText() !!}
     </div>
     <div class="follow_to_canal">
         @include('site.components.heading', ['title' => 'subscribe'])
@@ -79,17 +79,20 @@
                 </span>
             </div>
             <div class="connects">
-                <a href="{{ auth()->user()->makeReferalArticleUrl('FB', $article) }}" target="_blank" class="first_connect hover:!text-blue-500">
+                @php
+                  $user = auth()->check() ? auth()->user() : $article->author;
+                @endphp
+                <a href="{{ $user->makeReferalArticleUrl('FB', $article) }}" target="_blank" class="first_connect hover:!text-blue-500">
                   @include('icons.facebook-sm')
                 </a>
-                <a href="{{ auth()->user()->makeReferalArticleUrl('TW', $article) }}" target="_blank" class="second_connect hover:!text-black">
+                <a href="{{ $user->makeReferalArticleUrl('TW', $article) }}" target="_blank" class="second_connect hover:!text-black">
                   @include('icons.twitter-sm')
                 </a>
-                <a href="{{ auth()->user()->makeReferalArticleUrl('RD', $article) }}" target="_blank" class="third_connect hover:!text-black">
+                <a href="{{ $user->makeReferalArticleUrl('RD', $article) }}" target="_blank" class="third_connect hover:!text-black">
                   @include('icons.reddit-sm')
                 </a>
                 <a href="#" class="share copyToClipboard" data-target="{{ $hash_id }}">
-                  <input data-copyId="{{ $hash_id }}" type="hidden" value="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}"></input>
+                  <input data-copyId="{{ $hash_id }}" type="hidden" value="{{ $user->makeReferalArticleUrl(null, $article) }}"></input>
                   {{ print_var('share_message', $variables) }}
                 </a>
             </div>

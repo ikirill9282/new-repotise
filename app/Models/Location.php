@@ -6,16 +6,11 @@ use App\Helpers\Slug;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Mews\Purifier\Facades\Purifier;
 
 class Location extends Model
 {
   use Searchable, HasStatus;
-
-  public function toSearchableArray(): array
-  {
-    $array = $this->only('id', 'title', 'slug');
-    return $array;
-  }
 
   protected static function boot()
   {
@@ -23,16 +18,27 @@ class Location extends Model
 
     self::creating(function ($model) {
 
+      $model->title = Purifier::clean($model->title);
+
       if (!isset($model->slug) || empty($model->slug)) {
         $model->generateSlug();
       }
     });
 
     self::updating(function ($model) {
+      
+      $model->title = Purifier::clean($model->title);
+
       if ($model->isDirty('title')) {
         $model->generateSlug();
       }
     });
+  }
+
+  public function toSearchableArray(): array
+  {
+    $array = $this->only('id', 'title', 'slug');
+    return $array;
   }
 
   private function generateSlug()
@@ -42,7 +48,7 @@ class Location extends Model
 
   public function products()
   {
-    return $this->hasMany(Product::class);
+    return $this->belongsToMany(Product::class, ProductLocations::class, 'location_id', 'product_id', 'id', 'id');
   }
 
   public function hasPoster(): bool

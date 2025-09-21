@@ -2,7 +2,9 @@
   'id' => 'id'.uniqid(),
   'placeholder' => '',
   'label' => null,
-  'type' => 'media'
+  'type' => 'media',
+  'wrapClass' => '',
+  'filename' => null
 ])
 
 <div x-data="" class="relative group">
@@ -14,12 +16,19 @@
     for="{{ $id }}"
     class="p-3 rounded-lg bg-light group-hover:cursor-pointer text-gray transition group-hover:text-active"
     >
-      <div class="flex justify-start items-center !gap-2">
-        <div class="">
+
+      {{ $slot }}
+
+      <div class="flex justify-start items-center !gap-2 {{ $wrapClass }}">
+        <div class="@if($filename) flex justify-start items-center !gap-2 @endif">
           @if($type == 'file')
             @include('icons.document')
           @else
             @include('icons.download')
+          @endif
+
+          @if($filename)
+            <div class="">{{ $filename }}</div>
           @endif
         </div>
         @if($placeholder)

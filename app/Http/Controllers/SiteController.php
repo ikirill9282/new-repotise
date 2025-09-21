@@ -188,7 +188,7 @@ class SiteController extends Controller
     return view('site.pages.custom-page', ['page' => $page]);
   }
 
-  public function product(Request $request, string $country, string $product)
+  public function product(Request $request, string $product)
   {
     if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
       SessionExpire::set('referal', $request->get('referal'), Carbon::now()->addHours(24));
@@ -202,9 +202,9 @@ class SiteController extends Controller
       return (new FallbackController())($request);
     }
 
-    if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
-      Session::put('referal', $request->get('referal'));
-    }
+    // if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
+    //   Session::put('referal', $request->get('referal'));
+    // }
 
     $product = Product::findByPid(request()->get('pid'));
     
@@ -283,11 +283,11 @@ class SiteController extends Controller
       )
       ->when(
         isset($valid['type']),
-        fn($q) => $q->whereHas('type', fn($sq) => $sq->where('slug', $valid['type'])),
+        fn($q) => $q->whereHas('types', fn($sq) => $sq->where('slug', $valid['type'])),
       )
       ->when(
         isset($valid['locations']),
-        fn($q) => $q->whereHas('location', fn($sq) => $sq->whereIn('locations.slug', $valid['locations'])),
+        fn($q) => $q->whereHas('locations', fn($sq) => $sq->whereIn('locations.slug', $valid['locations'])),
       )
       ->when(
         isset($valid['author']),
@@ -305,11 +305,11 @@ class SiteController extends Controller
       )
       ->when(
         array_key_exists('country', $params),
-        fn($q) => $q->whereHas('location', fn($sq) => $sq->where('locations.slug', $params['country'])),
+        fn($q) => $q->whereHas('locations', fn($sq) => $sq->where('locations.slug', $params['country'])),
       )
     ;
 
-    $paginator = $query->paginate(20);
+    $paginator = $query->orderByDesc('id')->paginate(20);
 
     return view('site.pages.products', [
       'page' => $page,

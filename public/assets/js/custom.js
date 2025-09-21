@@ -975,6 +975,14 @@ $('[data-input="integer"]').on('input', function(evt) {
   $(this).val(evt.target.value.replace(/[^0-9]+/is, ''));
 });
 
+$('[data-input="percent"]').on('input', function(evt) {
+  $(this).val(evt.target.value.replace(/[^0-9\.]+/is, '') + '%');
+});
+
+$('[data-input="price"]').on('input', function(evt) {
+  $(this).val('$' + evt.target.value.replace(/[^0-9.]/g, ''));
+});
+
 $('[data-input="phone"]').on('input', function(evt) {
   $(this).val(evt.target.value.replace(/[^0-9\+\(\)_\s\-]+/is, ''));
 });
@@ -1045,6 +1053,25 @@ $(document).ready(function() {
 
   Livewire.hook('morphed',  ({ el, component }) => {
     discoverCartDropButtons(el);
+
+    window.LikeButtons.discover();
+    window.CartCounter.discover();
+    window.CopyToClipboard.discover();
+    window.EmojiButtons.discover();
+    window.ReadMoreButtons.discover();
+
+    $('[data-input="percent"]').on('input', function(evt) {
+      $(this).val(evt.target.value.replace(/[^0-9\.]+/is, '') + '%');
+    });
+
+    $('[data-input="integer"]').on('input', function(evt) {
+      $(this).val(evt.target.value.replace(/[^0-9]+/is, ''));
+    });
+
+    $('[data-input="price"]').on('input', function(evt) {
+      $(this).val('$' + evt.target.value.replace(/[^0-9.]/g, ''));
+    });
+
   });
 
   [...document.querySelectorAll('.stars_filter')].map(stars => {
@@ -1106,6 +1133,16 @@ $(document).ready(function() {
       text: message,
       icon: 'success',
       heading: 'Success',
+      position: 'top-right',
+    });
+  });
+
+  Livewire.on('toastError', params => {
+    const message = params[0]?.message;
+    $.toast({
+      text: message,
+      icon: 'error',
+      heading: 'Error',
       position: 'top-right',
     });
   });

@@ -14,17 +14,21 @@ return new class extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index();
+            $table->bigInteger('status_id')->unsigned()->index()->default(3);
             $table->string('title');
-            $table->string('subtitle')->nullable();
+            // $table->string('subtitle')->nullable();
             $table->text('slug');
             $table->integer('views')->default(0);
-            $table->text('annotation')->nullable();
+            // $table->text('annotation')->nullable();
             $table->longText('text');
+
+            $table->string('seo_title')->nullable();
+            $table->text('seo_text')->nullable();
+
             $table->datetime('scheduled_at')->index()->nullable();
             $table->datetime('published_at')->index()->nullable();
             $table->timestamps();
 
-            $table->bigInteger('status_id')->unsigned()->index()->default(3);
             $table->foreign('status_id')->references('id')->on('statuses');
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

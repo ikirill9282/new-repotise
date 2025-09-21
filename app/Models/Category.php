@@ -6,17 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use App\Helpers\Slug;
 use App\Traits\HasStatus;
+use Mews\Purifier\Facades\Purifier;
 
 class Category extends Model
 {
   use Searchable, HasStatus;
-
-  public function toSearchableArray(): array
-  {
-    $array = $this->only('id', 'title', 'slug', 'parent_id');
-
-    return $array;
-  }
 
   protected static function boot()
   {
@@ -24,16 +18,28 @@ class Category extends Model
 
     self::creating(function ($model) {
 
+      $model->title = Purifier::clean($model->title);
+
       if (!isset($model->slug) || empty($model->slug)) {
         $model->generateSlug();
       }
     });
 
     self::updating(function ($model) {
+
+      $model->title = Purifier::clean($model->title);
+
       if ($model->isDirty('title')) {
         $model->generateSlug();
       }
     });
+  }
+
+  public function toSearchableArray(): array
+  {
+    $array = $this->only('id', 'title', 'slug', 'parent_id');
+
+    return $array;
   }
 
   private function generateSlug()

@@ -68,7 +68,7 @@
                       </div>
 
                       <div class="creatorPage__content-products-moreBtn-wrapper">
-                          <x-link href="{{ route('products') . '?author=' . $user->profile }}">Show More</x-link>
+                          <x-link class="select-none" href="{{ route('products') . '?author=' . $user->profile }}">Show More</x-link>
                       </div>
                     @else
                       <div class="max-w-lg text-center mx-auto">
@@ -115,7 +115,7 @@
                                 <div class="mb-4">
                                     <h6 class="!text-2xl mb-4">{{ $article->title }}</h6>
                                     <div class="text-gray read-more read-more-300">
-                                        {!! $article->text !!}
+                                        {!! $article->getText() !!}
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-start flex-wrap gap-1">
@@ -163,7 +163,7 @@
                           @endforeach
                       </div>
                       <div class="text-center mt-10">
-                        <x-link href="{{ route('insights') . '?author=' . $user->profile }}">Show More</x-link>
+                        <x-link class="select-none" href="{{ route('insights') . '?author=' . $user->profile }}">Show More</x-link>
                       </div>
                     @else
                       <div class="max-w-lg text-center mx-auto">

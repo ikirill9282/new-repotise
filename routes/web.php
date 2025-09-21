@@ -60,6 +60,7 @@ Route::middleware('auth:web')->group(function() {
 
   Route::get('/profile/articles/create', [CabinetController::class, 'create_article'])->name('profile.articles.create');
   Route::get('/profile/products/create', [CabinetController::class, 'create_product'])->name('profile.products.create');
+  Route::get('/profile/products/create/media', [CabinetController::class, 'create_product_media'])->name('profile.products.create.media');
 });
 
 // Public Profile
@@ -92,8 +93,8 @@ Route::get('/policies', [SiteController::class, 'policies'])->name('policies');
 Route::get('/policies/{slug}', [SiteController::class, 'policies']);
 
 Route::get('/products', [SiteController::class, 'products'])->name('products');
-Route::get('/products/{country}', [SiteController::class, 'products'])->name('products.country');
-Route::get('/products/{country}/{product}', [SiteController::class, 'product'])->name('products.country.product');
+// Route::get('/products/{country}', [SiteController::class, 'products'])->name('products.country');
+Route::get('/products/{product}', [SiteController::class, 'product'])->name('products.country.product');
 
 Route::get('/payment', [SiteController::class, 'payment'])->name('payment');
 Route::get('/sellers', [SiteController::class, 'sellers'])->name('sellers');

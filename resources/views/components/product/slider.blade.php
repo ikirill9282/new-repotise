@@ -18,9 +18,6 @@
         prevEl: '.swiper-button-prev',
       },
       breakpoints: {
-        {{-- 640: { slidesPerView: 1, spaceBetween: 10 },
-        768: { slidesPerView: 2, spaceBetween: 20 },
-        1024: { slidesPerView: 3, spaceBetween: 30 } --}}
         420: { slidesPerView: 1.5 },
         420: { slidesPerView: 2.2 },
         576: { slidesPerView: 2.6 },
@@ -76,11 +73,17 @@
                 <div class="text-gray line-through">${{ number_format($product->old_price) }}</div>
             </div>
             <div class="flex flex-wrap gap-1.5">
-                <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/products/?type={$product->type->slug}") }}">{{ $product->type->title }}</a>
-                @foreach ($product->categories as $category)
+                @foreach ($product->types->shuffle()->slice(0, 3) as $type)
+                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/products/?type={$type->slug}") }}">{{ $type->title }}</a>
+                @endforeach
+
+                @foreach ($product->categories->shuffle()->slice(0, 3) as $category)
                   <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/search?q={$category->title}") }}">{{ $category->title }}</a>
                 @endforeach
-                <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/products/{$product->location->slug}") }}">{{ $product->location->title }}</a>
+                
+                @foreach ($product->locations->shuffle()->slice(0, 3) as $location)
+                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/products/{$location->slug}") }}">{{ $location->title }}</a>
+                @endforeach
             </div>
             <div class="flex justify-between items-center pt-2 !mt-auto">
                 <div class="flex">

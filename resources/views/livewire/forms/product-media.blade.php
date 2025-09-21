@@ -1,0 +1,134 @@
+<div>
+  <h1 class="!font-normal !m-0 !mb-10">Create Product - Media & Files</h1>
+
+  @php
+    $breadcrumbs = [
+      'My Account' => route('profile'),
+      'My Products' => route('profile.products'),
+      "Create Product (2/2)" => route('profile.products.create.media'),
+    ];
+  @endphp
+  <x-breadcrumbs class="!mb-10" :breadcrumbs="$breadcrumbs" />
+
+  <div class="max-w-4xl">
+      {{-- @dump($this->fields['banner']) --}}
+      {{-- @dump($this->fields['gallery']) --}}
+      @dump($this->fields)
+
+      {{-- MEDIA --}}
+      <h2 class="!font-bold !text-2xl !mb-10">Product Media & Files</h2>
+      <div class="flex flex-col justify-start items-stretch !gap-6 !mb-10">
+        
+        {{-- BANNER --}}
+        <div class="relative">
+          
+          <div class="max-w-sm !mb-6 relative">
+            <div wire:loading class="absolute w-full h-full bg-light/50 z-150">
+              <x-loader width="60" height="60" />
+            </div>
+
+            @if($this->fields['banner']['uploaded'])
+              <img class="w-full" src="{{ $this->fields['banner']['uploaded']->temporaryUrl() }}" alt="Banner">
+            @elseif ($this->fields['banner']['preview'])
+              <img class="w-full" src="{{ $this->fields['banner']['preview'] ?? '' }}" alt="Banner">
+            @endif
+          </div>
+
+          <x-form.file wire:model="fields.banner.uploaded" label="Featured Photo"></x-form.file>
+
+          @error('banner')
+            <div class="!mt-2 text-red-500">{{ $message }}</div>
+          @enderror
+        </div>
+
+        {{-- PHOTOS --}}
+        <div class="">
+          <div class="text-gray !mb-2">Additional Photos</div>
+          <div class="flex justify-start items-end !gap-2 flex-wrap">
+            @foreach($this->fields['gallery'] as $key => $item)
+              @php
+                $has_image = boolval($item['uploaded'] || $item['preview']);
+              @endphp
+
+              <div class="relative">
+                  <div wire:loading class="absolute w-full h-full bg-light/50 z-150">
+                    <x-loader width="60" height="60" />
+                  </div>
+
+                  <x-form.file 
+                    wire:model="fields.gallery.{{ $key }}.uploaded" 
+                    accept="image/*" 
+                    wrapClass="relative z-50 transition {{ $has_image ? '!text-white group-hover:!text-active' : '' }}"
+                  >
+                    @if($item['uploaded'])
+                      <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40">
+                        <img class="object-cover h-full w-full !inline-block opacity-100 transition group-hover:!opacity-50" src="{{ $item['uploaded']->temporaryUrl() }}" alt="Banner">
+                      </div>
+                    @elseif ($item['preview'])
+                      <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40">
+                        <img class="object-cover h-full w-full !inline-block opacity-100 transition group-hover:!opacity-50" src="{{ $item['preview'] ?? '' }}" alt="Banner">
+                      </div>
+                    @endif
+                  </x-form.file>
+              </div>
+
+            @endforeach
+          </div>
+        </div>
+
+      </div>
+
+      <h2 class="!font-bold !text-2xl !mb-10">Product Files</h2>
+      <div class="flex flex-col justify-start items-stretch !gap-6 !mb-10">
+        
+        {{-- PP TEXT --}}
+        <div class="">
+          <x-form.text-editor wire:model="fields.pp_text" :image="false" label="Post-Purchase Text (Optional):" placeholder="Start writing your post-purchase text here..."></x-form.text-editor>
+        </div>
+
+        {{-- PRODUCT FILES --}}
+        <div class="!mb-10">
+          <div class="!mb-4 !text-sm sm:!text-base">Upload up to 8 files of any file type for your product. Each file can be up to 100MB in size. You can upload a large video to platforms such as YouTube or Vimeo and embed the link below.</div>
+          <div class="flex justify-start items-center !gap-2 flex-wrap">
+            @foreach($this->fields['files'] as $key => $file)
+              <div class="flex flex-col justify-center items-center hover:cursor-pointer">
+                <x-form.file 
+                  wire:model="fields.files.{{ $key }}.uploaded" 
+                  type="file" 
+                  accept="application/pdf"
+                  :filename="empty($file['uploaded']) ? (empty($file['current']) ? null : $file['current']) : $file['uploaded']->getClientOriginalName()"
+                >
+                </x-form.file>
+                <div class="font-light text-xl transition hover:text-active">+</div>
+              </div>
+            @endforeach
+          </div>
+          <div class="text-sm text-gray !mt-2">You can add a description to each file (optional)</div>
+        </div>
+        
+
+        {{-- LINKS --}}
+        <div class="">
+          <h2 class="!font-bold !text-2xl !mb-10 relative !inline-block !pr-6">
+            Video Link (Optional)
+            <x-tooltip message="tooltip"></x-tooltip>
+          </h2>
+          <div class="flex flex-col justify-start items-stretch !gap-2">
+            @foreach ($this->fields['links'] as $key => $link)
+              <div class="flex justify-between items-stretch">
+                <x-form.input wire:model="fields.links.{{ $key }}.link" :tooltip="false" placeholder="Link" />
+                <span wire:click="addLink" class="text-2xl !font-light !p-3 !leading-6 transition hover:cursor-pointer hover:text-active">+</span>
+              </div>
+            @endforeach
+          </div>
+        </div>
+
+        {{-- BUTTONS --}}
+        <div class="flex justify-start items-stretch !gap-2 sm:!gap-4 flex-wrap sm:!flex-nowrap">
+          <x-btn wire:click.prevent="prevStep" class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" gray>Back to Details</x-btn>
+          <x-btn wire:click.prevent="draft" class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" outlined>Save as Draft</x-btn>
+          <x-btn wire:click.prevent="submit" class="!max-w-none sm:!max-w-sm">Save & Continue</x-btn>
+        </div>
+      </div>
+  </div>
+</div>

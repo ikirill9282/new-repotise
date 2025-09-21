@@ -119,4 +119,76 @@
   .ql-editor.ql-blank::before {
     max-width: 85%;
   }
+
+  .ql-snow .ql-editor h1,
+  .ql-snow .ql-editor h2,
+  .ql-snow .ql-editor h3,
+  .ql-snow .ql-editor h4,
+  .ql-snow .ql-editor h5,
+  .ql-snow .ql-editor h6 {
+    font-size: 1rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  .ql-size-large {
+    font-size: 1.5rem !important;
+    line-height: 2rem !important;
+  }
+
+  .ql-size-small {
+    font-size: .75rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  .user-custom-text p {
+    font-size: 1rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  .user-custom-text h1,
+  .user-custom-text h2,
+  .user-custom-text h3,
+  .user-custom-text h4,
+  .user-custom-text h5,
+  .user-custom-text h6 {
+    margin: 10px 0 !important;
+  }
+
+  .user-custom-text img {
+    display: inline-block !important;
+    margin: 10px 0 !important;
+  }
+
+  .articles-catalogue .ql-size-large,
+  .articles-catalogue .ql-size-small,
+  .articles-catalogue .user-custom-text p,
+  .articles-catalogue .user-custom-text h1,
+  .articles-catalogue .user-custom-text h2,
+  .articles-catalogue .user-custom-text h3,
+  .articles-catalogue .user-custom-text h4,
+  .articles-catalogue .user-custom-text h5,
+  .articles-catalogue .user-custom-text h6 {
+    font-size: 1rem !important;
+    line-height: 1.5rem !important;
+    margin: 5px 0 !important;
+    color: #A4A0A0 !important;
+  }
+
+
+  @media(max-width: 375px) {
+    .ql-size-large {
+      font-size: 1.25rem !important;
+      line-height: 1.75rem !important;
+    }
+
+    .ql-size-small {
+      font-size: .5rem !important;
+      line-height: 1rem !important;
+    }
+
+    .user-custom-text p {
+      font-size: 1rem !important;
+      line-height: 1.5rem !important;
+    }
+  }
 }

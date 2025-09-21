@@ -2,14 +2,12 @@
   'name' => uniqid(),
   'title' => null,
   'label' => null,
-  'value' => null,
   'options' => [
     10 => '10 Days',
     20 => '20 Days',
     30 => '30 Days',
   ],
 ])
-
 <div 
   x-data="{
     value: null,
@@ -26,24 +24,31 @@
         dropdown.style.height = `${height}px`;
       }
     },
-    setVal(val, label = null) {
+    setVal(val, label) {
       this.value = val;
-      this.label = label ? label : '';
-      this.$refs.placeholder.classList.add('!text-black')
+      this.label = label;
+      this.$refs.placeholder.classList.add('!text-black');
+      
+      const event = new Event('input', {
+        bubbles: true,
+        cancellable: true,
+      });
+
+      this.$refs.input.value = this.value;
+      this.$refs.input.dispatchEvent(event);
     }
   }"
   x-init="() => {
-    if (value === null && label === null) {
-      @if($value == null)
-        setVal('{{ array_key_first($options) }}', '{{ $options[array_key_first($options)] }}');
-      @else
-        setVal('{{ $value }}', '{{ $options[$value] ?? '' }}')
-      @endif
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const val = $refs.input.value;
+      const label = $refs.dropdownContent.querySelector(`div[data-key='${val}']`).innerHTML.trim();
+
+      setVal(val, label);
+    });
   }"
   class="w-full group text-sm sm:text-base"
 >
-  <input x-bind:value="value" type="hidden" name="{{ $name }}" {{ $attributes }}>
+  <input x-ref="input" type="hidden" name="{{ $name }}" {{ $attributes }}>
 
   @if($title)
     <label class="text-sm sm:text-base text-gray mb-1.5" for="{{ $name }}">{{ $title }}</label>
@@ -78,7 +83,8 @@
             x-on:click="() => {
               setVal('{{$val}}', '{{ $label }}');
               toggle();
-            }" 
+            }"
+            data-key="{{ $val }}"
             class="px-4 py-2 hover:cursor-pointer hover:text-black"
           >
             {{ $label }}

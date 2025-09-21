@@ -19,19 +19,21 @@ return new class extends Migration
           $table->decimal('price', 10);
           $table->decimal('old_price', 10)->nullable();
           $table->tinyInteger('subscription')->default(0);
-          $table->bigInteger('type_id')->unsigned()->index();
-          $table->bigInteger('location_id')->unsigned()->index();
           $table->bigInteger('status_id')->unsigned()->index()->default(3);
           $table->float('rating')->default(0);
           $table->integer('refund_policy')->default(90);
+          $table->integer('views')->default(0);
           $table->longText('text');
-          $table->datetime('published_at')->index()->nullable();
-          $table->timestamps();
+          $table->text('pp_text')->nullable();
+
+          $table->string('seo_title')->nullable();
+          $table->text('seo_text')->nullable();
 
           $table->foreign('status_id')->references('id')->on('statuses');
           $table->foreign('user_id')->references('id')->on('users');
-          $table->foreign('type_id')->references('id')->on('types');
-          $table->foreign('location_id')->references('id')->on('locations');
+
+          $table->datetime('published_at')->index()->nullable();
+          $table->timestamps();
         });
     }
 

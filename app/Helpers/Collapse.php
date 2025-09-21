@@ -17,4 +17,13 @@ class Collapse
       return $value;
     }
   }
+
+  public static function subtractPercent($number, $percent) {
+    return $number - ($number * ($percent / 100));
+  }
+
+  public static function bytesToMegabytes(int $bytes): float 
+  {
+    return $bytes / 1024 / 1024;
+  }
 }

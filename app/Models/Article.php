@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Helpers\CustomEncrypt;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
@@ -14,6 +15,8 @@ use App\Helpers\Slug;
 use App\Helpers\SessionExpire;
 use App\Traits\HasMessages;
 use App\Traits\HasStatus;
+use Illuminate\Support\Facades\Crypt;
+use Mews\Purifier\Facades\Purifier;
 
 class Article extends Model
 {
@@ -30,15 +33,31 @@ class Article extends Model
     parent::boot();
 
     self::creating(function ($model) {
+      
+      // PURIFY
+      $model->title = Purifier::clean($model->title);
+      $model->text = Purifier::clean($model->text);
+      $model->seo_title = Purifier::clean($model->seo_title);
+      $model->seo_text = Purifier::clean($model->seo_text);
+
+      // SLUG
       if (!isset($model->slug) || empty($model->slug)) {
         $model->generateSlug();
       }
     });
 
     self::updating(function ($model) {
-        if ($model->isDirty('title')) {
-            $model->generateSlug();
-        }
+      
+      // PURIFY
+      $model->title = Purifier::clean($model->title);
+      $model->text = Purifier::clean($model->text);
+      $model->seo_title = Purifier::clean($model->seo_title);
+      $model->seo_text = Purifier::clean($model->seo_text);
+
+      // SLUG
+      if ($model->isDirty('title')) {
+          $model->generateSlug();
+      }
     });
   }
 
@@ -55,10 +74,9 @@ class Article extends Model
       return $array;
   }
 
-
-  public static function selectShort()
+  public function getText(): string
   {
-    return static::query()->select(['id', 'title', 'user_id', 'annotation']);
+    return "<div class='user-custom-text'>$this->text</div>";
   }
 
   public function messages()
@@ -68,7 +86,7 @@ class Article extends Model
   
   public function tags()
   {
-    return $this->belongsToMany(Tag::class, 'article_tags', 'article_id', 'tag_id', 'id', 'id');
+    return $this->belongsToMany(Tag::class, 'article_tags', 'article_id', 'tag_id', 'id', 'id')->where('status_id', '!=', Status::DELETED);
   }
 
   public function likes()
@@ -83,7 +101,21 @@ class Article extends Model
 
   public function short(int $symbols = 200)
   {
-    return trim(mb_substr($this->text, 0, $symbols) . '...');
+    $str = $this->getText();
+    $str = preg_replace('/(<img.*?>)/is', '', $str);
+    $str = trim(mb_substr($str, 0, $symbols) . '...');
+    $str = preg_replace('/(?:<p>\s*<br\s*\/?>\s*<\/p>)/i', '', $str);
+
+    $dom = new \DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $str, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+    libxml_clear_errors();
+
+    $res = $dom->saveHTML();
+    
+    return $res;
+
   }
 
   private function generateSlug()
@@ -221,6 +253,11 @@ class Article extends Model
   public function makeFeedUrl()
   {
     return url("insights/$this->slug?aid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
+  }
+
+  public function makeEditUrl()
+  {
+    return route('profile.articles.create') . '?aid=' . Crypt::encrypt($this->id);
   }
 
   public function setAmountAnalogs(int $amount)

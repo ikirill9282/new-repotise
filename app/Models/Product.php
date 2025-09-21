@@ -14,39 +14,69 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Crypt;
 use Laravel\Scout\Searchable;
+use Mews\Purifier\Facades\Purifier;
 
 class Product extends Model
 {
   use HasAuthor, HasGallery, Searchable, HasFactory, HasStatus, HasMessages;
-
-  public function toSearchableArray(): array
-  {
-    $this->load('author', 'categories', 'type', 'location', 'preview')->loadCount('reviews');
-
-    $array = $this->toArray();
-
-    $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
-    $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
-    $array['type'] = $this->type->only(['id', 'title', 'slug']);
-    $array['location'] = $this->location->only(['id', 'title', 'slug']);
-    $array['preview'] = $this->preview?->image ?? '';
-    $array['reviews_count'] = $this->reviews_count;
-
-    return $array;
-  }
 
   protected static function boot()
   {
     parent::boot();
 
     self::creating(function ($model) {
+      // PURIFY
+      $model->title = Purifier::clean($model->title);
+      $model->text = Purifier::clean($model->text);
+      $model->seo_title = Purifier::clean($model->seo_title);
+      $model->seo_text = Purifier::clean($model->seo_text);
 
       if (!isset($model->slug) || empty($model->slug)) {
         $model->generateSlug();
       }
     });
+
+    self::created(function($model) {
+      if ($model->subscription && !$model->subprice()->exists()) {
+        $model->subprice()->create([
+          'month' => 0,
+          'quarter' => 0,
+          'year' => 0,
+        ]);
+      }
+    });
+
+    self::updating(function ($model) {
+      // PURIFY
+      $model->title = Purifier::clean($model->title);
+      $model->text = Purifier::clean($model->text);
+      $model->seo_title = Purifier::clean($model->seo_title);
+      $model->seo_text = Purifier::clean($model->seo_text);
+
+      if ($model->isDirty('title')) {
+        $model->generateSlug();
+      }
+    });
   }
+
+  public function toSearchableArray(): array
+  {
+    $this->load('author', 'categories', 'types', 'locations', 'preview')->loadCount('reviews');
+
+    $array = $this->toArray();
+
+    $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+    $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
+    $array['type'] = $this->types->select(['id', 'title', 'slug'])->toArray();
+    $array['location'] = $this->locations->select(['id', 'title', 'slug'])->toArray();
+    $array['preview'] = $this->preview?->image ?? '';
+    $array['reviews_count'] = $this->reviews_count;
+
+    return $array;
+  }
+
 
   private function generateSlug(bool $salt = false)
   {
@@ -54,6 +84,16 @@ class Product extends Model
     if (Product::where('slug', $this->slug)->exists()) {
       return $this->generateSlug(true);
     }
+  }
+
+  public function files()
+  {
+    return $this->hasMany(ProductFiles::class);
+  }
+
+  public function links()
+  {
+    return $this->hasMany(ProductLinks::class);
   }
 
   public function subprice()
@@ -66,14 +106,14 @@ class Product extends Model
     return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_id', 'id', 'id');
   }
 
-  public function type()
+  public function types()
   {
-    return $this->belongsTo(Type::class);
+    return $this->belongsToMany(Type::class, ProductTypes::class, 'product_id', 'type_id', 'id', 'id');
   }
 
-  public function location()
+  public function locations()
   {
-    return $this->belongsTo(Location::class);
+    return $this->belongsToMany(Location::class, ProductLocations::class, 'product_id', 'location_id', 'id', 'id');
   }
 
   public function reviews()
@@ -84,6 +124,38 @@ class Product extends Model
   public function messages()
   {
     return $this->hasMany(Review::class)->orderByDesc('id');
+  }
+
+  public function month(): float
+  {
+    $res = $this->subprice?->month > 0
+      ? Collapse::subtractPercent($this->price, $this->subprice->month)
+      : $this->price;
+
+    return round($res, 2);
+  }
+
+  public function quarter(): float
+  {
+    $res = $this->subprice?->quarter > 0
+      ? Collapse::subtractPercent($this->price, $this->subprice->quarter)
+      : $this->price;
+
+    return round($res, 2);
+  }
+
+  public function year(): float
+  {
+    $res = $this->subprice?->year > 0
+      ? Collapse::subtractPercent($this->price, $this->subprice->year)
+      : $this->price;
+
+    return round($res, 2);
+  }
+
+  public function getText(): string
+  {
+    return "<div class='user-custom-text'>$this->text</div>";
   }
 
   public function prepareRatingImages()
@@ -104,23 +176,19 @@ class Product extends Model
     return $this->reviews_count ?? 0;
   }
 
-  // public function price(): Attribute
-  // {
-  //   return Attribute::make(
-  //     get: fn($val) => number_format($val),
-  //   );
-  // }
-
-  // public function oldPrice(): Attribute
-  // {
-  //   return Attribute::make(
-  //     get: fn($val) => number_format($val),
-  //   );
-  // }
-
   public function makeUrl()
   {
-    return url("/products/{$this->location->slug}/$this->slug?pid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
+    return url("/products/$this->slug?pid=" . CustomEncrypt::generateUrlHash(['id' => $this->id]));
+  }
+
+  public function makeEditUrl()
+  {
+    return route('profile.products.create') . '?pid=' . Crypt::encrypt($this->id);
+  }
+
+  public function makeEditMediaUrl()
+  {
+    return route('profile.products.create.media') . '?pid=' . Crypt::encrypt($this->id);
   }
 
   public function getAllReviews(?int $limit = 10)
@@ -154,7 +222,6 @@ class Product extends Model
     return $this;
   }
 
-
   public function getChildren($review, int $max_level = 1)
   {
     $this->level++;
@@ -179,13 +246,12 @@ class Product extends Model
     }
   }
 
-
   public function getTogetherProducts(int $limit = 10, array $includes = []): Collection
   {
     $products = $this->query()
       ->where('id', '!=', $this->id)
-      ->whereHas('location', fn($q) => $q->where('slug', $this->location->slug))
-      ->orWhereHas('type', fn($q) => $q->where('slug', $this->type->slug))
+      ->whereHas('locations', fn($q) => $q->whereIn('locations.id', $this->locations->pluck('id')))
+      ->orWhereHas('types', fn($q) => $q->whereIn('types.id', $this->types->pluck('id')))
       ->limit($limit)
       ->get();
 
@@ -203,7 +269,7 @@ class Product extends Model
         !empty($includes),
         fn($query) => $query->whereIn('id', $includes)->orWhere('id', '>', 0),
       )
-      ->with('preview', 'location', 'categories', 'type')
+      ->with('preview', 'locations', 'categories', 'types')
       ->withCount(['reviews' => function($query) {
         $query->whereNull('parent_id');
       }])

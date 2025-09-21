@@ -68,12 +68,20 @@
         <span>${{ number_format($model->old_price) }}</span>
     </div>
     <div class="inf_cards flex flex-wrap">
-        {{-- @dd($model->type->title) --}}
-        <a class="text-nowrap" href="{{ url("/products/?type={$model->type->slug}") }}">{{ $model->type->title }}</a>
-        @foreach ($model->categories as $category)
+        {{-- TYPES --}}
+        @foreach ($model->types->shuffle()->slice(0, 3) as $type)
+          <a class="text-nowrap" href="{{ url("/products/?type={$type->slug}") }}">{{ $type->title }}</a>
+        @endforeach
+
+        {{-- CATEGORIES --}}
+        @foreach ($model->categories->shuffle()->slice(0, 3) as $category)
           <a class="text-nowrap" href="{{ url("/search?q={$category->title}") }}">{{ $category->title }}</a>
         @endforeach
-        <a class="text-nowrap" href="{{ url("/products/{$model->location->slug}") }}">{{ $model->location->title }}</a>
+
+        {{-- LOCATIONS --}}
+        @foreach ($model->locations->shuffle()->slice(0, 3) as $location)
+          <a class="text-nowrap" href="{{ url("/products/{$location->slug}") }}">{{ $location->title }}</a>
+        @endforeach
     </div>
     <div class="stars_block !mt-auto">
         <div class="stars">

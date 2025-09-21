@@ -1,42 +1,63 @@
 <div>
   <div class="max-w-4xl">
-    @dump($this->fields)
+    {{-- @dump($this->fields) --}}
+    
     {{-- CONTENT --}}
     <h2 class="!font-bold !text-xl !mb-10">Create New Article</h2>
     <div class="flex flex-col justify-start items-stretch !mb-10">
       <div class="flex flex-col justify-start items-stretch !gap-6">
         
-        <x-form.input wire:model="fields.title" label="Article Title" placeholder="Enter your article title here..." />
+        <x-form.input wire:model="fields.title" name="title" label="Article Title" placeholder="Enter your article title here..." />
     
-        <x-form.text-editor wire:model="fields.text" label="Article Content" placeholder="Start writing your article here..."></x-form.text-editor>
+        <x-form.text-editor wire:model="fields.text" name="text" label="Article Content" placeholder="Start writing your article here..."></x-form.text-editor>
 
         <div class="">
-          <x-form.chips source="tags" name="tags" label="Tags" placeholder="Search or create tags...(Up to 5)" />
+          <x-form.chips entangle="tags" source="tags" name="tags" label="Tags" placeholder="Search or create tags...(Up to 5)" />
         </div>
         
-        <div class="">
-          <x-form.datepicker label="Publish Date" placeholder="Schedule a publication date MM/DD/YEAR" />
-        </div>
+        @if(!$this->fields['published_at'] ?? null)
+          <div class="">
+            <x-form.datepicker wire:model="fields.scheduled_at" label="Publish Date" placeholder="Schedule a publication date MM/DD/YEAR" />
+          </div>
+        @endif
       </div>
     </div>
 
     {{-- BANNER --}}
     <h2 class="!font-bold !text-xl !mb-10">Featured Image</h2>
-    <div class="flex flex-col justify-start items-stretch !mb-10">
-      <x-form.file placeholder="350x100 px"></x-form.file>
+    <div class="banner-block relative !mb-10">
+      
+      <div wire:loading class="absolute w-full h-full bg-light/50 z-150">
+        <x-loader width="60" height="60" />
+      </div>
+
+      <div class="max-w-sm !mb-6">
+        @if($this->banner)
+          <img src="{{ $this->banner->temporaryUrl() }}" alt="Banner">
+        @elseif ($this->bannerPath)
+          <img src="{{ $this->bannerPath ?? '' }}" alt="Banner">
+        @endif
+      </div>
+
+      <div class="flex flex-col justify-start items-stretch">
+        <x-form.file wire:model="banner" accept="image/*" placeholder="350x100 px"></x-form.file>
+      </div>
+
+      @error('banner')
+        <div class="!mt-2 text-red-500">{{ $message }}</div>
+      @enderror
     </div>
 
     {{-- SEO SETTINGS --}}
     <h2 class="!font-bold !text-xl !mb-10">SEO Settings (Optional)</h2>
     <div class="flex flex-col justify-start items-stretch !gap-6 !mb-10">
-      <x-form.input label="Meta Title" placeholder="Enter meta title (for search engines)." />
+      <x-form.input wire:model="fields.seo_title" label="Meta Title" placeholder="Enter meta title (for search engines)." />
 
-      <x-form.textarea 
-        :tooltip="true" 
-        label="Meta Description" 
+      <x-form.textarea-counter 
+        wire:model="fields.seo_text"
+        label="Meta Description"
         placeholder="Enter meta description (for search engines)." 
-        class="min-h-18 sm:min-h-25"
-      />
+      ></x-form.textarea-counter>
     </div>
 
     {{-- BUTTONS --}}
@@ -46,3 +67,4 @@
     </div>
   </div>
 </div>
+

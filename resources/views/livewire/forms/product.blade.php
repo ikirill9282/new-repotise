@@ -1,158 +1,142 @@
 <div>
-    <h1 class="!font-normal !m-0 !mb-10">
-      @if($step == 1)
-        Create Product - Details
-      @else
-        Create Product - Media & Files
-      @endif
-    </h1>
+    <h1 class="!font-normal !m-0 !mb-10">Create Product - Details</h1>
+
     @php
       $breadcrumbs = [
         'My Account' => route('profile'),
         'My Products' => route('profile.products'),
+        "Create Product (1/2)" => route('profile.products.create'),
       ];
-      $breadcrumbs["Create Product ($step/2)"] = route('profile.products.create');
     @endphp
-    <x-breadcrumbs class="!mb-10" :breadcrumbs="$breadcrumbs" />
-    
+    <x-breadcrumbs class="!mb-10" :breadcrumbs="$breadcrumbs"></x-breadcrumbs>
+
+
     {{-- CONTENT --}}
     <div class="max-w-4xl">
-      @if($step == 1)
         <h2 class="!font-bold !text-2xl !mb-10">Product Details</h2>
         <div class="flex flex-col justify-start items-stretch !mb-10">
             <div class="flex flex-col justify-start items-stretch !gap-6">
 
                 <div class="">
-                  <x-form.input label="Product Title" placeholder="Enter your article title here..." />
+                  <x-form.input 
+                    wire:model="fields.title" 
+                    name="title"
+                    label="Product Title" 
+                    placeholder="Enter your article title here..." 
+                  />
                 </div>
 
                 <div class="">
-                  <x-form.chips source="types" label="Product Type" placeholder="Select product types... (Up to 5)" />
+                  <x-form.chips 
+                    name="loactions"
+                    create="false" 
+                    entangle="types" 
+                    source="types" 
+                    label="Product Type" 
+                    placeholder="Select product types... (Up to 5)" 
+                  />
                 </div>
 
                 <div class="">
-                  <x-form.checkbox label="Subscription" />
+                  <x-form.select 
+                    wire:model.live="fields.refund_policy"
+                    title="Refund Policy" 
+                    :options="[30 => '30 days', 60 => '60 days', 90 => '90 days',]"
+                  ></x-form.select>
+                </div>
+
+
+                <div class="">
+                  <x-form.checkbox wire:model="fields.subscription" :checked="(boolean)$this->fields['subscription']" label="Subscription" />
                 </div>
 
                 {{-- SUBSCRIPTION --}}
-                <div class="">
-                  <div class="!mb-6">
-                    <x-form.select title="Refund Policy" value="90" :options="[30 => '30 days', 60 => '60 days', 90 => '90 days',]"></x-form.select>
-                  </div>
-
-                  <div class="text-lg inline-block relative !pr-6 !mb-6">
+                <div x-data="{ show: @entangle('fields.subscription') }" x-show="show" class="">
+                  <div class="!font-semibold !text-2xl inline-block relative !pr-6 !mb-10">
                     Prepayment Discounts:
                     <x-tooltip message="tooltip"></x-tooltip>
                   </div>
                   <div class="grid grid-cols-3 !gap-3">
                     <div class="">
-                      <x-form.input :tooltip="false" label="Month:" placeholder="%" />
+                      <x-form.input x-data="{}"  x-init="() => $refs.input.dispatchEvent(new Event('input')) " x-ref="input" wire:model="subprice.month" :tooltip="false" label="Month:" placeholder="%" data-input="percent" />
+                      @error('month')
+                        <div class="!mt-2 text-red-500">{{ $message }}</div>
+                      @enderror
                     </div>
                     <div class="">
-                      <x-form.input :tooltip="false" label="Quarter:" placeholder="%" />
+                      <x-form.input x-data="{}"  x-init="() => $refs.input.dispatchEvent(new Event('input')) " x-ref="input" wire:model="subprice.quarter" :tooltip="false" label="Quarter:" placeholder="%" data-input="percent" />
+                      @error('quarter')
+                        <div class="!mt-2 text-red-500">{{ $message }}</div>
+                      @enderror
                     </div>
                     <div class="">
-                      <x-form.input :tooltip="false" label="Year:" placeholder="%" />
+                      <x-form.input x-data="{}"  x-init="() => $refs.input.dispatchEvent(new Event('input')) " x-ref="input" wire:model="subprice.year" :tooltip="false" label="Year:" placeholder="%" data-input="percent" />
+                      @error('year')
+                        <div class="!mt-2 text-red-500">{{ $message }}</div>
+                      @enderror
                     </div>
                   </div>
                 </div>
 
 
                 {{-- DESCRIPTION --}}
-                <x-form.text-editor label="Product Description" placeholder="Start writing your product description here..."></x-form.text-editor>
+                <x-form.text-editor wire:model="fields.text" name="text" label="Product Description" placeholder="Start writing your product description here..."></x-form.text-editor>
 
-                <div class="text-lg">Product Description</div>
+                <div class="!font-semibold !text-2xl !py-4">Product Description</div>
 
                 <div class="">
-                  <x-form.chips max="3" source="locations" label="Location" placeholder="Enter city or country...(Up to 3)" />
+                  <x-form.chips max="3" entangle="locations" source="locations" label="Location" placeholder="Enter city or country...(Up to 3)" />
                 </div>
 
                 <div class="">
-                  <x-form.chips source="categories" label="Categories" placeholder="Search or create сategories...(Up to 5)" />
+                  <x-form.chips entangle="categories" source="categories" label="Categories" placeholder="Search or create сategories...(Up to 5)" />
                 </div>
             </div>
         </div>
 
+        {{-- PRICE --}}
+        <h2 class="!font-bold !text-2xl !mb-10">Pricing & SEO</h2>
+        <div x-data="{}" class="flex flex-col xs:flex-row justify-start items-center !gap-4 !mb-10">
+          <div class="w-full">
+            <x-form.input 
+              wire:model="fields.price"
+              :tooltip="false" 
+              label="Price" 
+              placeholder="$10" 
+              data-input="price"
+              x-ref="input1" 
+              x-init="() => $refs.input1.dispatchEvent(new Event('input')) " 
+            />
+          </div>
+          <div class="w-full">
+            <x-form.input 
+              wire:model="fields.old_price"
+              :tooltip="false" 
+              label="Sale Price"
+              placeholder="$10" 
+              data-input="price" 
+              x-ref="input2"
+              x-init="() => $refs.input2.dispatchEvent(new Event('input')) " 
+            />
+          </div>
+          @error('price')
+            <div class="!mt-2 text-red-500">{{ $message }}</div>
+          @enderror
+        </div>
+        
         {{-- SEO SETTINGS --}}
         <h2 class="!font-bold !text-2xl !mb-10">SEO Settings (Optional)</h2>
         <div class="flex flex-col justify-start items-stretch !gap-6 !mb-10">
-            <x-form.input label="Meta Title" placeholder="Enter meta title (for search engines)." />
+          <x-form.input wire:model="fields.seo_title" label="Meta Title" placeholder="Enter meta title (for search engines)." />
 
-            <x-form.textarea :tooltip="true" label="Meta Description"
-                placeholder="Enter meta description (for search engines)." class="min-h-18 sm:min-h-25" />
+          <x-form.textarea-counter 
+              wire:model="fields.seo_text"
+              label="Meta Description"
+              placeholder="Enter meta description (for search engines)." 
+            ></x-form.textarea-counter>
         </div>
 
-      @else
-
-        {{-- MEDIA --}}
-        <h2 class="!font-bold !text-2xl !mb-10">Product Media & Files</h2>
-        <div class="flex flex-col justify-start items-stretch !gap-6 !mb-10">
-          
-          {{-- BANNER --}}
-          <div class="">
-            <x-form.file label="Featured Photo"></x-form.file>
-          </div>
-
-          {{-- PHOTOS --}}
-          <div class="">
-            <div class="text-gray !mb-2">Additional Photos</div>
-            <div class="flex justify-start items-center !gap-2 flex-wrap">
-              @for($i = 0; $i < 8; $i++)
-                <x-form.file></x-form.file>
-              @endfor
-            </div>
-          </div>
-
-        </div>
-
-        <h2 class="!font-bold !text-2xl !mb-10">Product Files</h2>
-        <div class="flex flex-col justify-start items-stretch !gap-6 !mb-10">
-          
-          {{-- PP TEXT --}}
-          <div class="">
-            <x-form.text-editor label="Post-Purchase Text (Optional):" placeholder="Start writing your post-purchase text here..."></x-form.text-editor>
-          </div>
-
-          {{-- PRODUCT FILES --}}
-          <div class="!mb-10">
-            <div class="!mb-4 !text-sm sm:!text-base">Upload up to 8 files of any file type for your product. Each file can be up to 100MB in size. You can upload a large video to platforms such as YouTube or Vimeo and embed the link below.</div>
-            <div class="flex justify-start items-center !gap-2 flex-wrap">
-              @for($i = 0; $i < 8; $i++)
-                <div class="flex flex-col justify-center items-center hover:cursor-pointer">
-                  <x-form.file type="file"></x-form.file>
-                  <div class="font-light text-xl transition hover:text-active">+</div>
-                </div>
-              @endfor
-            </div>
-            <div class="text-sm text-gray !mt-2">You can add a description to each file (optional)</div>
-          </div>
-          
-
-          {{-- LINKS --}}
-          <div class="">
-            <h2 class="!font-bold !text-2xl !mb-10 relative !inline-block !pr-6">
-              Video Link (Optional)
-              <x-tooltip message="tooltip"></x-tooltip>
-            </h2>
-            <div class="flex flex-col justify-start items-stretch !gap-2">
-              <div class="flex justify-between items-stretch">
-                <x-form.input :tooltip="false" placeholder="Link" />
-                <span class="text-2xl !font-light !p-3 !leading-6 transition hover:cursor-pointer hover:text-active">+</span>
-              </div>
-              <div class="flex justify-between items-stretch">
-                <x-form.input :tooltip="false" placeholder="Link" />
-                <span class="text-2xl !font-light !p-3 !leading-6 transition hover:cursor-pointer hover:text-active">+</span>
-              </div>
-              <div class="flex justify-between items-stretch">
-                <x-form.input :tooltip="false" placeholder="Link" />
-                <span class="text-2xl !font-light !p-3 !leading-6 transition hover:cursor-pointer hover:text-active">+</span>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-      @endif
+      
     </div>
 
     {{-- BUTTONS --}}
@@ -160,8 +144,8 @@
       @if($step == 2)
         <x-btn wire:click.prevent="prevStep" class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" gray>Back to Details</x-btn>
       @endif
-      <x-btn class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" outlined>Save as Draft</x-btn>
-      <x-btn wire:click.prevent="nextStep" class="!max-w-none sm:!max-w-sm">Save & Continue</x-btn>
+      <x-btn wire:click.prevent="draft" class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" outlined>Save as Draft</x-btn>
+      <x-btn wire:click.prevent="submit" class="!max-w-none sm:!max-w-sm">Save & Continue</x-btn>
     </div>
 </div>
 

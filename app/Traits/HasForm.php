@@ -35,4 +35,14 @@ trait HasForm
       }
     }
 
+    public function processText(string $text): string
+    {
+      $text = preg_replace('/(?:<p>\s*<br\s*\/?>\s*<\/p>){2,}/i', '<p><br></p>', $text);
+      $text = preg_replace('/(?:<p>\s+<\/p>)/i', '', $text);
+      $text = preg_replace('/(background-color.*;)/is', '', $text);
+      $text = preg_replace('/(color.*;)/is', '', $text);
+
+      return $text;
+    }
+
 }

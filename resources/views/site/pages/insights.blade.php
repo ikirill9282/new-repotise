@@ -13,7 +13,7 @@
         </div>
     </div>
   </section>
-  <section class="tips_news_group">
+  <section class="tips_news_group articles-catalogue">
     <div class="container">
         <div class="about_block justify-betwee items-stretch !gap-12">
             <x-card size="sm" class="item_group basis-9/12 lg:basis-4/5">
@@ -23,7 +23,7 @@
                   @foreach($articles as $item)
                     <div class="cards_group">
                         <a href="{{ $item->makeFeedUrl() }}">
-                          <img src="{{ $item->preview->image }}" alt="Article {{ $item->id }}" class="main_img">
+                          <img src="{{ $item->preview?->image }}" alt="Article {{ $item->id }}" class="main_img">
                         </a>
                         <a href="{{ $item->makeFeedUrl() }}">
                             <h3>{{ $item->title }}</h3>

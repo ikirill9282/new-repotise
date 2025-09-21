@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\CustomEncrypt;
+use App\Helpers\Slug;
 use App\Jobs\DeliveryGift;
 use App\Jobs\PayReward;
 use App\Jobs\ProcessOrder;
@@ -25,15 +26,15 @@ use App\Models\MailLog;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use App\Models\News;
+use Illuminate\Support\Facades\Crypt;
+use Mews\Purifier\Facades\Purifier;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $user = User::find(1);
-  dd($user->defaultPaymentMethod());
-  $sub = $user->newSubscription('default', 18)->create('seti_1RxnVwFkz2A7XNTiD8xqCTzM');
-  dd($sub);
+  $t = Crypt::encrypt(1);
+  dd(urlencode($t));
 });
 
 Artisan::command('ttm', function() {

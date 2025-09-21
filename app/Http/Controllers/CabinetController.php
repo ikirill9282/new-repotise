@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CustomEncrypt;
 use App\Jobs\CheckStripeVerification;
+use App\Models\Article;
+use App\Models\Product;
 use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +19,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use App\Models\Order;
 use App\Models\OrderProducts;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Session;
 
 class CabinetController extends Controller
@@ -266,13 +269,97 @@ class CabinetController extends Controller
 
   public function create_article(Request $request)
   {
-    return view('site.pages.create-article');
+    $id = null;
+
+    if (!empty($request->get('aid'))) {
+      $decryptionError = false;
+      try {
+        $aid = Crypt::decrypt($request->get('aid'));
+      }
+      catch (\Exception $e) { $decryptionError = true; }
+      catch (\Error $e) { $decryptionError = true; }
+
+      if ($decryptionError) {
+        Log::warning('Invlid AID parameter on product creation page', ['request' => $request, 'user' => Auth::user(), 'error' => $e]);
+        $aid = null;
+      }
+
+      $article = Article::find($aid);
+      
+      if (!$article) {
+        Log::warning('Undefined Product ID on product creation page', ['request' => $request, 'user' => Auth::user()]);
+        $aid = null;
+      } elseif ($article->author->id !== $request->user()->id) {
+        Log::emergency('Not Product Owner on product creation page', ['request' => $request, 'user' => Auth::user()]);
+        return redirect('profile');
+      }
+
+      if ($aid) $id = $request->get('aid');
+    }
+
+    return view('site.pages.create-article', ['article_id' => $id]);
   }
 
 
   public function create_product(Request $request)
   {
-    return view('site.pages.create-product');
+    $id = null;
+
+    if (!empty($request->get('pid'))) {
+      $decryptionError = false;
+      try {
+        $pid = Crypt::decrypt($request->get('pid'));
+      }
+      catch (\Exception $e) { $decryptionError = true; }
+      catch (\Error $e) { $decryptionError = true; }
+      
+      if ($decryptionError) {
+        Log::warning('Invlid PID parameter on product creation page', ['request' => $request, 'user' => Auth::user(), 'error' => $e]);
+        $pid = null;
+      }
+
+      $product = Product::find($pid);
+      if (!$product) {
+        Log::warning('Undefined Product ID on product creation page', ['request' => $request, 'user' => Auth::user()]);
+        $pid = null;
+      } elseif ($product->author->id !== $request->user()->id) {
+        Log::emergency('Not Product Owner on product creation page', ['request' => $request, 'user' => Auth::user()]);
+        return redirect('profile');
+      }
+
+      if ($pid) $id = $request->get('pid');
+    }
+    return view('site.pages.create-product', ['product_id' => $id]);
+  }
+
+  public function create_product_media(Request $request)
+  {
+    if (!empty($request->get('pid'))) {
+      $decryptionError = false;
+      try {
+        $pid = Crypt::decrypt($request->get('pid'));
+      }
+      catch (\Exception $e) { $decryptionError = true; }
+      catch (\Error $e) { $decryptionError = true; }
+      
+      if ($decryptionError) {
+        Log::warning('Invlid PID parameter on product creation page', ['request' => $request, 'user' => Auth::user(), 'error' => $e]);
+        $pid = null;
+      }
+
+      $product = Product::find($pid);
+      if (!$product) {
+        Log::warning('Undefined Product ID on product creation page', ['request' => $request, 'user' => Auth::user()]);
+        $pid = null;
+      } elseif ($product->author->id !== $request->user()->id) {
+        Log::emergency('Not Product Owner on product creation page', ['request' => $request, 'user' => Auth::user()]);
+        return redirect('profile');
+      }
+
+      if ($pid) $id = $request->get('pid');
+      return view('site.pages.create-product-media', ['product_id' => $id]);
+    }
+    return redirect()->route('profile.products.create');
   }
 
   public function createProduct2(Request $request)

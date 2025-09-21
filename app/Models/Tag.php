@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Helpers\Slug;
+use Mews\Purifier\Facades\Purifier;
 
 class Tag extends Model
 {
@@ -14,12 +15,20 @@ class Tag extends Model
 
       self::creating(function ($model) {
 
+        // PURIFY
+        $model->title = Purifier::clean($model->title);
+
+        // SLIG
         if (!isset($model->slug) || empty($model->slug)) {
           $model->generateSlug();
         }
       });
 
       self::updating(function ($model) {
+        // PURIFY
+        $model->title = Purifier::clean($model->title);
+
+        // SLUG
         if ($model->isDirty('title')) {
           $model->generateSlug();
         }

@@ -4,11 +4,14 @@
   'placeholder' => '',
   'source' => null,
   'max' => 5,
+  'entangle' => null,
+  'create' => true,
 ])
 
 <div class="relative dropdown text-sm sm:text-base"
   x-data="{
-    selected: [],
+    selected: @if($entangle) @entangle($entangle) @else [] @endif,
+    create: {{ $create }},
     options: [],
     error: null,
     load(query = '') {
@@ -51,7 +54,7 @@
       }
     },
     dropVal(val) {
-      this.selected = this.selected.filter(elem => elem !== val);
+      this.selected = this.selected.filter(elem => elem.key !== val.key);
       this.error = null;
     },
     hasVal(val) {
@@ -87,6 +90,7 @@
     },
     setVal(val) {
       this.$refs.value.value = val;
+      this.$refs.value.dispatchEvent(new Event('input'));
     },
   }"
 
@@ -118,10 +122,11 @@
           load(evt.target.value);
         }"
         x-on:keydown.enter.prevent="(evt) => {
-          console.log('ok');
-          pushVal(evt.target.value);
-          $refs.input.value = '';
-          if (isEmptyOptions()) load();
+          if (create) {
+            pushVal(evt.target.value);
+            $refs.input.value = '';
+            if (isEmptyOptions()) load();
+          }
         }"
         type="text" 
         name="{{ $id }}" 

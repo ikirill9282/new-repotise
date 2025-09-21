@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\Collapse;
 use App\Models\Article;
 use App\Models\Product;
 use App\Models\News;
@@ -21,7 +22,7 @@ class GallerySeeder extends Seeder
           'user_id' => $article->user_id,
           'preview' => 1,
           'type' => 'articles',
-          'size' => 1000000,
+          'size' => Collapse::bytesToMegabytes(1000000),
         ]);
       }
 
@@ -40,12 +41,13 @@ class GallerySeeder extends Seeder
       ];
       foreach (Product::all() as $product) {
         shuffle($proucts);
-        $product->gallery()->firstOrCreate([
+        $product->gallery()->firstOrCreate(
+        [
           'image' => "/storage/images/{$proucts[0]}",
           'user_id' => $product->user_id,
           'preview' => 1,
           'type' => 'products',
-          'size' => 1000000,
+          'size' => Collapse::bytesToMegabytes(1000000),
         ]);
 
         foreach (array_slice($proucts, 1, 5) as $img) {
@@ -54,7 +56,8 @@ class GallerySeeder extends Seeder
             'user_id' => $product->user_id,
             'preview' => 0,
             'type' => 'products',
-            'size' => 1000000,
+            'placement' => 'gallery',
+            'size' => Collapse::bytesToMegabytes(1000000),
           ]);
         }
       }

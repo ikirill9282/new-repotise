@@ -1,6 +1,6 @@
 @php
 
-$news = \App\Models\Article::getLastNews(5);
+$news = \App\Models\Article::limit(5)->get();
 
 @endphp
 

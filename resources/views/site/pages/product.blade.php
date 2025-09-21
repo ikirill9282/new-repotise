@@ -15,13 +15,20 @@
                 </div>
             </section>
             <div class="container">
+              @php
+                $gallery = $product->gallery->where('preview', 1)
+                  ->values()
+                  ->merge($product->gallery->where('preview', 0)->sortByDesc('id')->values());
+
+                // dump($product->gallery->where('preview', 0)->sortByDesc('id'));
+              @endphp
                 <div class="about_block">
                     <div class="group_left">
-                        <div class="img_products">
+                        <div class="img_products lg:!max-w-[49%]">
                             <div style="--swiper-navigation-color: #fff; --swiper-pagination-color: #fff"
                                 class="swiper mySwiper14">
                                 <div class="swiper-wrapper">
-                                    @foreach ($product->gallery as $image)
+                                    @foreach ($gallery as $image)
                                         <div class="swiper-slide">
                                             <img src="{{ url($image->image) }}" />
                                         </div>
@@ -30,7 +37,7 @@
                             </div>
                             <div thumbsSlider="" class="swiper mySwiper13">
                                 <div class="swiper-wrapper">
-                                    @foreach ($product->gallery as $image)
+                                    @foreach ($gallery as $image)
                                         <div class="swiper-slide">
                                             <img src="{{ url($image->image) }}" />
                                         </div>
@@ -91,7 +98,7 @@
                               <div class="cards_monthly_group">
                                   <div class="card_monthly ">
                                       <h3>Monthly</h3>
-                                      <p class="text-center">${{ $product->subprice->month }} / month</p>
+                                      <p class="text-center">${{ $product->month() }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -101,7 +108,7 @@
                                   </div>
                                   <div class="card_monthly ">
                                       <h3>Quarterly</h3>
-                                      <p class="text-center">${{ $product->subprice->quarter }} / month</p>
+                                      <p class="text-center">${{ $product->quarter() }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -111,7 +118,7 @@
                                   </div>
                                   <div class="card_monthly ">
                                       <h3>Yearly</h3>
-                                      <p class="text-center">${{ $product->subprice->year }} / month</p>
+                                      <p class="text-center">${{ $product->year() }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -148,7 +155,7 @@
                             <div class="bottom_informations">
                                 <div class="text_inf">
                                     <h4>Product Type</h4>
-                                    <p>{{ $product->type->title }}</p>
+                                    <p>{{ $product->types->pluck('title')->join(', ') }}</p>
                                 </div>
                                 <div class="text_inf">
                                     <h4>Categories</h4>
@@ -156,7 +163,7 @@
                                 </div>
                                 <div class="text_inf">
                                     <h4>Location</h4>
-                                    <p>{{ $product->location->title }}</p>
+                                    <p>{{ $product->locations->pluck('title')->join(', ') }}</p>
                                 </div>
                                 <div class="text_inf">
                                     <h4>Creator Refund Policy</h4>
@@ -166,7 +173,7 @@
                         </div>
                         <div class="product_description">
                             <h3 class="mb-3">Product Description</h3>
-                            <div class="read-more" data-text="Read More" data-color="#f9f9f9">{{ $product->text }}</div>
+                            <div class="read-more" data-text="Read More" data-color="#f9f9f9">{!! $product->getText() !!}</div>
                         </div>
 
                         <div class="group_middle">
@@ -192,7 +199,7 @@
                               <div class="cards_monthly_group">
                                   <div class="card_monthly">
                                       <h3>Monthly</h3>
-                                      <p class="text-center">${{ $product->subprice->month }} / month</p>
+                                      <p class="text-center">${{ $product->month() }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -202,7 +209,7 @@
                                   </div>
                                   <div class="card_monthly ">
                                       <h3>Quarterly</h3>
-                                      <p class="text-center">${{ $product->subprice->quarter }} / month</p>
+                                      <p class="text-center">${{ $product->quarter() }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -212,7 +219,7 @@
                                   </div>
                                   <div class="card_monthly ">
                                       <h3>Yearly</h3>
-                                      <p class="text-center">${{ $product->subprice->year }} / month</p>
+                                      <p class="text-center">${{ $product->year() }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -248,7 +255,7 @@
                             <div class="bottom_informations">
                                 <div class="text_inf">
                                     <h4>Product Type</h4>
-                                    <p>{{ $product->type->title }}</p>
+                                    <p>{{ $product->types->pluck('title')->join(', ') }}</p>
                                 </div>
                                 <div class="text_inf">
                                     <h4>Categories</h4>
@@ -256,7 +263,7 @@
                                 </div>
                                 <div class="text_inf">
                                     <h4>Location</h4>
-                                    <p>{{ $product->location->title }}</p>
+                                    <p>{{ $product->locations->pluck('title')->join(', ') }}</p>
                                 </div>
                                 <div class="text_inf">
                                     <h4>Creator Refund Policy</h4>
@@ -266,7 +273,7 @@
                           </div>
                           <div class="product_description">
                               <h3 class="mb-3">Product Description</h3>
-                              <div class="read-more" data-text="Read More" data-color="#f9f9f9">{{ $product->text }}</div>
+                              <div class="read-more" data-text="Read More" data-color="#f9f9f9">{!! $product->getText() !!}</div>
                           </div>
                         </div>
 
@@ -391,7 +398,7 @@
                         </div>
                     </div>
 
-                    <div class="group_right">
+                    <div class="group_right !max-w-[268px]">
                         <div class="meet_creator">
                             <h3>Meet the Creator</h3>
                             <a href="{{ $product->author->makeProfileUrl() }}" class="creator">

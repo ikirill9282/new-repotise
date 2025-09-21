@@ -11,7 +11,7 @@ $article = \App\Models\Article::find($variables->firstWhere('name', 'main_articl
                 'variables' => $variables, 
                 'header_text' => $article->title
               ])
-              <div class="print-content text-[#A4A0A0]">{!! $article->short(600) !!}</div>
+              <div class="print-content text-[#A4A0A0]">{!! $article->short(800) !!}</div>
               <div class="name_author">
                 <a class="group w-full flex items-center justify-start gap-2" href="{{ $article->author->makeProfileUrl() }}" class="author-image">
                   <img class="objcet-cover" src="{{ url($article->author->avatar) }}" alt="Article {{ $article->id }}">

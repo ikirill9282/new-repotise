@@ -4,40 +4,37 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 gap-4 mb-6">
             @foreach ($this->levels as $level)
                 @php
-                    $icon = match ($level->id) {
-                        1 => 'icons.star',
-                        2 => 'icons.graph-rise',
-                        3 => 'icons.thumb',
-                        default => null,
-                    };
-
                     $class = match ($level->id) {
                         3 => '!w-7 !h-7',
-                        default => '',
+                        default => ''
                     };
-
-                    $text = match ($level->id) {
-                        1 => 'Starting Level',
-                        2 => 'Reach $100 in sales to unlock',
-                        3 => 'Reach $300 in sales to unlock',
+                    
+                    $color = match($level->id) {
+                      1 => '!text-yellow',
+                      2 => '!text-blue-500',
+                      3 => '!text-red',
+                      4 => '!text-red',
+                      default => 'text-second'
                     };
                 @endphp
                 <div class="p-2.5 rounded-lg border-1 border-gray/25">
                     <div class="font-bold text-2xl flex items-center gap-2 w-full bg-light rounded-lg p-3 mb-4">
-                        <span class="text-yellow">
-                            @includeIf($icon, ['width' => 25, 'height' => 25, 'class' => $class])
+                        <span class="{{ $color }}">
+                            @includeIf($level->icon, ['width' => 25, 'height' => 25, 'class' => $class])
                         </span>
                         <div class="text-nowrap">Level {{ $level->id }}: {{ $level->title }}</div>
                     </div>
                     <ol>
-                        <li class="!list-disc">Platform Fee: {{ $level->fee }}%</li>
-                        <li class="!list-disc">Storage Limit: {{ $level->getSpace() }}</li>
-                        <li class="!list-disc">Starting Level</li>
+                        <li class="!list-disc">Platform Fee: {{ $level->fee == 0 ? 'Exclusive Rate' : ($level->fee . "%") }}</li>
+                        <li class="!list-disc">Storage Limit: {{ $level->space == 0 ? 'Unlimited' : $level->getSpace() }}</li>
+                        @if($level->description)
+                          <li class="!list-disc">{{ $level->description }}</li>
+                        @endif
                     </ol>
                 </div>
             @endforeach
 
-            <div class="p-2.5 rounded-lg border-1 border-gray/25">
+            {{-- <div class="p-2.5 rounded-lg border-1 border-gray/25">
                 <div class="font-bold text-2xl flex items-center gap-2 w-full bg-light rounded-lg p-3 mb-4">
                     <span class="text-red">@include('icons.gem', ['width' => 25, 'height' => 25])</span>
                     <div class="text-nowrap">Level 4: Exclusive</div>
@@ -46,7 +43,7 @@
                     <li class="!list-disc">Platform Fee: Exclusive Rate</li>
                     <li class="!list-disc">Storage Limit: Unlimited</li>
                 </ol>
-            </div>
+            </div> --}}
 
         </div>
         <div class="max-w-2xl">

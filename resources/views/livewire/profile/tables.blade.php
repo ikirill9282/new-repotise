@@ -47,6 +47,6 @@
     </div>
 
     @if(view()->exists("livewire.".$this->getTableName()))
-      @livewire($this->getTableName(), key($this->activeTable))
+      @livewire($this->getTableName(), ['active' => $this->activeTable], key($this->activeTable))
     @endif
 </div>

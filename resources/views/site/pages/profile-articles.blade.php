@@ -15,15 +15,15 @@
         'tables' => [
           [
             'name' => "articles-published",
-            'title' => "Published (". $user->products()->where('status_id', 1)->count() .")",
+            'title' => "Published (". $user->articles()->where('status_id', 1)->count() .")",
           ],
           [
             'name' => 'articles-scheduled',
-            'title' => "Scheduled (". $user->products()->where('status_id', 2)->count() .")",
+            'title' => "Scheduled (". $user->articles()->whereIn('status_id',[6,3])->count() .")",
           ],
           [
             'name' => 'articles-draft',
-            'title' => "Draft (". $user->products()->where('status_id', 3)->count() .")",
+            'title' => "Draft (". $user->articles()->where('status_id', 2)->count() .")",
           ]
         ]
       ])

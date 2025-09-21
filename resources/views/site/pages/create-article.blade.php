@@ -11,7 +11,7 @@
         ]" />
 
         @livewire('forms.article', [
-          'article' => \App\Models\Article::find(1)
+          'article_id' => $article_id,
         ])
       </div>
   </section>

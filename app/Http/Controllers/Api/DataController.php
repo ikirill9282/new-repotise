@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
+use App\Helpers\Collapse;
 use App\Helpers\CustomEncrypt;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -36,13 +38,15 @@ class DataController extends Controller
       $gallery = Gallery::create([
         'model_id' => 0,
         'user_id' => $request->user()->id,
-        'type' => 'article',
-        'image' => "/storage$path",
-        'size' => $image->getSize(),
-        'scheduled_at' => Carbon::tomorrow()->endOfDay(),
+        'type' => 'articles',
+        'image' => "/storage/$path",
+        'placement' => 'text',
+        'size' => Collapse::bytesToMegabytes($image->getSize()),
+        'expires_at' => Carbon::now()->addHours(1),
       ]);
 
       return response()->json(['status' => 'success', 'message' => '', 'path' => $gallery->image]);
+
     } catch (\Exception $e) {
       if ($path && Storage::disk('public')->exists($path)) {
         Storage::disk('public')->delete($path);
@@ -160,11 +164,15 @@ class DataController extends Controller
     $valid = $request->validate(['q' => 'sometimes|nullable|string']);
 
     return Tag::query()
-      ->when(
-        !empty($valid['q']),
-        fn($query) => $query->where('title', 'like', "%{$valid['q']}%")
-          ->orWhere('slug', 'like', "%{$valid['q']}%")
-      )
+      ->where(function ($query) use($valid) {
+          $query->when(
+            !empty($valid['q']),
+            fn($subquery) => $subquery->where('title', 'like', "%{$valid['q']}%")
+              ->orWhere('slug', 'like', "%{$valid['q']}%")
+          );
+      })
+      ->where('status_id', '!=', Status::DELETED)
+      // ->ddRawSql()
       ->get()
       ->map(function($item) {
         return [

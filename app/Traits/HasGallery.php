@@ -27,12 +27,19 @@ trait HasGallery
 
   public function gallery()
   {
-    return $this->hasMany(Gallery::class, 'model_id')->where('type', $this->table);
+    return $this->hasMany(Gallery::class, 'model_id')
+      ->where('type', $this->table)
+      ->whereNull('expires_at')
+      ;
   }
 
   public function preview()
   {
-    return $this->hasOne(Gallery::class, 'model_id')->where('preview', 1)->where('type', $this->table);
+    return $this->hasOne(Gallery::class, 'model_id')
+      ->where('preview', 1)
+      ->where('type', $this->table)
+      ->whereNull('expires_at')
+      ;
   }
 
   public function copyGallery($newRecord, $type)
