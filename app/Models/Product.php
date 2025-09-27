@@ -88,7 +88,7 @@ class Product extends Model
 
   public function files()
   {
-    return $this->hasMany(ProductFiles::class);
+    return $this->hasMany(ProductFiles::class)->whereNull('expires_at');
   }
 
   public function links()

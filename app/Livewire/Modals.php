@@ -12,7 +12,7 @@ class Modals extends Component
     public $inited = false;
     public $args = [];
 
-    public $oneTime = ['report'];
+    public $oneTime = ['report', 'file-description'];
 
     public function mount()
     {
@@ -33,6 +33,7 @@ class Modals extends Component
       $this->modal = $modalName;
       $this->inited = true;
       $this->startShowAnimation();
+
       if (!in_array($modalName, $this->oneTime)) {
         $this->dispatch('modal-opened', ['modal' => $modalName]);
       }

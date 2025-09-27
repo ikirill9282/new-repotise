@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use Livewire\Attributes\On;
 use App\Enums\Status;
 use App\Models\Gallery;
 use App\Models\Product;
@@ -137,7 +138,7 @@ class ProductMedia extends Component
       $this->attrs['id'] = $product_id;
       $this->prepareFormFields();
     }
-
+    
     public function draft()
     {
       $this->fields['status_id'] = Status::DRAFT;
@@ -156,6 +157,14 @@ class ProductMedia extends Component
           'link' => null,
           'id' => null,
         ] : $link;
+      }
+    }
+
+    #[On('fileDescriptionUpdated')]
+    public function onFileDescriptionUpdate($args)
+    {
+      if (isset($args['key']) && isset($args['description'])) {
+        $this->fields['files'][$args['key']]['description'] = $args['description'];
       }
     }
 
@@ -217,6 +226,7 @@ class ProductMedia extends Component
           if ($key) {
             $this->fields['files'][$key]['current'] = $file->name;
             $this->fields['files'][$key]['id'] = Crypt::encrypt($file->id);
+            $this->fields['files'][$key]['description'] = $file->description;
           }
         }
       }
@@ -229,6 +239,7 @@ class ProductMedia extends Component
 
       $validator = Validator::make($data, [
         'banner' => 'required|array',
+        'status_id' => 'required|integer',
         'gallery' => 'required|array',
         'pp_text' => 'sometimes|nullable|string',
         'files' => 'sometimes|nullable|array',
@@ -254,7 +265,10 @@ class ProductMedia extends Component
     {
       $data = $this->prepareFormData();
       $product = $this->getProduct();
-      $attributes = collect($data)->only(['pp_text'])->toArray();
+      $attributes = collect($data)->only([
+        'pp_text',
+        'status_id',
+      ])->toArray();
 
       DB::beginTransaction();
       try {
@@ -278,7 +292,7 @@ class ProductMedia extends Component
 
       DB::commit();
       $this->dispatch('toastSuccess', ['message' => 'Product Media updated successful!']);
-      return redirect()->route('profile.products');
+      // return redirect()->route('profile.products');
     }
 
     protected function resetBanner(Product $product, array $data)
@@ -321,6 +335,8 @@ class ProductMedia extends Component
             'placement' => 'gallery',
             'size' => Collapse::bytesToMegabytes($item['uploaded']->getSize()),
           ]);
+        } elseif (empty($item['preview']) && !empty($item['id'])) {
+          Gallery::where('id', Crypt::decrypt($item['id']))->update(['expires_at' => Carbon::now()]);
         }
       }
     }
@@ -342,7 +358,6 @@ class ProductMedia extends Component
 
     protected function resetFiles(Product $product, array $data)
     {
-      $product->files()->update(['expires_at' => Carbon::now()]);
       foreach($data['files'] as $file) {
         if (!empty($file['uploaded'])) {
           
@@ -358,6 +373,11 @@ class ProductMedia extends Component
             'description' => $file['description'] ? $this->processText($file['description']) : null,
             'name' => Purifier::clean($file['uploaded']->getClientOriginalName()),
           ]);
+
+        } elseif (empty($file['current']) && !empty($file['id'])) {
+          ProductFiles::where('id', Crypt::decrypt($file['id']))->update(['expires_at' => Carbon::now()]);
+        } elseif (!empty($file['description'])) {
+          ProductFiles::where('id', Crypt::decrypt($file['id']))->update(['description' => $this->processText($file['description'])]);
         }
       }
     }
@@ -379,7 +399,19 @@ class ProductMedia extends Component
       ]);
       $this->dispatch('toastError', ['message' => 'Something went wrong...']);
     }
+    
+    public function dropPhoto(string $key)
+    {
+      $this->fields['gallery'][$key]['uploaded'] = null;
+      $this->fields['gallery'][$key]['preview'] = null;
+    }
 
+    public function dropFile(string $key)
+    {
+      $this->fields['files'][$key]['uploeded'] = null;
+      $this->fields['files'][$key]['current'] = null;
+    }
+    
     public function render()
     {
       return view('livewire.forms.product-media');

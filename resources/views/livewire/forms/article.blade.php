@@ -9,7 +9,9 @@
         
         <x-form.input wire:model="fields.title" name="title" label="Article Title" placeholder="Enter your article title here..." />
     
-        <x-form.text-editor wire:model="fields.text" name="text" label="Article Content" placeholder="Start writing your article here..."></x-form.text-editor>
+        <div wire:ignore class="">
+          <x-form.text-editor wire:model="fields.text" name="text" label="Article Content" placeholder="Start writing your article here..."></x-form.text-editor>
+        </div>
 
         <div class="">
           <x-form.chips entangle="tags" source="tags" name="tags" label="Tags" placeholder="Search or create tags...(Up to 5)" />

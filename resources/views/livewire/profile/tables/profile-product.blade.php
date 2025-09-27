@@ -27,7 +27,9 @@
               </div>
               <div class="flex justify-start items-start md:items-center flex-col md:flex-row w-full !gap-16 overflow-hidden">
                 <div class="w-full md:w-auto md:overflow-hidden">
-                  <div class="text-gray truncate mb-2 w-full">{{ $product->title }}</div>
+                  <div class="text-gray truncate mb-2 w-full">
+                    <x-link href="{{ $product->makeUrl() }}" class="!border-0">{{ $product->title }}</x-link>
+                  </div>
                   <div class="flex justify-start items-center gap-2 text-sm mb-2">
                       <p class="text-gray bg-light px-2 py-1 rounded-full">{{ \Illuminate\Support\Carbon::parse($product->published_at ?? $product->created_at)->format('d.m.Y') }}</p>
                       <p class="text-gray bg-light px-2 py-1 rounded-full">{{ $product->views }} Views</p>

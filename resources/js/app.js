@@ -161,10 +161,20 @@ function makeQuill(editor) {
 const builded_editors = [];
 window.addEventListener("DOMContentLoaded", function () {
     const editors = document.querySelectorAll(".quill-editor");
-    editors.forEach((editor) => makeQuill(editor));
+    editors.forEach((editor) => {
+      if (!builded_editors.includes(editor)) {
+        makeQuill(editor);
+        builded_editors.push(editor);
+      }
+    });
 
     Livewire.hook("morphed", () => {
         const editors = document.querySelectorAll(".quill-editor");
-        editors.forEach((editor) => makeQuill(editor));
+        editors.forEach((editor) => {
+          if (!builded_editors.includes(editor)) {
+            makeQuill(editor);
+            builded_editors.push(editor);
+          }
+        });
     });
 });

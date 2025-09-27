@@ -2,13 +2,14 @@
   'label' => null,
   'placeholder' => null,
   'tooltip' => true,
+  'max' => 500,
 ])
 <div  class="" 
     x-ref="base"
     x-data="{
       len: 0,
-      max: 500,
-      setLen(val) {
+      max: {{ $max }},
+      setLen() {
         const len = this.getLen();
         if (this.len <= this.max) {
           this.len = len;
@@ -19,6 +20,7 @@
       }
     }"
     x-init="() => {
+      setTimeout(() => setLen(), 300);
       window.addEventListener('DOMContentLoaded', () => {
         setLen();
         Livewire.hook('morphed', () => {
@@ -27,6 +29,13 @@
       });
     }"
   >
+  @if($attributes->get('wire:model'))
+    @php
+      $var = $attributes->get('wire:model');
+      $val = data_get($this, $var);
+      if (!empty($val)) $placeholder = null;
+    @endphp
+  @endif
   <x-form.textarea 
     :placeholder="$placeholder"
     :label="$label"

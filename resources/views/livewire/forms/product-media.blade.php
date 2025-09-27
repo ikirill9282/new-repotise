@@ -34,7 +34,7 @@
             @endif
           </div>
 
-          <x-form.file wire:model="fields.banner.uploaded" label="Featured Photo"></x-form.file>
+          <x-form.file wire:model="fields.banner.uploaded" label="Featured Photo" accept="image/*"></x-form.file>
 
           @error('banner')
             <div class="!mt-2 text-red-500">{{ $message }}</div>
@@ -44,31 +44,40 @@
         {{-- PHOTOS --}}
         <div class="">
           <div class="text-gray !mb-2">Additional Photos</div>
-          <div class="flex justify-start items-end !gap-2 flex-wrap">
+          <div class="flex justify-start items-start !gap-2 flex-wrap">
             @foreach($this->fields['gallery'] as $key => $item)
               @php
                 $has_image = boolval($item['uploaded'] || $item['preview']);
               @endphp
 
               <div class="relative">
-                  <div wire:loading class="absolute w-full h-full bg-light/50 z-150">
-                    <x-loader width="60" height="60" />
-                  </div>
 
                   <x-form.file 
-                    wire:model="fields.gallery.{{ $key }}.uploaded" 
+                    wire:model.defer="fields.gallery.{{ $key }}.uploaded" 
+                    :delete="!empty($item['uploaded']) || !empty($item['preview'])"
                     accept="image/*" 
                     wrapClass="relative z-50 transition {{ $has_image ? '!text-white group-hover:!text-active' : '' }}"
                   >
+                    <div wire:loading class="absolute w-full h-full top-0 left-0 bg-light/50 z-150">
+                      <x-loader width="60" height="60" />
+                    </div>
                     @if($item['uploaded'])
-                      <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40">
+                      <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40 group-hover:cursor-pointer">
                         <img class="object-cover h-full w-full !inline-block opacity-100 transition group-hover:!opacity-50" src="{{ $item['uploaded']->temporaryUrl() }}" alt="Banner">
                       </div>
                     @elseif ($item['preview'])
-                      <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40">
+                      <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40 group-hover:cursor-pointer">
                         <img class="object-cover h-full w-full !inline-block opacity-100 transition group-hover:!opacity-50" src="{{ $item['preview'] ?? '' }}" alt="Banner">
                       </div>
                     @endif
+
+                    <x-slot name="drop">
+                      @if($item['uploaded'] || $item['preview'])
+                        <div wire:click.prevent="dropPhoto('{{ $key }}')" class="!mt-2 text-center flex justify-center items-center hover:cursor-pointer hover:text-active">
+                          @include('icons.close', ['width' => 9, 'height' => 9])
+                        </div>
+                      @endif
+                    </x-slot>
                   </x-form.file>
               </div>
 
@@ -89,17 +98,33 @@
         {{-- PRODUCT FILES --}}
         <div class="!mb-10">
           <div class="!mb-4 !text-sm sm:!text-base">Upload up to 8 files of any file type for your product. Each file can be up to 100MB in size. You can upload a large video to platforms such as YouTube or Vimeo and embed the link below.</div>
-          <div class="flex justify-start items-center !gap-2 flex-wrap">
+          <div class="flex justify-start items-start !gap-2 flex-wrap">
             @foreach($this->fields['files'] as $key => $file)
+              @php
+                $filename = empty($file['uploaded']) ? (empty($file['current']) ? null : $file['current']) : $file['uploaded']->getClientOriginalName();
+              @endphp
               <div class="flex flex-col justify-center items-center hover:cursor-pointer">
                 <x-form.file 
                   wire:model="fields.files.{{ $key }}.uploaded" 
                   type="file" 
-                  accept="application/pdf"
-                  :filename="empty($file['uploaded']) ? (empty($file['current']) ? null : $file['current']) : $file['uploaded']->getClientOriginalName()"
+                  accept="*/*"
+                  :filename="$filename"
                 >
+                  <div wire:loading class="absolute w-full h-full top-0 left-0 bg-light/50 z-150">
+                    <x-loader width="60" height="60" />
+                  </div>
+                  <x-slot name="drop">
+                    @if($filename)
+                      <div class="flex justify-center items-center !gap-6">
+                        <div wire:click.prevent="$dispatch('openModal', { modalName: 'file-description', args: { filename: '{{ $filename }}', key: '{{ $key }}', description: '{{ $file['description'] ?? '' }}' } })" class="font-light text-xl transition hover:text-active">+</div>
+
+                        <div wire:click.prevent="dropFile('{{ $key }}')" class="text-center flex justify-center items-center hover:cursor-pointer hover:text-active">
+                          @include('icons.close', ['width' => 9, 'height' => 9])
+                        </div>
+                      </div>
+                    @endif
+                  </x-slot>
                 </x-form.file>
-                <div class="font-light text-xl transition hover:text-active">+</div>
               </div>
             @endforeach
           </div>
