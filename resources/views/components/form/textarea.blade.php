@@ -15,17 +15,20 @@
     show() {
       if (!this.$refs.textarea.value.length) {
         this.$refs.placeholder.classList.add('opacity-100');
-        this.$refs.placeholder.classList.remove('opacity-0');
-        
+        this.$refs.placeholder.classList.remove('opacity-0'); 
       }
-    }
+    },
   }"
   x-init="() => {
     window.addEventListener('DOMContentLoaded', () => {
       if ($refs.textarea.value.length) {
         hide();
       }
-      Livewire.hook('morphed', () => hide());
+      Livewire.hook('morphed', () => {
+        if ($refs.textarea.value.length) {
+          hide();
+        }
+      });
     });
   }"
   class=""

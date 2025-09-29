@@ -7,11 +7,13 @@
     20 => '20 Days',
     30 => '30 Days',
   ],
+  'name' => null,
 ])
 <div 
   x-data="{
     value: null,
     label: {{ $label ? "'$label'" : 'null' }},
+    placeholder: {{ $label ? "'$label'" : 'null' }},
     toggle() {
       const dropdown = this.$refs.dropdown;
       const height = this.$refs.dropdownContent?.offsetHeight ?? 0;
@@ -40,10 +42,16 @@
   }"
   x-init="() => {
     window.addEventListener('DOMContentLoaded', () => {
-      const val = $refs.input.value;
-      const label = $refs.dropdownContent.querySelector(`div[data-key='${val}']`).innerHTML.trim();
+      const val = $refs.input.value ?? '';
+      const lab = $refs.dropdownContent.querySelector(`div[data-key='${val}']`)?.innerHTML.trim();
+      if (lab) {
+        setVal(val, lab);
+      }
 
-      setVal(val, label);
+      Livewire.on('resetForm', () => {
+        value = null;
+        label = placeholder;
+      });
     });
   }"
   class="w-full group text-sm sm:text-base"
@@ -93,4 +101,8 @@
       </div>
     </div>
   </div>
+
+  @error($name)
+    <div class="!mt-2 text-red-500">{{ $message }}</div>
+  @enderror
 </div>

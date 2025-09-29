@@ -336,8 +336,8 @@
                             <span>Sort by:</span>
                             <select>
                                 <option>Top Rated</option>
-                                <option>Top Rated1</option>
-                                <option>Top Rated2</option>
+                                <option>Price Ascending</option>
+                                <option>Price Descending</option>
                             </select>
                         </div>
                         <div class="filter_cards_group !items-stretch">

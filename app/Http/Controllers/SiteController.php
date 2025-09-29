@@ -9,7 +9,6 @@ use App\Models\Page;
 use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Models\User;
 use App\Models\SearchQueries;
 use App\Models\News;
@@ -65,16 +64,27 @@ class SiteController extends Controller
       'countries' => 'sometimes|nullable|array',
       'collaboration' => 'sometimes|nullable|integer',
       'q' => 'sometimes|nullable|string',
+      'sort' => 'sometimes|nullable|string',
     ]);
 
+    $sort = ['created_at', 'desc'];
+    if (isset($valid['sort'])) {
+      $sort = match($valid['sort']) {
+        'newsest' => ['created_at', 'desc'],
+        'followed' => ['followers_count', 'desc'],
+        default => $sort,
+      };
+    }
+
     $query = User::query()
+      ->withCount('followers')
       ->when(
         isset($valid['creator']),
         fn($query) => $query->where('username', str_ireplace('@', '', $valid['creator']))
       )
       ->when(
-        isset($valid['followers_min']),
-        fn($query) => $query->withCount('followers')
+        isset($valid['followers_min']) && ($valid['followers_min'] > 0),
+        fn($query) => $query
           ->having('followers_count', '>', $valid['followers_min'])
           ->having('followers_count', '<', $valid['followers_max'])
       )
@@ -115,6 +125,7 @@ class SiteController extends Controller
           $query->orWhereIn('id', $creators_ids);
         },
       )
+      ->orderBy(...$sort)
       ;
 
     return view('site.pages.creators', [

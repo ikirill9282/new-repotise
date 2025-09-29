@@ -55,6 +55,14 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        'forms' => [
+            'driver' => 'local',
+            'root' => storage_path('app/forms'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
 
         's3' => [
             'driver' => 's3',

@@ -13,7 +13,7 @@
               :breadcrumbs="[
                 'Home' => route('home'),
                 'Creators' => route('creators'),
-              ]" 
+              ]"
             />
 
             <x-search action="{{ route('creators') }}" data-source="creators" placeholder="Search creators by name, topic, or channel...">
@@ -30,6 +30,7 @@
     <section class="catalog !py-12 bg-light">
         <div class="container">
             <div class="grid grid-cols-1 md:grid-cols-[260px_1fr] lg:grid-cols-[300px_1fr] !gap-4 lg:!gap-10">
+                
                 {{-- FILTERS --}}
                 <div class="col-span-1">
                     <form action="{{ route('creators') }}" mthod="GET" class="accordion bg-white rounded-lg" id="accordion">
@@ -344,16 +345,22 @@
                   @if($creators->isEmpty())
                     <div class="!text-2xl text-center">Creators not found... Try another filters combination.</div>
                   @else
-                    <div class="flex justify-end items-center !mb-6">
+                    <div x-data="{}" class="flex justify-end items-center !mb-6">
                       <label class="text-gray" for="sorting-table">Sort By:</label>
                       <select
                         wire:model.live="sorting" 
                         id="sorting-table"
                         class="outline-0 pr-1 hover:cursor-pointer"
+                        x-on:change="(evt) => {
+                          const url = new URL(window.location.href);
+                          const params = new URLSearchParams(url.search);
+                          params.set('sort', evt.target.value);
+                          url.search = params.toString();
+                          window.location.href = url.toString();
+                        }"
                         >
-                        <option value="">Newest First 1</option>
-                        <option value="">Newest First 2</option>
-                        <option value="">Newest First 3</option>
+                        <option value="newest" {{ request()->has('sort') && request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                        <option value="followed" {{ request()->has('sort') && request()->get('sort') == 'followed' ? 'selected' : '' }}>Most Followers</option>
                       </select>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 !gap-3 lg:!gap-6 !mb-6">
@@ -403,7 +410,6 @@
                     @include('site.components.paginator', ['paginator' => $creators])
                   @endif
                 </div>
-
 
             </div>
         </div>
@@ -503,6 +509,7 @@
           evt.preventDefault();
           const collab = Number($('#collaboration').is(':checked'));
           const search = (new URLSearchParams(window.location.search)).get('q');
+          const sort = (new URLSearchParams(window.location.search)).get('sort');
           const formData = {
             followers_min: $('#accordion').find('.followers-min').val(),
             followers_max: $('#accordion').find('.followers-max').val(),
@@ -517,6 +524,10 @@
 
           if (search) {
             formData['q'] = search;
+          }
+
+          if (sort) {
+            formData['sort'] = sort;
           }
           
           const query = objectToQueryString(formData);

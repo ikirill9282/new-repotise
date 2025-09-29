@@ -1,7 +1,6 @@
 <div>
 
   <div class="flex justify-betweeen items-stretch !gap-12 flex-col lg:flex-row">
-    
     <div class="basis-1/2">
       {{-- HEAD --}}
       <div class="!text-2xl !font-semibold !mb-4">Let's Connect</div>
@@ -21,28 +20,25 @@
         }"
         class="flex flex-col justify-between items-stretch !gap-3">
         <div class="">
-          <x-form.input placeholder="Company name" />
+          <x-form.input wire:model="fields.name" name="name" placeholder="Company name" />
         </div>
+
         <div class="">
-          <x-form.select label="Select a topic" />
+          <x-form.select 
+            wire:model="fields.topic"
+            label="Select a topic" 
+            name="topic"
+            :options="[
+              'topic1' => 'topic1', 
+              'topic2' => 'topic2', 
+              'topic3' => 'topic3',
+            ]" 
+          />
         </div>
-        <div class="">
-          <x-form.textarea 
-            placeholder="Text your message"
-            :tooltip="true"
-            class="min-h-24"
-            x-on:input="(evt) => {
-              const len = evt.target.value.length;
-              if (len <= max) setLen(len);
-            }"
-            x-ref="ta"
-          ></x-form.textarea>
-          <div class="text-sm !text-gray text-right mt-2">
-            <span x-html="len"></span>
-            <span>/</span>
-            <span x-html="max"></span>
-          </div>
-        </div>
+
+        <x-form.textarea-counter wire:model="fields.text" name="text" placeholder="Text your message"></x-form.textarea-counter>
+
+        <x-btn wire:click.prevent="submit" class="sm:!w-auto self-center lg:self-start sm:!px-12">Start Partnership</x-btn>
       </div>
     </div>
 

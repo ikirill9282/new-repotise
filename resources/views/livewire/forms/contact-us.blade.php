@@ -3,19 +3,35 @@
     <div class="flex justify-between items-stretch !gap-12 flex-col-reverse lg:flex-row">
       <div class="basis-full lg:basis-1/2">
         <x-title class="!mb-4">Get in Touch</x-title>
+        
         <div class="!mb-8">Have a question? We're here to assist. Send us a message.</div>
+        
         <div class="flex flex-col !gap-3">
-          <x-form.input name="name" placeholder="Your Name" />
 
-          <x-form.input type="email" name="email" placeholder="Email" />
+          @csrf
 
-          <x-form.select label="Select subject..." :options="['subject' => 'Subject', 'subject2' => 'Subject2', 'subject3' => 'Subject3',]" />
+          <x-form.input wire:model="fields.name" name="name" placeholder="Your Name" />
 
-          <x-form.textarea class="min-h-24" id="ta" placeholder="Your Message<br> Please provide details about your request"></x-form.textarea>
+          <x-form.input wire:model="fields.email" type="email" name="email" placeholder="Email" />
 
-          <x-form.file></x-form.file>
+          <x-form.select wire:model="fields.subject" name="subject" label="Select subject..." :options="['subject' => 'Subject', 'subject2' => 'Subject2', 'subject3' => 'Subject3',]" />
 
-          <x-btn class="!w-auto !px-18 self-start">Submit</x-btn>
+          <x-form.textarea-counter wire:model="fields.text" name="text" class="min-h-24" id="ta" placeholder="Your Message<br> Please provide details about your request"></x-form.textarea-counter>
+
+          <x-form.file wire:model="fields.file" accept="image/*">
+            <div wire:loading class="absolute w-full h-full top-0 left-0 bg-light/50 z-150">
+              <x-loader width="60" height="60" />
+            </div>
+
+            @if($this->fields['file'])
+              <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40 group-hover:cursor-pointer">
+                <img class="object-cover h-full w-full !inline-block opacity-100 transition group-hover:!opacity-50" src="{{ $this->fields['file']->temporaryUrl() }}" alt="Banner">
+              </div>
+            @endif
+          </x-form.file>
+
+          <x-btn wire:click.prevent="submit" class="!w-auto !px-18 self-start">Submit</x-btn>
+
         </div>
       </div>
 

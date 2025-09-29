@@ -3,6 +3,7 @@
   'placeholder' => null,
   'tooltip' => true,
   'max' => 500,
+  'name' => null,
 ])
 <div  class="" 
     x-ref="base"
@@ -50,4 +51,8 @@
     <span>/</span>
     <span x-html="max"></span>
   </div>
+
+  @error($name)
+    <div class="text-red-500">{{ $message }}</div>
+  @enderror
 </div>
