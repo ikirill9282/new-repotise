@@ -2,6 +2,7 @@
   'id' => "checkbox-" . uniqid(),
   'label' => '',
   'tooltip' => false,
+  'checked' => false,
 ])
 
 <div class="group relative text-sm sm:text-base">
@@ -10,6 +11,7 @@
     id="{{ $id }}"
     class="w-0 h-0 opacity-0 absolute"
     {{ $attributes }}
+    {{ $checked ? 'checked' : '' }}
   >
   <label 
     for="{{ $id }}"

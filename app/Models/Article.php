@@ -59,6 +59,10 @@ class Article extends Model
           $model->generateSlug();
       }
     });
+
+    self::updated(function($model) {
+      $model->searchable();
+    });
   }
 
   public function toSearchableArray(): array
@@ -276,8 +280,7 @@ class Article extends Model
   public static function getLastNews(int|string $maximum_models = 4)
   {
     $last_news = static::query()
-      ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'system')))
-      // ->whereHas('author', fn($query) => $query->whereHas('roles', fn($q) => $q->where('name', 'admin')))
+      ->whereHas('author', fn($query) => $query->where('id', 0))
       ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
       ->orderByDesc('id')
       // ->ddRawSql()

@@ -88,14 +88,14 @@
                         ],
                         'form_class' => 'search-product',
                         'form_id' => 'search-product',
-                    ])
-                        @if (auth()->check() && auth()->user()->can('create-products'))
-                            <x-slot name="buttons">
-                                <div class="add_products">
-                                    <a href="{{ route('profile.products.create') }}">Add product</a>
-                                </div>
-                            </x-slot>
-                        @endif
+                      ])
+                      @if (auth()->check() && auth()->user()->can('create-products'))
+                          <x-slot name="buttons">
+                              <div class="add_products">
+                                  <a href="{{ route('profile.products.create') }}">Add product</a>
+                              </div>
+                          </x-slot>
+                      @endif
                     @endcomponent
                     <div class="search_results flex-wrap">
                         @foreach (\App\Models\Location::whereHas('products')->limit(20)->orderByDesc('id')->get() as $item)

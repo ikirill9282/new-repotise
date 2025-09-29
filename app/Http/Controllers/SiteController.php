@@ -18,11 +18,14 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Helpers\CustomEncrypt;
+use App\Models\Country;
+use App\Models\Language;
 use Illuminate\Support\ItemNotFoundException;
 use App\Models\Order;
 use App\Services\Cart;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
+use PDO;
 
 class SiteController extends Controller
 {
@@ -40,7 +43,7 @@ class SiteController extends Controller
     return view('site.pages.home', ['page' => $page]);
   }
 
-  public function creators()
+  public function creators(Request $request)
   {
     $page = Page::where('slug', 'creators')
       ->with('config')
@@ -53,11 +56,71 @@ class SiteController extends Controller
       ->pluck('username')
       ->map(fn($val) => ['title' => "@$val"]);
     
+    $valid = $request->validate([
+      'creator' => 'sometimes|nullable|string',
+      'followers_min' => 'sometimes|nullable|integer', // Always in filters
+      'followers_max' => 'sometimes|nullable|integer', // Always in filters
+      'platforms' => 'sometimes|nullable|array',
+      'langs' => 'sometimes|nullable|array',
+      'countries' => 'sometimes|nullable|array',
+      'collaboration' => 'sometimes|nullable|integer',
+      'q' => 'sometimes|nullable|string',
+    ]);
+
+    $query = User::query()
+      ->when(
+        isset($valid['creator']),
+        fn($query) => $query->where('username', str_ireplace('@', '', $valid['creator']))
+      )
+      ->when(
+        isset($valid['followers_min']),
+        fn($query) => $query->withCount('followers')
+          ->having('followers_count', '>', $valid['followers_min'])
+          ->having('followers_count', '<', $valid['followers_max'])
+      )
+      ->when(
+        isset($valid['platforms']),
+        function($query) use($valid) {
+          $query->whereHas('options', function($subquery) use ($valid) {
+            foreach ($valid['platforms'] as $platform) {
+              $subquery->whereNotNull($platform);
+            }
+          });
+        }
+      )
+      ->when(
+        isset($valid['langs']),
+        function($query) use($valid) {
+          $langs = Language::select('id')->whereIn('name', $valid['langs'])->pluck('id')->toArray();
+          $query->whereHas('options', fn($subquery) => $subquery->whereIn('language_id', $langs));
+        }
+      )
+      ->when(
+        isset($valid['countries']),
+        function($query) use($valid) {
+          $langs = Country::select('id')->whereIn('name', $valid['countries'])->pluck('id')->toArray();
+          $query->whereHas('options', fn($subquery) => $subquery->whereIn('country_id', $langs));
+        }
+      )
+      ->when(
+        isset($valid['collaboration']),
+        fn($query) => $query->whereHas('options', fn($subquery) => $subquery->where('collaboration', $valid['collaboration']))
+      )
+      ->when(
+        isset($valid['q']),
+        function($query) use ($valid) {
+          $client = new SearchClient();
+          $creators = $client->findIn($valid['q'], 'users', 5000);
+          $creators_ids = array_column($creators, 'id');
+          $query->orWhereIn('id', $creators_ids);
+        },
+      )
+      ;
+
     return view('site.pages.creators', [
       'page' => $page,
       'tags' => $tags,
-      // 'creators' => \App\Models\User::whereHas('roles', fn($q) => $q->where('name', 'creator'))->paginate(50),
-      'creators' => User::paginate(6),
+      'creators' => $query->paginate(5),
     ]);
   }
 

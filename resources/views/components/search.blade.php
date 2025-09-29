@@ -3,10 +3,11 @@
   'formClass' => '',
   'formId' => '',
   'button' => true,
+  'action' => url('/search'),
 ])
 
 <div class="search_group flex flex-col">
-  <form class="search_block relative search-form {{ $formClass }}" id="{{ $formId }}" method="GET" action="{{ url('/search') }}">
+  <form class="search_block relative search-form {{ $formClass }}" id="{{ $formId }}" method="GET" action="{{ $action }}">
     <div class="search-wrap relative">
       <label for="search">
         @include('icons.search', ['width' => 20, 'height' => 20])

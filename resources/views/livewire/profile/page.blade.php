@@ -92,7 +92,7 @@
                       <div class="w-full">
                           @foreach ($user->articles()->latest()->limit(6)->get() as $article)
                             <div class="flex flex-col mb-10 last:mb-0">
-                                <div class="flex items-center mb-2">
+                                <div class="flex justify-start items-center mb-2">
                                     <div class="w-9 h-9 mr-1 rounded-full overflow-hidden">
                                       <img src="{{ $article->author->avatar }}" alt="Avatar"
                                         class="object-cover w-full h-full" />
@@ -102,9 +102,18 @@
                                       <p>{{ $article->author->profile }}</p>
                                     </div>
                                     @if(auth()->user()?->id == $article->author->id)
-                                      <x-btn class="!flex items-center text-sm !w-auto gap-2 px-4 py-1 ml-3">
+                                      <x-btn class="!flex items-center sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3">
                                         <span>@include('icons.edit')</span>
                                         <span>Edit Insights</span>
+                                      </x-btn>
+                                    @else
+                                      <x-btn 
+                                        href="{{ $user->makeSubscribeUrl() }}" 
+                                        class="follow follow-btn sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3"
+                                        data-resource="{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}"
+                                        data-group="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $user->id]); }}"
+                                      >
+                                        {{ $user->hasFollower(auth()->user()?->id) ? 'Unsubscribe' : 'Subscribe' }}
                                       </x-btn>
                                     @endif
                                 </div>

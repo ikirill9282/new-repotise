@@ -59,6 +59,10 @@ class Product extends Model
         $model->generateSlug();
       }
     });
+
+    self::updated(function($model) {
+      $model->searchable();
+    });
   }
 
   public function toSearchableArray(): array

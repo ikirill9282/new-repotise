@@ -18,7 +18,27 @@ import Quill from "quill";
 window.Quill = Quill;
 window.AirDatepicker = AirDatepicker;
 window.createDatePicker = createDatePicker;
-// window.makeQuill = makeQuill;
+window.objectToQueryString = objectToQueryString;
+
+function objectToQueryString(obj) {
+  const params = new URLSearchParams();
+
+  function addParams(prefix, value) {
+    if (value !== null && typeof value === 'object') {
+      for (const key in value) {
+        if (value.hasOwnProperty(key)) {
+          addParams(prefix ? `${prefix}[${key}]` : key, value[key]);
+        }
+      }
+    } else {
+      params.append(prefix, value);
+    }
+  }
+
+  addParams('', obj);
+
+  return params.toString();
+}
 
 function createDatePicker(selector) {
     return new AirDatepicker(selector, {

@@ -60,7 +60,8 @@
                                                 <h3>
                                                   @php
                                                     $path = match ($item['index']) {
-                                                      'products' => '/products/' . $item['location']['slug'] . '/' . print_key('slug', $item) . '?pid=' . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => print_key('id', $item)]),
+                                                      // 'products' => '/products/' . $item['location']['slug'] . '/' . print_key('slug', $item) . '?pid=' . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => print_key('id', $item)]),
+                                                      'products' => '/products/?locations=' . implode(',', array_column($item['location'], 'slug'))
                                                       //  => ,
                                                     };
                                                   @endphp

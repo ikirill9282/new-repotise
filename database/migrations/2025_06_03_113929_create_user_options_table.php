@@ -33,7 +33,8 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->integer('zip')->nullable();
             $table->string('state')->nullable();
-            $table->string('country')->nullable();
+            $table->bigInteger('country_id')->unsigned()->nullable();
+            $table->bigInteger('language_id')->unsigned()->nullable();
             $table->string('birthday')->nullable();
             $table->integer('tax_id')->nullable();
             $table->string('phone')->nullable();
@@ -52,6 +53,8 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('level_id')->references('id')->on('levels');
+            $table->foreign('country_id')->references('id')->on('countries');
+            $table->foreign('language_id')->references('id')->on('languages');
         });
     }
 

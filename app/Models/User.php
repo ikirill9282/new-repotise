@@ -94,6 +94,10 @@ class User extends Authenticatable implements HasName, FilamentUser
           $model->resetBackup();
         }
       });
+
+      self::updated(function($model) {
+        $model->searchable();
+      });
     }
 
     public function toSearchableArray(bool $load_options = true): array

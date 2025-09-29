@@ -2,13 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Article;
-use App\Models\ArticleLikes;
-use App\Models\User;
-use App\Models\UserOptions;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Meilisearch\Meilisearch;
 
 class DatabaseSeeder extends Seeder
 {
@@ -38,6 +32,8 @@ class DatabaseSeeder extends Seeder
         FaqSeeder::class,
         PagesConfigSeeder::class,
         UserOptionSeeder::class,
+        CountrySeeder::class,
+        LanguageSeeder::class,
 
         MeilisearchSeeder::class,
       ]);

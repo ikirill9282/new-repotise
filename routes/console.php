@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Crypt;
 use Mews\Purifier\Facades\Purifier;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
+Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {

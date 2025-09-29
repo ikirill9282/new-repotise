@@ -200,11 +200,14 @@ class SearchClient
             })
             ->toArray()
         : [];
+
+
       $type = (isset($item['type']) && !empty($item['type']))
-        ? [['id' => $item['type']['id'], 'title' => $item['type']['title'], 'type' => 'type']]
+        ? array_map(fn($elem) => ['id' => $elem['id'], 'title' => $elem['title']], $item['type'])
         : [];
+
       $location = (isset($item['location']) && !empty($item['location']))
-        ? [['id' => $item['location']['id'], 'title' => $item['location']['title'], 'type' => 'location']]
+        ? array_map(fn($elem) => ['id' => $elem['id'], 'title' => $elem['title']], $item['location'])
         : [];
 
       $tags = array_merge($categories, $type, $location);
