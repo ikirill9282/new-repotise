@@ -1,12 +1,12 @@
 window.addEventListener('DOMContentLoaded', function() {
   $('.search-input').on('input', function() {
 
-    if (!$(this).data('loading')) {
-      $(this).data('loading', true);
+    // if (!$(this).data('loading')) {
+      // $(this).data('loading', true);
 
-      setTimeout(() => {
-        $(this).data('loading', false);
-      }, 300);
+      // setTimeout(() => {
+      //   $(this).data('loading', false);
+      // }, 300);
 
       $.ajax({
         method: 'GET',
@@ -67,7 +67,7 @@ window.addEventListener('DOMContentLoaded', function() {
           hits.fadeIn();
         }
       });
-    }
+    // }
     
     $(this).on('focus', function() {
       const id = $(this).data('hits');
