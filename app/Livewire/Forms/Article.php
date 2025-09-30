@@ -159,7 +159,7 @@ class Article extends Component
         return redirect($model->makeEditUrl());
       }
 
-      return ;
+      return redirect()->route('profile.articles');
     }
 
     public function resetBanner(ModelArticle $model): void
@@ -190,6 +190,7 @@ class Article extends Component
     public function resetImages(ModelArticle $model): void
     {
       Gallery::where('model_id', $model->id)
+        ->where('type', 'article')
         ->where('preview', 0)
         ->where('placement', 'text')
         ->update(['expires_at' => Carbon::now()])
@@ -199,7 +200,13 @@ class Article extends Component
       
       if (!empty($images[0])) {
         foreach($images[1] as $image) {
-          $img = Gallery::where('image', $image)->first();
+          $img = Gallery::query()
+            ->where([
+              'type' => 'article', 
+              'model_id' => $model->id,
+              'image' => $image,
+            ])
+            ->first();
           if ($img) {
             $img->update(['model_id' => $model->id, 'expires_at' => null]);
           }

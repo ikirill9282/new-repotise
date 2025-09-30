@@ -164,7 +164,7 @@ class CabinetController extends Controller
     }
 
     return view('site.pages.profile-creator', [
-      'user' => $user,
+      'user_id' => Crypt::encrypt($user->id),
     ]);
   }
 
@@ -177,7 +177,7 @@ class CabinetController extends Controller
     }
 
     return view('site.pages.profile', [
-      'user' => $user,
+      'user_id' => Crypt::encrypt($user->id),
     ]);
   }
 

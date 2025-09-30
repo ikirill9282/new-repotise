@@ -33,6 +33,48 @@ class UserOptions extends Model
       return $this->belongsTo(Level::class);
     }
 
+    public function getSocial(): array
+    {
+      return [
+        'youtube' => $this->youtube,
+        'tiktok' => $this->tiktok,
+        'facebook' => $this->facebook,
+        'instagram' => $this->instagram,
+        'google' => $this->google,
+        'xai' => $this->xai,
+        'website' => $this->website,
+        'other' => $this->other,
+      ];
+    }
+
+    public static function getSocialIcons(): array
+    {
+      return [
+        'youtube' => asset('assets/img/icons/youtube.svg'),
+        'tiktok' => asset('assets/img/icons/tiktok.svg'),
+        'facebook' => asset('assets/img/icons/facebook.svg'),
+        'instagram' => asset('assets/img/icons/insta.svg'),
+        'google' => asset('assets/img/icons/google.svg'),
+        'xai' => asset('assets/img/icons/xai.svg'),
+        'website' => asset('assets/img/icons/web.svg'),
+        'other' => asset('assets/img/icons/web.svg'),
+      ];
+    }
+
+    public static function getSocialLables(): array
+    {
+      return [
+        'youtube' => 'YouTube',
+        'tiktok' => 'TikTok',
+        'facebook' => 'Facebook',
+        'instagram' => 'Instagram',
+        'google' => 'Google',
+        'xai' => 'XAI',
+        'website' => 'Website',
+        'other' => 'Other',
+      ];
+    }
+
     public function getFee(): float
     {
       try {

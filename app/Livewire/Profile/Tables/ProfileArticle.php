@@ -11,6 +11,8 @@ class ProfileArticle extends Component
 {
   public int $status_id;
 
+  public bool $all_checked = false;
+
   public function mount($active)
   {
     $this->status_id = match($active) {

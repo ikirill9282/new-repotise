@@ -734,7 +734,7 @@ const ReadMoreButtons = function() {
 
   this.discover = () => {
     [...document.querySelectorAll('.read-more')].forEach((elem, k) => {
-      if (!this.buttons.includes(elem)) {
+      if (!elem.getAttribute('data-inited')) {
         const text = $('<div>', { class: "read-more-text inline-block", html: $(elem).html() });
         const btnWrap = $('<div>', { 
           class: "read-more-wrap",
@@ -772,6 +772,7 @@ const ReadMoreButtons = function() {
         btnWrap.append(btn);
         $(elem).append(btnWrap);
         this.buttons.push(elem);
+        elem.setAttribute('data-inited', 'true');
       }
     });
   }

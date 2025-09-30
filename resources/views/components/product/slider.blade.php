@@ -8,26 +8,37 @@
 @endphp
 
 <div 
-  x-data="{ swiper: null }" x-init="swiper = new Swiper($refs.container, {
-      loop: true,
-      slidesPerView: 1.3,
-      autoHeight: true,
-      spaceBetween: 10,
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
-      breakpoints: {
-        420: { slidesPerView: 1.5 },
-        420: { slidesPerView: 2.2 },
-        576: { slidesPerView: 2.6 },
-        600: { slidesPerView: 3 },
-        768: { slidesPerView: 2 },
-        900: { slidesPerView: 3 },
-        1024: { slidesPerView: 2 },
-        1200: { slidesPerView: 3 },
-      },
-    })"
+  x-data="{ 
+    swiper: null,
+    makeSweeper() {
+      this.swiper = new Swiper($refs.container, {
+        loop: true,
+        slidesPerView: 1.3,
+        autoHeight: true,
+        spaceBetween: 10,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+          420: { slidesPerView: 1.5 },
+          420: { slidesPerView: 2.2 },
+          576: { slidesPerView: 2.6 },
+          600: { slidesPerView: 3 },
+          768: { slidesPerView: 2 },
+          900: { slidesPerView: 3 },
+          1024: { slidesPerView: 2 },
+          1200: { slidesPerView: 3 },
+        },
+      });
+    }
+  }" 
+  x-init="() => {
+    makeSweeper();
+    window.addEventListener('DOMContentLoaded', () => {
+      Livewire.hook('morphed', makeSweeper);
+    });
+  }"
   class=""
 >
   <div class="swiper" x-ref="container" id="{{ $id }}">

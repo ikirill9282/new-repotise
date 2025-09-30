@@ -1,4 +1,8 @@
 <div>
+    @php
+      $user = \App\Models\User::find(\Illuminate\Support\Facades\Crypt::decrypt($this->user_id));
+    @endphp
+
     <section class="creatorPage bg-light">
         <div class="container {{ $container }}">
             <div class="grid grid-cols-1 md:!gap-3 items-start md:grid-cols-[1fr_1fr_280px] lg:grid-cols-[1fr_1fr_380px]">
@@ -102,7 +106,7 @@
                                       <p>{{ $article->author->profile }}</p>
                                     </div>
                                     @if(auth()->user()?->id == $article->author->id)
-                                      <x-btn class="!flex items-center sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3">
+                                      <x-btn href="{{ $article->makeEditUrl() }}" class="!flex items-center sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3">
                                         <span>@include('icons.edit')</span>
                                         <span>Edit Insights</span>
                                       </x-btn>
@@ -185,6 +189,7 @@
 
                 <aside class="flex flex-col gap-4 order-1 md:!order-2 
                   top-[80px] rightt-0 col-span-1 bg-white !p-2 sm:!p-4 rounded">
+
                     @if(auth()->user()->id == $user->id)
                       <x-btn class="!py-2 !max-w-none">Edit Profile</x-btn>
                     @endif
@@ -254,43 +259,13 @@
 
                     <div class="">
                         <h5 class="mb-3">Connect Online</h5>
-                        <div class="flex flex-col justify-start items-stretch gap-2 mb-2.5">
-                            <div class="p-2.5 rounded-lg bg-light flex justify-between items-center">
-                                <div class="creatorPage__aside-connectSocials-item-author-wrapper">
-                                    <img src="{{ asset('assets/img/icons/youtube.svg') }}" alt="" />
-                                    <p class="creatorPage__aside-connectSocials-item-socialName">Youtube</p>
-                                </div>
-                                <label for="toggle3" class="leading-0 hover:cursor-pointer">
-                                    <input type="checkbox" id="toggle3"
-                                        class="creatorPage__aside-connectSocials-item-checkbox" />
-                                    <span class="toggle-switch"></span>
-                                </label>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-light flex justify-between items-center">
-                                <div class="creatorPage__aside-connectSocials-item-author-wrapper">
-                                    <img src="{{ asset('assets/img/icons/tiktok.svg') }}" alt="" />
-                                    <p class="creatorPage__aside-connectSocials-item-socialName">TikTok</p>
-                                </div>
-                                <label for="toggle1" class="leading-0 hover:cursor-pointer">
-                                    <input type="checkbox" id="toggle1"
-                                        class="creatorPage__aside-connectSocials-item-checkbox" />
-                                    <span class="toggle-switch"></span>
-                                </label>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-light flex justify-between items-center">
-                                <div class="creatorPage__aside-connectSocials-item-author-wrapper">
-                                    <img src="{{ asset('assets/img/icons/facebook.svg') }}" alt="" />
-                                    <p class="creatorPage__aside-connectSocials-item-socialName">Facebook</p>
-                                </div>
-                                <label for="toogle4" class="leading-0 hover:cursor-pointer">
-                                    <input type="checkbox" id="toogle4"
-                                        class="creatorPage__aside-connectSocials-item-checkbox" />
-                                    <span class="toggle-switch"></span>
-                                </label>
-                            </div>
-                        </div>
+                        <x-profile.social-aside 
+                          :owner="$user->id == auth()->user()?->id"
+                          :social="$user->options->getSocial()"
+                        ></x-profile.social-aside>
+
                         @if(auth()->user()->id == $user->id)
-                          <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social' })" class="inline-block">Add Social Link</x-link>
+                          <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social', args: { user_id: '{{ $this->user_id }}' } })" class="inline-block !mt-3">Add Social Link</x-link>
                         @endif
                     </div>
                     
@@ -300,3 +275,11 @@
         </div>
     </section>
 </div>
+
+@script
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      Livewire.hook('morphed', () => window.ReadMoreButtons.discover());
+    });
+  </script>
+@endscript
