@@ -193,7 +193,7 @@ return [
               ]
             ],
             User::class => [
-              'filterableAttributes' => ['id', 'username', 'name'],
+              'filterableAttributes' => ['id', 'username', 'name', 'email'],
               'searchableAttributes' => ['id', 'username', 'name', 'email'],
               'typoTolerance' => [
                 'enabled' => true,
@@ -203,9 +203,10 @@ return [
                 ]
               ]
             ],
-            // 'users' => [
-            //     'filterableAttributes'=> ['id', 'name', 'email'],
-            // ],
+            'users' => [
+                'filterableAttributes' => ['id', 'username', 'name', 'email'],
+                'searchableAttributes' => ['id', 'username', 'name', 'email'],
+            ],
         ],
     ],
 

@@ -1,13 +1,6 @@
 window.addEventListener('DOMContentLoaded', function() {
   $('.search-input').on('input', function() {
 
-    // if (!$(this).data('loading')) {
-      // $(this).data('loading', true);
-
-      // setTimeout(() => {
-      //   $(this).data('loading', false);
-      // }, 300);
-
       $.ajax({
         method: 'GET',
         url: '/api/search?q=' + $(this).val() + ($(this).data('source')?.length ? "&source=" + $(this).data('source') : '')

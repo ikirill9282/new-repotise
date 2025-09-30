@@ -366,7 +366,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 !gap-3 lg:!gap-6 !mb-6">
                         
                           @foreach ($creators as $creator)
-                            <div class="relative group flex flex-col items-stretch justify-start !gap-1">
+                            <div class="relative group flex flex-col items-stretch justify-start !gap-1 group/card">
                               @include('site.components.favorite.button', [
                                 'stroke' => '#FF2C0C',
                                 'type' => 'author',
@@ -377,7 +377,7 @@
                                 <img class="object-cover w-full h-full" src="{{ $creator->avatar }}" alt="" class="" />
                               </x-link>
 
-                              <div class="flex justify-start items-center !gap-2">
+                              <x-link href="{{ $creator->makeProfileUrl() }}" class="flex justify-start items-center !gap-2 !border-0 group-has-[a]/card:!text-black">
                                 <div class="">{{ $creator->getName() }}</div>
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -388,7 +388,8 @@
                                         d="M11.9885 6.36973L10.8449 5.2262L7.21133 8.85979L5.20408 6.85254L4.06055 7.99607L7.21133 11.1469L11.9885 6.36973Z"
                                         fill="white" />
                                 </svg>
-                              </div>
+                              </x-link>
+
                               <x-link href="{{ $creator->makeProfileUrl() }}" class="!border-none">{{ $creator->profile }}</x-link>
 
                               <div class="flex justify-start items-center !gap-2 text-gray">

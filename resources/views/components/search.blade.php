@@ -6,8 +6,8 @@
   'action' => url('/search'),
 ])
 
-<div class="search_group flex flex-col">
-  <form class="search_block relative search-form {{ $formClass }}" id="{{ $formId }}" method="GET" action="{{ $action }}">
+<div x-data="{}" class="search_group flex flex-col">
+  <form x-ref="form" class="search_block relative search-form {{ $formClass }}" id="{{ $formId }}" method="GET" action="{{ $action }}">
     <div class="search-wrap relative">
       <label for="search">
         @include('icons.search', ['width' => 20, 'height' => 20])
@@ -25,7 +25,7 @@
     </div>
 
     @if($button)
-      <x-btn href="#" class="!w-auto !p-3 !rounded-lg search-button hover:!bg-second">Search</x-btn>
+      <x-btn x-on:click.prevent="$refs.form.submit()" href="#" class="!w-auto !p-3 !rounded-lg search-button hover:!bg-second">Search</x-btn>
     @endif
   </form>
   {{ $slot }}

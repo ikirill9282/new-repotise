@@ -69,9 +69,11 @@
                 <li><a href="{{ url('/policies') }}">More Policies</a></li>
             </ul>
         </nav>
-        <div class="bottom_by_des">
-            <span class="TrekGuider_span">{{ date('Y', time()) }} TrekGuider Ink.</span>
-            <span class="by_to">by moloko69.ru</span>
+
+        <div class="bottom_by_des !mb-10">
+          <span class="TrekGuider_span">{{ date('Y', time()) }} TrekGuider Ink.</span>
         </div>
+
+        <div class="text-gray font-thin"><span class="inline-block">Designed by</span><span class="inline-block text-white !px-3 !py-1 bg-[#046D53] rounded-lg !ml-3">moloko69</span></div>
     </div>
 </footer>
