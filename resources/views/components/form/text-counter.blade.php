@@ -20,10 +20,8 @@
           maxLength: {{ $max }},
           resize() {
             if (this.$refs.ta) {
-              if (this.$refs.ta) {
-                this.$refs.ta.style.height = 'auto';
-                this.$refs.ta.style.height = this.$refs.ta.scrollHeight + 'px';
-              }
+              this.$refs.ta.style.height = 'auto';
+              this.$refs.ta.style.height = this.$refs.ta.scrollHeight + 'px';
             }
           }
         }"
