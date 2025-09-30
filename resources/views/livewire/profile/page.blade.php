@@ -257,19 +257,34 @@
                       <span>Dontation</span>
                     </x-btn>
 
+                    {{-- SOCIALS --}}
                     <div class="">
                         <h5 class="mb-3">Connect Online</h5>
+
                         <x-profile.social-aside 
                           :owner="$user->id == auth()->user()?->id"
                           :social="$user->options->getSocial()"
-                        ></x-profile.social-aside>
+                        />
 
                         @if(auth()->user()->id == $user->id)
                           <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social', args: { user_id: '{{ $this->user_id }}' } })" class="inline-block !mt-3">Add Social Link</x-link>
                         @endif
                     </div>
                     
-                    <x-btn wire:click.prevent="$dispatch('openModal', { modalName: 'contact' })" class="!py-2 !max-w-none">Contact Creator</x-btn>
+                    @if(auth()->check() && auth()->user()->id !== $user->id)
+                      <x-btn 
+                        wire:click.prevent="$dispatch('openModal', { 
+                          modalName: 'contact', 
+                          args: { 
+                            sender_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt(auth()->user()->id) }}', 
+                            recipient_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}' 
+                          }
+                        })" 
+                        class="!py-2 !max-w-none"
+                      >
+                        Contact Creator
+                      </x-btn>
+                    @endif
                 </aside>
             </div>
         </div>

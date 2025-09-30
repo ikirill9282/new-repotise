@@ -40,10 +40,8 @@
     <div x-ref="placeholder" class="absolute top-3 left-3 max-w-5/6 !text-gray transition">
       {!! $placeholder !!}
     </div>
-    {{-- @dump($attributes) --}}
     <textarea
       x-ref="textarea"
-      x-on:change="() => console.log('test')"
       x-on:focus="hide()"
       x-on:focusout="show()"
       class="w-full relative z-10 bg-transparent outline-0 {{ $attributes->get('class') }}"
