@@ -27,6 +27,7 @@
             </x-search>
         </div>
     </section>
+
     <section class="catalog !py-12 bg-light">
         <div class="container">
             <div class="grid grid-cols-1 md:grid-cols-[260px_1fr] lg:grid-cols-[300px_1fr] !gap-4 lg:!gap-10">
@@ -359,8 +360,8 @@
                           window.location.href = url.toString();
                         }"
                         >
-                        <option value="newest" {{ request()->has('sort') && request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
-                        <option value="followed" {{ request()->has('sort') && request()->get('sort') == 'followed' ? 'selected' : '' }}>Most Followers</option>
+                          <option value="newest" {{ request()->has('sort') && request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                          <option value="followed" {{ request()->has('sort') && request()->get('sort') == 'followed' ? 'selected' : '' }}>Most Followers</option>
                       </select>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 !gap-3 lg:!gap-6 !mb-6">

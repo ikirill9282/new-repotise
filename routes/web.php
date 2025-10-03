@@ -21,13 +21,14 @@ use App\Jobs\ProcessOrder;
 use App\Models\Order;
 
 require __DIR__ . '/api.php';
-// Route::controller(SiteController::class)->group(function() {
-//   Route::get('/')->name('main');
-//   Route::get('/{slug}');
-// });
 
 Route::get('/mail/{slug}', function(Request $request, $slug) {
-  return view("emails.$slug", ['recipient' => User::find(7), 'sender' => User::find(1), 'msg' => 'test msg', 'credentials' => ['password' => '123']]);
+  return view("emails.$slug", [
+    'recipient' => User::find(7), 
+    'sender' => User::find(1), 
+    'msg' => 'test msg', 
+    'credentials' => ['password' => '123']
+  ]);
 });
 
 Route::prefix('/auth')
@@ -37,6 +38,10 @@ Route::prefix('/auth')
     Route::match(['get', 'post'], 'signout', 'signout')->name('signout');
 
     Route::get('/email/verify', 'verifyEmail');
+
+    Route::get('/google/callback', 'googleCallback');
+    Route::get('/facebook/callback', 'facebookCallback');
+    Route::get('/x/callback', 'xCallback');
   });
 
 Route::middleware('auth:web')->group(function() {

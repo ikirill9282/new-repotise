@@ -12,15 +12,17 @@ use App\Models\History;
 use App\Enums\Action;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ResetPasswordConfirm extends Component
 {
     use HasForm;
 
     public array $form = [
-        'code' => null,
-        'password' => null,
-        'password_confirmation' => null,
+      'code' => null,
+      'password' => null,
+      'password_confirmation' => null,
     ];
 
     public $email;
@@ -51,7 +53,7 @@ class ResetPasswordConfirm extends Component
         ];
     }
 
-    public function mount($args)
+    public function mount($args = [])
     {
       $this->email = $args['email'] ?? null;
       $this->fillFromSession();
@@ -99,20 +101,30 @@ class ResetPasswordConfirm extends Component
 
     public function submit()
     {
-      $state = $this->getValidFormState();
+      $validator = Validator::make($this->form, [
+        'code' => 'required|string|min:6|max:6|regex:/^[0-9]+$/|exists:user_verifies,code',
+        'password' => 'required|min:8|regex:/[a-zA-Z0-9!@#$%^&*()_+={}\[\]:;"\'<>,.?\/\\-]/',
+        'password_confirmation' => 'required|same:password',
+      ]);
 
-      if (!User::validatePassword($state['password'])) {
-        $this->addError('form.password', 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.');
+      if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
+
+      $valid = $validator->validated();
+
+      if (!User::validatePassword($valid['password'])) {
+        $validator->errors()->add('password', 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.');
         return ;
       }
 
-      if ($state['password'] !== $state['password_confirmation']) {
-        $this->addError('form.password_confirmation', 'Passwords do not match. Please re-enter.');
+      if ($valid['password'] !== $valid['password_confirmation']) {
+        $validator->errors()->add('password_confirmation', 'Passwords do not match. Please re-enter.');
         return ;
       }
 
       $user = User::whereHas('verify', fn($query) => $query->where([
-        'code' => $state['code'],
+        'code' => $valid['code'],
         'type' => 'reset',
       ]))
         ->with('verify')
@@ -120,19 +132,19 @@ class ResetPasswordConfirm extends Component
 
 
       if (!$user) {
-        $this->addError('form.code', 'Code is expired');
-        ResetFailed::dispatch(null, $state['code'], 'code');
+        $validator->errors()->add('code', 'Code is expired');
+        ResetFailed::dispatch(null, $valid['code'], 'code');
         return ;
       }
 
-      if ($user->verify->where('type', 'reset')->first()?->code !== $state['code']) {
-        $this->addError('form.code', 'Invalid code');
-        ResetFailed::dispatch($user, $state['code'], 'invalid');
+      if ($user->verify->where('type', 'reset')->first()?->code !== $valid['code']) {
+        $validator->errors()->add('code', 'Invalid code');
+        ResetFailed::dispatch($user, $valid['code'], 'invalid');
         return ;
       }
 
       $op = $user->password;
-      $user->update(['password' => $state['password']]);
+      $user->update(['password' => $valid['password']]);
       $user->refresh();
       $user->verify()->where('type', 'reset')->delete();
 

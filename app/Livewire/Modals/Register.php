@@ -11,6 +11,9 @@ use App\Models\UserReferal;
 use App\Helpers\CustomEncrypt;
 use App\Helpers\SessionExpire;
 use App\Models\History;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 class Register extends Component
 {
@@ -23,63 +26,45 @@ class Register extends Component
     'as_seller' => false,
   ];
 
-  public function getRules()
+  public function attempt()
   {
-    return [
-      'form.email' => 'required|email|max:255|unique:users,email',
-      'form.password' => 'required|min:8|regex:/[a-zA-Z0-9!@#$%^&*()_+={}\[\]:;"\'<>,.?\/\\-]/',
-      'form.repeat_password' => 'required|same:form.password',
-      'form.as_seller' => 'boolean',
-    ];
-  }
-  public function getMessages()
-  {
-    return [
-      'form.email.required' => 'Email is required.',
-      'form.email.email' => 'Please enter a valid email address.',
-      'form.email.unique' => 'This email address is already registered. Sign In instead?',
-      'form.password.required' => 'Password is required.',
-      'form.password.min' => 'Password must be at least 8 characters long.',
-      'form.password.regex' => 'The password must include a combination of letters, numbers, and symbols.',
-      'form.repeat_password.required' => 'Please repeat your password.',
-      'form.repeat_password.same' => 'Passwords do not match. Please re-enter.',
-      'form.as_seller.boolean' => 'As seller must be true or false.',
-    ];
-  }
-  
+    $validator = Validator::make($this->form, [
+      'email' => 'required|email|max:255|unique:users,email',
+      'password' => 'required|min:8|regex:/[a-zA-Z0-9!@#$%^&*()_+={}\[\]:;"\'<>,.?\/\\-]/',
+      'repeat_password' => 'required|same:password',
+      'as_seller' => 'boolean',
+    ]);
 
-  public function submit()
-  {
-    $state = $this->getValidFormState();
+    if ($validator->fails()) {
+      throw new ValidationException($validator);
+    }
 
-    if (!User::validatePassword($state['password'])) {
-      $this->addError('form.password', 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.');
+    $valid = $validator->valid();
+
+    if (!User::validatePassword($valid['password'])) {
+      $validator->errors()->add('password', 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.');
       return ;
     }
 
-    if ($state['password'] !== $state['repeat_password']) {
-      $this->addError('form.repeat_password', 'Passwords do not match. Please re-enter.');
+    if ($valid['password'] !== $valid['repeat_password']) {
+      $validator->errors()->add('repeat_password', 'Passwords do not match. Please re-enter.');
       return ;
     }
     $user = User::create([
-      'email' => $state['email'],
-      'password' => $state['password'],
+      'email' => $valid['email'],
+      'password' => $valid['password'],
     ]);
-    
-    DB::transaction(function() use ($user) {
-      if (SessionExpire::exists('referal')) {
-          $id = CustomEncrypt::getId(SessionExpire::get('referal'));
-          $owner = User::find($id);
-          UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $user->id]);
-          Session::forget('referal');
-        }
-      History::userCreated($user);
-    });
 
-    $user->sendVerificationCode(seller: $state['as_seller']);
+    History::userCreated($user);
+
+    $user->sendVerificationCode(seller: $valid['as_seller']);
     $this->dispatch('openModal', 'register-success');
   }
 
+  public function googleAuth()
+  {
+    return redirect()->away(Socialite::driver('google')->redirect()->getTargetUrl());
+  }
 
   public function render()
   {

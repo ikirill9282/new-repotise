@@ -3,6 +3,7 @@
 namespace App\Livewire\Modals;
 
 use App\Traits\HasForm;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 
 class Backup extends Component
@@ -13,21 +14,11 @@ class Backup extends Component
         'code' => null,
     ];
 
-    public function getRules()
+    public function attempt()
     {
-        return [
-            'form.code' => 'required|string|min:6|max:6|regex:/^[a-zA-Z0-9]+$/',
-        ];
-    }
-
-    public function getMessages()
-    {
-        return [
-            'form.code.required' => 'The backup code field is required.',
-            'form.code.min' => 'The backup code must be exactly 6 characters long.',
-            'form.code.max' => 'The backup code must be exactly 6 characters long.',
-            'form.code.regex' => 'The backup code must be a 6-digit number.',
-        ];
+      $validatior = Validator::make($this->form, [
+        'code' => 'required|string|min:6|max:6|regex:/^[a-zA-Z0-9]+$/',
+      ]);
     }
 
     public function render()

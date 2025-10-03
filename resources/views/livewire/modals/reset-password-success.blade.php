@@ -2,27 +2,16 @@
     class=""
 >
     <div class="text-center">
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="mx-auto mb-4 text-emerald-600"
-            width="64"
-            height="64"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-            >
-            <path d="M20 6L9 17l-5-5" />
-        </svg>
+        <h2 id="popup-title" class="text-2xl font-semibold !mb-2">Password Reset Successful!</h2>
 
-        <h2 id="popup-title" class="text-2xl font-semibold !mb-2">Success!</h2>
-        <p class="text-gray-600 !mb-6">A confirmation email has been sent to your email address. Please check your inbox and click the link to verify your account.</p>
+        <div class="">
+          @include('icons.success')
+        </div>
+
+        <p class="text-gray-600 !mb-6">Your password has been successfully updated. You can now log in using your new password.</p>
         
-        <button wire:click.prevent="$dispatch('openModal', { modalName: 'auth' })" class="w-full !bg-[#FC7361] hover:!bg-[#484134] text-white font-medium !py-2.5 !rounded-lg transition">
+        <x-btn wire:click.prevent="$dispatch('openModal', { modalName: 'auth' })" class="!max-w-64">
           Sign In
-        </button>
+        </x-btn>
     </div>
 </div>

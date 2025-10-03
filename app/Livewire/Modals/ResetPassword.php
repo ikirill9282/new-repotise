@@ -5,6 +5,8 @@ namespace App\Livewire\Modals;
 use App\Traits\HasForm;
 use Livewire\Component;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ResetPassword extends Component
 {
@@ -32,8 +34,15 @@ class ResetPassword extends Component
 
     public function submit()
     {
-        $state = $this->getValidFormState();
-        $user = User::firstWhere('email', $state['email']);
+        $validator = Validator::make($this->form, [
+          'email' => 'required|email|exists:users,email',
+        ]);
+        if ($validator->fails()) {
+          throw new ValidationException($validator);
+        }
+        $valid = $validator->validated();
+
+        $user = User::firstWhere('email', $valid['email']);
         $user->sendResetCode();
         $this->dispatch('openModal', 'reset-password-confirm', ['email' => $user->email]);
     }

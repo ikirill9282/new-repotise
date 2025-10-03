@@ -34,9 +34,28 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
     'mailgun' => [
       'domain' => env('MAILGUN_DOMAIN'),
       'secret' => env('MAILGUN_API_KEY'),
       'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
+    ],
+    
+    'google' => [
+      'client_id' => env('GOOGLE_CLIENT_ID'),
+      'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+      'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+    
+    'facebook' => [
+      'client_id' => env('FB_CLIENT_ID'),
+      'client_secret' => env('FB_CLIENT_SECRET'),
+      'redirect' => env('FB_REDIRECT_URI'),
+    ],
+    
+    'x' => [
+      'client_id' => env('X_CLIENT_ID'),
+      'client_secret' => env('X_CLIENT_SECRET'),
+      'redirect' => env('X_REDIRECT_URI'),
     ],
 ];

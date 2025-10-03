@@ -32,6 +32,7 @@
         :tooltipClass="$tooltipModal ? 'sm:!max-w-sm !transform-none !translate-x-[-100%] after:!hidden' : ''" 
         ></x-tooltip>
     @endif
+    {{ $icon ?? '' }}
   </div>
 
   @error($name)

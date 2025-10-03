@@ -30,6 +30,8 @@ use Laravel\Cashier\Cashier;
 use App\Helpers\CustomEncrypt;
 use App\Traits\HasGallery;
 use Stripe\Identity\VerificationSession;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -42,11 +44,6 @@ class User extends Authenticatable implements HasName, FilamentUser
         'password',
         'remember_token',
     ];
-
-    // public $appends = [
-    //   'profile',
-    //   'avatar',
-    // ];
 
     protected function casts(): array
     {
@@ -73,6 +70,12 @@ class User extends Authenticatable implements HasName, FilamentUser
 
         $model->username = $username;
         $model->name = ucfirst($username);
+
+        // For Social Auth [validation required in forms.]
+        if (empty($model->password)) {
+          $model->password = static::makePassword();
+        }
+
       });
 
       self::created(function($model) {
@@ -87,6 +90,16 @@ class User extends Authenticatable implements HasName, FilamentUser
           'type' => 'info',
           'message' => 'Welcome to TrekGuider! Please, complete your profile and verify your email address.',
         ]);
+
+        // Referal
+        DB::transaction(function() use ($model) {
+          if (SessionExpire::exists('referal')) {
+            $id = CustomEncrypt::getId(SessionExpire::get('referal'));
+            $owner = User::find($id);
+            UserReferal::firstOrCreate(['owner_id' => $owner->id, 'referal_id' => $model->id]);
+            Session::forget('referal');
+          }
+        });
       });
 
       self::saving(function($model) {
@@ -310,7 +323,6 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function makeCompletetVerifyUrl(): string
     {
       return url('/profile/verify/complete' . '/?token=' . CustomEncrypt::generateUrlHash(['id' => $this->id]));
-      // return url('/profile/verify/complete');
     }
 
     public function makeSubscribeUrl(): string
@@ -426,11 +438,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       MailVerify::dispatch($this);
     }
 
-    // TODO: Rework code generation to this method.
     public function sendResetCode()
     {
       $mail = new ResetCode($this);
       Mail::to($this->email)->send($mail);
+      dd('ok2');
       MailReset::dispatch($this);
     }
 

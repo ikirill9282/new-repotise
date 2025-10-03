@@ -1,55 +1,73 @@
 <div class="relative">
-  <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center select-none">Sign In</h2>
+  <h2 class="text-2xl font-bold text-gray-900 !mb-6 text-center select-none">Sign In</h2>
   
-  <form wire:submit="submit" class="!space-y-4">
+  <form wire:submit="submit" class="!space-y-4 !mb-10">
     @csrf
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-      <input 
-        wire:model="form.email"
-        type="email" 
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all 
-              @error('form.email') !border-red-500 @enderror
-              "
-        placeholder="your@email.com"
-        name="email"
-      />
-      @error('form.email')
-        <x-form.error>{{ $message }}</x-form.error>
-      @enderror
+
+    {{-- STEP 1 --}}
+    @if($this->step == 1)
+
+      <div class="!mb-6">
+        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email"></x-form.input>
+      </div>
+
+    {{-- STEP 2 --}}
+    @elseif ($this->step == 2)
+
+      <div class="">
+        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email"></x-form.input>
+      </div>
+      
+      <div x-data="{ type: 'password' }" class="">
+        <x-form.input wire:model="form.password" name="password" x-bind:type="type" placeholder="password" :tooltip="false">
+          <x-slot name="icon">
+            <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-3 translate-y-[-50%] hover:cursor-pointer">
+              <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
+            </div>
+          </x-slot>
+        </x-form.input>
+      </div>
+      
+      @if($this->getUser()?->getAttribute('2fa'))
+        <div class="!mb-3">
+          <x-form.input wire:model="form.2fa" name="2fa" placeholder="Authenticator App Code" />
+        </div>
+
+        <div class="">
+          <x-form.checkbox label="Use Backup Code" />
+        </div>
+      @endif
+
+    @endif
+
+    <div class="flex justify-between items-center !gap-2">
+      <x-btn wire:click.prevent="$dispatch('closeModal')" class="basis-1/3" gray>Cancel</x-btn>
+      <x-btn wire:click.prevent="attempt" class="basis-2/3" >Continue</x-btn>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-      <input 
-        wire:model="form.password"
-        type="password" 
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all
-              @error('form.password') !border-red-500 @enderror
-              "
-        placeholder="••••••••"
-        name="password"
-      />
-      @error('form.password')
-        <x-form.error>{{ $message }}</x-form.error>
-      @enderror
+    <div class="flex items-center justify-center">
+      <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'reset-password' })" href="#" class="!border-0">Forgot password?</x-link>
     </div>
-
-    <div class="flex items-center justify-between">
-      <label class="!flex justify-start items-center  gap-2">
-        <input wire:model="form.remember" type="checkbox" name="remember" class="!rounded !border-gray-300 !text-[#FC7361] hover:!text-[#484134] !focus:ring-[#FC7361] checked:bg-[#FC7361]"/>
-        <span class="ml-2 text-sm text-gray-600 hover:cursor-pointer hover:text-[#FC7361] transition">Remember me</span>
-      </label>
-      <a wire:click.prevent="$dispatch('openModal', { modalName: 'reset-password' })" href="#" class="disabled text-sm !text-[#FC7361] hover:!text-[#484134] transition">Forgot password?</a>
-    </div>
-
-    <button class="w-full !bg-[#FC7361] hover:!bg-[#484134] text-white font-medium !py-2.5 !rounded-lg transition">
-      Sign In
-    </button>
   </form>
 
-  <div class="!mt-6 text-center text-sm text-gray-600">
-    Don't have an account? 
-    <a wire:click.prevent="$dispatch('openModal', {modalName: 'register'})" href="#" class="!text-[#FC7361] hover:!text-[#484134] font-medium transition">Sign up</a>
+  <div class="flex justify-center items-center !gap-2 !mb-6">
+    <div class="bg-[#F3F2F2] h-[1px] w-full"></div>
+    <div class="text-gray shrink-0 text-sm">Other log in options.</div>
+    <div class="bg-[#F3F2F2] h-[1px] w-full"></div>
+  </div>
+
+  <div class="flex justify-between items-center !gap-2 text-gray">
+    <div wire:click.prevent="googleAuth" class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+      <div class=""><img src="{{ asset('assets/img/icons/google.svg') }}" alt="Google"></div>
+      <div class="transition group-hover:text-active !mt-0.5">Google</div>
+    </div>
+    <div wire:click.prevent="fbAuth" class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+      <div class=""><img src="{{ asset('assets/img/icons/facebook.svg') }}" alt="Facebook"></div>
+      <div class="transition group-hover:text-active !mt-0.5">Facebook</div>
+    </div>
+    <div wire:click.prevent="xAuth" class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+      <div class=""><img src="{{ asset('assets/img/icons/xai.svg') }}" alt="XAI"></div>
+      <div class="transition group-hover:text-active !mt-0.5">X (Twitter)</div>
+    </div>
   </div>
 </div>

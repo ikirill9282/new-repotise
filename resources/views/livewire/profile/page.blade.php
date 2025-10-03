@@ -271,20 +271,9 @@
                         @endif
                     </div>
                     
-                    @if(auth()->check() && auth()->user()->id !== $user->id)
-                      <x-btn 
-                        wire:click.prevent="$dispatch('openModal', { 
-                          modalName: 'contact', 
-                          args: { 
-                            sender_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt(auth()->user()->id) }}', 
-                            recipient_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}' 
-                          }
-                        })" 
-                        class="!py-2 !max-w-none"
-                      >
-                        Contact Creator
-                      </x-btn>
-                    @endif
+                    <x-btn class="!py-2 !max-w-none">
+                      Contact Creator
+                    </x-btn>
                 </aside>
             </div>
         </div>

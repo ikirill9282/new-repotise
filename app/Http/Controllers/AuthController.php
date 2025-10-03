@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use App\Jobs\ReferalPromocode;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -100,5 +101,29 @@ class AuthController extends Controller
       return redirect('/');
     }
 
-    
+    public function googleCallback(Request $request)
+    {
+      $google_user = Socialite::driver('google')->user();
+      $user = User::firstWhere('email', $google_user->email);
+      
+      if (!$user) {
+        $user = User::create(['email' => $google_user->email]);
+        History::userCreated($user);
+      }
+
+      Auth::login($user);
+      Session::regenerate();
+
+      return redirect()->route('home');
+    }
+
+    public function facebookCallback(Request $request)
+    {
+      
+    }
+
+    public function xCallback(Request $request)
+    {
+      
+    }
 }

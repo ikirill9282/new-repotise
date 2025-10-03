@@ -1,75 +1,67 @@
 <div class="relative">
-  <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center select-none">Sign Up</h2>
+  <h2 class="text-2xl font-bold text-gray-900 !mb-6 text-center select-none">Sign In</h2>
   
-  <form wire:submit="submit" class="!space-y-4">
+  <form wire:submit="submit" class="!space-y-4 !mb-10">
     @csrf
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-      <input 
-        wire:model="form.email"
-        type="email" 
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all 
-                @error('form.email') !border-red-500 @enderror
-                "
-        placeholder="your@email.com"
-        name="email"
-        autocomplete="off"
-      />
-      @error('form.email')
-        <x-form.error>{{ $message }}</x-form.error>
-      @enderror
+    
+    <x-form.input wire:model="form.email" name="email" type="email" :tooltipModal="true" />
+
+    <div x-data="{ type: 'password' }" class="">
+      <x-form.input wire:model="form.password" name="password" x-bind:type="type" placeholder="Password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
+        <x-slot name="icon">
+          <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-9 translate-y-[-50%] hover:cursor-pointer">
+            <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
+          </div>
+        </x-slot>
+      </x-form.input>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-      <input 
-        wire:model="form.password"
-        type="password" 
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all 
-              @error('form.password') !border-red-500 @enderror
-              "
-        placeholder="Password"
-        name="password"
-      />
-      
-      @error('form.password')
-        <x-form.error>{{ $message }}</x-form.error>
-      @enderror
+    <div x-data="{ type: 'password' }" class="">
+      <x-form.input wire:model="form.repeat_password" name="repeat_password" x-bind:type="type" placeholder="Create a password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
+        <x-slot name="icon">
+          <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-9 translate-y-[-50%] hover:cursor-pointer">
+            <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
+          </div>
+        </x-slot>
+      </x-form.input>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Repeat password</label>
-      <input 
-        wire:model="form.repeat_password"
-        type="password" 
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all 
-              @error('form.repeat_password') !border-red-500 @enderror
-              "
-        placeholder="Repeat password"
-        name="repeat_password"
-      />
-
-      @error('form.repeat_password')
-        <x-form.error>{{ $message }}</x-form.error>
-      @enderror
+    <div class="!mb-10">
+      <x-form.checkbox wire:model="form.as_seller" name="as_seller" label="Sign up as a seller" />
     </div>
 
-
-    <div class="flex items-center justify-between">
-      <label class="!flex justify-start items-center gap-2">
-        <input wire:model="form.as_seller" type="checkbox" name="as_seller" class="!rounded !border-gray-300 !text-[#FC7361] !focus:ring-[#FC7361] checked:bg-[#FC7361]"/>
-        <span class="ml-2 text-sm text-gray-600 hover:cursor-pointer hover:text-[#FC7361] transition">Sign up as a seller</span>
-      </label>
+    <div class="flex justify-between items-center !gap-2">
+      <x-btn wire:click.prevent="$dispatch('closeModal')" class="basis-1/3" gray>Cancel</x-btn>
+      <x-btn wire:click.prevent="attempt" class="basis-2/3" >Sign Up</x-btn>
     </div>
 
-    <button class="w-full !bg-[#FC7361] hover:!bg-[#484134] text-white font-medium !py-2.5 !rounded-lg transition">
-      Sign Up
-    </button>
+    <div class="flex items-center justify-center group text-gray">
+      Already have an account? <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'auth' })" href="#" class="!border-0 !inline-bliock !p-0 ml-1 group-has-[a]:!text-active">Sign In</x-link>
+    </div>
   </form>
 
+  <div class="flex justify-center items-center !gap-2 !mb-6">
+    <div class="bg-[#F3F2F2] h-[1px] w-full"></div>
+    <div class="text-gray shrink-0 text-sm">Other log in options.</div>
+    <div class="bg-[#F3F2F2] h-[1px] w-full"></div>
+  </div>
 
-  <div class="!mt-6 text-center text-sm text-gray-600">
-    Already have an account?
-    <a wire:click.prevent="$dispatch('openModal', {modalName: 'auth'})" href="#" class="!text-[#FC7361] hover:!text-[#484134] font-medium transition">Sign in</a>
+  <div class="flex justify-between items-center !gap-2 text-gray !mb-6">
+    <div wire:click.prevent="googleAuth" class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+      <div class=""><img src="{{ asset('assets/img/icons/google.svg') }}" alt="Google"></div>
+      <div class="transition group-hover:text-active !mt-0.5">Google</div>
+    </div>
+    <div class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+      <div class=""><img src="{{ asset('assets/img/icons/facebook.svg') }}" alt="Facebook"></div>
+      <div class="transition group-hover:text-active !mt-0.5">Facebook</div>
+    </div>
+    <div class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+      <div class=""><img src="{{ asset('assets/img/icons/xai.svg') }}" alt="XAI"></div>
+      <div class="transition group-hover:text-active !mt-0.5">X (Twitter)</div>
+    </div>
+  </div>
+
+  <div class="group text-sm text-gray">
+    By clicking ‘‘Sign Up,’’ you agree to our <x-link href="/policies/terms-and-conditions" target="_blank" class="!border-0 group-has-[a]:!text-active">Terms of Service</x-link>, <x-link href="/policies/privacy-policy" target="_blank" class="!border-0 group-has-[a]:!text-active">Privacy Policy</x-link>, and <x-link href="/policies" target="_blank" class="!border-0 group-has-[a]:!text-active">Other Terms</x-link>.
   </div>
 </div>

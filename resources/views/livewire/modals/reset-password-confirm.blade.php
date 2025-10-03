@@ -4,44 +4,26 @@
         Please enter the code below and create your new password. The code is valid for 1 hour.</p>
     <form wire:submit="submit" class="!space-y-4">
         @csrf
-        <div>
-            <input wire:model="form.code" type="text"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
-              focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all 
-              @error('form.code') !border-red-500 @enderror
-              "
-                name="code" placeholder="Enter Verification code" autocomplete="one-time-code" id="code-field" />
-            @error('form.code')
-                <x-form.error>{{ $message }}</x-form.error>
-            @enderror
+        <x-form.input wire:model="form.code" name="code" placeholder="Enter Verification code" autocomplete="one-time-code" id="code-field" />
+
+        <div x-data="{ type: 'password' }" class="">
+          <x-form.input wire:model="form.password" name="password" x-bind:type="type" placeholder="Password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
+            <x-slot name="icon">
+              <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-9 translate-y-[-50%] hover:cursor-pointer">
+                <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
+              </div>
+            </x-slot>
+          </x-form.input>
         </div>
 
-        <div>
-            <input wire:model="form.password" type="password"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
-              focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all 
-              @error('form.password') !border-red-500 @enderror
-              "
-                placeholder="New Passowrd" name="password" autocomplete="one-time-code" id="np-field" />
-
-            @error('form.password')
-                <x-form.error>{{ $message }}</x-form.error>
-            @enderror
-        </div>
-
-        <div>
-            <input wire:model="form.password_confirmation" type="password"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
-              focus:ring-[#FC7361] focus:!border-[#FC7361] outline-none transition-all 
-              @error('form.password_confirmation') !border-red-500 @enderror
-              "
-                placeholder="Confirm New Password" name="password_confirmation" autocomplete="one-time-code"
-                id="rnp-field" />
-
-
-            @error('form.password_confirmation')
-                <x-form.error>{{ $message }}</x-form.error>
-            @enderror
+        <div x-data="{ type: 'password' }" class="">
+          <x-form.input wire:model="form.password_confirmation" name="password_confirmation" x-bind:type="type" placeholder="Create a password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
+            <x-slot name="icon">
+              <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-9 translate-y-[-50%] hover:cursor-pointer">
+                <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
+              </div>
+            </x-slot>
+          </x-form.input>
         </div>
 
         @if ($this->resend)
@@ -49,11 +31,6 @@
                 <span>The code has already been sent. Resending will be available after:</span>
                 <span x-text="formattedTime"></span>
             </div>
-
-            <a wire:click.prevent="$dispatch('openModal', {modalName: 'backup'})" href="#"
-                class="w-full inline-block !text-[#FC7361] hover:!text-[#484134] hover:cursor-pointer !mb-2 font-medium !py-2.5 !rounded-lg transition">
-                If you possess a backup code, please enter it here to restore access.
-            </a>
         @else
             <a wire:click.prevent="resendCode"
                 class="w-full inline-block !text-[#FC7361] hover:!text-[#484134] hover:cursor-pointer !mb-2 font-medium !py-2.5 !rounded-lg transition">
@@ -103,8 +80,6 @@
                         String(minutes).padStart(2, '0') + ':' +
                         String(seconds).padStart(2, '0');
 
-                    console.log(minutes, seconds);
-                    console.log(minutes == 0 && seconds == 0);
                     if (minutes == 0 && seconds == 0) {
                         clearInterval(this.inter);
                         Livewire.dispatch('clearTimer');
