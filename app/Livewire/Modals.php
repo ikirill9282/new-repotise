@@ -12,7 +12,7 @@ class Modals extends Component
     public $inited = false;
     public $args = [];
 
-    public $oneTime = ['report', 'file-description', 'social', 'contact', 'auth-second'];
+    public $oneTime = ['report', 'file-description', 'social', 'contact', 'auth-second', 'backup'];
 
     public function mount()
     {

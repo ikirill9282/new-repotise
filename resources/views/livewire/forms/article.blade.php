@@ -1,6 +1,5 @@
 <div>
   <div class="max-w-4xl">
-    {{-- @dump($this->fields) --}}
     
     {{-- CONTENT --}}
     <h2 class="!font-bold !text-xl !mb-10">Create New Article</h2>

@@ -20,7 +20,7 @@ class Auth extends Component
         'email' => null,
         'password' => null,
         '2fa' => null,
-        'remember' => true,
+        'backup' => null,
     ];
 
     public ?string $user_id = null;
@@ -54,9 +54,11 @@ class Auth extends Component
         'email' => 'required|email|exists:users,email',
         'password' => 'required|string',
         '2fa' => 'sometimes|nullable|string',
+        'backup' => 'sometimes|nullable|boolean',
       ]);
 
       if ($validator->fails()) {
+        dd($validator->errors());
         throw new ValidationException($validator);
       }
 
@@ -67,6 +69,18 @@ class Auth extends Component
       if (!$user || !$user->active) {
         $validator->errors()->add('email', 'Your account is temporarily locked. Please try again later or contact support.');
         throw new ValidationException($validator);
+      }
+
+      if ($user->getAttribute('2fa')) {
+        if (!isset($valid['2fa']) && !isset($valid['backup'])) {
+          $validator->errors()->add('2fa', 'Please enter the two-factor authentication code to proceed.');
+          throw new ValidationException($validator);
+        }
+
+        if (isset($valid['backup']) && $valid['backup']) {
+          $this->dispatch('openModal', 'backup', ['user_id' => Crypt::encrypt($user->id)]);
+          return ;
+        }
       }
 
       if (AuthFacade::attempt(['email' => $valid['email'], 'password' => $valid['password']], true)) {
@@ -99,7 +113,7 @@ class Auth extends Component
     {
       return $this->user_id ? User::find(Crypt::decrypt($this->user_id)) : null;
     }
-    
+
     public function render()
     {
       return view('livewire.modals.auth');

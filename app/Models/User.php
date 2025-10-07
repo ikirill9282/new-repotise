@@ -311,7 +311,6 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function makeProfileUrl(): string
     {
-      // return $this->hasRole('creator') ? url("/profile/@$this->username") : route('profile.purchases') ;
       return url("/profile/@$this->username");
     }
 
@@ -442,7 +441,6 @@ class User extends Authenticatable implements HasName, FilamentUser
     {
       $mail = new ResetCode($this);
       Mail::to($this->email)->send($mail);
-      dd('ok2');
       MailReset::dispatch($this);
     }
 
@@ -506,6 +504,12 @@ class User extends Authenticatable implements HasName, FilamentUser
       foreach ($codes as $code) {
         $this->backup()->create(['code' => $code]);
       }
+    }
+
+    public function canBackup()
+    {
+      $available_attempts = SessionExpire::get('backup');
+      return $available_attempts < 3;
     }
 
     public function canWriteComment()

@@ -34,8 +34,10 @@
                       <p class="text-gray bg-light px-2 py-1 rounded-full">{{ \Illuminate\Support\Carbon::parse($product->published_at ?? $product->created_at)->format('d.m.Y') }}</p>
                       <p class="text-gray bg-light px-2 py-1 rounded-full">{{ $product->views }} Views</p>
                   </div>
-                  <div class="">
-                    <x-like type="product" count="1234567890" :id="$product->id"></x-like>
+                  <div class="flex justify-start items-center !gap-2 text-gray">
+                    <div class="">@include('icons.like')</div>
+                    <div class="">Like</div>
+                    <div class="!text-black">{{ $product->favorite_count }}</div>
                   </div>
                 </div>
               </div>

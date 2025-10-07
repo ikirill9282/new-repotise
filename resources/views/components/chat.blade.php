@@ -87,18 +87,7 @@
                         @endif
 
 
-                        {{-- @if ($can_write || $type == 'comment')
-                          <div class="block sm:hidden text-left mb-2">{{ auth()->user()->profile }}</div>
-                        @endif --}}
-                        
                         <div class="w-full flex justify-start items-start gap-2 sm:gap-3">
-                            {{-- <div
-                                class="relative grow flex items-center justify-start gap-2 sm:gap-3 bg-light rounded-lg">  
-                                @if (!$can_write || $type == 'comment')
-                                  <div class="hidden sm:block pl-3">{{ auth()->user()->profile }}</div>
-                                @endif
-                                
-                            </div> --}}
                             @php
                               $emoji_hash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id])
                             @endphp

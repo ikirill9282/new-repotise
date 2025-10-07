@@ -130,6 +130,11 @@ class Product extends Model
     return $this->hasMany(Review::class)->orderByDesc('id');
   }
 
+  public function favorite()
+  {
+    return $this->belongsToMany(User::class, UserFavorite::class, 'item_id', 'user_id', 'id', 'id')->where('type', 'product');
+  }
+
   public function month(): float
   {
     $res = $this->subprice?->month > 0

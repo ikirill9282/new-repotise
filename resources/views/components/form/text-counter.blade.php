@@ -71,7 +71,7 @@
                 @if($emoji)
                   <div class="emoji-btn relative hover:cursor-pointer p-1 !bg-white rounded transition hover:text-black"
                       data-target="{{ $id }}">
-                      <!-- Emoji SVG icon here -->
+                      @include('icons.emoji')
                   </div>
                 @endif
 

@@ -5,7 +5,7 @@
   <form wire:submit="submit" class="!space-y-4">
     @csrf
 
-    <x-form.input wire:model="form.code" placeholder="Backup Code" autocomplete="one-time-code" :tooltipModal="true" />
+    <x-form.input wire:model="form.code" name="code" placeholder="Backup Code" autocomplete="one-time-code" :tooltipModal="true" />
 
     <div class="flex justify-start items-stretch gap-3 group">
       <div class="basis-1/4">
@@ -15,7 +15,7 @@
       </div>
 
       <div class="basis-3/4">
-        <x-btn class="">
+        <x-btn wire:click.prevent="attempt" class="">
           Reset two-factor authentication
         </x-btn>
       </div>

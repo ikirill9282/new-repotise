@@ -292,7 +292,7 @@ class ProductMedia extends Component
 
       DB::commit();
       $this->dispatch('toastSuccess', ['message' => 'Product Media updated successful!']);
-      // return redirect()->route('profile.products');
+      return redirect()->route('profile.products');
     }
 
     protected function resetBanner(Product $product, array $data)

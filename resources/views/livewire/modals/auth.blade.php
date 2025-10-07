@@ -8,18 +8,18 @@
     @if($this->step == 1)
 
       <div class="!mb-6">
-        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email"></x-form.input>
+        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email" :tooltipModal="true"></x-form.input>
       </div>
 
     {{-- STEP 2 --}}
     @elseif ($this->step == 2)
 
       <div class="">
-        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email"></x-form.input>
+        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email" :tooltipModal="true" autocomplete="one-time-code"></x-form.input>
       </div>
       
       <div x-data="{ type: 'password' }" class="">
-        <x-form.input wire:model="form.password" name="password" x-bind:type="type" placeholder="password" :tooltip="false">
+        <x-form.input wire:model="form.password" name="password" x-bind:type="type" placeholder="Password" :tooltip="false">
           <x-slot name="icon">
             <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-3 translate-y-[-50%] hover:cursor-pointer">
               <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
@@ -34,7 +34,7 @@
         </div>
 
         <div class="">
-          <x-form.checkbox label="Use Backup Code" />
+          <x-form.checkbox wire:model="form.backup" label="Use Backup Code" />
         </div>
       @endif
 

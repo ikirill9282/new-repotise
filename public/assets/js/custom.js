@@ -754,10 +754,12 @@ const ReadMoreButtons = function() {
               const height = 150;
               $(elem).css({ height: `${height}px` });
             }
-            
+            btn.text('Read More');
           } else {
             const height = text.outerHeight() + btn.outerHeight();
             $(elem).css({ height: `${height}px` });
+            btn.text('Read Less');
+            console.log(btn);
           }
         });
 

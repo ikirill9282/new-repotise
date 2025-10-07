@@ -28,6 +28,7 @@ class ProfileProduct extends Component
     
     return view('livewire.profile.tables.profile-product', [
       'products' => Auth::user()->products()
+        ->withCount('favorite')
         ->whereIn('status_id', $satuses)
         ->orderByDesc('id')
         ->get()

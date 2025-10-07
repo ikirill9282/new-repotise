@@ -8,6 +8,7 @@
         "Create Product (1/2)" => route('profile.products.create'),
       ];
     @endphp
+    
     <x-breadcrumbs class="!mb-10" :breadcrumbs="$breadcrumbs"></x-breadcrumbs>
 
 

@@ -11,9 +11,6 @@
   <x-breadcrumbs class="!mb-10" :breadcrumbs="$breadcrumbs" />
 
   <div class="max-w-4xl">
-      {{-- @dump($this->fields['banner']) --}}
-      {{-- @dump($this->fields['gallery']) --}}
-      @dump($this->fields)
 
       {{-- MEDIA --}}
       <h2 class="!font-bold !text-2xl !mb-10">Product Media & Files</h2>

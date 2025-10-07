@@ -14,8 +14,8 @@
                 <img src="{{ $icons[$key] }}" alt="{{ ucfirst($key) }}" />
                 <p class="creatorPage__aside-connectSocials-item-socialName">{{ ucfirst($key) }}</p>
             </div>
-            <label for="toggle3" class="leading-0 hover:cursor-pointer">
-                <input type="checkbox" id="toggle3" class="creatorPage__aside-connectSocials-item-checkbox" />
+            <label for="{{ $key }}" class="leading-0 hover:cursor-pointer">
+                <input type="checkbox" id="{{ $key }}" class="creatorPage__aside-connectSocials-item-checkbox" />
                 <span class="toggle-switch"></span>
             </label>
         </div>
