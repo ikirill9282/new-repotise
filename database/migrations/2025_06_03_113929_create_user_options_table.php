@@ -49,6 +49,9 @@ return new class extends Migration
             $table->string('website')->nullable();
             $table->string('other')->nullable();
 
+            $table->string('contact')->nullable();
+            $table->string('contact2')->nullable();
+
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

@@ -71,7 +71,7 @@ class Auth extends Component
         throw new ValidationException($validator);
       }
 
-      if ($user->getAttribute('2fa')) {
+      if ($user->twofa) {
         if (!isset($valid['2fa']) && !isset($valid['backup'])) {
           $validator->errors()->add('2fa', 'Please enter the two-factor authentication code to proceed.');
           throw new ValidationException($validator);

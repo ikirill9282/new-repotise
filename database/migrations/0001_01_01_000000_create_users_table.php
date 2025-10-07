@@ -16,12 +16,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('username')->unique();
             $table->string('email')->unique()->index();
-            $table->tinyInteger('2fa')->default(0);
+            $table->tinyInteger('twofa')->default(0);
             $table->tinyInteger('verified')->default(0)->index();
+            $table->tinyInteger('active')->default(1)->index();
             $table->decimal('balance')->default(0.00);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->tinyInteger('active')->default(1)->index();
+            $table->string('google2fa_secret')->nullable();
             $table->rememberToken();
             $table->timestamp('stripe_verified_at')->nullable();
             $table->timestamps();

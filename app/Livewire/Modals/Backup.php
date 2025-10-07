@@ -61,7 +61,7 @@ class Backup extends Component
         throw new ValidationException($validator);
       }
 
-      $user->update(['2fa' => 0]);
+      $user->update(['twofa' => 0]);
       $user->backup()->where('code', $valid['code'])->delete();
       
       if ($user->backup()->get()->isEmpty()) {
