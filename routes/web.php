@@ -118,4 +118,4 @@ Route::get('/test', function() {
 
 Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');
 
-Route::fallback(FallbackController::class);
+// Route::fallback(FallbackController::class);
