@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use App\Jobs\ProcessOrder;
 use App\Models\Order;
+use App\Http\Controllers\StripeController;
 
 require __DIR__ . '/api.php';
 
@@ -72,10 +73,7 @@ Route::middleware('auth:web')->group(function() {
 Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
 
 
-Route::post('/hook/stripe', function(Request $request) {
-  Log::channel('stripe_events')->debug('Stripe Event', ['data' => $request->attributes->get('stripe_event')]);
-  return response('ok');
-})
+Route::post('/hook/stripe', [StripeController::class, 'hook'])
   ->middleware(StripeWebhook::class)
   ->withoutMiddleware([VerifyCsrfToken::class]);;
 
