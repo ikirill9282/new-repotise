@@ -56,6 +56,8 @@ class SearchClient
           'type',
           'location',
           'categories',
+          'calcedPrice',
+          'priceWithoutDiscount',
         ]),
         (new SearchQuery())
           ->setIndexUid('articles')

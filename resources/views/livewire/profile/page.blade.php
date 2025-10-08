@@ -113,7 +113,7 @@
                                     @else
                                       <x-btn 
                                         href="{{ $user->makeSubscribeUrl() }}" 
-                                        class="follow follow-btn sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3"
+                                        class="follow follow-btn sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3 {{ auth()->check() ? '' : 'open_auth' }}"
                                         data-resource="{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}"
                                         data-group="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $user->id]); }}"
                                       >
@@ -156,17 +156,17 @@
                                         <x-like :id="$article->id" :count="$article->likes()->count()"></x-like>
 
                                         <div class="flex justify-start items-center gap-1 text-sm">
-                                            <a href="{{ auth()->user()->makeReferalArticleUrl('FB', $article) }}" target="_blank" class="first_connect !text-gray hover:!text-blue-500">
+                                            <a href="{{ auth()->user()?->makeReferalArticleUrl('FB', $article) ?? $article->makeShareUrl('FB') }}" target="_blank" class="first_connect !text-gray hover:!text-blue-500">
                                               @include('icons.facebook-sm')
                                             </a>
-                                            <a href="{{ auth()->user()->makeReferalArticleUrl('TW', $article) }}" target="_blank" class="second_connect !text-gray hover:!text-black">
+                                            <a href="{{ auth()->user()?->makeReferalArticleUrl('TW', $article) ?? $article->makeShareUrl('TW') }}" target="_blank" class="second_connect !text-gray hover:!text-black">
                                               @include('icons.twitter-sm')
                                             </a>
-                                            <a href="{{ auth()->user()->makeReferalArticleUrl('RD', $article) }}" target="_blank" class="third_connect !text-gray hover:!text-black">
+                                            <a href="{{ auth()->user()?->makeReferalArticleUrl('RD', $article) ?? $article->makeShareUrl('RD') }}" target="_blank" class="third_connect !text-gray hover:!text-black">
                                               @include('icons.reddit-sm')
                                             </a>
-                                            <x-link href="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}" class="share copyToClipboard ml-1" data-target="{{ $hash_id }}">
-                                              <input data-copyId="{{ $hash_id }}" type="hidden" value="{{ auth()->user()->makeReferalArticleUrl(null, $article) }}"></input>
+                                            <x-link href="{{ auth()->user()?->makeReferalArticleUrl(null, $article) ?? $article->makeShareUrl() }}" class="share copyToClipboard ml-1" data-target="{{ $hash_id }}">
+                                              <input data-copyId="{{ $hash_id }}" type="hidden" value="{{ auth()->user()?->makeReferalArticleUrl(null, $article) ?? $article->makeShareUrl() }}"></input>
                                               Share
                                             </x-link>
                                         </div>
@@ -190,8 +190,17 @@
                 <aside class="flex flex-col gap-4 order-1 md:!order-2 
                   top-[80px] rightt-0 col-span-1 bg-white !p-2 sm:!p-4 rounded">
 
-                    @if(auth()->user()->id == $user->id && auth()->user()->hasRole('creator'))
+                    @if(auth()->user()?->id == $user->id && auth()->user()?->hasRole('creator'))
                       <x-btn class="!py-2 !max-w-none">Edit Profile</x-btn>
+                    @else
+                      <x-btn 
+                        href="{{ $user->makeSubscribeUrl() }}" 
+                        class="follow follow-btn !w-auto !py-2 {{ auth()->check() ? '' : 'open_auth' }}"
+                        data-resource="{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}"
+                        data-group="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $user->id]); }}"
+                      >
+                        {{ $user->hasFollower(auth()->user()?->id) ? 'Unsubscribe' : 'Subscribe' }}
+                      </x-btn>
                     @endif
 
                     <div class="flex flex-col gap-2">
@@ -246,19 +255,21 @@
                     </div>
                     
 
-                    @if (auth()->user()->hasRole('creator'))
-                      <x-btn wire:click.prevent="$dispatch('openModal', { modalName: 'donate' })" class="!py-2 !max-w-none !flex items-center justify-center gap-2 group" outlined>
-                        <span class="text-red">
-                          <svg width="20" height="18" viewBox="0 0 20 18" fill="none"
-                              xmlns="http://www.w3.org/2000/svg">
-                              <path
-                                  d="M14.5835 0.0971069C13.6451 0.111703 12.7272 0.373651 11.9224 0.856499C11.1177 1.33935 10.4546 2.026 10.0001 2.84711C9.54566 2.026 8.88257 1.33935 8.07783 0.856499C7.27308 0.373651 6.35517 0.111703 5.41679 0.0971069C3.92091 0.162099 2.51155 0.816485 1.49661 1.9173C0.481678 3.01812 -0.0563308 4.47588 0.000128002 5.97211C0.000128002 9.76127 3.98846 13.8996 7.33346 16.7054C8.08031 17.333 9.02459 17.6771 10.0001 17.6771C10.9757 17.6771 11.9199 17.333 12.6668 16.7054C16.0118 13.8996 20.0001 9.76127 20.0001 5.97211C20.0566 4.47588 19.5186 3.01812 18.5036 1.9173C17.4887 0.816485 16.0793 0.162099 14.5835 0.0971069ZM11.596 15.4304C11.1493 15.8066 10.5841 16.0129 10.0001 16.0129C9.41617 16.0129 8.85098 15.8066 8.40429 15.4304C4.12263 11.8379 1.66679 8.39127 1.66679 5.97211C1.60983 4.9177 1.9721 3.88355 2.6746 3.09519C3.37709 2.30683 4.36282 1.82823 5.41679 1.76377C6.47077 1.82823 7.45649 2.30683 8.15899 3.09519C8.86149 3.88355 9.22376 4.9177 9.16679 5.97211C9.16679 6.19312 9.25459 6.40508 9.41087 6.56136C9.56715 6.71764 9.77911 6.80544 10.0001 6.80544C10.2211 6.80544 10.4331 6.71764 10.5894 6.56136C10.7457 6.40508 10.8335 6.19312 10.8335 5.97211C10.7765 4.9177 11.1388 3.88355 11.8413 3.09519C12.5438 2.30683 13.5295 1.82823 14.5835 1.76377C15.6374 1.82823 16.6232 2.30683 17.3257 3.09519C18.0282 3.88355 18.3904 4.9177 18.3335 5.97211C18.3335 8.39127 15.8776 11.8379 11.596 15.4271V15.4304Z"
-                                  fill="currentColor" />
-                          </svg>
-                        </span>
-                        <span>Dontation</span>
-                      </x-btn>
-                    @endif
+                    <x-btn 
+                      wire:click.prevent="$dispatch('openModal', { modalName: '{{ auth()->check() ? 'donate' : 'auth' }}' })" 
+                      class="!py-2 !max-w-none !flex items-center justify-center gap-2 group"
+                      outlined
+                    >
+                      <span class="text-red">
+                        <svg width="20" height="18" viewBox="0 0 20 18" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M14.5835 0.0971069C13.6451 0.111703 12.7272 0.373651 11.9224 0.856499C11.1177 1.33935 10.4546 2.026 10.0001 2.84711C9.54566 2.026 8.88257 1.33935 8.07783 0.856499C7.27308 0.373651 6.35517 0.111703 5.41679 0.0971069C3.92091 0.162099 2.51155 0.816485 1.49661 1.9173C0.481678 3.01812 -0.0563308 4.47588 0.000128002 5.97211C0.000128002 9.76127 3.98846 13.8996 7.33346 16.7054C8.08031 17.333 9.02459 17.6771 10.0001 17.6771C10.9757 17.6771 11.9199 17.333 12.6668 16.7054C16.0118 13.8996 20.0001 9.76127 20.0001 5.97211C20.0566 4.47588 19.5186 3.01812 18.5036 1.9173C17.4887 0.816485 16.0793 0.162099 14.5835 0.0971069ZM11.596 15.4304C11.1493 15.8066 10.5841 16.0129 10.0001 16.0129C9.41617 16.0129 8.85098 15.8066 8.40429 15.4304C4.12263 11.8379 1.66679 8.39127 1.66679 5.97211C1.60983 4.9177 1.9721 3.88355 2.6746 3.09519C3.37709 2.30683 4.36282 1.82823 5.41679 1.76377C6.47077 1.82823 7.45649 2.30683 8.15899 3.09519C8.86149 3.88355 9.22376 4.9177 9.16679 5.97211C9.16679 6.19312 9.25459 6.40508 9.41087 6.56136C9.56715 6.71764 9.77911 6.80544 10.0001 6.80544C10.2211 6.80544 10.4331 6.71764 10.5894 6.56136C10.7457 6.40508 10.8335 6.19312 10.8335 5.97211C10.7765 4.9177 11.1388 3.88355 11.8413 3.09519C12.5438 2.30683 13.5295 1.82823 14.5835 1.76377C15.6374 1.82823 16.6232 2.30683 17.3257 3.09519C18.0282 3.88355 18.3904 4.9177 18.3335 5.97211C18.3335 8.39127 15.8776 11.8379 11.596 15.4271V15.4304Z"
+                                fill="currentColor" />
+                        </svg>
+                      </span>
+                      <span>Donation</span>
+                    </x-btn>
 
                     {{-- SOCIALS --}}
                     <div class="">
@@ -269,16 +280,22 @@
                           :social="$user->options->getSocial()"
                         />
 
-                        @if(auth()->user()->id == $user->id)
+                        @if(auth()->user()?->id == $user->id)
                           <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social', args: { user_id: '{{ $this->user_id }}' } })" class="inline-block !mt-3">Add Social Link</x-link>
                         @endif
                     </div>
                     
-                    @if (auth()->user()->hasRole('creator'))
-                      <x-btn class="!py-2 !max-w-none">
-                        Contact Creator
-                      </x-btn>
-                    @endif
+                    
+                    <x-btn 
+                      wire:click.prevent="$dispatch('openModal', { 
+                        modalName: '{{ (auth()->check() && auth()->user()?->id == $user->id) ? 'edit-contacts' : 'contact' }}',
+                        args: { user_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}' }
+                      })"
+                      class="!py-2 !max-w-none"
+                    >
+                      Contact Creator
+                    </x-btn>
+                  
                 </aside>
             </div>
         </div>

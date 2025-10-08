@@ -18,9 +18,11 @@
               @php
                 $gallery = $product->gallery->where('preview', 1)
                   ->values()
-                  ->merge($product->gallery->where('preview', 0)->sortByDesc('id')->values());
-
-                // dump($product->gallery->where('preview', 0)->sortByDesc('id'));
+                  ->merge(
+                    $product->gallery->where('preview', 0)
+                      ->sortByDesc('id')
+                      ->values()
+                  );
               @endphp
                 <div class="about_block">
                     <div class="group_left">
@@ -91,14 +93,14 @@
                                 </div>
                             </div>
                             <div class="cost">
-                                <p>${{ $product->price }}</p>
-                                <span>${{ $product->old_price }}</span>
+                                <p>{{ currency($product->getPrice()) }}</p>
+                                <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
                             </div>
                             @if($product->subscription)
                               <div class="cards_monthly_group">
                                   <div class="card_monthly ">
                                       <h3>Monthly</h3>
-                                      <p class="text-center">${{ $product->month() }} / month</p>
+                                      <p class="text-center">{{ currency($product->month()) }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -108,7 +110,7 @@
                                   </div>
                                   <div class="card_monthly ">
                                       <h3>Quarterly</h3>
-                                      <p class="text-center">${{ $product->quarter() }} / month</p>
+                                      <p class="text-center">{{ currency($product->quarter()) }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>
@@ -118,7 +120,7 @@
                                   </div>
                                   <div class="card_monthly ">
                                       <h3>Yearly</h3>
-                                      <p class="text-center">${{ $product->year() }} / month</p>
+                                      <p class="text-center">{{ currency($product->year()) }} / month</p>
                                       <div class="subscribe justify-center items-end">
                                           <div class="flex flex-col gap-1">
                                             <a href="#">Subscribe</a>

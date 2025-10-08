@@ -204,7 +204,7 @@ class Product extends Component
       $data = array_merge($data, $subprice);
 
       $data['price'] = str_ireplace('$', '', $data['price']);
-      $data['old_price'] = str_ireplace('$', '', $data['old_price']);
+      $data['sale_price'] = str_ireplace('$', '', $data['sale_price']);
 
       return $data;
     }
@@ -220,7 +220,7 @@ class Product extends Component
         'refund_policy' => 'required|integer',
         'subscription' => 'required|boolean',
         'price' => 'required|numeric',
-        'old_price' => 'sometimes|nullable|numeric',
+        'sale_price' => 'sometimes|nullable|numeric',
         'seo_title' => 'sometimes|nullable|string',
         'seo_text' => 'sometimes|nullable|string',
         'types' => 'sometimes|nullable|array',
@@ -254,7 +254,7 @@ class Product extends Component
         'text',
         'subscription',
         'price',
-        'old_price',
+        'sale_price',
         'refund_policy',
         'seo_title',
         'seo_text',

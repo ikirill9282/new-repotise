@@ -240,7 +240,7 @@ class SiteController extends Controller
         'found' => count($search_results),
       ]);
     }
-
+    
     return view('site.pages.search', [
       'page' => $page,
       'search_results' => $search_results,
@@ -264,6 +264,10 @@ class SiteController extends Controller
 
   public function product(Request $request, string $product)
   {
+    if (!request()->has('pid')) {
+      return redirect("/search/?q=$product");
+    }
+
     if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
       SessionExpire::set('referal', $request->get('referal'), Carbon::now()->addHours(24));
     }
@@ -275,10 +279,6 @@ class SiteController extends Controller
     if (is_null($page)) {
       return (new FallbackController())($request);
     }
-
-    // if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
-    //   Session::put('referal', $request->get('referal'));
-    // }
 
     $product = Product::findByPid(request()->get('pid'));
     

@@ -47,11 +47,7 @@ class CabinetController extends Controller
   public function verificate(Request $request)
   {
     $user = $request->user();
-    // if ($user->verify()->where('type', 'stripe')->exists()) {
-    //   $verify = $user->verify()->where('type', 'stripe')->first();
-    //   $verify_session = Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
-    //   dd($verify_session);
-    // }
+
     $valid = $request->validate([
       'full_name' => 'required|string',
       'street' => 'required|string',
@@ -62,9 +58,7 @@ class CabinetController extends Controller
       'country' => 'required|string',
       'birthday' => 'required|string',
       'tax_id' => 'sometimes|nullable|integer',
-      // 'tax_id' => 'required|integer',
       'phone' => 'sometimes|nullable|string',
-      // 'phone' => 'required|string',
     ]);
 
     if (isset($valid['phone'])) $valid['phone'] = preg_replace('/[^0-9]+/is', '', $valid['phone']);
@@ -361,12 +355,6 @@ class CabinetController extends Controller
     }
     return redirect()->route('profile.products.create');
   }
-
-  public function createProduct2(Request $request)
-  {
-    return view('site.pages.create-product2');
-  }
-
 
   protected function getUser(string $slug)
   {

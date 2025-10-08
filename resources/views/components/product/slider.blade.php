@@ -80,8 +80,8 @@
               </a>
             </div>
             <div class="flex justify-start items-center gap-2">
-                <div class="">${{ number_format($product->price) }}</div>
-                <div class="text-gray line-through">${{ number_format($product->old_price) }}</div>
+                <div class="">{{ currency($product->getPrice()) }}</div>
+                <div class="text-gray line-through">{{ currency($product->getPriceWithoutDiscount()) }}</div>
             </div>
             <div class="flex flex-wrap gap-1.5">
                 @foreach ($product->types->shuffle()->slice(0, 3) as $type)

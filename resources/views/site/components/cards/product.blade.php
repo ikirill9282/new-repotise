@@ -13,10 +13,8 @@
                     href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
             </h4>
             <h5>
-              {{ number_format($model->price) }}
-              @if (isset($model->old_price))
-                <span>${{ number_format($model->old_price) }}</span>
-              @endif
+              <span>{{ currency($model->getPrice()) }}</span>
+              <span>{{ currency($model->getPriceWithoutDiscount()) }}</span>
             </h5>
         </div>
         <p>{{ $model->categories->pluck('title')->join(', ') }}</p>
@@ -51,21 +49,25 @@
           'item_id' => $model->id,
         ])
 
-        <a 
-          href="{{ url('/cart') }}" 
-          class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" 
-          data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}"
-          data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $model->id]) }}"
-        >
-          {{ $cart->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
-        </a>
+        @if ($model->subscription)
+          <x-btn href="{{ $model->makeUrl() }}" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5">Subscribe</x-btn>
+        @else
+          <a 
+            href="{{ url('/cart') }}" 
+            class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" 
+            data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}"
+            data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $model->id]) }}"
+          >
+            {{ $cart->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
+          </a>
+        @endif
     </div>
     <h3 class="text-nowrap overflow-hidden text-ellipsis">
       <a class="transition !text-inherit hover:!text-black" href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
     </h3>
     <div class="cost">
-        <p>${{ number_format($model->price) }}</p>
-        <span>${{ number_format($model->old_price) }}</span>
+      <p>{{ currency($model->getPrice()) }}</p>
+      <span>{{ currency($model->getPriceWithoutDiscount()) }}</span>
     </div>
     <div class="inf_cards flex flex-wrap">
         {{-- TYPES --}}

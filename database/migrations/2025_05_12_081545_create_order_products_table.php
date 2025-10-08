@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('order_id')->unsigned()->index();
             $table->bigInteger('product_id')->unsigned()->index();
             $table->decimal('price');
-            $table->decimal('old_price')->nullable();
+            $table->decimal('sale_price')->nullable();
             $table->decimal('discount')->unsigned()->nullable()->default(0);
             $table->integer('count')->unsigned();
             $table->decimal('total');

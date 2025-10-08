@@ -77,6 +77,8 @@ class Product extends Model
     $array['location'] = $this->locations->select(['id', 'title', 'slug'])->toArray();
     $array['preview'] = $this->preview?->image ?? '';
     $array['reviews_count'] = $this->reviews_count;
+    $array['calcedPrice'] = $this->getPrice();
+    $array['priceWithoutDiscount'] = $this->getPriceWithoutDiscount();
 
     return $array;
   }
@@ -135,11 +137,23 @@ class Product extends Model
     return $this->belongsToMany(User::class, UserFavorite::class, 'item_id', 'user_id', 'id', 'id')->where('type', 'product');
   }
 
+  public function getPrice()
+  {
+    return $this->price - $this->sale_price;
+  }
+
+  public function getPriceWithoutDiscount()
+  {
+    if ($this->getPrice() == $this->price) return null;
+
+    return $this->price;
+  }
+
   public function month(): float
   {
     $res = $this->subprice?->month > 0
-      ? Collapse::subtractPercent($this->price, $this->subprice->month)
-      : $this->price;
+      ? Collapse::subtractPercent($this->getPrice(), $this->subprice->month)
+      : $this->getPrice();
 
     return round($res, 2);
   }
@@ -147,8 +161,8 @@ class Product extends Model
   public function quarter(): float
   {
     $res = $this->subprice?->quarter > 0
-      ? Collapse::subtractPercent($this->price, $this->subprice->quarter)
-      : $this->price;
+      ? Collapse::subtractPercent($this->getPrice(), $this->subprice->quarter)
+      : $this->getPrice();
 
     return round($res, 2);
   }
@@ -156,8 +170,8 @@ class Product extends Model
   public function year(): float
   {
     $res = $this->subprice?->year > 0
-      ? Collapse::subtractPercent($this->price, $this->subprice->year)
-      : $this->price;
+      ? Collapse::subtractPercent($this->getPrice(), $this->subprice->year)
+      : $this->getPrice();
 
     return round($res, 2);
   }
@@ -198,6 +212,25 @@ class Product extends Model
   public function makeEditMediaUrl()
   {
     return route('profile.products.create.media') . '?pid=' . Crypt::encrypt($this->id);
+  }
+
+
+  public function makeShareUrl(?string $source = null)
+  {
+    $url = $this->makeUrl();
+    $route_url = urlencode($url);
+    $title = urlencode('Discover your next adventure together!');
+
+    return match($source) {
+      'FB' => "http://www.facebook.com/share.php?u=$route_url&title=$title",
+      'TW' => "https://twitter.com/intent/tweet?text=" . ($title." ".$route_url),
+      'PI' => "http://pinterest.com/pin/create/link/?url=$route_url&description=$title",
+      'GM' => "https://mail.google.com/mail/u/0/?ui=2&fs=1&tf=cm&su=$title&body=Link:+$route_url",
+      'WA' => "https://wa.me/?text=$title $route_url",
+      'TG' => "https://t.me/share/url?url=$route_url&text=$title",
+      'RD' => "https://www.reddit.com/submit?url=$url&title=$title",
+      default => $url
+    };
   }
 
   public function getAllReviews(?int $limit = 10)

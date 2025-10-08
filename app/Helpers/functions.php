@@ -106,8 +106,13 @@ if (! function_exists('enable_more')) {
 }
 
 if (! function_exists('currency')) {
-  function currency(int|float $value): string
+  function currency(int|float|null $value): ?string
   {
-    return '$' . number_format($value, 2, '.', ' ');
+    if (is_null($value)) return null;
+    
+    $decimalPart = strstr((string)$value, '.');
+    $decimals = $decimalPart !== false ? 2 : 0;
+
+    return '$' . number_format($value, $decimals, '.', ',');
   }
 }

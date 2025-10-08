@@ -15,16 +15,13 @@
                 <div class="input_group flex-wrap !justify-start">
                   <x-search placeholder="Search for travel guides, maps, itineraries...">
                     @if (isset($tags) && !empty($tags))
-                        <div div class="name_tags">
+                        <div div class="name_tags flex-wrap">
                             @foreach ($tags as $tag)
-                                <a href="{{ url("search?q=". urlencode($tag['title']) ."") }}">{{ $tag['title'] }}</a>
+                                <a class="text-nowrap" href="{{ url("search?q=". urlencode($tag['title']) ."") }}">{{ $tag['title'] }}</a>
                             @endforeach
                         </div>
                     @endif
                   </x-search>
-                    {{-- @include('site.components.search', [
-                        'placeholder' => print_var('search_placeholder', $variables ?? null),
-                    ]) --}}
                 </div>
             </div>
         </div>
@@ -58,16 +55,9 @@
                                             </div>
                                             <div class="right_text">
                                                 <h3>
-                                                  @php
-                                                    $path = match ($item['index']) {
-                                                      // 'products' => '/products/' . $item['location']['slug'] . '/' . print_key('slug', $item) . '?pid=' . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => print_key('id', $item)]),
-                                                      'products' => '/products/?locations=' . implode(',', array_column($item['location'], 'slug'))
-                                                      //  => ,
-                                                    };
-                                                  @endphp
                                                   <a  
                                                     class="!text-inherit"
-                                                    href="{{ url($path) }}"
+                                                    href="{{ url("/products/{$item['slug']}?pid=" . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $item['id']])) }}"
                                                     >
                                                       {!! print_key('title', $item) !!}
                                                   </a>
@@ -89,8 +79,16 @@
                                             </div>
                                             <div class="right_reviews_group">
                                                 <div class="cost">
-                                                    <p>${{ print_key('price', $item) }}</p>
-                                                    <span>${{ print_key('old_price', $item) }}</span>
+                                                    @php
+                                                      try {
+                                                        $a1 = $item['calcedPrice'];
+                                                        $a2 = $item['priceWithoutDiscount'];
+                                                      } catch (\Exception $e) {
+                                                        dd($item);
+                                                      }
+                                                    @endphp
+                                                    <p>{{ currency($item['calcedPrice']) }}</p>
+                                                    <span>{{ currency($item['priceWithoutDiscount']) }}</span>
                                                 </div>
                                                 <div class="reviews">
                                                     <div class="stars flex">

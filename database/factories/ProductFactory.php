@@ -32,9 +32,9 @@ class ProductFactory extends Factory
     return [
       'user_id' => fake()->randomElement([0,2,3]),
       'title' => collect(fake()->words(3))->map(fn($word) => ucfirst($word))->join(' '),
-      'price' => fake()->numberBetween(10, 200),
+      'price' => fake()->numberBetween(100, 300),
       'subscription' => fake()->boolean(),
-      'old_price' => fake()->numberBetween(300, 2000),
+      'sale_price' => fake()->numberBetween(10, 50),
       'rating' => fake()->numberBetween(0, 5),
       'text' => collect(fake()->paragraphs(20))->map(fn($paragraph) => ucfirst($paragraph))->join("\n"),
     ];
