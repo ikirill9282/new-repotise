@@ -2,7 +2,7 @@
   <div class="cards_monthly_group">
       <div class="card_monthly ">
           <h3>Monthly</h3>
-          <p class="text-center">{{ currency($product->month()) }} / month</p>
+          <p class="text-center">{{ currency($product->subprice->month()) }} / month</p>
           <div class="subscribe justify-center items-end">
               <div class="flex flex-col gap-1">
                 <a wire:click.prevent="moveCheckout('month')" href="#">Subscribe</a>
@@ -12,7 +12,7 @@
       </div>
       <div class="card_monthly ">
           <h3>Quarterly</h3>
-          <p class="text-center">{{ currency($product->quarter()) }} / month</p>
+          <p class="text-center">{{ currency($product->subprice->quarter()) }} / month</p>
           <div class="subscribe justify-center items-end">
               <div class="flex flex-col gap-1">
                 <a wire:click.prevent="moveCheckout('quarter')" href="#">Subscribe</a>
@@ -22,7 +22,7 @@
       </div>
       <div class="card_monthly ">
           <h3>Yearly</h3>
-          <p class="text-center">{{ currency($product->year()) }} / month</p>
+          <p class="text-center">{{ currency($product->subprice->year()) }} / month</p>
           <div class="subscribe justify-center items-end">
               <div class="flex flex-col gap-1">
                 <a wire:click.prevent="moveCheckout('year')" href="#">Subscribe</a>

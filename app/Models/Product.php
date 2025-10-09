@@ -43,14 +43,14 @@ class Product extends Model
 
       // Push to Stripe
       $stripe_client = new StripeClient();
-      $stripe_product = $stripe_client->createProduct($model);
+      // $stripe_product = $stripe_client->createProduct($model);
 
       if ($model->subscription) {
         if (!$model->subprice()->exists()) {
           $model->subprice()->create();
         }
 
-        $stripe_client->createPrices($model, $stripe_product);
+        // $stripe_client->createPrices($model, $stripe_product);
       }
     });
 
@@ -89,7 +89,6 @@ class Product extends Model
 
     return $array;
   }
-
 
   private function generateSlug(bool $salt = false)
   {
@@ -154,48 +153,6 @@ class Product extends Model
     if ($this->getPrice() == $this->price) return null;
 
     return $this->price;
-  }
-
-  public function month(): float
-  {
-    $res = $this->subprice?->month > 0
-      ? Collapse::subtractPercent($this->getPrice(), $this->subprice->month)
-      : $this->getPrice();
-
-    return round($res, 2);
-  }
-
-  public function quarter(): float
-  {
-    $res = $this->subprice?->quarter > 0
-      ? Collapse::subtractPercent($this->getPrice(), $this->subprice->quarter)
-      : $this->getPrice();
-
-    return round($res, 2);
-  }
-
-  public function year(): float
-  {
-    $res = $this->subprice?->year > 0
-      ? Collapse::subtractPercent($this->getPrice(), $this->subprice->year)
-      : $this->getPrice();
-
-    return round($res, 2);
-  }
-
-  public function getMonthSum()
-  {
-    return $this->month();
-  }
-
-  public function getQuarterSum()
-  {
-    return round($this->quarter() * 3, 2);
-  }
-
-  public function getYearSum()
-  {
-    return round($this->year() * 12, 2);
   }
 
   public function getText(): string

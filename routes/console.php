@@ -29,6 +29,8 @@ use App\Models\News;
 use Database\Factories\ProductFactory;
 use Illuminate\Support\Facades\Crypt;
 use Mews\Purifier\Facades\Purifier;
+use Stripe\Collection;
+use Stripe\Price;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('app:clear-expires-images')->hourlyAt(5);
@@ -68,4 +70,26 @@ Artisan::command('rl_index', function() {
 
   $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
   $index = $client->index('articles')->updateSortableAttributes(['created_at']);
+});
+
+
+Artisan::command('flush_stripe_products', function() {
+  $products = Cashier::stripe()->products->all(['limit' => 100]);
+  
+  while(!$products->isEmpty()) {
+    foreach ($products as $product) {
+      try {
+        Cashier::stripe()->products->delete($product->id);
+      } catch (\Exception $e) {
+        continue;
+      }
+    }
+  }
+});
+
+Artisan::command('flush_stripe_customers', function() {
+  $users = Cashier::stripe()->customers->all(['limit' => 100]);
+  foreach ($users as $user) {
+    Cashier::stripe()->customers->delete($user->id);
+  }
 });

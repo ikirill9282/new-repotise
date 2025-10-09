@@ -7,31 +7,130 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subprice extends Model
 {
-    public function product()
-    {
-      return $this->belongsTo(Product::class);
-    }
+  public function product()
+  {
+    return $this->belongsTo(Product::class);
+  }
 
-    public function getMonthId()
-    {
-      return $this->stripe_data['month'];
-    }
+  public function stripeData(): Attribute
+  {
+    return Attribute::make(
+      get: fn(?string $val) => json_decode($val, true),
+      set: fn(array $val) => json_encode($val),
+    );
+  }
 
-    public function getQuarterId()
-    {
-      return $this->stripe_data['quarter'];
-    }
+  public function month(): float
+  {
+    $res = $this->month > 0
+      ? $this->subtractPercent($this->getPrice(), $this->month)
+      : $this->getPrice();
 
-    public function getYearId()
-    {
-      return $this->stripe_data['year'];
-    }
+    return round($res, 2);
+  }
 
-    public function stripeData(): Attribute
-    {
-      return Attribute::make(
-        get: fn(?string $val) => json_decode($val, true),
-        set: fn(array $val) => json_encode($val),
-      );
-    }
+  public function monthWithoutDiscount()
+  {
+    $res = $this->month > 0
+      ? $this->subtractPercent($this->getPriceWithoutDiscount(), $this->month)
+      : $this->getPrice();
+
+    return round($res, 2);
+  }
+
+  public function quarter(): float
+  {
+    $res = $this->subprice?->quarter > 0
+      ? $this->subtractPercent($this->getPrice(), $this->quarter)
+      : $this->getPrice();
+
+    return round($res, 2);
+  }
+
+  public function quarterWithoutDiscount()
+  {
+    $res = $this->subprice?->quarter > 0
+      ? $this->subtractPercent($this->getPriceWithoutDiscount(), $this->quarter)
+      : $this->getPrice();
+
+    return round($res, 2);
+  }
+
+  public function year(): float
+  {
+    $res = $this->subprice?->year > 0
+      ? $this->subtractPercent($this->getPrice(), $this->year)
+      : $this->getPrice();
+
+    return round($res, 2);
+  }
+
+  public function yearWithoutDiscount(): float
+  {
+    $res = $this->subprice?->year > 0
+      ? $this->subtractPercent($this->getPriceWithoutDiscount(), $this->year)
+      : $this->getPrice();
+
+    return round($res, 2);
+  }
+
+  public function getMonthSum(): float
+  {
+    return $this->month();
+  }
+
+  public function getMonthSumWithoutDiscount(): float
+  {
+    return $this->monthWithoutDiscount();
+  }
+
+  public function getQuarterSum(): float
+  {
+    return round($this->quarter() * 3, 2);
+  }
+
+  public function getQuarterSumWithoutDiscount(): float
+  {
+    return round($this->quarterWithoutDiscount() * 3, 2);
+  }
+
+  public function getYearSum(): float
+  {
+    return round($this->year() * 12, 2);
+  }
+
+  public function getYearSumWithoutDiscount(): float
+  {
+    return round($this->yearWithoutDiscount() * 12, 2);
+  }
+
+  public function getMonthId(): string
+  {
+    return $this->stripe_data['month'];
+  }
+
+  public function getQuarterId(): string
+  {
+    return $this->stripe_data['quarter'];
+  }
+
+  public function getYearId(): string
+  {
+    return $this->stripe_data['year'];
+  }
+
+  public function getPrice(): float
+  {
+    return $this->product->getPrice();
+  }
+
+  public function getPriceWithoutDiscount(): float
+  {
+    return $this->product->getPriceWithoutDiscount();
+  }
+
+  public function subtractPercent($number, $percent): float
+  {
+    return $number - ($number * ($percent / 100));
+  }
 }

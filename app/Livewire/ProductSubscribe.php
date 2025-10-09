@@ -22,32 +22,39 @@ class ProductSubscribe extends Component
 
     public function moveCheckout(string $period)
     {
+      if(!Auth::check()) {
+        $this->dispatch('openModal', 'auth');
+        return ;
+      }
+
       $product = $this->getProduct();
-      
-      $cart = new Cart('cart');
-      $cart->addProduct($product->id);
       $cost = match($period) {
-        'month' => $product->getMonthSum(),
-        'quarter' => $product->getQuarterSum(),
-        'year' => $product->getYearSum(),
+        'month' => $product->subprice->getMonthSum(),
+        'quarter' => $product->subprice->getQuarterSum(),
+        'year' => $product->subprice->getYearSum(),
+      };
+      $costWithoutDiscount = match($period) {
+        'month' => $product->subprice->getMonthSumWithoutDiscount(),
+        'quarter' => $product->subprice->getQuarterSumWithoutDiscount(),
+        'year' => $product->subprice->getYearSumWithoutDiscount(),
       };
 
       $order = new Order();
-      $order->user_id = Auth::user()?->id ?? 0;
+      $order->user_id = Auth::user()?->id;
       $order->status_id = EnumsOrder::NEW;
       $order->cost = $cost;
-      $order->cost_without_discount = $product->price;
-      $order->cost_without_tax = $cost;
+      $order->cost_without_discount = $costWithoutDiscount;
+      $order->cost_without_tax = $costWithoutDiscount;
       $order->save();
 
       $order->order_products()->create([
         'order_id' => $order->id,
         'product_id' => $product->id,
-        'price' => $cost,
+        'price' => $product->price,
         'sale_price' => $product->sale_price,
         'count' => 1,
         'total' => $cost,
-        'total_without_discount' => $cost,
+        'total_without_discount' => $costWithoutDiscount,
       ]);
 
       Session::put('checkout', $order->id);

@@ -166,39 +166,7 @@
                                 <span>${{ $product->old_price }}</span>
                             </div>
                             @if($product->subscription)
-                              <div class="cards_monthly_group">
-                                  <div class="card_monthly">
-                                      <h3>Monthly</h3>
-                                      <p class="text-center">${{ $product->month() }} / month</p>
-                                      <div class="subscribe justify-center items-end">
-                                          <div class="flex flex-col gap-1">
-                                            <a href="#">Subscribe</a>
-                                            <span>Billed Annually</span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="card_monthly ">
-                                      <h3>Quarterly</h3>
-                                      <p class="text-center">${{ $product->quarter() }} / month</p>
-                                      <div class="subscribe justify-center items-end">
-                                          <div class="flex flex-col gap-1">
-                                            <a href="#">Subscribe</a>
-                                            <span>Billed Annually</span>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="card_monthly ">
-                                      <h3>Yearly</h3>
-                                      <p class="text-center">${{ $product->year() }} / month</p>
-                                      <div class="subscribe justify-center items-end">
-                                          <div class="flex flex-col gap-1">
-                                            <a href="#">Subscribe</a>
-                                            <span>Billed Annually</span>
-                                          </div>
-                                      </div>
-                                      <span class="best_value !h-6 !leading-5 !px-3 bg-active after:content-[''] after:absolute after:top-0 after:right-0 after:border-12 after:border-active after:!border-r-transparent after:translate-x-[100%]">BEST VALUE</span>
-                                  </div>
-                              </div>
+                              @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
                             @else
                               <div class="add_to_card_block">
                                   <a href="#"
