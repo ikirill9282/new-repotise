@@ -34,14 +34,14 @@ class StripeClient
   {
     $month = StripePrice::create([
       'product' => $stripe_product->id,
-      'unit_amount' => $product->getMonthSum() * 100, // cents!
+      'unit_amount' => $product->subprice->getMonthSum() * 100, // cents!
       'currency' => 'usd',
       'recurring' => ['interval' => 'month'],
     ]);
 
     $quarter = StripePrice::create([
       'product' => $stripe_product->id,
-      'unit_amount' => $product->getQuarterSum() * 100, // cents!
+      'unit_amount' => $product->subprice->getQuarterSum() * 100, // cents!
       'currency' => 'usd',
       'recurring' => [
         'interval' => 'month',
@@ -51,7 +51,7 @@ class StripeClient
 
     $year = StripePrice::create([
       'product' => $stripe_product->id,
-      'unit_amount' => $product->getYearSum() * 100, // cents!
+      'unit_amount' => $product->subprice->getYearSum() * 100, // cents!
       'currency' => 'usd',
       'recurring' => [
         'interval' => 'year',

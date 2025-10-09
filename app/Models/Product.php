@@ -42,14 +42,13 @@ class Product extends Model
     self::created(function($model) {
 
       // Push to Stripe
-      $stripe_client = new StripeClient();
+      // $stripe_client = new StripeClient();
       // $stripe_product = $stripe_client->createProduct($model);
 
       if ($model->subscription) {
         if (!$model->subprice()->exists()) {
           $model->subprice()->create();
         }
-
         // $stripe_client->createPrices($model, $stripe_product);
       }
     });
@@ -70,6 +69,15 @@ class Product extends Model
       $model->searchable();
       
     });
+  }
+
+  public function publishInStripe()
+  {
+    $stripe_client = new StripeClient();
+    $stripe_product = $stripe_client->createProduct($this);
+    if ($this->subscription) {
+      $stripe_client->createPrices($this, $stripe_product);
+    }
   }
 
   public function toSearchableArray(): array
