@@ -34,6 +34,7 @@ Route::prefix('/auth')
 
     Route::get('/google/callback', 'googleCallback');
     Route::get('/facebook/callback', 'facebookCallback');
+    Route::get('/facebook/callback/delete', 'facebookCallbackDelete');
     Route::get('/x/callback', 'xCallback');
   });
 

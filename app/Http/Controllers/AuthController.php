@@ -118,9 +118,9 @@ class AuthController extends Controller
       return redirect()->route('home');
     }
 
-    public function facebookCallback(Request $request)
+    public function googleCallbackDelete(Request $request)
     {
-      
+      return response()->json('OK');
     }
 
     public function xCallback(Request $request)
