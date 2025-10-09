@@ -14,8 +14,8 @@ class OrderProducts extends Model
       parent::boot();
 
       self::creating(function (Model $model) {
-        if (is_null($model->price_without_discount)) {
-          $model->price_without_discount = $model->price;
+        if (is_null($model->total_without_discount)) {
+          $model->total_without_discount = $model->price;
         }
       });
     }
@@ -35,8 +35,19 @@ class OrderProducts extends Model
       return $this->belongsTo(OrderProducts::class);
     }
 
+    public function getPrice()
+    {
+      return $this->price - $this->sale_price;
+    }
+
+    public function getPriceWithoutDiscount()
+    {
+      if ($this->getPrice() == $this->price) return null;
+
+      return $this->price;
+    }
     public function getTotal(): int
     {
-      return round($this->price * $this->count ?? 1, 2);
+      return round($this->getPrice() * $this->count ?? 1, 2);
     }
 }

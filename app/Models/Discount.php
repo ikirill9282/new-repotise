@@ -89,19 +89,6 @@ class Discount extends Model
       if ($this->limit == $this->attempts) {
         $this->update(['active' => 0]);
       }
-
-      // if ($this->type == 'promocode') {
-      //   if ($this->limit == 1) {
-      //     $this->update(['attempts' => 1, 'active' => 0]);
-      //   } else {
-      //     $this->increment('attempts');
-      //     if ($this->limit == $this->attempts) {}
-      //   }
-      // }
-
-      // if ($this->type == 'freeproduct') {
-      //   $this->update(['attempts' => 1, 'active' => 0]);
-      // }
     }
 
 

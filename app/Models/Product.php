@@ -5,10 +5,10 @@ namespace App\Models;
 use App\Helpers\Collapse;
 use App\Helpers\CustomEncrypt;
 use App\Helpers\Slug;
+use App\Services\StripeClient;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use App\Traits\HasMessages;
-use App\Traits\HasPrice;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -17,6 +17,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Laravel\Scout\Searchable;
 use Mews\Purifier\Facades\Purifier;
+
 
 class Product extends Model
 {
@@ -39,12 +40,17 @@ class Product extends Model
     });
 
     self::created(function($model) {
-      if ($model->subscription && !$model->subprice()->exists()) {
-        $model->subprice()->create([
-          'month' => 0,
-          'quarter' => 0,
-          'year' => 0,
-        ]);
+
+      // Push to Stripe
+      $stripe_client = new StripeClient();
+      $stripe_product = $stripe_client->createProduct($model);
+
+      if ($model->subscription) {
+        if (!$model->subprice()->exists()) {
+          $model->subprice()->create();
+        }
+
+        $stripe_client->createPrices($model, $stripe_product);
       }
     });
 
@@ -62,6 +68,7 @@ class Product extends Model
 
     self::updated(function($model) {
       $model->searchable();
+      
     });
   }
 
@@ -174,6 +181,21 @@ class Product extends Model
       : $this->getPrice();
 
     return round($res, 2);
+  }
+
+  public function getMonthSum()
+  {
+    return $this->month();
+  }
+
+  public function getQuarterSum()
+  {
+    return round($this->quarter() * 3, 2);
+  }
+
+  public function getYearSum()
+  {
+    return round($this->year() * 12, 2);
   }
 
   public function getText(): string

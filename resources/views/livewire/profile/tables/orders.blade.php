@@ -1,56 +1,78 @@
 <div>
-    {{-- @if(empty($this->data))
-      <div class="text-lg text-center">There are no sales yet.</div>
-    @else
-    @endif --}}
-
-
+  @if($user->orders->isNotEmpty())
     <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
-      <table class="table !mb-0 ">
-        <thead>
-          <tr class="">
-            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Date</th>
-            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Order</th>
-            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Product</th>
-            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Actions</th>
-            <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for($i = 0; $i < 10; $i++)
+
+        <table class="table !mb-0 ">
+          <thead>
             <tr class="">
-              <td class="bg-clip-content !px-0 !text-gray !border-light !rounded-tl-2xl !rounded-bl-2xl">
-                <div class="!p-3 rounded-tl-lg rounded-bl-lg ">05.28.2025</div>
-              </td>
-              <td class="bg-clip-content !px-0 !text-gray !border-light">
-                <div class="!p-3 ">#123454567</div>
-              </td>
-              <td class="bg-clip-content !px-0 !text-gray !border-light">
-                <div class="!p-3 flex justify-start items-start gap-3 group ">
-                  <div class="w-20 h-24 rounded overflow-hidden shrink-0">
-                    <img class="w-full h-full object-cover" src="http://localhost:9990/storage/images/product_2.jpg" alt="Image">
-                  </div>
-                  <x-link class="!border-0 group-has-[a]:!text-black text-nowrap">A Guide to Getting to Know North Korea</x-link>
-                </div>
-              </td>
-              <td class="bg-clip-content !px-0 text-nowrap !border-light">
-                <div class="!p-3 flex items-start justify-start gap-4 group ">
-                  <div class="flex">
-                    <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'product' })">View & Download</x-link>
-                  </div>
-                  <div class="flex flex-col items-start justify-start gap-2">
-                    <x-link class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Leave Review</x-link>
-                    <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'refund' })" class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Refund</x-link>
-                  </div>
-                </div>
-              </td>
-              <td class="bg-clip-content !px-0 !border-light !rounded-tr-2xl !rounded-br-2xl">
-                <div class="!p-3 ">$50.00</div>
-              </td>
+              <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Date</th>
+              <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Order</th>
+              <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Product</th>
+              <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Actions</th>
+              <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Price</th>
             </tr>
-          @endfor
-        </tbody>
-        <tfoot></tfoot>
-      </table>
+          </thead>
+          <tbody>
+            @foreach($user->orders as $order)
+              @foreach ($order->order_products as $order_product)
+                <tr class="">
+                  <td class="bg-clip-content !px-0 !text-gray !border-light !rounded-tl-2xl !rounded-bl-2xl">
+                    <div class="!p-3 rounded-tl-lg rounded-bl-lg ">{{ \Illuminate\Support\Carbon::parse($order->created_at)->format('d.m.Y') }}</div>
+                  </td>
+                  <td class="bg-clip-content !px-0 !text-gray !border-light">
+                    <div class="!p-3 ">#{{ $order->id }}</div>
+                  </td>
+                  <td class="bg-clip-content !px-0 !text-gray !border-light">
+                    <div class="!p-3 flex justify-start items-start gap-3 group ">
+                      <div class="w-20 h-24 rounded overflow-hidden shrink-0">
+                        <img class="w-full h-full object-cover" src="{{ $order_product->product->preview->image }}" alt="Image">
+                      </div>
+                      <x-link 
+                        href="{{ $order_product->product->makeUrl() }}" 
+                        class="!border-0 group-has-[a]:!text-black text-nowrap"
+                        >
+                          {{ $order_product->product->title }}
+                        </x-link>
+                    </div>
+                  </td>
+                  <td class="bg-clip-content !px-0 text-nowrap !border-light">
+                    <div class="!p-3 flex items-start justify-start gap-4 group ">
+                      @if($order->status_id == \App\Enums\Order::COMPLETE)
+                        <div class="flex group">
+                          <x-link class="group-has-[a]:!text-active" wire:click.prevent="$dispatch('openModal', { modalName: 'product' })">View & Download</x-link>
+                        </div>
+                        <div class="flex flex-col items-start justify-start gap-2">
+                          @if ($user->canWriteReview($order_product->product))
+                            <x-link class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Leave Review</x-link>
+                          @endif
+                          <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'refund' })" class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Refund</x-link>
+                        </div>
+                      @else
+                        <div class="flex group opacity-0">View & Download</div>
+                        <div class="flex flex-col items-start justify-start gap-2">
+                          <x-link wire:click.prevent="moveCheckout('{{ \Illuminate\Support\Facades\Crypt::encrypt($order->id) }}')" class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Complete payment</x-link>
+                        </div>
+                      @endif
+                    </div>
+                  </td>
+                  <td class="bg-clip-content !px-0 !border-light !rounded-tr-2xl !rounded-br-2xl">
+                    <div class="!p-3">{{ currency($order_product->getPrice()) }}</div>
+                  </td>
+                </tr>
+              @endforeach
+            @endforeach
+          </tbody>
+          <tfoot></tfoot>
+        </table>
+
     </div>
+
+  @else
+
+    <div class="text-center">
+      You haven't placed any orders yet. <x-link href="{{ route('products') }}">Discover your advanture now!</x-link>
+    </div>
+
+  @endif
+
 </div>

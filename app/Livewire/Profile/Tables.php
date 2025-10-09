@@ -12,16 +12,19 @@ class Tables extends Component
 
     public $sortable = false;
     public $sorting = null;
+    public $args = [];
 
     public function mount(
       array $tables = [], 
       ?string $active = null, 
-      ?string $sortable = null
+      ?string $sortable = null,
+      ?array $args = [],
     )
     {
       $this->tables = $tables;
       $this->activeTable = $active;
       $this->sortable = $sortable ?? false;
+      $this->args = $args;
     }
 
     public function setActive(string $name)

@@ -26,6 +26,7 @@ use App\Models\MailLog;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use App\Models\News;
+use Database\Factories\ProductFactory;
 use Illuminate\Support\Facades\Crypt;
 use Mews\Purifier\Facades\Purifier;
 
@@ -34,8 +35,7 @@ Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $t = Crypt::encrypt(1);
-  dd(urlencode($t));
+  Product::factory(1)->create();
 });
 
 Artisan::command('ttm', function() {
@@ -52,25 +52,6 @@ Artisan::command('rl_stripe', function() {
     $item->delete();
   }
 });
-
-  // "id" => "vs_1RWx7vFkz2A7XNTilUfYxhop"
-  // "object" => "identity.verification_session"
-  // "client_reference_id" => null
-  // "client_secret" => "vs_1RWx7vFkz2A7XNTilUfYxhop_secret_test_YWNjdF8xUjRrU2NGa3oyQTdYTlRpLF9TUnFwOEdCTU9HZ2x2R2liSDJaWWtIM0pBcUtiQUxK0100JgDIth0G"
-  // "created" => 1749204235
-  // "last_error" => null
-  // "last_verification_report" => null
-  // "livemode" => false
-  // "metadata" => array:1 [
-  //   "user_id" => "1"
-  // ]
-  // "options" => []
-  // "redaction" => null
-  // "related_customer" => null
-  // "status" => "requires_input"
-  // "type" => "document"
-  // "url" => "https://verify.stripe.com/start/test_YWNjdF8xUjRrU2NGa3oyQTdYTlRpLF9TUnFwOEdCTU9HZ2x2R2liSDJaWWtIM0pBcUtiQUxK0100JgDIth0G"
-
 
 Artisan::command('rl_index', function() {
   Artisan::call('scout:flush', ['model' => Product::class]);

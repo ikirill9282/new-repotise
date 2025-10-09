@@ -8,6 +8,6 @@ class Order extends Component
 {
     public function render()
     {
-        return view('livewire.modals.order');
+      return view('livewire.modals.order');
     }
 }

@@ -108,6 +108,7 @@ class AuthController extends Controller
       
       if (!$user) {
         $user = User::create(['email' => $google_user->email]);
+        $user->sendVerificationCode();
         History::userCreated($user);
       }
 

@@ -70,7 +70,7 @@ class Order extends Model
     public function products()
     {
       return $this->belongsToMany(Product::class, OrderProducts::class, 'order_id', 'product_id', 'id', 'id')
-        ->withPivot(['count', 'price', 'old_price', 'seller_reward']);
+        ->withPivot(['count', 'price', 'sale_price', 'seller_reward']);
     }
 
     public function order_products()
@@ -106,11 +106,22 @@ class Order extends Model
       $this->setPaymentId($transaction->id);
     }
 
+
+    public function getCosts()
+    {
+      return [
+        'subtotal' => number_format($this->getAmount()),
+        'discount' => number_format($this->getDiscount()),
+        'tax' => number_format($this->getTax()),
+        'total' => number_format($this->getTotal()),
+      ];
+    }
+
     public function getAmount(): int
     {
       return $this->prepare 
         ? $this->products->reduce(function($c, $i) {
-          return $c += ($i->pivot['price'] * ($i->pivot['count'] ?? 1));
+          return $c += (($i->pivot['price'] - $i->pivot['sale_price']) * ($i->pivot['count'] ?? 1));
         }, 0)
         : $this->order_products->reduce(fn($c, $i) => $c += $i->getTotal(), 0);
     }
@@ -122,24 +133,12 @@ class Order extends Model
 
     public function getTax(): int
     {
-      // $amount = $this->getAmount() - $this->getDiscount();
-      // return static::calcPercent($amount, static::$tax);
       return 0;
     }
 
     public function getTotal(): int
     {
       return $this->getAmount() - $this->getDiscount() + $this->getTax();
-    }
-
-    public function getCosts()
-    {
-      return [
-        'subtotal' => number_format($this->getAmount()),
-        'discount' => number_format($this->getDiscount()),
-        'tax' => number_format($this->getTax()),
-        'total' => number_format($this->getTotal()),
-      ];
     }
 
     public static function calcPercent(int $price, int $percent): int
@@ -168,7 +167,7 @@ class Order extends Model
           $product->pivot = [
             'count' => $item['count'],
             'price' => $product->price,
-            'old_price' => $product->old_price,
+            'sale_price' => $product->sale_price,
           ];
           return $product;
         }, $cart->getProducts());
@@ -207,7 +206,7 @@ class Order extends Model
         'product_id' => $item->id, 
         'count' => $item->pivot['count'], 
         'price' => $item->pivot['price'],
-        'old_price' => $item->pivot['old_price'],
+        'sale_price' => $item->pivot['sale_price'],
         'total' => $item->pivot['price'] * ($item->pivot['count'] ?? 1),
         'total_without_discount' => $item->pivot['price'] * ($item->pivot['count'] ?? 1),
       ])

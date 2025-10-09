@@ -61,13 +61,5 @@ class GallerySeeder extends Seeder
           ]);
         }
       }
-
-      // foreach (News::all() as $news_item) {
-      //   $news_item->gallery()->firstOrCreate([
-      //     'image' => '/storage/images/img_articles.png',
-      //     'preview' => 1,
-      //     'type' => 'news',
-      //   ]);
-      // }
     }
 }

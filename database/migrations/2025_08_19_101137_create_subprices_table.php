@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('subprices', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('product_id')->unsigned()->unique();
-            $table->decimal('month');
-            $table->decimal('quarter');
-            $table->decimal('year');
+            $table->decimal('month')->default(0);
+            $table->decimal('quarter')->default(0);
+            $table->decimal('year')->default(0);
+            $table->json('stripe_data')->nullable();
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');

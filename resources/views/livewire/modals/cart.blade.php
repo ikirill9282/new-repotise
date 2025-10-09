@@ -88,20 +88,20 @@
             <div class="costs pt-4">
                 <div class="text_cost">
                     <span>Subtotal</span>
-                    <h4>$<span class="cart-subtotal">{{ number_format($order->getAmount()) }}</span></h4>
+                    <h4><span class="cart-subtotal">{{ currency($order->getAmount()) }}</span></h4>
                 </div>
                 <div class="text_cost">
                     <span>Discount</span>
-                    <h4 class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-$<span
-                            class="cart-discount">{{ number_format($order->getDiscount()) }}</span></h4>
+                    <h4 class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-<span
+                            class="cart-discount">{{ currency($order->getDiscount()) }}</span></h4>
                 </div>
                 <div class="text_cost">
                     <span>Tax</span>
-                    <h4 class="color_red">$<span class="cart-tax">{{ number_format($order->getTax()) }}</span></h4>
+                    <h4 class="color_red"><span class="cart-tax">{{ currency($order->getTax()) }}</span></h4>
                 </div>
                 <div class="text_cost">
                     <h5>Total</h5>
-                    <h6>$<span class="cart-total">{{ number_format($order->getTotal()) }}</span></h6>
+                    <h6><span class="cart-total">{{ currency($order->getTotal()) }}</span></h6>
                 </div>
             </div>
             <a wire:click.prevent="moveCheckout" href="#" class="place_button inline-block">Place Order</a>

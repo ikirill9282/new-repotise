@@ -335,6 +335,7 @@
                         <div class="right_select">
                             <span>Sort by:</span>
                             <select>
+                                <option>Newest First</option>
                                 <option>Top Rated</option>
                                 <option>Price Ascending</option>
                                 <option>Price Descending</option>

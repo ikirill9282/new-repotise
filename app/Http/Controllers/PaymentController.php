@@ -18,7 +18,8 @@ use App\Mail\InviteByPurchase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use App\Jobs\ProcessOrder;
-use PhpParser\Node\Expr\Cast\Object_;
+use Stripe\PaymentMethod;
+
 
 class PaymentController extends Controller
 {

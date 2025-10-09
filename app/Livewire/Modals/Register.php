@@ -5,11 +5,6 @@ namespace App\Livewire\Modals;
 use App\Traits\HasForm;
 use Livewire\Component;
 use App\Models\User;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
-use App\Models\UserReferal;
-use App\Helpers\CustomEncrypt;
-use App\Helpers\SessionExpire;
 use App\Models\History;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -64,6 +59,16 @@ class Register extends Component
   public function googleAuth()
   {
     return redirect()->away(Socialite::driver('google')->redirect()->getTargetUrl());
+  }
+
+  public function fbAuth()
+  {
+    return redirect()->away(Socialite::driver('facebook')->redirect()->getTargetUrl());
+  }
+
+  public function xAuth()
+  {
+    return redirect()->away(Socialite::driver('x')->redirect()->getTargetUrl());
   }
 
   public function render()

@@ -23,6 +23,7 @@ return new class extends Migration
           $table->float('rating')->default(0);
           $table->integer('refund_policy')->default(90);
           $table->integer('views')->default(0);
+          $table->string('stripe_id')->nullable();
           $table->longText('text');
           $table->text('pp_text')->nullable();
 

@@ -517,14 +517,13 @@ class User extends Authenticatable implements HasName, FilamentUser
       return Auth::check();
     }
 
-    public function canWriteReview(Product $product, string $type = 'review'): bool
+    public function canWriteReview(Product $product): bool
     {
 
       $orders = Order::query()
         ->where('orders.status_id', '>=', 1)
         ->whereHas('order_products', fn($query) => $query->where('order_products.product_id', $product->id))
         ->where(fn($query) => $query->where('orders.user_id', $this->id)->orWhere('orders.recipient', $this->email))
-        // ->ddRawSql()
         ->get()
       ;
 

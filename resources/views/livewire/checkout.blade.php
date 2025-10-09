@@ -198,9 +198,9 @@
                               <h4><a href="{{ $product->makeUrl() }}">{{ $product->title }}</a>
                               </h4>
                               <h5>
-                                  {{ number_format($product->price) }}
-                                  @if (isset($product->old_price))
-                                      <span>${{ number_format($product->old_price) }}</span>
+                                  {{ currency($product->getPrice()) }}
+                                  @if (isset($product->sale_price))
+                                      <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
                                   @endif
                               </h5>
                           </div>

@@ -8,17 +8,9 @@ use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
 use App\Http\Middleware\StripeWebhook;
-use App\Jobs\CalcReward;
-use App\Jobs\PayReward;
 use Illuminate\Http\Request;
-use App\Mail\ConfirmRegitster;
-use App\Models\Discount;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use App\Jobs\ProcessOrder;
-use App\Models\Order;
 use App\Http\Controllers\StripeController;
 
 require __DIR__ . '/api.php';
@@ -46,6 +38,9 @@ Route::prefix('/auth')
   });
 
 Route::middleware('auth:web')->group(function() {
+
+  Route::get('/products/subscribe', [PaymentController::class, 'subscribe']);
+
   Route::get('/profile', [CabinetController::class, 'profile'])->name('profile');
   Route::get('/profile/verify', [CabinetController::class, 'verify'])->name('verify');
   Route::post('/profile/verify', [CabinetController::class, 'verificate']);
@@ -72,7 +67,7 @@ Route::middleware('auth:web')->group(function() {
 // Public Profile
 Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
 
-
+// Stripe Hooks
 Route::post('/hook/stripe', [StripeController::class, 'hook'])
   ->middleware(StripeWebhook::class)
   ->withoutMiddleware([VerifyCsrfToken::class]);;

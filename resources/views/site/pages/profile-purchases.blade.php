@@ -9,6 +9,9 @@
             
             @livewire('profile.tables', [
               'active' => 'orders',
+              'args' => [
+                'user_id' => \Illuminate\Support\Facades\Crypt::encrypt($user->id),
+              ],
               'tables' => [
                 [
                   'name' => "orders",
@@ -18,7 +21,7 @@
                   'name' => 'subs',
                   'title' => "Subscriptions",
                 ],
-              ]
+              ],
             ])
         </div>
     </x-profile.wrap>

@@ -5,10 +5,6 @@ namespace App\Services;
 use App\Helpers\SessionExpire;
 use Illuminate\Support\Collection;
 use App\Models\Product;
-use App\Models\Promocode;
-use App\Models\Order;
-use Laravel\Cashier\Cashier;
-use Illuminate\Support\Facades\Auth;
 
 class Cart
 {
@@ -31,6 +27,26 @@ class Cart
   public function flushCart()
   {
     $this->updateCart($this->template);
+  }
+
+  public function addProduct(int $product_id, int $count = 1)
+  {
+    if (!isset($this->cart['products'])) $this->cart['products'] = [];
+
+    if ($this->inCart($product_id)) {
+      foreach($this->cart['products'] as &$product) {
+        if ($product['id'] == $product_id) {
+          $product['count'] = $product['count'] + $count;
+        }
+      }
+    } else {
+      $this->cart['products'][] = [
+        'id' => $product_id,
+        'count' => $count,
+      ];
+    }
+
+    $this->updateCart($this->cart);
   }
 
   public function getCart()

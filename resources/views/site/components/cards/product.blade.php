@@ -13,7 +13,7 @@
                     href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
             </h4>
             <h5>
-              <span>{{ currency($model->getPrice()) }}</span>
+              <div class="text-sm">{{ currency($model->getPrice()) }}</div>
               <span>{{ currency($model->getPriceWithoutDiscount()) }}</span>
             </h5>
         </div>

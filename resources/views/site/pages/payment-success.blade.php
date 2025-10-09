@@ -78,9 +78,16 @@
                                   <div class="description_orders">
                                       <div class="title_description">
                                           <h4><a href="{{ $product->makeUrl() }}" class="link-black">{{ $product->title }} x {{ $product->pivot->count }}</a></h4>
-                                          <h5>${{ $product->price }} <span>${{ $product->old_price }}</span></h5>
+                                          <h5>{{ currency($product->getPrice()) }} <span>{{ currency($product->getPriceWithoutDiscount()) }}</span></h5>
                                       </div>
-                                      <p>{{ $product->type->title }}, {{ $product->location->title }}</p>
+                                      <p>
+                                        @foreach($product->types as $type)
+                                          {{ $type->title }}, 
+                                        @endforeach
+                                        @foreach($product->locations as $location)
+                                          {{ $location->title }},
+                                        @endforeach
+                                      </p>
                                   </div>
                               </div>
                             @endforeach
