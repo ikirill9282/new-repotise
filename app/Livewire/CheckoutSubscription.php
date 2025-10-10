@@ -35,7 +35,7 @@ class CheckoutSubscription extends Component
       try {
         $price_id = $order_product->product->subprice->getPeriodId($order->sub_period);
         $sub_name = 'plan_' . $order->sub_period . '_' . $order_product->product->id;
-        $order->user->newSubscription($sub_name, '123')->create($intent['payment_method']);
+        $order->user->newSubscription($sub_name, $price_id)->create($intent['payment_method']);
       } catch (\Exception $e) {
         $this->dispatch('toastError', ['message' => 'Something went wrong ... Please contact with administration!']);
         Log::critical('Subscription error', [
