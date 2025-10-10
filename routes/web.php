@@ -68,9 +68,9 @@ Route::middleware('auth:web')->group(function() {
 Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
 
 // Stripe Hooks
-// Route::post('/hook/stripe', [StripeController::class, 'hook'])
-//   ->middleware(StripeWebhook::class)
-//   ->withoutMiddleware([VerifyCsrfToken::class]);
+Route::post('/hook/stripe', [StripeController::class, 'hook'])
+  ->middleware(StripeWebhook::class)
+  ->withoutMiddleware([VerifyCsrfToken::class]);
 
 
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('checkout');
@@ -110,8 +110,8 @@ Route::get('/test', function() {
   // $job->handle();
 });
 
-Route::post('/hook/stripe', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook')
-  ->middleware(StripeWebhook::class)
-  ->withoutMiddleware([VerifyCsrfToken::class]);
+// Route::post('/hook/stripe', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook')
+//   ->middleware(StripeWebhook::class)
+//   ->withoutMiddleware([VerifyCsrfToken::class]);
 
 Route::fallback(FallbackController::class);
