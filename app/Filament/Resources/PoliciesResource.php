@@ -34,7 +34,7 @@ class PoliciesResource extends Resource
                   ,
                 RichEditor::make('content')
                   ->disableToolbarButtons([
-                    'attachFile',
+                    'attachFiles',
                   ])
                   ->columnSpanFull()
                   ,
