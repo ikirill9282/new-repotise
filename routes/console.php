@@ -38,8 +38,9 @@ Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $client = new StripeClient();
-  $client->createPaymentIntent(Order::find(100211));
+  Product::find(98)->publishInStripe();
+  // $client = new StripeClient();
+  // $client->createPaymentIntent(Order::find(100211));
 });
 
 Artisan::command('ttm', function() {
