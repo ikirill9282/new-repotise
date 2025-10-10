@@ -44,6 +44,8 @@ class CheckoutSubscription extends Component
     public function render()
     {
       $order = $this->getOrder();
+      $pm = $order->user->paymentMethods();
+      dd($pm);
       return view('livewire.checkout-subscription', [
         'order' => $this->getOrder(),
         'intent' => $order->user->createSetupIntent(),
