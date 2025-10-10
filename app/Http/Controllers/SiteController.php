@@ -21,6 +21,7 @@ use App\Models\Country;
 use App\Models\Language;
 use Illuminate\Support\ItemNotFoundException;
 use App\Models\Order;
+use App\Models\Policies;
 use App\Services\Cart;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
@@ -249,17 +250,21 @@ class SiteController extends Controller
     ]);
   }
 
-  public function policies(Request $request, ?string $slug = null)
+  public function allPolicies(Request $request)
   {
-    $page = Page::where('slug', ($slug ?? 'all-policies'))
-      ->with('config')
-      ->first();
+    return view('site.pages.policies-all', [
+      'models' => Policies::select('title', 'slug')->get(),
+    ]);
+  }
 
-    if (is_null($page)) {
-      return (new FallbackController())($request);
+  public function policies(Request $request, string $slug)
+  {
+    if (is_null($slug)) {
+      
+    } else {
     }
-
-    return view('site.pages.custom-page', ['page' => $page]);
+    $content = Policies::where('slug', $slug)->first()?->content ?? '';
+    return view('site.pages.policies', ['content' => $content]);
   }
 
   public function product(Request $request, string $product)

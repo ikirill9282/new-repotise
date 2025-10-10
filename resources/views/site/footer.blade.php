@@ -29,7 +29,7 @@
                         <li><a href="{{ url('/policies/terms-and-conditions') }}">Terms and Conditions</a></li>
                         <li><a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a></li>
                         <li><a href="{{ url('/policies/cookie-policy') }}">Cookie Policy</a></li>
-                        <li><a href="{{ url('/policies') }}">More Policies</a></li>
+                        <li><a href="{{ url('/policies-all') }}">More Policies</a></li>
                     </ul>
                 </div>
                 <div x-data="{}" class="group mb-4 md:mb-0">
@@ -66,7 +66,7 @@
                 <li><a href="{{ url('/policies/terms-and-conditions') }}">Terms and Conditions</a></li>
                 <li><a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a></li>
                 <li><a href="{{ url('/policies/cookie-policy') }}">Cookie Policy</a></li>
-                <li><a href="{{ url('/policies') }}">More Policies</a></li>
+                <li><a href="{{ url('/policies-all') }}">More Policies</a></li>
             </ul>
         </nav>
 

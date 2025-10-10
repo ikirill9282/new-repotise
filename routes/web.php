@@ -88,7 +88,7 @@ Route::get('/insights/{article}', [SiteController::class, 'feed'])->name('feed')
 
 Route::get('/creators', [SiteController::class, 'creators'])->name('creators');
 
-Route::get('/policies', [SiteController::class, 'policies'])->name('policies');
+Route::get('/policies-all', [SiteController::class, 'allPolicies'])->name('policies');
 Route::get('/policies/{slug}', [SiteController::class, 'policies']);
 
 Route::get('/products', [SiteController::class, 'products'])->name('products');
