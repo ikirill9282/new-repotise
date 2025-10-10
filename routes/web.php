@@ -110,6 +110,8 @@ Route::get('/test', function() {
   // $job->handle();
 });
 
-Route::post('/hook/stripe', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');
+Route::post('/hook/stripe', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook')
+  ->middleware(StripeWebhook::class)
+  ->withoutMiddleware([VerifyCsrfToken::class]);
 
 Route::fallback(FallbackController::class);
