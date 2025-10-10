@@ -38,11 +38,21 @@ class ProductSubscribe extends Component
         'quarter' => $product->subprice->getQuarterSumWithoutDiscount(),
         'year' => $product->subprice->getYearSumWithoutDiscount(),
       };
+      $discount = match($period) {
+        'month' => round(($product->getPrice() / 100 * $product->subprice->month), 2),
+        'quarter' => round(($product->getPrice() / 100 * $product->subprice->quarter), 2),
+        'year' => round(($product->getPrice() / 100 * $product->subprice->year), 2),
+      };
+
+      // TODO: add discounts result
+      dd($discount);
 
       $order = new Order();
       $order->user_id = Auth::user()?->id;
       $order->status_id = EnumsOrder::NEW;
       $order->cost = $cost;
+      $order->sub = 1;
+      $order->sub_period = $period;
       $order->cost_without_discount = $costWithoutDiscount;
       $order->cost_without_tax = $costWithoutDiscount;
       $order->save();
@@ -58,7 +68,7 @@ class ProductSubscribe extends Component
       ]);
 
       Session::put('checkout', $order->id);
-      return redirect()->route('checkout');
+      return redirect()->route('checkout.subscription');
     }
 
     public function getProduct(): ?Product

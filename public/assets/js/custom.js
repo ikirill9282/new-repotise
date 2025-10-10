@@ -1137,6 +1137,7 @@ $(document).ready(function() {
       icon: 'success',
       heading: 'Success',
       position: 'top-right',
+      hideAfter: 5000,
     });
   });
 
@@ -1147,6 +1148,7 @@ $(document).ready(function() {
       icon: 'error',
       heading: 'Error',
       position: 'top-right',
+      hideAfter: 5000,
     });
   });
 });

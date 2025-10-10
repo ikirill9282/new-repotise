@@ -48,7 +48,6 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/verify/complete', [CabinetController::class, 'verifyComplete']);
   Route::get('/profile/verify/cancel', [CabinetController::class, 'verifyCancel']);
   Route::get('/profile/checkout', [CabinetController::class, 'checkout'])->name('profile.checkout');
-  
 
   Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('profile.purchases');
   Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
@@ -69,12 +68,13 @@ Route::middleware('auth:web')->group(function() {
 Route::get('/profile/@{slug}', [CabinetController::class, 'public_profile'])->name('view.profile');
 
 // Stripe Hooks
-Route::post('/hook/stripe', [StripeController::class, 'hook'])
-  ->middleware(StripeWebhook::class)
-  ->withoutMiddleware([VerifyCsrfToken::class]);;
+// Route::post('/hook/stripe', [StripeController::class, 'hook'])
+//   ->middleware(StripeWebhook::class)
+//   ->withoutMiddleware([VerifyCsrfToken::class]);;
 
 
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('checkout');
+Route::get('/payment/checkout-subscription', [PaymentController::class, 'checkoutSubscription'])->name('checkout.subscription');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment-success');
 Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment-error');
 
@@ -110,6 +110,6 @@ Route::get('/test', function() {
   // $job->handle();
 });
 
-Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');
+Route::post('/hook/stripe', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');
 
 Route::fallback(FallbackController::class);

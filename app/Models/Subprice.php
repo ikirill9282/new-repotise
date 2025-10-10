@@ -119,6 +119,16 @@ class Subprice extends Model
     return $this->stripe_data['year'];
   }
 
+  public function getPeriodId(string $period): ?string
+  {
+    return match($period) {
+      'month' => $this->getMonthId(),
+      'quarter' => $this->getQuarterId(),
+      'year' => $this->getYearId(),
+      default => null,
+    };
+  }
+
   public function getPrice(): float
   {
     return $this->product->getPrice();

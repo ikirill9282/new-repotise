@@ -11,6 +11,7 @@ use Laravel\Cashier\Cashier;
 use Stripe\PaymentIntent;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\ProcessOrder;
+use App\Services\StripeClient;
 use App\Traits\HasAuthor;
 use Illuminate\Support\Facades\DB;
 
@@ -27,24 +28,10 @@ class Order extends Model
       parent::booted();
 
       static::creating(function($model) {
-        $ephemeralKey = Cashier::stripe()->ephemeralKeys->create(
-          ['customer' => $model->user->asStripeCustomer()->id],
-          ['stripe_version' => '2022-11-15']
-        );
-        $transaction = Cashier::stripe()->paymentIntents->create([
-          'amount' => ($model->cost * 100),
-          'currency' => 'usd',
-          'automatic_payment_methods' => ['enabled' => true],
-          'customer' => $model->user->asStripeCustomer()->id,
-          // 'payment_method_types' => ['card'],
-          'metadata' => [
-            'initiator' => ($model->user?->id ?? 0 == 0) ? 'system' : 'customer',
-            'inititator_id' => $model->user?->id ?? 0,
-            'ephermal' => $ephemeralKey->secret,
-            'type' => 'order',
-          ],
-        ]);
-        $model->payment_id = $transaction->id;
+        if (!$model->sub) {
+          $stripeClient = new StripeClient();
+          $stripeClient->createPaymentIntent($model);
+        }
       });
 
       static::created(function($model) {

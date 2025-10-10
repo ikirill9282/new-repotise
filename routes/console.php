@@ -26,6 +26,7 @@ use App\Models\MailLog;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use App\Models\News;
+use App\Services\StripeClient;
 use Database\Factories\ProductFactory;
 use Illuminate\Support\Facades\Crypt;
 use Mews\Purifier\Facades\Purifier;
@@ -37,8 +38,8 @@ Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $product = Product::find(99);
-  $product->publishInStripe();
+  $client = new StripeClient();
+  $client->createPaymentIntent(Order::find(100211));
 });
 
 Artisan::command('ttm', function() {

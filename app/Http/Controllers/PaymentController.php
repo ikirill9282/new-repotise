@@ -80,4 +80,18 @@ class PaymentController extends Controller
       'page' => Page::where('slug', 'payment-error')->with('config')->first(),
     ]);
   }
+
+
+  public function checkoutSubscription(Request $request)
+  {
+    if (!Session::exists('checkout') || empty(Session::get('checkout'))) {
+      return redirect('/products');
+    }
+
+    $order = Order::find(Session::get('checkout'));
+    
+    return view("site.pages.checkout-subscription", [
+      'order' => $order,
+    ]);
+  }
 }

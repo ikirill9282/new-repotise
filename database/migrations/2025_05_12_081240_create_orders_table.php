@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('tax', 10, 2)->default(0);
             $table->decimal('cost_without_discount', 10, 2);
             $table->decimal('cost_without_tax', 10, 2);
+            $table->tinyInteger('sub')->default(0);
+            $table->string('sub_period')->nullable();
             $table->decimal('stripe_fee')->nullable();
             $table->decimal('base_reward')->nullable();
             $table->decimal('seller_reward')->nullable();
