@@ -6,6 +6,7 @@ use Livewire\Attributes\On;
 use App\Models\Order;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\Component;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutSubscription extends Component
 {
@@ -31,14 +32,18 @@ class CheckoutSubscription extends Component
       $order_product = $order->order_products->first();
       $order->user->addPaymentMethod($intent['payment_method']);
 
-      $price_id = $order_product->product->subprice->getPeriodId($order->sub_period);
-      if (!$price_id) {
+      try {
+        $price_id = $order_product->product->subprice->getPeriodId($order->sub_period);
+        $sub_name = 'plan_' . $order->sub_period . '_' . $order_product->product->id;
+        $order->user->newSubscription($sub_name, '123')->create($intent['payment_method']);
+      } catch (\Exception $e) {
         $this->dispatch('toastError', ['message' => 'Something went wrong ... Please contact with administration!']);
+        Log::critical('Subscription error', [
+          'order' => $order,
+          'error' => $e,
+        ]);
         return ;
       }
-
-      $sub_name = 'plan_' . $order->sub_period . '_' . $order_product->product->id;
-      $order->user->newSubscription($sub_name, '123')->create($intent['payment_method']);
     }
 
     public function render()
