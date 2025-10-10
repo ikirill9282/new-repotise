@@ -45,7 +45,7 @@ class ProductSubscribe extends Component
       };
 
       // TODO: add discounts result
-      dd($discount);
+      // dd($discount);
 
       $order = new Order();
       $order->user_id = Auth::user()?->id;
