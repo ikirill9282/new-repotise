@@ -34,6 +34,7 @@ class StripeClient
         'type' => 'order',
       ],
     ]);
+    dd($model);
     $model->update(['payment_id' => $transaction->id]);
   }
 
