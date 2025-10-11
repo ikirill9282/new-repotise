@@ -36,7 +36,7 @@ class Order extends Model
 
       static::created(function($model) {
         if (!$model->sub) {
-          Cashier::stripe()->paymentIntents->update($model->payment_id, ['metadata' => ['id' => $model->id]]);
+          // Cashier::stripe()->paymentIntents->update($model->payment_id, ['metadata' => ['id' => $model->id]]);
         }
       });
 
