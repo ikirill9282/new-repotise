@@ -34,8 +34,7 @@ class StripeClient
         'type' => 'order',
       ],
     ]);
-    dd($model, $transaction);
-    $model->update(['payment_id' => $transaction->id]);
+    $model->payment_id = $transaction->id;
   }
 
   public function createProduct(Product $model): StripeProduct
