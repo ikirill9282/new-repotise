@@ -38,7 +38,7 @@ Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  Product::find(100)->publishInStripe();
+  Product::find(99)->publishInStripe();
 });
 
 Artisan::command('ttm', function() {
