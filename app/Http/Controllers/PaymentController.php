@@ -74,6 +74,11 @@ class PaymentController extends Controller
     ]);
   }
 
+  public function subscriptionSuccess(Request $request)
+  {
+    
+  }
+
   public function error(Request $request)
   {
     return view('site.pages.payment-error', [

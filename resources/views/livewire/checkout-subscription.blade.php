@@ -13,6 +13,32 @@
               <div class="about_block !items-stretch">
                 <div class="left_form">
                     <div>
+                        <div class="!mb-3">
+                          <x-form.input wire:model="form.username" name="username" placeholder="Your Full Name" />
+                        </div>
+                        <div class="!mb-6">
+                          <x-form.input wire:model="form.email" name="email" type="email" placeholder="Your Email" />
+                        </div>
+
+                        @if (!is_null($paymentMethods) && !$paymentMethods->isEmpty())
+                          <div class="!mb-6">
+                            @foreach($paymentMethods as $pm)
+                              @if($pm->type == 'card')
+                                <div class="">
+                                  <x-form.payment-method
+                                    wire:model="form.paymentMethod"
+                                    label="Card" 
+                                    :brand="ucfirst($pm->card->brand)"
+                                    :last4="$pm->card->last4"
+                                    :editor="false"
+                                    :value="$pm->id"
+                                  />
+                                </div>
+                              @endif
+                            @endforeach
+                          </div>
+                        @endif
+
                         <div class="@if($order->cost <= 0) hidden @endif">
                           <div wire:ignore>
                               <div id="payment" class="mb-4"></div>
@@ -72,12 +98,12 @@
                         <div class="item">
                             <img src="{{ url($order_product->product->preview->image) }}" alt="Product Preview" class="order_img">
                           <div class="description_orders">
-                          <div class="flex justify-start items-start flex-col !gap-2 !mb-2">
+                          <div class="flex justify-start items-start flex-col !gap-1 !mb-2">
                               <h4 class="!text-base group">
                                 <x-link class="!border-none group-has-[a]:!text-black" target="_blank" href="{{ $order_product->product->makeUrl() }}">{{ $order_product->product->title }}</x-link>
                               </h4>
-                              <h5 class="flex justify-end items-center !gap-3 !text-sm">
-                                <span>{{ currency($order_product->total) }}</span>
+                              <h5 class="flex justify-end items-center !gap-1 !text-sm">
+                                <span>{{ currency($order_product->product->subprice->getPeriodPrice($order->sub_period)) }}</span>
                                 <span>per {{ $order->sub_period }}</span>
                               </h5>
                           </div>
@@ -114,15 +140,24 @@
       const btn = document.getElementById('payment-btn');
       btn.addEventListener('click', async (evt) => {
         evt.preventDefault();
-        const { error, setupIntent } = await stripe.confirmSetup({
-          elements,
-          redirect: 'if_required',
+        $wire.checkValidtion().then(async response => {
+          if (response) {
+            if (response.action === 'create') {
+              const { error, setupIntent } = await stripe.confirmSetup({
+                elements,
+                redirect: 'if_required',
+              });
+              
+              if (error) {
+                $wire.dispatch('toastError', [{message: error.message}]);
+              } else {
+                $wire.dispatch('makeSubscription', { pm_id: setupIntent.id });
+              }
+            } else {
+              $wire.dispatch('makeSubscription', { pm_id: response.action });
+            }
+          }
         });
-        if (error) {
-          $wire.dispatch('toastError', [{message: error.message}]);
-        } else {
-          $wire.dispatch('makeSubscription', { intent: setupIntent });
-        }
       });
       
 

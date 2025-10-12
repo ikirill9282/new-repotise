@@ -1,12 +1,8 @@
 <div>
-    {{-- @if(empty($this->data))
-      <div class="text-lg text-center">There are no sales yet.</div>
-    @else
-    @endif --}}
 
-
+    @if($subs?->isNotEmpty())
     <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
-      
+
       <table class="table !mb-0">
         <thead>
           <tr class="">
@@ -18,40 +14,55 @@
           </tr>
         </thead>
         <tbody>
-          @for($i = 0; $i < 10; $i++)
+          @foreach($subs as $sub)
+            @php
+              $product = $sub->order_products->first();
+              $paymentMethodId = $sub->getTransaction()->payment_method;
+              $paymentMethod = $sub->user->findPaymentMethod($paymentMethodId);
+            @endphp
             <tr>
               <td class="!border-none bg-clip-content !px-0 !text-gray !rounded-tl-2xl !rounded-bl-2xl">
                 <div class="!p-3 flex justify-start items-start gap-3 group">
                   <div class="w-20 h-24 rounded overflow-hidden shrink-0">
-                    <img class="w-full h-full object-cover" src="http://localhost:9990/storage/images/product_2.jpg" alt="Image">
+                    <img class="w-full h-full object-cover" src="{{ $product->product->preview->image }}" alt="Image">
                   </div>
-                  <x-link class="!border-0 group-has-[a]:!text-black text-nowrap">A Guide to Getting to Know North Korea</x-link>
+                  <x-link class="!border-0 group-has-[a]:!text-black text-nowrap">{{ $product->product->title }}</x-link>
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 !text-gray">
                 <div class="!p-3 ">
-                  05.28.2025
+                  {{ \Illuminate\Support\Carbon::parse($sub->created_at)->format('d.m.Y') }}
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 !text-gray">
                 <div class="!p-3 ">
-                  Visa **** 1234
+                  @if($paymentMethod->type == 'card')
+                    {{ ucfirst($paymentMethod->card->brand) }} **** {{ $paymentMethod->card->last4 }}
+                  @endif
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 ">
                 <div class="!p-3 ">
-                  $50.00/month
+                  {{ currency($product->total) }}/{{ $sub->sub_period }}
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 text-nowrap !rounded-tr-2xl !rounded-br-2xl">
                 <div class="!p-3 ">
-                  <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'cancelsub' })" class="group-has-[a]:hover:!text-black">Cancel Subscription</x-link>
+                  @if(!$sub->user->subscription($sub->getSubscriptionType())->asStripeSubscription()->cancel_at_period_end)
+                    <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'cancelsub', args: { order_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}' } })" class="group-has-[a]:hover:!text-black">Cancel Subscription</x-link>
+                  @endif
                 </div>
               </td>
             </tr>
-          @endfor
+          @endforeach
         </tbody>
         <tfoot></tfoot>
       </table>
     </div>
+    @else
+
+      <div class="text-center !py-10">
+        You haven't placed any subscriptions yet. <x-link href="{{ route('products') }}">Discover your advanture now!</x-link>
+      </div>
+    @endif
 </div>

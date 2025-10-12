@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
         UserOptionSeeder::class,
         CountrySeeder::class,
         LanguageSeeder::class,
+        PolicySeeder::class,
 
         MeilisearchSeeder::class,
       ]);

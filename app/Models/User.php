@@ -28,6 +28,7 @@ use App\Events\MailReset;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Cashier;
 use App\Helpers\CustomEncrypt;
+use App\Mail\Password;
 use App\Traits\HasGallery;
 use Stripe\Identity\VerificationSession;
 use Illuminate\Support\Facades\Session;
@@ -63,7 +64,7 @@ class User extends Authenticatable implements HasName, FilamentUser
       parent::boot();
 
       self::creating(function($model) {
-        $username = preg_replace("/^(.*?)@.*$/is", "$1", $model->email);
+        $username = $model->username ? $model->username : preg_replace("/^(.*?)@.*$/is", "$1", $model->email);
         while (static::where('username', $username)->exists()) {
           $username = "$username" . random_int(0, 100);
         }
@@ -420,6 +421,12 @@ class User extends Authenticatable implements HasName, FilamentUser
       return UserFavorite::where(['user_id' => Auth::user()->id, 'type' => $type, 'item_id' => $id])->exists();
     }
 
+    public function subscribed(Product|int $product)
+    {
+      $product = is_int($product) ? Product::find($product) : $product;
+      return $this->subscriptions()->where('type', 'like', "%_$product->id")->where('stripe_status', 'active')->exists();
+    }
+
     public function getRecomendProducts(int $limit = 6): Collection
     {
       return Product::limit($limit)->orderByDesc('id')->get();
@@ -442,6 +449,12 @@ class User extends Authenticatable implements HasName, FilamentUser
       $mail = new ResetCode($this);
       Mail::to($this->email)->send($mail);
       MailReset::dispatch($this);
+    }
+
+    public function sendPassword(string $password)
+    {
+      $mail = new Password($this, $password);
+      Mail::to($this->email)->send($mail);
     }
 
     public function getVerifyUrl(bool $seller = false): string

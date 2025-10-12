@@ -21,6 +21,7 @@ use Laravel\Cashier\Cashier;
 use App\Jobs\TestQueue;
 use App\Mail\Gift;
 use App\Mail\InviteByPurchase;
+use App\Mail\Password;
 use App\Models\Discount;
 use App\Models\MailLog;
 use App\Models\Order;
@@ -35,10 +36,11 @@ use Stripe\Price;
 
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('app:clear-expires-images')->hourlyAt(5);
-Schedule::command('artisan queue-monitor:stale')->daily();
+Schedule::command('queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  Product::find(99)->publishInStripe();
+  // Product::find(99)->publishInStripe();
+  Product::find(98)->publishInStripe();
 });
 
 Artisan::command('ttm', function() {

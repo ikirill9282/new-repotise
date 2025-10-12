@@ -57,7 +57,9 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
         }
 
         $this->order->status_id = EnumsOrder::REWARDING;
-        $this->order->recalculate();
+        if ($this->order->type == 'cart') {
+          $this->order->recalculate();
+        }
 
         PayReward::dispatch($this->order);
         ReferalFreeProduct::dispatch($this->order->user);

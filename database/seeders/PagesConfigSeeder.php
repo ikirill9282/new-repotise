@@ -151,44 +151,44 @@ class PagesConfigSeeder extends Seeder
           'box3_link' => '/insights',
         ],
       ],
-      [
-        'page' => Page::where('slug', 'all-policies')->first(),
-        'variables' => [
-          'content' => '<h1>All Policies</h1><ol><li><a href="/policies/terms-and-conditions"><span style="text-decoration: underline;">Terms and Conditions</span></a></li><li><a href="/policies/seller-agreement"><span style="text-decoration: underline;">Seller Agreement</span></a></li><li><a href="/policies/privacy-policy"><span style="text-decoration: underline;">Privacy Policy</span></a></li><li><a href="/policies/cookie-policy"><span style="text-decoration: underline;">Cookie Policy</span></a></li><li><a href="/policies/data-processing-agreement"><span style="text-decoration: underline;">Data Processing Agreement (DPA)</span></a></li><li><a href="/policies/payment-policy"><span style="text-decoration: underline;">Payment Policy</span></a></li><li><a href="/policies/copyright-policy"><span style="text-decoration: underline;">Copyright Policy</span></a></li><li><a href="/policies/dispute-resolution-policy"><span style="text-decoration: underline;">Dispute Resolution Policy</span></a></li></ol><p><br></p>',
-        ]
-      ],
-      [
-        'page' => Page::where('slug', 'terms-and-conditions')->first(),
-        'variables' => $this->getTerms()
-      ],
-      [
-        'page' => Page::where('slug', 'seller-agreement')->first(),
-        'variables' => $this->getSellerAgreement()
-      ],
-      [
-        'page' => Page::where('slug', 'privacy-policy')->first(),
-        'variables' => $this->getPrivacyPolicy()
-      ],
-      [
-        'page' => Page::where('slug', 'cookie-policy')->first(),
-        'variables' => $this->getCookiePolicy()
-      ],
-      [
-        'page' => Page::where('slug', 'data-processing-agreement')->first(),
-        'variables' => $this->getDPA()
-      ],
-      [
-        'page' => Page::where('slug', 'payment-policy')->first(),
-        'variables' => $this->getPaymentPolicy()
-      ],
-      [
-        'page' => Page::where('slug', 'copyright-policy')->first(),
-        'variables' => $this->getCopyrightPolicy()
-      ],
-      [
-        'page' => Page::where('slug', 'dispute-resolution-policy')->first(),
-        'variables' => $this->getDRP(),
-      ],
+      // [
+      //   'page' => Page::where('slug', 'all-policies')->first(),
+      //   'variables' => [
+      //     'content' => '<h1>All Policies</h1><ol><li><a href="/policies/terms-and-conditions"><span style="text-decoration: underline;">Terms and Conditions</span></a></li><li><a href="/policies/seller-agreement"><span style="text-decoration: underline;">Seller Agreement</span></a></li><li><a href="/policies/privacy-policy"><span style="text-decoration: underline;">Privacy Policy</span></a></li><li><a href="/policies/cookie-policy"><span style="text-decoration: underline;">Cookie Policy</span></a></li><li><a href="/policies/data-processing-agreement"><span style="text-decoration: underline;">Data Processing Agreement (DPA)</span></a></li><li><a href="/policies/payment-policy"><span style="text-decoration: underline;">Payment Policy</span></a></li><li><a href="/policies/copyright-policy"><span style="text-decoration: underline;">Copyright Policy</span></a></li><li><a href="/policies/dispute-resolution-policy"><span style="text-decoration: underline;">Dispute Resolution Policy</span></a></li></ol><p><br></p>',
+      //   ]
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'terms-and-conditions')->first(),
+      //   'variables' => $this->getTerms()
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'seller-agreement')->first(),
+      //   'variables' => $this->getSellerAgreement()
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'privacy-policy')->first(),
+      //   'variables' => $this->getPrivacyPolicy()
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'cookie-policy')->first(),
+      //   'variables' => $this->getCookiePolicy()
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'data-processing-agreement')->first(),
+      //   'variables' => $this->getDPA()
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'payment-policy')->first(),
+      //   'variables' => $this->getPaymentPolicy()
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'copyright-policy')->first(),
+      //   'variables' => $this->getCopyrightPolicy()
+      // ],
+      // [
+      //   'page' => Page::where('slug', 'dispute-resolution-policy')->first(),
+      //   'variables' => $this->getDRP(),
+      // ],
       [
         'page' => Page::where('slug', 'favorites')->first(),
         'variables' => [

@@ -175,22 +175,16 @@ class CabinetController extends Controller
     ]);
   }
 
-  public function purchases(Request $request)
+  public function purchases(Request $request, ?string $type = null)
   {
     $user = Auth::user();
     if (!$user) {
       return redirect('/unknown');
     }
 
-
-    $products = OrderProducts::whereIn('order_id', $user->orders->pluck('id'))
-      ->orWhereIn('order_id', Order::where('recipient', $user->email)->pluck('id'))
-      ->orderByDesc('order_id')
-      ->paginate(10);
-
     return view('site.pages.profile-purchases', [
       'user' => $user,
-      'products' => $products,
+      'type' => $type,
     ]);
   }
 

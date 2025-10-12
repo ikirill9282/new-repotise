@@ -44,7 +44,7 @@ class ProductSubscribe extends Component
       $order->user_id = Auth::user()?->id ?? 0;
       $order->status_id = EnumsOrder::NEW;
       $order->cost = $cost;
-      $order->sub = 1;
+      $order->type = 'sub';
       $order->sub_period = $period;
       $order->cost_without_discount = $costWithoutDiscount;
       $order->cost_without_tax = $costWithoutDiscount;
@@ -57,6 +57,7 @@ class ProductSubscribe extends Component
         'price' => $product->price,
         'sale_price' => $product->sale_price,
         'count' => 1,
+        'discount' => $discount,
         'total' => $cost,
         'total_without_discount' => $costWithoutDiscount,
       ]);

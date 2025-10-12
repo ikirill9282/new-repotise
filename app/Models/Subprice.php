@@ -129,6 +129,26 @@ class Subprice extends Model
     };
   }
 
+  public function getPeriodPrice(string $period)
+  {
+    return match($period) {
+      'month' => $this->getMonthSum(),
+      'quarter' => $this->getQuarterSum(),
+      'year' => $this->getYearSum(),
+      default => null,
+    };
+  }
+
+  public function getPeriodPriceWithoutDiscount(string $period)
+  {
+    return match($period) {
+      'month' => $this->getMonthSumWithoutDiscount(),
+      'quarter' => $this->getQuarterSumWithoutDiscount(),
+      'year' => $this->getYearSumWithoutDiscount(),
+      default => null,
+    };
+  }
+
   public function getPrice(): float
   {
     return $this->product->getPrice();

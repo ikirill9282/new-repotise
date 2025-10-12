@@ -11,7 +11,7 @@
     {{-- TEXT --}}
     <div class="mb-4">
       <p>
-        Your subscription to <span class="!text-dark font-semibold text-nowrap">[Название продукта/подписки]</span> has been successfully canceled. You will not be charged again. You will continue to have access until <span class="!text-dark font-semibold text-nowrap">[Дата окончания текущего периода]</span>
+        Your subscription to <span class="!text-dark font-semibold text-nowrap">{{ $product_name }}</span> has been successfully canceled. You will not be charged again. You will continue to have access until <span class="!text-dark font-semibold text-nowrap">{{ $sub_end }}</span>
       </p>
     </div>
 

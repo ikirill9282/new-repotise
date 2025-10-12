@@ -20,6 +20,7 @@ class Modals extends Component
       'auth-second', 
       'backup',
       'edit-contacts',
+      'cancelsub',
     ];
 
     public function mount()

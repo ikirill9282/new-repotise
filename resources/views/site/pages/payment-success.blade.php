@@ -32,35 +32,37 @@
                       {{ print_var('share_button_text', $variables) }}
                     </a>
                 </div>
-                <div class="text_right">
+                <div class="text_right {{ auth()->check() ? '' : '!w-full' }}">
                     <div class="input_block">
                         @if ($user)
                           <input type="text" value="{{ $user->makeReferalUrl() }}" readonly data-copyId="referal"/>
                           <button class="copyToClipboard" data-target="referal"><img src="{{ asset('assets/img/copy.svg') }}" alt=""></button>
                         @else
-                          <x-btn outlined class="open_auth">Sign in</x-btn>
+                          <x-btn outlined class="open_auth !w-full">Sign in</x-btn>
                         @endif
                     </div>
-                    <div class="connecting">
-                        <a href="{{ $user->makeReferalUrl('FB') }}" class="hover:!text-blue-500 transition duration-500">
-                            @include('icons.facebook')
-                        </a>
-                        <a href="{{ $user->makeReferalUrl('PI') }}" class="hover:!text-rose-500 transition duration-500">
-                            @include('icons.pinterest')
-                        </a>
-                        <a href="{{ $user->makeReferalUrl('TW') }}" class="hover:!text-black transition duration-500">
-                            @include('icons.twitter')
-                        </a>
-                        <a href="{{ $user->makeReferalUrl('GM') }}" class="hover:!text-orange-500 transition duration-500">
-                            @include('icons.mail')
-                        </a>
-                        <a href="{{ $user->makeReferalUrl('WA') }}" class="hover:!text-emerald-500 transition duration-500">
-                            @include('icons.whatsapp')
-                        </a>
-                        <a href="{{ $user->makeReferalUrl('TG') }}" class="hover:!text-sky-500 transition duration-500">
-                            @include('icons.telegram')
-                        </a>
-                    </div>
+                    @if(auth()->check())
+                      <div class="connecting">
+                          <a href="{{ $user?->makeReferalUrl('FB') }}" class="hover:!text-blue-500 transition duration-500">
+                              @include('icons.facebook')
+                          </a>
+                          <a href="{{ $user?->makeReferalUrl('PI') }}" class="hover:!text-rose-500 transition duration-500">
+                              @include('icons.pinterest')
+                          </a>
+                          <a href="{{ $user?->makeReferalUrl('TW') }}" class="hover:!text-black transition duration-500">
+                              @include('icons.twitter')
+                          </a>
+                          <a href="{{ $user?->makeReferalUrl('GM') }}" class="hover:!text-orange-500 transition duration-500">
+                              @include('icons.mail')
+                          </a>
+                          <a href="{{ $user?->makeReferalUrl('WA') }}" class="hover:!text-emerald-500 transition duration-500">
+                              @include('icons.whatsapp')
+                          </a>
+                          <a href="{{ $user?->makeReferalUrl('TG') }}" class="hover:!text-sky-500 transition duration-500">
+                              @include('icons.telegram')
+                          </a>
+                      </div>
+                    @endif
                 </div>
             </div>
             <div class="order_details">
@@ -78,7 +80,14 @@
                                   <div class="description_orders">
                                       <div class="title_description">
                                           <h4><a href="{{ $product->makeUrl() }}" class="link-black">{{ $product->title }} x {{ $product->pivot->count }}</a></h4>
-                                          <h5>{{ currency($product->getPrice()) }} <span>{{ currency($product->getPriceWithoutDiscount()) }}</span></h5>
+                                          <h5>
+                                            @if ($order->type == 'sub')
+                                              {{ currency($product->subprice->getPrice()) }} per {{ $order->sub_period }}
+                                            @else
+                                              {{ currency($product->getPrice()) }} 
+                                              <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
+                                            @endif
+                                          </h5>
                                       </div>
                                       <p>
                                         @foreach($product->types as $type)

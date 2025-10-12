@@ -28,16 +28,16 @@ class Order extends Model
       parent::booted();
 
       static::creating(function($model) {
-        if (!$model->sub) {
-          $stripeClient = new StripeClient();
-          $stripeClient->createPaymentIntent($model);
-        }
+        // if (!$model->sub) {
+        //   $stripeClient = new StripeClient();
+        //   $stripeClient->createPaymentIntent($model);
+        // }
       });
 
       static::created(function($model) {
-        if (!$model->sub) {
-          Cashier::stripe()->paymentIntents->update($model->payment_id, ['metadata' => ['id' => $model->id]]);
-        }
+        // if (!$model->sub) {
+        //   Cashier::stripe()->paymentIntents->update($model->payment_id, ['metadata' => ['id' => $model->id]]);
+        // }
       });
 
       static::deleting(function($model) {
@@ -70,6 +70,13 @@ class Order extends Model
     public function discount()
     {
       return $this->belongsTo(Discount::class, 'discount_id', 'id');
+    }
+
+    public function getSubscriptionType()
+    {
+      return $this->type == 'sub' 
+        ? 'plan_' . $this->sub_period . '_' . $this->order_products->first()->product->id
+        : '';
     }
 
     public function complete()
@@ -228,12 +235,14 @@ class Order extends Model
 
     public function cancelTransaction(string $message)
     {
+      if ($this->payment_id) {
         Cashier::stripe()->paymentIntents->update($this->payment_id, [
           'metadata' => [
             'message' => $message,
           ]
         ]);
         Cashier::stripe()->paymentIntents->cancel($this->payment_id);
+      }
     }
 
     public function getDiscount(): int
@@ -309,7 +318,6 @@ class Order extends Model
               $op->total = ($op->price * $op->count ?? 1) - $discount_product;
               $op->total_without_discount = ($op->price * $op->count ?? 1);
               $discount_max = $discount_max - $discount_product;
-
             }
           }
         }
@@ -321,7 +329,7 @@ class Order extends Model
           $op->total_without_discount = ($op->price * $op->count ?? 1);
         }
 
-      } else {
+      } elseif ($this->type == 'cart') {
         $this->discount_amount = 0;
         foreach ($this->order_products as $op) {
           $op->discount = 0;

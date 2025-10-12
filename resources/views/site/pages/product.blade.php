@@ -97,7 +97,9 @@
                                 <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
                             </div>
                             @if($product->subscription)
-                              @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
+                              @if(!auth()->user()?->subscribed($product->id))
+                                @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
+                              @endif
                             @else
                               <div class="add_to_card_block">
                                   <a href="#"
@@ -166,7 +168,9 @@
                                 <span>${{ $product->old_price }}</span>
                             </div>
                             @if($product->subscription)
-                              @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
+                              @if(!auth()->user()?->subscribed($product->id))
+                                @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
+                              @endif
                             @else
                               <div class="add_to_card_block">
                                   <a href="#"

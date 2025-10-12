@@ -1,5 +1,5 @@
 <div>
-  @if($user->orders->isNotEmpty())
+  @if($orders->isNotEmpty())
     <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
 
         <table class="table !mb-0 ">
@@ -13,7 +13,7 @@
             </tr>
           </thead>
           <tbody>
-            @foreach($user->orders as $order)
+            @foreach($orders as $order)
               @foreach ($order->order_products as $order_product)
                 <tr class="">
                   <td class="bg-clip-content !px-0 !text-gray !border-light !rounded-tl-2xl !rounded-bl-2xl">
@@ -69,7 +69,7 @@
 
   @else
 
-    <div class="text-center">
+    <div class="text-center !py-10">
       You haven't placed any orders yet. <x-link href="{{ route('products') }}">Discover your advanture now!</x-link>
     </div>
 

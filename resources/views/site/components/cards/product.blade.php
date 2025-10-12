@@ -9,8 +9,8 @@
         class="order_img">
     <div class="description_orders">
         <div class="title_description">
-            <h4><a
-                    href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
+            <h4>
+              <a href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
             </h4>
             <h5>
               <div class="text-sm">{{ currency($model->getPrice()) }}</div>
@@ -50,7 +50,17 @@
         ])
 
         @if ($model->subscription)
-          <x-btn href="{{ $model->makeUrl() }}" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5">Subscribe</x-btn>
+          <x-btn href="{{ $model->makeUrl() }}" :disabled="auth()->user()?->subscribed($model->id)" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5">
+            @if(auth()->check())
+              @if(auth()->user()->subscribed($model->id))
+                Subscribed
+              @else
+                Subscribe
+              @endif
+            @else
+              Subscribe
+            @endif
+          </x-btn>
         @else
           <a 
             href="{{ url('/cart') }}" 

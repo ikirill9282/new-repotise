@@ -36,6 +36,7 @@ class Orders extends Component
 
       return view('livewire.profile.tables.orders', [
         'user' => $user,
+        'orders' => $user->orders()->where('type', 'cart')->get(),
       ]);
     }
 }

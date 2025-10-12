@@ -29,6 +29,11 @@ class Tables extends Component
 
     public function setActive(string $name)
     {
+      $table = $this->getTableByName($name);
+      if (isset($table['href']) && !empty($table['href'])) {
+        return redirect($table['href']);
+      }
+
       $this->activeTable = $name;
       $this->dispatch('tableChanged', $this->activeTable);
     }
@@ -42,6 +47,15 @@ class Tables extends Component
         return "profile.tables.profile-article";
       }
       return "profile.tables.". $this->activeTable;
+    }
+
+    public function getTableByName(string $name)
+    {
+      foreach ($this->tables as $table) {
+        if ($table['name'] == $name) {
+          return $table;
+        }
+      }
     }
 
     public function render()

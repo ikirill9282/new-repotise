@@ -25,9 +25,12 @@
               >
 
                 @if (!auth()->check())
-                    <a @click.prevent="$dispatch('openModal', {modalName: 'auth'})" href="#"
-                        class="!text-gray hover:!text-active border-b border-dashed pb-0.5 inline-block !mb-4 transition">Login
-                        to review</a>
+                  <a 
+                      @click.prevent="$dispatch('openModal', {modalName: 'auth'})" href="#"
+                      class="!text-gray hover:!text-active border-b border-dashed pb-0.5 inline-block !mb-4 transition"
+                    >
+                    Login to review
+                  </a>
                 @elseif ( 
                         $can_write||
                         auth()->user()->id == $model->author->id ||
@@ -101,11 +104,11 @@
                             ></x-form.text-counter>
                             
                             @if ($can_write && $type == 'review')
-                                <button
-                                    class="!p-2 sm:!p-4 flex flex-col sm:block bg-active hover:bg-secondary transition rounded text-white !text-xs sm:!text-base">
+                                <x-btn
+                                    class="!p-2 sm:!p-2.75 flex flex-col !w-auto bg-active hover:bg-secondary transition rounded text-nowrap text-white !text-xs sm:!text-base">
                                     <span>Post</span>
                                     <span>Review</span>
-                                </button>
+                                </x-btn>
                             @endif
                         </div>
 

@@ -50,6 +50,7 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/checkout', [CabinetController::class, 'checkout'])->name('profile.checkout');
 
   Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('profile.purchases');
+  Route::get('/profile/purchases/{type}', [CabinetController::class, 'purchases'])->name('profile.purchases.subscriptions');
   Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
   Route::get('/profile/referal', [CabinetController::class, 'referal'])->name('profile.referal');
   
@@ -76,6 +77,7 @@ Route::post('/hook/stripe', [StripeController::class, 'hook'])
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('checkout');
 Route::get('/payment/checkout-subscription', [PaymentController::class, 'checkoutSubscription'])->name('checkout.subscription');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment-success');
+Route::get('/payment/subscription-success', [PaymentController::class, 'success'])->name('subscription.success');
 Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment-error');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');

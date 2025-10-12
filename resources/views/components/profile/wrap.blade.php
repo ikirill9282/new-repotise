@@ -52,6 +52,7 @@
                                 <a class=" lg:w-full
                                     {{ request()->route()->getName() === $name ? 'active' : '' }}
                                     {{ ($name === 'profile.articles' && str_contains(request()->route()->getName(), 'profile.articles')) ? 'active' : '' }}
+                                    {{ ($name === 'profile.purchases' && str_contains(request()->route()->getName(), 'profile.purchases')) ? 'active' : '' }}
                                     "
                                     href="{{ $route['url'] }}"
                                   >
