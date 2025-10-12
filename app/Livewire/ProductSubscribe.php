@@ -22,12 +22,8 @@ class ProductSubscribe extends Component
 
     public function moveCheckout(string $period)
     {
-      if(!Auth::check()) {
-        $this->dispatch('openModal', 'auth');
-        return ;
-      }
-
       $product = $this->getProduct();
+      
       $cost = match($period) {
         'month' => $product->subprice->getMonthSum(),
         'quarter' => $product->subprice->getQuarterSum(),
@@ -44,17 +40,15 @@ class ProductSubscribe extends Component
         'year' => round(($product->getPrice() / 100 * $product->subprice->year), 2),
       };
 
-      // TODO: add discounts result
-      // dd($discount);
-
       $order = new Order();
-      $order->user_id = Auth::user()?->id;
+      $order->user_id = Auth::user()?->id ?? 0;
       $order->status_id = EnumsOrder::NEW;
       $order->cost = $cost;
       $order->sub = 1;
       $order->sub_period = $period;
       $order->cost_without_discount = $costWithoutDiscount;
       $order->cost_without_tax = $costWithoutDiscount;
+      $order->discount_amount = $discount;
       $order->save();
 
       $order->order_products()->create([

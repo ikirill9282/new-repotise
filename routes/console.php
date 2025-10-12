@@ -38,12 +38,7 @@ Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('artisan queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $paymentIntent = Cashier::stripe()->paymentIntents->create([
-    'amount' => 2000,
-    'currency' => 'usd',
-    'automatic_payment_methods' => ['enabled' => true],
-  ]);
-  dd($paymentIntent);
+  Product::find(100)->publishInStripe();
 });
 
 Artisan::command('ttm', function() {

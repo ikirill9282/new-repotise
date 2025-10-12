@@ -7,11 +7,17 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
+use Laravel\Cashier\Cashier;
 
 class CheckoutSubscription extends Component
 {
 
     public string $order_id;
+
+    public array $fields = [
+      'username' => null,
+      'email' => null,
+    ];
 
     public function mount(string $order_id)
     {
@@ -49,11 +55,13 @@ class CheckoutSubscription extends Component
     public function render()
     {
       $order = $this->getOrder();
-      $pm = $order->user->paymentMethods();
-      // dd($pm);
+      // TODO: payment methods for authenticated users
+
       return view('livewire.checkout-subscription', [
         'order' => $this->getOrder(),
-        'intent' => $order->user->createSetupIntent(),
+        'intent' => Cashier::stripe()->setupIntents->create([
+          'payment_method_types' => ['card'],
+        ]),
         'user' => $order->user,
       ]);
     }
