@@ -80,23 +80,25 @@ class Checkout extends Component
 
     public function dropProduct(int $product_id): void
     {
-      DB::transaction(function() use ($product_id) {
-        $this->order->order_products()->where('product_id', $product_id)->delete();
-        $this->order->load('products');
+      $order = $this->getOrder();
+
+      DB::transaction(function() use ($product_id, $order) {
+        $order->order_products()->where('product_id', $product_id)->delete();
+        $order->load('products');
 
         // $this->order->discount->isAvailable($this->order);
-        if ($this->order->discount_id && !$this->order->discount->isAvailable($this->order)) {
-          $this->order->removeDiscount();
+        if ($order->discount_id && !$order->discount->isAvailable($order)) {
+          $order->removeDiscount();
           // $this->promocode = null;
         }
       });
       
-      if ($this->order->products->isEmpty()) {
-        $this->order->delete();
+      if ($order->products->isEmpty()) {
+        $order->delete();
         Session::forget('checkout');
       } else {
-        $this->order->recalculate();
-        $this->updatePaymentIntent();
+        $order->recalculate();
+        // $this->updatePaymentIntent();
       }
     }
     
@@ -233,11 +235,11 @@ class Checkout extends Component
     public function render()
     {
       $order = $this->getOrder();
-      $paymentMethods = $order->user_id !== 0 ? $order->user->paymentMethods() : null;
+      $paymentMethods = ($order && $order?->user_id) !== 0 ? $order?->user->paymentMethods() : null;
 
       return view('livewire.checkout', [
         'order' => $order,
-        'user' => $order->user,
+        'user' => $order?->user,
         'paymentMethods' => $paymentMethods,
       ]);
     }

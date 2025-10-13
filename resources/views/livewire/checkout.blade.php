@@ -12,7 +12,8 @@
             <div class="container">
               <div class="about_block">
                 <div class="left_form">
-                    {{-- @dump($this->form) --}}
+
+                    {{-- FORM --}}
                     <form action="/cart/order" id="payment-form1">
 
                         <div class="!mb-3">
@@ -33,6 +34,8 @@
                               tooltipText="Enter your valid email. We will send you validation link."
                             />
                         </div>
+
+                        {{-- GIFT --}}
                         <div class="menu_block">
                             <ul class="nav nav-pills" id="" role="tablist">
                                 <li class="nav-item" role="presentation">
@@ -103,6 +106,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- PROMOCODE --}}
                         <div class="promo_cod flex-col !items-start !gap-3">
                             <div class="flex w-full gap-3">
                                 <div class="input_block">
@@ -128,12 +133,33 @@
                             @enderror
                         </div>
 
+                        @if (!is_null($paymentMethods) && !$paymentMethods->isEmpty())
+                          <div class="!mb-6">
+                            @foreach($paymentMethods as $pm)
+                              @if($pm->type == 'card')
+                                <div class="">
+                                  <x-form.payment-method
+                                    wire:model="form.paymentMethod"
+                                    label="Card" 
+                                    :brand="ucfirst($pm->card->brand)"
+                                    :last4="$pm->card->last4"
+                                    :editor="false"
+                                    :value="$pm->id"
+                                  />
+                                </div>
+                              @endif
+                            @endforeach
+                          </div>
+                        @endif
+
+                        {{-- STRIPE --}}
                         <div class="class="@if($order->cost <= 0) hidden @endif">
                           <div wire:ignore>
                               <div id="payment" class="mb-4"></div>
                           </div>
                         </div>
 
+                        {{-- COSTS --}}
                         <div class="costs">
                             <div class="text_cost">
                                 <span>Subtotal</span>
@@ -178,6 +204,8 @@
                         </div>
                     </form>
                 </div>
+
+                {{-- PRODUCTS --}}
                 <div class="right_orders">
                   <div class="title_block">
                       <h3>Your order</h3>
