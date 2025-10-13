@@ -76,9 +76,9 @@ Route::post('/hook/stripe', [StripeController::class, 'hook'])
 
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('checkout');
 Route::get('/payment/checkout-subscription', [PaymentController::class, 'checkoutSubscription'])->name('checkout.subscription');
-Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment-success');
+Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/subscription-success', [PaymentController::class, 'success'])->name('subscription.success');
-Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment-error');
+Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment.error');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/help-center', [SiteController::class, 'helpCenter'])->name('help-center');

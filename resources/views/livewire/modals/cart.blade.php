@@ -1,7 +1,4 @@
 @php
-  $cart = new \App\Services\Cart();
-  $order = \App\Models\Order::preparing($cart);
-
   $trending_products = auth()->check()
       ? auth()->user()->getRecomendProducts(10)
       : \App\Models\Product::limit(10)->latest()->get();
@@ -70,14 +67,14 @@
                 cart-order
                 "
         >
-        <div class="order-view {{ ($order?->products && $order->products->isNotEmpty()) ? '' : 'hidden' }}">
+        <div class="order-view {{ ($this->order?->products && $this->order->products->isNotEmpty()) ? '' : 'hidden' }}">
             <div class="title_block px-2 py-4 flex justify-between items-center">
               <h3>Your order</h3>
-              <p>Items <span><span class="cart-counter text-gray-400">({{ $cart->getCartCount() }})</span></span></p>
+              <p>Items <span class="text-gray">(<span class="cart-counter text-gray">{{ $this->getCart()->getCartCount() }}</span>)</span></p>
             </div>
             <div class="products_modal">
                 <div class="items_group">
-                    @foreach ($order->products as $product)
+                    @foreach ($this->order->products as $product)
                         @include('site.components.cards.product', [
                             'template' => 'cart',
                             'model' => $product,
@@ -88,20 +85,21 @@
             <div class="costs pt-4">
                 <div class="text_cost">
                     <span>Subtotal</span>
-                    <h4><span class="cart-subtotal">{{ currency($order->getAmount()) }}</span></h4>
+                    <h4>$<span class="cart-subtotal">{{ $this->order->getAmount() }}</span></h4>
                 </div>
                 <div class="text_cost">
                     <span>Discount</span>
-                    <h4 class="{{ $order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">-<span
-                            class="cart-discount">{{ currency($order->getDiscount()) }}</span></h4>
+                    <h4 class="{{ $this->order->getDiscount() > 0 ? '!text-emerald-500' : '' }}">
+                      -$<span class="cart-discount">{{ $this->order->getDiscount() }}</span>
+                    </h4>
                 </div>
                 <div class="text_cost">
                     <span>Tax</span>
-                    <h4 class="color_red"><span class="cart-tax">{{ currency($order->getTax()) }}</span></h4>
+                    <h4 class="color_red">$<span class="cart-tax">{{ $this->order->getTax() }}</span></h4>
                 </div>
                 <div class="text_cost">
                     <h5>Total</h5>
-                    <h6><span class="cart-total">{{ currency($order->getTotal()) }}</span></h6>
+                    <h6>$<span class="cart-total">{{ $this->order->getTotal() }}</span></h6>
                 </div>
             </div>
             <a wire:click.prevent="moveCheckout" href="#" class="place_button inline-block">Place Order</a>
@@ -110,7 +108,7 @@
             </p>
         </div>
           
-        <div class="container h-full flex justify-center items-center  empty-container {{ ($order?->products && $order->products->isNotEmpty()) ? 'hidden' : '' }}">
+        <div class="container h-full flex justify-center items-center  empty-container {{ ($this->order?->products && $this->order->products->isNotEmpty()) ? 'hidden' : '' }}">
           @include('site.components.favorite.empty', [
             'text' => 'Cart',
             'class' => 'empty-cart',

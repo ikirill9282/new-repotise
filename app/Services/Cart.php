@@ -26,17 +26,18 @@ class Cart
 
   public function flushCart()
   {
+    $this->cart = $this->template;
     $this->updateCart($this->template);
   }
 
-  public function addProduct(int $product_id, int $count = 1)
+  public function addProduct(int $product_id, ?int $count = null)
   {
     if (!isset($this->cart['products'])) $this->cart['products'] = [];
 
     if ($this->inCart($product_id)) {
       foreach($this->cart['products'] as &$product) {
         if ($product['id'] == $product_id) {
-          $product['count'] = $product['count'] + $count;
+          $product['count'] = $count ?? 1;
         }
       }
     } else {
@@ -49,6 +50,67 @@ class Cart
     $this->updateCart($this->cart);
   }
 
+  public function removeProduct(int $product_id)
+  {
+    foreach ($this->cart['products'] as $key => $product) {
+      if ($product['id'] == $product_id) {
+        unset($this->cart['products'][$key]);
+        break;
+      }
+    }
+
+    $this->updateCart();
+  }
+
+
+  public function updateCart(): void
+  {
+    SessionExpire::saveCart($this->name, $this->cart);
+    $this->loadCart();
+  }
+
+  public function loadCart()
+  {
+    $this->cart = SessionExpire::getCart($this->name) ?? [];
+    if (empty($this->cart)) $this->cart = $this->template;
+  }
+
+  public function inCart(int $id)
+  {
+    return collect($this->cart['products'])->where('id', $id)->isNotEmpty();
+  }
+
+  public function getCartCount(): int
+  {
+    return collect($this->getProducts())->sum('count') ?? 0;
+
+    // if ($this->hasProducts()) {
+    //   return collect($this->getProducts())->sum('count');
+    // }
+    // return 0;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   public function getCart()
   {
     if (empty($this->cart)) {
@@ -56,30 +118,6 @@ class Cart
     }
 
     return $this->cart;
-  }
-
-  public function updateCart(array $data): void
-  {
-    SessionExpire::saveCart($this->name, $data);
-    $this->loadCart();
-  }
-
-  public function loadCart()
-  {
-    $this->cart = SessionExpire::getCart($this->name) ?? [];
-  }
-
-  public function inCart(int $id)
-  {
-    return $this->hasProducts() ? collect($this->getProducts())->where('id', $id)->isNotEmpty() : false;
-  }
-
-  public function getCartCount(): int
-  {
-    if ($this->hasProducts()) {
-      return collect($this->getProducts())->sum('count');
-    }
-    return 0;
   }
 
   public function getCartAmount(): int

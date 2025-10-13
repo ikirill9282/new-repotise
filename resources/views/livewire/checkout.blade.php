@@ -14,33 +14,24 @@
                 <div class="left_form">
                     {{-- @dump($this->form) --}}
                     <form action="/cart/order" id="payment-form1">
-                        <div class="input_block">
-                            <input wire:model="form.fullname" type="text" name="fullname"
-                                placeholder="Your Full Name" required
-                                class="@error('form.fullname') border !border-red-500 @enderror">
 
-                            <x-tooltip class="!opacity-100 !absolute top-4 right-2"
-                                message='Enter your valid full name. e.g. "John Doe".'>
-                                @include('icons.shield')
-                            </x-tooltip>
-
-                            @error('form.fullname')
-                                <span class="inline-block text-red-500 !mt-2">{{ $message }}</span>
-                            @enderror
+                        <div class="!mb-3">
+                          <x-form.input 
+                            wire:model="form.fullname" 
+                            name="fullname"
+                            placeholder="Your Full Name"
+                            tooltipText='Enter your valid full name. e.g. "John Doe".'
+                          />
                         </div>
-                        <div class="input_block">
-                            <input wire:model="form.email" type="email" name="email" placeholder="Your Email"
-                                required class="@error('form.email') border !border-red-500 @enderror">
-
-                            <x-tooltip class="!opacity-100 !absolute top-4 right-2"
-                                message='Enter your valid email. We will send you validation link.'>
-                                @include('icons.shield')
-                            </x-tooltip>
-
-
-                            @error('form.email')
-                                <span class="inline-block !text-red-500 !mt-2">{{ $message }}</span>
-                            @enderror
+                        
+                        <div class="!mb-3">
+                            <x-form.input 
+                              wire:model="form.email"
+                              name="email"
+                              type="email"
+                              placeholder="Your email"
+                              tooltipText="Enter your valid email. We will send you validation link."
+                            />
                         </div>
                         <div class="menu_block">
                             <ul class="nav nav-pills" id="" role="tablist">
@@ -166,21 +157,24 @@
                             </div>
                         </div>
 
-                        <button wire:click.prevent="submit" class="place_button">Confirm Payment</button>
+                        <x-btn id="submit-btn" class="!max-w-none !mb-3">Confirm Payment</x-btn>
 
-                        <p class="terms_service">By confirm your payment, you agree to our <a
-                                href="{{ url('/all-policies') }}">Terms of
-                                Service & Privacy Policy.</a>
+                        <p class="text-sm group !mb-6">By confirm your payment, you agree to our <x-link
+                              class="!border-none group-has-[a]:!text-active"  
+                              href="{{ url('/all-policies') }}"
+                            >
+                              Terms of Service & Privacy Policy.
+                            </x-link>
                         </p>
                         <div class="bottom_back_block">
-                            <a href="#" class="back_cart">
+                            <x-link href="#" class="!border-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="7" height="12"
                                     viewBox="0 0 7 12" fill="none">
                                     <path d="M6 1L1 6L6 11" stroke="#A4A0A0" />
                                 </svg>
                                 Back to Cart
-                            </a>
-                            <a href="{{ url('/help-center') }}" class="need_help">Need Help?</a>
+                            </x-link>
+                            <x-link href="{{ url('/help-center') }}" class="!border-none">Need Help?</x-link>
                         </div>
                     </form>
                 </div>
@@ -257,6 +251,32 @@
 
 @script
   <script>
+      const stripe = Stripe('pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl');
+      const clientSecret = '{{ $this->clientSecret }}';
+      const elements = stripe.elements({clientSecret});
+      const paymentMethod = elements.create('payment');
+
+      if (document.getElementById('payment')) {
+        paymentMethod.mount('#payment');
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        $wire.checkValidtion().then(async response => {
+          const { error, setupIntent } = await stripe.confirmSetup({
+            elements,
+            redirect: 'if_required',
+          });
+          
+          if (error) {
+            $wire.dispatch('toastError', [{message: error.message}]);
+          } else {
+            $wire.dispatch('makePayment', { pm_id: setupIntent.payment_method });
+          }
+        });
+      });
+
       $('.text-area-gift').on('input', function(evt) {
           $('.text-area-gift-counter').find('.text-area-counter').html(evt.target.value.length);
       });
@@ -280,53 +300,5 @@
           // $wire.set('form.gift', val);
           // $wire.call('setGift', val);
       });
-
-      const stripe = Stripe(
-        'pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl'
-      );
-      const stripeData = {};
-      if (document.getElementById('payment')) {
-        const client_secret = '{{ $order->getTransaction()?->client_secret }}';
-        const appearance = {
-            theme: 'stripe',
-        };
-
-        stripeData.elements = stripe.elements({
-            clientSecret: client_secret,
-            appearance: appearance,
-        });
-
-        try {
-            stripeData.paymentElement = stripeData.elements.create('payment', {
-                // paymentMethodTypes: ['card'],
-            });
-            stripeData.paymentElement.mount("#payment");
-        } catch (error) {
-            console.log(error);
-        }
-      }
-      
-      Livewire.hook('morphed', () => {
-        // initStripe();
-      });
-
-
-      console.log(stripeData);
-      
-      Livewire.on('payment-confirm', async (arg) => {
-        console.log(stripeData);
-        
-        const {error} = await stripe.confirmPayment({
-          elements: stripeData.elements,
-          confirmParams: {
-            return_url: '{{ route("payment-success") }}',
-          },
-        });
-
-        if (error) {
-          
-        }
-      });
-      
   </script>
 @endscript

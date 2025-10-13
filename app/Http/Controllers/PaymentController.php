@@ -30,22 +30,36 @@ class PaymentController extends Controller
     }
     
     $order = Order::find(Session::get('checkout'));
-    $transaction = Cashier::stripe()->paymentIntents->retrieve(
-      $order->payment_id,
-      []
-    );
-    $page = Page::where('slug', 'checkout')
-      ->with('config')
-      ->first();
+    // $transaction = Cashier::stripe()->paymentIntents->retrieve(
+    //   $order->payment_id,
+    //   []
+    // );
+    // $page = Page::where('slug', 'checkout')
+    //   ->with('config')
+    //   ->first();
 
-    if (is_null($page)) {
-      return (new FallbackController())($request);
-    }
+    // if (is_null($page)) {
+    //   return (new FallbackController())($request);
+    // }
 
     return view("site.pages.checkout", [
-      'page' => $page, 
       'order' => $order,
-      'transaction' => $transaction,
+      // 'page' => $page, 
+      // 'transaction' => $transaction,
+    ]);
+  }
+
+
+  public function checkoutSubscription(Request $request)
+  {
+    if (!Session::exists('checkout') || empty(Session::get('checkout'))) {
+      return redirect('/products');
+    }
+
+    $order = Order::find(Session::get('checkout'));
+    
+    return view("site.pages.checkout-subscription", [
+      'order' => $order,
     ]);
   }
 
@@ -74,29 +88,10 @@ class PaymentController extends Controller
     ]);
   }
 
-  public function subscriptionSuccess(Request $request)
-  {
-    
-  }
-
   public function error(Request $request)
   {
     return view('site.pages.payment-error', [
       'page' => Page::where('slug', 'payment-error')->with('config')->first(),
-    ]);
-  }
-
-
-  public function checkoutSubscription(Request $request)
-  {
-    if (!Session::exists('checkout') || empty(Session::get('checkout'))) {
-      return redirect('/products');
-    }
-
-    $order = Order::find(Session::get('checkout'));
-    
-    return view("site.pages.checkout-subscription", [
-      'order' => $order,
     ]);
   }
 }

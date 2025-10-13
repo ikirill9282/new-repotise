@@ -5,5 +5,5 @@
 
 
 @section('content')
-  @livewire('checkout', ['order' => $order])
+  @livewire('checkout', ['order_id' => \Illuminate\Support\Facades\Crypt::encrypt($order->id)])
 @endsection

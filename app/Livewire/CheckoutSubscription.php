@@ -99,7 +99,7 @@ class CheckoutSubscription extends Component
         'user_id' => $user->id,
       ]);
       
-      $url = route('payment-success') . '/?payment_intent=' . $payment_id;
+      $url = route('payment.success') . '/?payment_intent=' . $payment_id;
       return redirect($url);
     }
 

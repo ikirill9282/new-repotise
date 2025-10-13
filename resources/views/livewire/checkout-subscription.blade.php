@@ -151,7 +151,7 @@
               if (error) {
                 $wire.dispatch('toastError', [{message: error.message}]);
               } else {
-                $wire.dispatch('makeSubscription', { pm_id: setupIntent.id });
+                $wire.dispatch('makeSubscription', { pm_id: setupIntent.payment_method });
               }
             } else {
               $wire.dispatch('makeSubscription', { pm_id: response.action });

@@ -1151,4 +1151,21 @@ $(document).ready(function() {
       hideAfter: 5000,
     });
   });
+
+  Livewire.on('setCartCounter', params => {
+    const count = params[0]?.count;
+    console.log(count);
+    
+    if (count !== undefined) {
+      if (count > 0) {
+        $('.cart-counter').html(count);
+        $('.cart-counter').removeClass('hidden');
+        $('.cart-counter').attr('style', '');
+      } else {
+        $('.cart-counter').fadeOut(function() {
+          $(this).addClass('hidden');
+        });
+      }
+    }
+  });
 });

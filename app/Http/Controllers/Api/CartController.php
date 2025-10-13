@@ -19,20 +19,9 @@ class CartController extends Controller
     {
       $valid = $request->validate(['item' => 'required|string']);
       try {
-        $cart = new Cart('cart');
-        $product_data = CustomEncrypt::decodeUrlHash($valid['item']);
-        $cart_data = $cart->getCart();
-
-        if (!isset($cart_data['products'])) $cart_data['products'] = [];
-        if (!in_array($product_data['id'], array_column($cart_data['products'], 'id'))) {
-          $cart_data['products'][] = [
-            'id' => $product_data['id'],
-            'count' => 1,
-          ];
-        }
-
-        SessionExpire::saveCart('cart', $cart_data);
-        $cart->loadCart();
+        $cart = new Cart();
+        $product_id = CustomEncrypt::getId($valid['item']);
+        $cart->addProduct($product_id, 1);
 
       } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => 'Something went wrong...'], 502);
@@ -50,10 +39,8 @@ class CartController extends Controller
         'count' => 'required|integer',
       ]);
       $cart = new Cart();
-      $valid['item'] = CustomEncrypt::decodeUrlHash($valid['item']);
-      SessionExpire::setCartItemCount('cart', $valid['item']['id'], $valid['count']);
-      $cart->loadCart();
-
+      $product_id = CustomEncrypt::getId($valid['item']);
+      $cart->addProduct($product_id, $valid['count']);
       $order = Order::preparing($cart);
 
       return response()->json([
@@ -70,7 +57,7 @@ class CartController extends Controller
       ]);
       $cart = new Cart();
       $id = CustomEncrypt::getId($valid['item']);
-      $cart->removeFromCart($id);
+      $cart->removeProduct($id);
       $order = Order::preparing($cart);
       
       return response()->json([
@@ -96,7 +83,6 @@ class CartController extends Controller
       $cart->applyPromocode($discount);
       $order = Order::preparing($cart);
       
-      // dd($order->getCosts());
       return response()->json([
         'status' => 'success',
         'costs' => $order->getCosts(),

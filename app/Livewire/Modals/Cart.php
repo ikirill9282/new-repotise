@@ -10,26 +10,41 @@ use App\Services\Cart as CartService;
 
 class Cart extends Component
 {
+    public array|Order $order;
+    // public array|CartService $cart;
 
-    public function incrementProductCount(int $product_id): void
+    public function mount()
     {
-      $product = $this->order->products->where('id', $product_id)->first();
-      $product->pivot->update(['count' => ($product->pivot->count + 1)]);
-
-      $this->order->recalculate();
-      $this->updatePaymentIntent();
+      $this->prepareOrder();
     }
 
-    public function decrementProductCount(int $product_id): void
+    public function prepareOrder()
     {
-      $product = $this->order->products->where('id', $product_id)->first();
-      if ($product->pivot->count > 1) {
-        $product->pivot->update(['count' => ($product->pivot->count - 1)]);
-
-        $this->order->recalculate();
-        $this->updatePaymentIntent();
-      }
+      $cart = $this->getCart();
+      $this->order = Order::preparing($cart);
     }
+
+    public function getCart()
+    {
+      return new CartService();
+    }
+
+    // public function incrementProductCount(int $product_id): void
+    // {
+    //   $product = $this->order->products->where('id', $product_id)->first();
+    //   $product->pivot->update(['count' => ($product->pivot->count + 1)]);
+      
+    //   $this->order->recalculate();
+    // }
+
+    // public function decrementProductCount(int $product_id): void
+    // {
+    //   $product = $this->order->products->where('id', $product_id)->first();
+    //   if ($product->pivot->count > 1) {
+    //     $product->pivot->update(['count' => ($product->pivot->count - 1)]);
+    //     $this->order->recalculate();
+    //   }
+    // }
 
 
     public function moveCheckout()
