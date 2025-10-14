@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Profile\Tables;
 
+use App\Enums\Order;
 use Livewire\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
@@ -36,7 +37,7 @@ class Orders extends Component
 
       return view('livewire.profile.tables.orders', [
         'user' => $user,
-        'orders' => $user->orders()->where('type', 'cart')->get(),
+        'orders' => $user->orders()->whereIn('status_id', [Order::PAID, Order::REWARDING, Order::COMPLETE])->get(),
       ]);
     }
 }

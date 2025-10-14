@@ -66,14 +66,24 @@ class PaymentController extends Controller
   public function success(Request $request)
   {
     $valid = $request->validate(['payment_intent' => 'required|string']);
-    $order = Order::where('payment_id', $valid['payment_intent'])->first();
+    
+    $order = Order::whereHas(
+        'payments', 
+        fn($query) => $query->where('stripe_id', $valid['payment_intent'])
+      )
+      ->first();
+
+    if (!$order) {
+      return (new FallbackController)($request);
+    }
 
     if ($order->free()) {
       $paymentIntent = null;
       $paymentMethod = 'Free';
       $order->cancelTransaction('Used free product promocode.');
     } else {
-      $paymentIntent = $order->getTransaction();
+      $payment = $order->getSuccessPayment();
+      $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($payment->stripe_id);
       $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($paymentIntent->payment_method);
     }
     

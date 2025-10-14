@@ -44,7 +44,7 @@ class Subs extends Component
 
       return view('livewire.profile.tables.subs', [
         'user' => $user,
-        'subs' => $user->orders()->where('type', 'sub')->get(),
+        'subs' => $user->subscriptions()->active()->get(),
       ]);
     }
 }

@@ -108,7 +108,13 @@
                             <div class="descriptions_pay">
                                 <p>Payment Method: {{-- Card --}} </p> 
                                 <div class="right_text">
-                                    <span>{{ strtoupper(is_object($paymentMethod) ? $paymentMethod?->card->brand : $paymentMethod) }}</span>
+                                    @php
+                                      $pm = $pm_type = $paymentMethod->type;
+                                      if ($pm_type == 'card') {
+                                        $pm = $paymentMethod?->card->brand;
+                                      }
+                                    @endphp
+                                    <span>{{ strtoupper($pm) }}</span>
                                 </div>
                             </div>
                             <div class="descriptions_pay">

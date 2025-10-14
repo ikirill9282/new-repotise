@@ -77,6 +77,22 @@ class Order extends Model
       return $this->belongsTo(Discount::class, 'discount_id', 'id');
     }
 
+    public function getSuccessPayment(): Payments
+    {
+      return $this->payments()->where('status', 'succeeded')->first();
+    }
+
+    public function hasIncompletePayment(): bool
+    {
+      if (!$this->payments()->exists()) return false;
+
+      foreach ($this->payments as $payment) {
+        dd($payment);
+      }
+
+      return false;
+    }
+
     public function getSubscriptionType()
     {
       return $this->type == 'sub' 

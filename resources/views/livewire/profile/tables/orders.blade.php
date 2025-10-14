@@ -37,7 +37,7 @@
                   </td>
                   <td class="bg-clip-content !px-0 text-nowrap !border-light">
                     <div class="!p-3 flex items-start justify-start gap-4 group ">
-                      @if($order->status_id == \App\Enums\Order::COMPLETE)
+                      @if($order->status_id !== \App\Enums\Order::NEW)
                         <div class="flex group">
                           <x-link class="group-has-[a]:!text-active" wire:click.prevent="$dispatch('openModal', { modalName: 'product' })">View & Download</x-link>
                         </div>

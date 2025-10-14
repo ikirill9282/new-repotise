@@ -18,6 +18,9 @@ use Livewire\Attributes\On;
 class Checkout extends Component
 {
     // 4000 0027 6000 3184 - 3d secure
+    // 4000 0000 0000 0002 - error
+    // 4000 0000 0000 0001 - no money
+
     public string $order_id;
     
     public bool $requiresAction = false;
@@ -123,6 +126,7 @@ class Checkout extends Component
       DB::beginTransaction();
       try {
         $order = $this->getOrder();
+
         if (!Auth::check()) {
           $pwd = User::makePassword();
           $user = User::firstOrCreate(
@@ -139,6 +143,7 @@ class Checkout extends Component
         } else {
           $user = $order->user;
         }
+
         if ($this->form['gift'] && $this->form['recipient'] !== $order->user->email) {
           $order->update([
             'gift' => 1,
@@ -146,15 +151,14 @@ class Checkout extends Component
             'recipient_message' => $this->form['recipient_message'],
           ]);
         }
-
-
+        
         $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
         if ($paymentMethod->customer !== $user->stripe_id) {
           $user->addPaymentMethod($pm_id);
         }
 
-        if ($order->payment_id) {
-          $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->payment_id);
+        if ($order->hasIncompletePayment()) {
+          $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->getCurrentPayment()->stripe_id);
 
           if ($paymentIntent->status == 'requires_payment_method') {
             Cashier::stripe()->paymentIntents->update($paymentIntent->id, [
@@ -176,7 +180,13 @@ class Checkout extends Component
               'order_id' => $order->id,
             ],
           ]);
-          $order->update(['payment_id' => $paymentIntent->id]);
+
+          $order->payments()->create([
+            'user_id' => $order->user_id,
+            'stripe_id' => $paymentIntent->id,
+            'status' => $paymentIntent->status,
+            'amount' => $paymentIntent->amount / 100, // !cents
+          ]);
         }
 
       } catch (\Exception $e) {
