@@ -14,6 +14,7 @@ use App\Jobs\ProcessOrder;
 use App\Services\StripeClient;
 use App\Traits\HasAuthor;
 use Illuminate\Support\Facades\DB;
+use Stripe\Service\PaymentIntentService;
 
 class Order extends Model
 {
@@ -77,20 +78,25 @@ class Order extends Model
       return $this->belongsTo(Discount::class, 'discount_id', 'id');
     }
 
-    public function getSuccessPayment(): Payments
+    public function getLatestPayment()
+    {
+      return $this->payments()
+        ->whereNotIn('status', ['succeeded', 'canceled'])
+        ->latest()
+        ->first()
+        ;
+    }
+
+    public function getSuccessPayment(): ?Payments
     {
       return $this->payments()->where('status', 'succeeded')->first();
     }
 
     public function hasIncompletePayment(): bool
     {
-      if (!$this->payments()->exists()) return false;
-
-      foreach ($this->payments as $payment) {
-        dd($payment);
-      }
-
-      return false;
+      return $this->payments()
+        ->whereNotIn('status', ['succeeded', 'canceled'])
+        ->exists();
     }
 
     public function getSubscriptionType()

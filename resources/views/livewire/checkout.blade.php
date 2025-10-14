@@ -295,6 +295,7 @@
           if (response) {
             
             if (response.action == 'create') {
+
               const { error, setupIntent } = await stripe.confirmSetup({
                 elements,
                 redirect: 'if_required',
@@ -305,6 +306,7 @@
               } else {
                 $wire.dispatch('makePayment', { pm_id: setupIntent.payment_method });
               }
+
             } else {
               $wire.dispatch('makePayment', { pm_id: response.action });
             }
@@ -320,7 +322,9 @@
         });
 
         const result = error ? 'error' : 'success';
-        $wire.paymentResult(result, error.paymentIntent.id);
+        const pid = error ? error.paymentIntent.id : paymentIntent.id;
+
+        $wire.paymentResult(result, pid);
       });
 
       $('.text-area-gift').on('input', function(evt) {

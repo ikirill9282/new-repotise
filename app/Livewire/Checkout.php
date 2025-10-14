@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Jobs\CancelPaymentIntents;
 use App\Models\Order;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -13,13 +14,15 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Laravel\Cashier\PaymentMethod;
 use Livewire\Attributes\On;
+use Stripe\PaymentMethod as StripePaymentMethod;
 
 class Checkout extends Component
 {
     // 4000 0027 6000 3184 - 3d secure
     // 4000 0000 0000 0002 - error
-    // 4000 0000 0000 0001 - no money
+    // 4000 0000 0000 9995 - no money
 
     public string $order_id;
     
@@ -45,6 +48,11 @@ class Checkout extends Component
       if (Auth::check()) {
         $this->form['fullname'] = Auth::user()->name;
         $this->form['email'] = Auth::user()->email;
+      }
+
+      $success_payment = $this->getOrder()->getSuccessPayment();
+      if ($success_payment) {
+        return $this->paymentResult('success', $success_payment->stripe_id);
       }
 
       $setupIntent = Cashier::stripe()->setupIntents->create([
@@ -152,27 +160,35 @@ class Checkout extends Component
           ]);
         }
         
-        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
-        if ($paymentMethod->customer !== $user->stripe_id) {
-          $user->addPaymentMethod($pm_id);
-        }
+        $paymentMethod = $this->addUserPaymentMethod($user, $pm_id);
+        $paymentIntent = null;
+        $need_creation = false;
 
         if ($order->hasIncompletePayment()) {
-          $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->getCurrentPayment()->stripe_id);
+          $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->getLatestPayment()->stripe_id);
 
-          if ($paymentIntent->status == 'requires_payment_method') {
-            Cashier::stripe()->paymentIntents->update($paymentIntent->id, [
-              'payment_method' => $paymentMethod->id,
-            ]);
-            $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->payment_id);
+          if ($paymentIntent->payment_method == $pm_id) {
+            if ($paymentIntent->status == 'requires_payment_method') {
+              Cashier::stripe()->paymentIntents->update($paymentIntent->id, [
+                'payment_method' => $paymentMethod->id,
+              ]);
+              $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->payment_id);
+            }
+          } else {
+            $need_creation = true;
+            CancelPaymentIntents::dispatch([$paymentIntent->id]);
           }
 
         } else {
+          $need_creation = true;
+        }
+
+        if ($need_creation) {
           $paymentIntent = Cashier::stripe()->paymentIntents->create([
             'customer' => $user->stripe_id,
             'amount' => $order->getTotal() * 100, // cents!
             'currency' => 'usd',
-            'payment_method' => $pm_id,
+            'payment_method' => $paymentMethod->id,
             'confirmation_method' => 'automatic',
             'confirm' => true,
             'return_url' => route('payment.success'),
@@ -213,6 +229,50 @@ class Checkout extends Component
       } else {
           return $this->paymentResult('error', $paymentIntent->id);
       }
+    }
+
+    public function addUserPaymentMethod(User $user, string $pm_id): PaymentMethod|StripePaymentMethod
+    {
+      $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
+      $pmType = $paymentMethod->type;
+
+      $newFingerprint = $paymentMethod->card->fingerprint;
+
+      $existingMethods = Cashier::stripe()->paymentMethods->all([
+        'customer' => $user->stripe_id,
+        'type' => $pmType,
+      ]);
+
+      $pm = null;
+      if ($pmType === 'card') {
+          $newFingerprint = $paymentMethod->card->fingerprint;
+
+          foreach ($existingMethods->data as $method) {
+              if ($method->card->fingerprint === $newFingerprint) {
+                  $pm = $method;
+                  break;
+              }
+          }
+      } elseif ($pmType === 'sepa_debit') {
+          $newBankDetails = $paymentMethod->sepa_debit;
+          foreach ($existingMethods->data as $method) {
+              $existingBankDetails = $method->sepa_debit;
+              if (
+                  $existingBankDetails->last4 === $newBankDetails->last4 &&
+                  $existingBankDetails->bank_code === $newBankDetails->bank_code
+              ) {
+                  $pm = $method;
+                  break;
+              }
+          }
+      }
+
+      if (is_null($pm)) {
+        $user->addPaymentMethod($paymentMethod->id);
+        $pm = $paymentMethod;
+      }
+
+      return $pm;
     }
 
     public function getOrder(): ?Order
