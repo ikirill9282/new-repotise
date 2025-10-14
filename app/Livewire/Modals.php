@@ -21,6 +21,8 @@ class Modals extends Component
       'backup',
       'edit-contacts',
       'cancelsub',
+      'delete-subscription',
+      'delete-subscription-accept',
     ];
 
     public function mount()
@@ -101,6 +103,8 @@ class Modals extends Component
         'order',
         'edit-contacts',
         'file-description',
+        'delete-subscription',
+        'delete-subscription-accept',
       ];
       return !in_array($this->modal, $arr);
     }    
@@ -135,6 +139,7 @@ class Modals extends Component
         'message',
         'social',
         'donate',
+        'delete-subscription',
       ])) return '!max-w-2xl';
       
       if (in_array($this->modal, ['funds', 'contact'])) return '!max-w-xl';

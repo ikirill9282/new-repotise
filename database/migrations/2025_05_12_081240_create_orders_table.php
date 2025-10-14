@@ -20,15 +20,15 @@ return new class extends Migration
             $table->decimal('tax', 10, 2)->default(0);
             $table->decimal('cost_without_discount', 10, 2);
             $table->decimal('cost_without_tax', 10, 2);
-            $table->string('type')->default('cart')->index();
-            $table->string('sub_period')->nullable();
+            // $table->string('type')->default('cart')->index();
+            // $table->string('sub_period')->nullable();
             $table->decimal('stripe_fee')->nullable();
             $table->decimal('base_reward')->nullable();
             $table->decimal('seller_reward')->nullable();
             $table->decimal('referal_reward')->nullable();
             $table->decimal('platform_reward')->nullable();
             $table->bigInteger('discount_id')->unsigned()->nullable()->index();
-            $table->string('payment_id')->nullable()->unique();
+            // $table->string('payment_id')->nullable()->unique();
             $table->tinyInteger('gift')->default(0);
             $table->string('recipient')->index()->nullable();
             $table->string('recipient_message')->nullable();

@@ -100,7 +100,6 @@ class LocationSeeder extends Seeder
       "Singapore",
       "South Korea",
       "Sri Lanka",
-      "Syria",
       "Taiwan",
       "Tajikistan",
       "Thailand",
@@ -119,26 +118,5 @@ class LocationSeeder extends Seeder
           'poster' => "/storage/images/home_filter.png",
         ]);
     }
-    // Location::firstOrCreate(
-    //   ['title' => 'Japan'],
-    //   [
-    //     'title' => 'Japan',
-    //     'slug' => Slug::makeEn('Japan'),
-    //   ],
-    // );
-    // Location::firstOrCreate(
-    //   ['title' => 'Vietnam'],
-    //   [
-    //     'title' => 'Vietnam',
-    //     'slug' => Slug::makeEn('Vietnam'),
-    //   ],
-    // );
-    // Location::firstOrCreate(
-    //   ['title' => 'China'],
-    //   [
-    //     'title' => 'China',
-    //     'slug' => Slug::makeEn('China'),
-    //   ],
-    // );
   }
 }

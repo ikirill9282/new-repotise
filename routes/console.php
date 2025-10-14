@@ -40,7 +40,7 @@ Schedule::command('queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
   // Product::find(99)->publishInStripe();
-  Product::find(98)->publishInStripe();
+  Product::find(2)->publishInStripe();
 });
 
 Artisan::command('ttm', function() {

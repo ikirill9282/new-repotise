@@ -29,7 +29,8 @@ class Checkout extends Component
       'email' => null,
       'gift' => false,
       'recipient' => null,
-      'recipient_message' => null
+      'recipient_message' => null,
+      'payment_method' => null,
     ];
 
     // public ?string $promocode = null;
@@ -47,30 +48,7 @@ class Checkout extends Component
         'payment_method_types' => ['card'],
       ]);
       $this->clientSecret = $setupIntent->client_secret;
-      
-      // if (!empty($order->discount_id)) {
-      //   $this->promocode = $order->discount->code;
-      // }
     }
-
-    // public function applyPromocode(): void
-    // {
-    //   $this->promocode = trim($this->promocode);
-    //   $this->validate(['promocode' => 'required|string|min:7|exists:discounts,code']);
-      
-    //   $discount = Discount::query()
-    //     ->where('code', $this->promocode)
-    //     ->first();
-        
-    //   if ($discount->isAvailable($this->order)) {
-    //     $this->order->applyDiscount($discount);
-    //     if ($this->order->cost > 0) {
-    //       $this->updatePaymentIntent();
-    //     }
-    //   } else {
-    //     $this->addError('promocode', 'Incorrect promocode');
-    //   }
-    // }
 
     public function removePromocode(): void
     {
@@ -86,10 +64,8 @@ class Checkout extends Component
         $order->order_products()->where('product_id', $product_id)->delete();
         $order->load('products');
 
-        // $this->order->discount->isAvailable($this->order);
         if ($order->discount_id && !$order->discount->isAvailable($order)) {
           $order->removeDiscount();
-          // $this->promocode = null;
         }
       });
       
@@ -98,7 +74,6 @@ class Checkout extends Component
         Session::forget('checkout');
       } else {
         $order->recalculate();
-        // $this->updatePaymentIntent();
       }
     }
     
@@ -110,8 +85,6 @@ class Checkout extends Component
 
       $new_count = $product->pivot->count + 1;
       $product->pivot->update(['count' => $new_count]);
-      // $this->order->recalculate();
-      // $this->updatePaymentIntent();
     }
 
     public function decrementProductCount(int $product_id): void
@@ -121,22 +94,8 @@ class Checkout extends Component
       if ($product->pivot->count > 1) {
         $new_count = $product->pivot->count - 1;
         $product->pivot->update(['count' => $new_count]);
-        // $this->order->recalculate();
-        // $this->updatePaymentIntent();
       }
     }
-
-    // protected function updatePaymentIntent(): void
-    // {
-    //   Cashier::stripe()
-    //     ->paymentIntents
-    //     ->update(
-    //       $this->order->payment_id, 
-    //       [
-    //         'amount' => ($this->order->getTotal() * 100)
-    //       ]
-    //     );
-    // }
 
     public function checkValidtion()
     {
@@ -146,6 +105,7 @@ class Checkout extends Component
         'gift' => 'required|boolean',
         'recipient' => 'required_if_accepted:form.gift|nullable|email',
         'recipient_message' => 'required_if_accepted:form.gift|nullable|string',
+        'payment_method' => 'sometimes|nullable|string',
       ]);
 
       if ($validator->fails()) {
@@ -153,13 +113,13 @@ class Checkout extends Component
         return false;
       }
 
-      return true;
+      $valid = $validator->validated();
+      return ['action' => isset($valid['payment_method']) ? $valid['payment_method'] : 'create'];
     }
 
     #[On('makePayment')]
     public function onMakePayment(string $pm_id)
     { 
-
       DB::beginTransaction();
       try {
         $order = $this->getOrder();
@@ -187,19 +147,37 @@ class Checkout extends Component
           ]);
         }
 
-        $user->addPaymentMethod($pm_id);
-        $paymentIntent = Cashier::stripe()->paymentIntents->create([
-          'customer' => $user->stripe_id,
-          'amount' => $order->getTotal() * 100, // cents!
-          'currency' => 'usd',
-          'payment_method' => $pm_id,
-          'confirmation_method' => 'manual',
-          'confirm' => true,
-          'return_url' => route('payment.success'),
-          'metadata' => [
-            'order_id' => $order->id,
-          ],
-        ]);
+
+        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
+        if ($paymentMethod->customer !== $user->stripe_id) {
+          $user->addPaymentMethod($pm_id);
+        }
+
+        if ($order->payment_id) {
+          $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->payment_id);
+
+          if ($paymentIntent->status == 'requires_payment_method') {
+            Cashier::stripe()->paymentIntents->update($paymentIntent->id, [
+              'payment_method' => $paymentMethod->id,
+            ]);
+            $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($order->payment_id);
+          }
+
+        } else {
+          $paymentIntent = Cashier::stripe()->paymentIntents->create([
+            'customer' => $user->stripe_id,
+            'amount' => $order->getTotal() * 100, // cents!
+            'currency' => 'usd',
+            'payment_method' => $pm_id,
+            'confirmation_method' => 'automatic',
+            'confirm' => true,
+            'return_url' => route('payment.success'),
+            'metadata' => [
+              'order_id' => $order->id,
+            ],
+          ]);
+          $order->update(['payment_id' => $paymentIntent->id]);
+        }
 
       } catch (\Exception $e) {
         Log::critical('Error while payement creation', [
@@ -212,16 +190,18 @@ class Checkout extends Component
       }
       DB::commit();
 
-      $order->update(['payment_id' => $paymentIntent->id]);
-      if ($paymentIntent->status === 'requires_action') {
+      if (in_array($paymentIntent->status, ['requires_action', 'requires_confirmation'])) {
           $this->requiresAction = true;
           $this->clientSecret = $paymentIntent->client_secret;
-          $this->dispatch('requires-action', ['clientSecret' => $this->clientSecret]);
+          $this->dispatch('requires-action', [
+            'clientSecret' => $this->clientSecret,
+            'paymentMethod' => $paymentMethod->id,
+          ]);
+
       } elseif ($paymentIntent->status === 'succeeded') {
-          $url = route('payment.success') . '/?payment_intent=' . $paymentIntent->id;
-          return redirect($url);
+          return $this->paymentResult('success', $paymentIntent->id);
       } else {
-          return redirect()->route('payment.error');
+          return $this->paymentResult('error', $paymentIntent->id);
       }
     }
 
@@ -230,6 +210,12 @@ class Checkout extends Component
       return Order::where('id', Crypt::decrypt($this->order_id))
         ->with('user', 'order_products.product')
         ->first();
+    }
+
+    public function paymentResult(string $result, string $paymentIntentId)
+    {
+      $url = route("payment.$result") . '/?payment_intent=' . $paymentIntentId;
+      return redirect($url);
     }
 
     public function render()

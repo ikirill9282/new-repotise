@@ -137,9 +137,9 @@
                           <div class="!mb-6">
                             @foreach($paymentMethods as $pm)
                               @if($pm->type == 'card')
-                                <div class="">
+                                <div class="!mb-3">
                                   <x-form.payment-method
-                                    wire:model="form.paymentMethod"
+                                    wire:model="form.payment_method"
                                     label="Card" 
                                     :brand="ucfirst($pm->card->brand)"
                                     :last4="$pm->card->last4"
@@ -292,17 +292,35 @@
       btn.addEventListener('click', (evt) => {
         evt.preventDefault();
         $wire.checkValidtion().then(async response => {
-          const { error, setupIntent } = await stripe.confirmSetup({
-            elements,
-            redirect: 'if_required',
-          });
-          
-          if (error) {
-            $wire.dispatch('toastError', [{message: error.message}]);
-          } else {
-            $wire.dispatch('makePayment', { pm_id: setupIntent.payment_method });
+          if (response) {
+            
+            if (response.action == 'create') {
+              const { error, setupIntent } = await stripe.confirmSetup({
+                elements,
+                redirect: 'if_required',
+              });
+              
+              if (error) {
+                $wire.dispatch('toastError', [{message: error.message}]);
+              } else {
+                $wire.dispatch('makePayment', { pm_id: setupIntent.payment_method });
+              }
+            } else {
+              $wire.dispatch('makePayment', { pm_id: response.action });
+            }
+
           }
         });
+      });
+
+      $wire.on('requires-action', async (data) => {
+        const params = data[0];
+        const { error, paymentIntent } = await stripe.confirmCardPayment(params.clientSecret, {
+          payment_method: params.paymentMethod,
+        });
+
+        const result = error ? 'error' : 'success';
+        $wire.paymentResult(result, error.paymentIntent.id);
       });
 
       $('.text-area-gift').on('input', function(evt) {

@@ -17,8 +17,8 @@
           @foreach($subs as $sub)
             @php
               $product = $sub->order_products->first();
-              $paymentMethodId = $sub->getTransaction()->payment_method;
-              $paymentMethod = $sub->user->findPaymentMethod($paymentMethodId);
+              $paymentMethodId = $sub->getTransaction()?->payment_method;
+              $paymentMethod = $paymentMethodId ? $sub->user->findPaymentMethod($paymentMethodId) : null;
             @endphp
             <tr>
               <td class="!border-none bg-clip-content !px-0 !text-gray !rounded-tl-2xl !rounded-bl-2xl">
@@ -31,12 +31,14 @@
               </td>
               <td class="!border-none bg-clip-content !px-0 !text-gray">
                 <div class="!p-3 ">
-                  {{ \Illuminate\Support\Carbon::parse($sub->created_at)->format('d.m.Y') }}
+                  @if($paymentMethod)
+                    {{ \Illuminate\Support\Carbon::parse($sub->created_at)->format('d.m.Y') }}
+                  @endif
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 !text-gray">
                 <div class="!p-3 ">
-                  @if($paymentMethod->type == 'card')
+                  @if($paymentMethod && $paymentMethod->type == 'card')
                     {{ ucfirst($paymentMethod->card->brand) }} **** {{ $paymentMethod->card->last4 }}
                   @endif
                 </div>
@@ -48,8 +50,30 @@
               </td>
               <td class="!border-none bg-clip-content !px-0 text-nowrap !rounded-tr-2xl !rounded-br-2xl">
                 <div class="!p-3 ">
-                  @if(!$sub->user->subscription($sub->getSubscriptionType())->asStripeSubscription()->cancel_at_period_end)
-                    <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'cancelsub', args: { order_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}' } })" class="group-has-[a]:hover:!text-black">Cancel Subscription</x-link>
+                  @if($sub->status_id !== \App\Enums\Order::NEW)
+                    @if(!$sub->user->subscription($sub->getSubscriptionType())?->asStripeSubscription()->cancel_at_period_end)
+                      <x-link 
+                        wire:click.prevent="$dispatch('openModal', { modalName: 'cancelsub', args: { order_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}' } })" 
+                        class="group-has-[a]:hover:!text-black"
+                      >
+                        Cancel Subscription
+                      </x-link>
+                    @endif
+                  @else
+                    <div class="flex flex-col !gap-3 items-start">
+                      <x-link 
+                          wire:click.prevent="completePayment('{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}')" 
+                          class="group-has-[a]:hover:!text-black"
+                        >
+                          Complete Payment
+                        </x-link>
+                      <x-link 
+                          wire:click.prevent="$dispatch('openModal', {modalName: 'delete-subscription', args: { order_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}' }})"
+                          class="group-has-[a]:hover:!text-black"
+                        >
+                          Delete Subscription
+                        </x-link>
+                    </div>
                   @endif
                 </div>
               </td>

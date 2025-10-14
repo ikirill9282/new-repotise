@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Cashier\Cashier;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Laravel\Cashier\Payment;
 
 class CheckoutSubscription extends Component
 {
@@ -45,6 +47,7 @@ class CheckoutSubscription extends Component
     public function onMakeSubscription(string $pm_id)
     {
       $order = $this->getOrder();
+      $order_product = $order->order_products->first();
 
       DB::beginTransaction();
       try {
@@ -73,8 +76,31 @@ class CheckoutSubscription extends Component
       }
 
       DB::commit();
-      $user->addPaymentMethod($pm_id);
-      $order_product = $order->order_products->first();
+
+      $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
+      if ($paymentMethod->customer !== $user->stripe_id) {
+        $user->addPaymentMethod($pm_id);
+      }
+
+      $subscription = $user->subscription($order->getSubscriptionType());
+      if ($subscription && $subscription->hasIncompletePayment()) {
+        $paymentIntent = $subscription->latestPayment()->asStripePaymentIntent();
+        $paymentIntent = Cashier::stripe()->paymentIntents->confirm($paymentIntent->id, [
+          'payment_method' => $pm_id,
+        ]);
+
+        if (in_array($paymentIntent->status, ['requires_action', 'requires_confirmation'])) {
+          $this->dispatch('requires-action', [
+            'clientSecret' => $paymentIntent->client_secret,
+            'paymentMethod' => $paymentMethod->id,
+          ]);
+
+        } elseif ($paymentIntent->status === 'succeeded') {
+          return $this->paymentResult('success', $paymentIntent->id);
+        } else {
+          return $this->paymentResult('error', $paymentIntent->id);
+        }
+      }
 
       try {
         $price_id = $order_product->product->subprice->getPeriodId($order->sub_period);
@@ -85,11 +111,24 @@ class CheckoutSubscription extends Component
           ]
         ]);
       } catch (\Exception $e) {
+        $sub = $user->subscription($order->getSubscriptionType());
+        $paymentIntent = $sub->latestPayment()->asStripePaymentIntent();
+        $order->update(['payment_id' => $paymentIntent->id]);
+
+        if (in_array($paymentIntent->status, ['requires_action', 'requires_confirmation'])) {
+          $this->dispatch('requires-action', [
+            'clientSecret' => $paymentIntent->client_secret,
+            'paymentMethod' => $pm_id,
+          ]);
+          return ;
+        }
+
         $this->dispatch('toastError', ['message' => 'Something went wrong ... Please contact with administration!']);
         Log::critical('Subscription error', [
           'order' => $order,
           'error' => $e,
         ]);
+
         return ;
       }
 
@@ -103,7 +142,7 @@ class CheckoutSubscription extends Component
       return redirect($url);
     }
 
-    public function checkValidtion()
+    public function checkValidation()
     {
       $validator = Validator::make($this->form, [
         'username' => 'required|string',
@@ -117,6 +156,12 @@ class CheckoutSubscription extends Component
       $valid = $validator->validated();
 
       return ['action' => isset($valid['paymentMethod']) ? $valid['paymentMethod'] : 'create'];
+    }
+
+    public function paymentResult(string $result, string $paymentIntentId)
+    {
+      $url = route("payment.$result") . '/?payment_intent=' . $paymentIntentId;
+      return redirect($url);
     }
 
     public function render()

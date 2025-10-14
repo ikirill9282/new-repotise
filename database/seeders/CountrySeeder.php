@@ -182,7 +182,6 @@ class CountrySeeder extends Seeder
           ['name' => 'Suriname', 'iso' => 'SR', 'prefix' => '+597'],
           ['name' => 'Sweden', 'iso' => 'SE', 'prefix' => '+46'],
           ['name' => 'Switzerland', 'iso' => 'CH', 'prefix' => '+41'],
-          ['name' => 'Syria', 'iso' => 'SY', 'prefix' => '+963'],
           ['name' => 'Taiwan', 'iso' => 'TW', 'prefix' => '+886'],
           ['name' => 'Tajikistan', 'iso' => 'TJ', 'prefix' => '+992'],
           ['name' => 'Tanzania', 'iso' => 'TZ', 'prefix' => '+255'],

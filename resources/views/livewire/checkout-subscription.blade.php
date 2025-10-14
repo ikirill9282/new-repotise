@@ -14,17 +14,17 @@
                 <div class="left_form">
                     <div>
                         <div class="!mb-3">
-                          <x-form.input wire:model="form.username" name="username" placeholder="Your Full Name" />
+                          <x-form.input wire:model="form.username" name="username" placeholder="Your Full Name" tooltipText='Enter your valid full name. e.g. "John Doe".' />
                         </div>
                         <div class="!mb-6">
-                          <x-form.input wire:model="form.email" name="email" type="email" placeholder="Your Email" />
+                          <x-form.input wire:model="form.email" name="email" type="email" placeholder="Your Email" tooltipText="Enter your valid email. We will send you validation link." />
                         </div>
 
                         @if (!is_null($paymentMethods) && !$paymentMethods->isEmpty())
                           <div class="!mb-6">
                             @foreach($paymentMethods as $pm)
                               @if($pm->type == 'card')
-                                <div class="">
+                                <div class="!mb-3">
                                   <x-form.payment-method
                                     wire:model="form.paymentMethod"
                                     label="Card" 
@@ -140,7 +140,7 @@
       const btn = document.getElementById('payment-btn');
       btn.addEventListener('click', async (evt) => {
         evt.preventDefault();
-        $wire.checkValidtion().then(async response => {
+        $wire.checkValidation().then(async response => {
           if (response) {
             if (response.action === 'create') {
               const { error, setupIntent } = await stripe.confirmSetup({
@@ -159,8 +159,18 @@
           }
         });
       });
-      
 
+      $wire.on('requires-action', async (data) => {
+        const params = data[0];
+        const { error, paymentIntent } = await stripe.confirmCardPayment(params.clientSecret, {
+          payment_method: params.paymentMethod,
+        });
+
+        const result = error ? 'error' : 'success';
+        const pid = error ? error.paymentIntent.id : paymentIntent.id;
+        $wire.paymentResult(result, pid);
+      });
+      
       $('.text-area-gift').on('input', function(evt) {
           $('.text-area-gift-counter').find('.text-area-counter').html(evt.target.value.length);
       });

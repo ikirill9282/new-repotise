@@ -12,6 +12,8 @@ class Subs extends Component
 
     public string $user_id;
 
+    protected $listeners = ['subs-refresh' => '$refresh'];
+
     public function mount(string $user_id)
     {
       $this->user_id = $user_id;
@@ -30,18 +32,19 @@ class Subs extends Component
       return redirect()->route('checkout');
     }
 
-    public function cancelSubscription(int $order_id)
+    public function completePayment(string $order_id)
     {
-      dd($order_id);
+      Session::put('checkout', Crypt::decrypt($order_id));
+      return redirect()->route('checkout.subscription');
     }
 
     public function render()
     {
-        $user = $this->getUser();
+      $user = $this->getUser();
 
-        return view('livewire.profile.tables.subs', [
-          'user' => $user,
-          'subs' => $user->orders()->where('type', 'sub')->get(),
-        ]);
+      return view('livewire.profile.tables.subs', [
+        'user' => $user,
+        'subs' => $user->orders()->where('type', 'sub')->get(),
+      ]);
     }
 }

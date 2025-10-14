@@ -40,7 +40,7 @@
   @endif
 
   @if($tooltip)
-    <x-tooltip message="tooltip" class="right-4"></x-tooltip>
+    <x-tooltip message="tooltip" class="right-3"></x-tooltip>
   @endif
 
   @if ($icons)
