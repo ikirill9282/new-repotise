@@ -24,13 +24,13 @@ class Cart
     $this->loadCart();
   }
 
-  public function flushCart()
+  public function flushCart(): void
   {
     $this->cart = $this->template;
     $this->updateCart($this->template);
   }
 
-  public function addProduct(int $product_id, ?int $count = null)
+  public function addProduct(int $product_id, ?int $count = null): void
   {
     if (!isset($this->cart['products'])) $this->cart['products'] = [];
 
@@ -50,7 +50,7 @@ class Cart
     $this->updateCart($this->cart);
   }
 
-  public function removeProduct(int $product_id)
+  public function removeProduct(int $product_id): void
   {
     foreach ($this->cart['products'] as $key => $product) {
       if ($product['id'] == $product_id) {
@@ -69,25 +69,48 @@ class Cart
     $this->loadCart();
   }
 
-  public function loadCart()
+  public function loadCart(): void
   {
     $this->cart = SessionExpire::getCart($this->name) ?? [];
     if (empty($this->cart)) $this->cart = $this->template;
   }
 
-  public function inCart(int $id)
+  public function inCart(int $id): bool
   {
     return collect($this->cart['products'])->where('id', $id)->isNotEmpty();
   }
 
   public function getCartCount(): int
   {
+    $r = collect($this->getProducts())->sum('count') ?? 0;
+    // dd($this->cart);
     return collect($this->getProducts())->sum('count') ?? 0;
 
     // if ($this->hasProducts()) {
     //   return collect($this->getProducts())->sum('count');
     // }
     // return 0;
+  }
+
+  public function hasProducts(): bool
+  {
+    return !empty($this->cart) && isset($this->cart['products']) && !empty($this->cart['products']);
+  }
+
+  public function hasPromocode(?array $cart = null): bool
+  {
+    // if (is_null($cart)) $cart = $this->getCart();
+    return (isset($this->cart['promocode']) && !empty($this->cart['promocode']));
+  }
+
+  public function getCartProducts(): ?Collection
+  {
+    return $this->hasProducts() ? Product::whereIn('id', $this->getCartProductsIds())->get() : collect([]);
+  }
+
+  public function getProducts(): array
+  {
+    return $this->hasProducts() ? $this->cart['products'] : [];
   }
 
 
@@ -135,16 +158,6 @@ class Cart
       return $result;
     }
     return 0;
-  }
-
-  public function getProducts(): array
-  {
-    return $this->hasProducts() ? $this->getCart()['products'] : [];
-  }
-
-  public function getCartProducts(): ?Collection
-  {
-    return $this->hasProducts() ? Product::whereIn('id', $this->getCartProductsIds())->get() : collect([]);
   }
 
   public function getCartProductsIds(): array
@@ -199,18 +212,6 @@ class Cart
   public function calcDiscount($promo, ?int $price = null) {
     $int = is_null($price) ? $this->getCartAmount() : $price;
     return round(($int / 100) * $promo->percentage);
-  }
-
-  public function hasProducts(?array $cart = null)
-  {
-    if (is_null($cart)) $cart = $this->getCart();
-    return !empty($cart) && isset($cart['products']) && !empty($cart['products']);
-  }
-
-  public function hasPromocode(?array $cart = null)
-  {
-    if (is_null($cart)) $cart = $this->getCart();
-    return (isset($cart['promocode']) && !empty($cart['promocode']));
   }
 
   public function paymentExists()

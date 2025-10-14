@@ -46,6 +46,11 @@ class Order extends Model
       
     }
 
+    public function payments()
+    {
+      return $this->morphMany(Payments::class, 'paymentable');
+    }
+
     public function free(): bool
     {
       return $this->discount && $this->cost == 0;
@@ -216,7 +221,7 @@ class Order extends Model
     {
       return [
           'user_id' => $this->user_id,
-          'payment_id' => $this->payment_id,
+          // 'payment_id' => $this->payment_id,
           'cost' => $this->getTotal(),
           'tax' => $this->getTax(),
           'cost_without_discount' => ($this->getAmount() + $this->getTax()),

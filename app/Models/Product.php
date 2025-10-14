@@ -77,6 +77,8 @@ class Product extends Model
     $stripe_product = $stripe_client->createProduct($this);
     if ($this->subscription) {
       $stripe_client->createPrices($this, $stripe_product);
+    } else {
+      $stripe_client->createPrice($this, $stripe_product);
     }
   }
 

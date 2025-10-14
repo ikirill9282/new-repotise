@@ -53,6 +53,17 @@ class StripeClient
     return $stripe_product;
   }
 
+  public function createPrice(Product $product, StripeProduct $stripe_product): void
+  {
+    $price = StripePrice::create([
+      'product' => $stripe_product->id,
+      'unit_amount' => $product->getPrice() * 100, // cents!
+      'currency' => 'usd',
+    ]);
+
+    $product->update(['stripe_price_id' => $price->id]);
+  }
+
   public function createPrices(Product $product, StripeProduct $stripe_product): void
   {
     $month = StripePrice::create([

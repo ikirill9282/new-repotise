@@ -27,9 +27,11 @@ use App\Models\MailLog;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use App\Models\News;
+use App\Models\Subscriptions;
 use App\Services\StripeClient;
 use Database\Factories\ProductFactory;
 use Illuminate\Support\Facades\Crypt;
+use Laravel\Cashier\Subscription;
 use Mews\Purifier\Facades\Purifier;
 use Stripe\Collection;
 use Stripe\Price;
@@ -39,8 +41,9 @@ Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
+  $order = Order::find(100200);
   // Product::find(99)->publishInStripe();
-  Product::find(2)->publishInStripe();
+  // Product::find(2)->publishInStripe();
 });
 
 Artisan::command('ttm', function() {

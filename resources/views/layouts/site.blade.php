@@ -43,7 +43,6 @@
 
     @stack('head')
 
-
     @php
       $cart = new \App\Services\Cart();
     @endphp

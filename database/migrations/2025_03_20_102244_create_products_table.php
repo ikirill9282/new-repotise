@@ -24,6 +24,7 @@ return new class extends Migration
           $table->integer('refund_policy')->default(90);
           $table->integer('views')->default(0);
           $table->string('stripe_id')->nullable();
+          $table->string('stripe_price_id')->nullable();
           $table->longText('text');
           $table->text('pp_text')->nullable();
 
