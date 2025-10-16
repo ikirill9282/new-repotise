@@ -37,7 +37,7 @@ class Orders extends Component
 
       return view('livewire.profile.tables.orders', [
         'user' => $user,
-        'orders' => $user->orders()->whereIn('status_id', [Order::PAID, Order::REWARDING, Order::COMPLETE])->get(),
+        'orders' => $user->orders()->get(),
       ]);
     }
 }

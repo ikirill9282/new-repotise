@@ -198,7 +198,7 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->hasMany(Order::class);
     }
 
-    public function owner()
+    public function referrer()
     {
       return $this->hasOneThrough(User::class, UserReferal::class, 'referal_id', 'id', 'id', 'owner_id');
     }

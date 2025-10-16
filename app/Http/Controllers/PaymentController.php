@@ -18,7 +18,9 @@ use App\Mail\InviteByPurchase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use App\Jobs\ProcessOrder;
+use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
+use App\Models\Payments;
 
 
 class PaymentController extends Controller
@@ -52,14 +54,13 @@ class PaymentController extends Controller
 
   public function checkoutSubscription(Request $request)
   {
-    if (!Session::exists('checkout') || empty(Session::get('checkout'))) {
+    if (!Session::exists('checkout-sub') || empty(Session::get('checkout-sub'))) {
       return redirect('/products');
     }
-
-    $order = Order::find(Session::get('checkout'));
     
+    $data = Session::get('checkout-sub');
     return view("site.pages.checkout-subscription", [
-      'order' => $order,
+      'data' => $data,
     ]);
   }
 
@@ -77,16 +78,16 @@ class PaymentController extends Controller
       return (new FallbackController)($request);
     }
 
-    if ($order->free()) {
-      $paymentIntent = null;
-      $paymentMethod = 'Free';
-      $order->cancelTransaction('Used free product promocode.');
-    } else {
-      $payment = $order->getSuccessPayment();
-      $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($payment->stripe_id);
-      $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($paymentIntent->payment_method);
+    $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($valid['payment_intent']);
+    $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($paymentIntent->payment_method);
+
+    if ($paymentIntent->status == PaymentIntent::STATUS_SUCCEEDED) {
+      Payments::query()
+        ->where('stripe_id', $paymentIntent->id)
+        ->update(['status' => $paymentIntent->status]);
     }
     
+    // $order->update(['status_id' => EnumsOrder::PAID]);
     ProcessOrder::dispatch($order);
     
     return view('site.pages.payment-success', [

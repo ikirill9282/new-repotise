@@ -230,7 +230,7 @@ class Order extends Model
         'count' => $item->pivot['count'], 
         'price' => $item->pivot['price'],
         'sale_price' => $item->pivot['sale_price'],
-        'total' => $item->pivot['price'] * ($item->pivot['count'] ?? 1),
+        'total' => ($item->pivot['price'] - $item->pivot['sale_price']) * ($item->pivot['count'] ?? 1),
         'total_without_discount' => $item->pivot['price'] * ($item->pivot['count'] ?? 1),
       ])
         ->toArray();

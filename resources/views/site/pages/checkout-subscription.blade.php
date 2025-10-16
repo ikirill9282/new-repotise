@@ -1,5 +1,8 @@
 @extends('layouts.site')
 
 @section('content')
-  @livewire('checkout-subscription', ['order_id' => \Illuminate\Support\Facades\Crypt::encrypt($order->id)])
+  @livewire('checkout-subscription', [
+    'product_id' => $data['product_id'],
+    'period' => $data['period'],
+  ]);
 @endsection

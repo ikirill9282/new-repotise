@@ -27,6 +27,7 @@ use App\Models\MailLog;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use App\Models\News;
+use App\Models\OrderProducts;
 use App\Models\Subscriptions;
 use App\Services\StripeClient;
 use Database\Factories\ProductFactory;
@@ -41,9 +42,23 @@ Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('queue-monitor:stale')->daily();
 
 Artisan::command('tt', function(Request $request) {
-  $order = Order::find(100200);
-  // Product::find(99)->publishInStripe();
-  // Product::find(2)->publishInStripe();
+  // foreach (Order::all() as $order) {
+    $order = Order::find(100208);
+    $job = new ProcessOrder($order);
+    $job->handle();
+  // }
+});
+
+Artisan::command('tt2', function() {
+  $query = "metadata['order_id']:'100205'";
+  $results = Cashier::stripe()->paymentIntents->search([
+      'query' => $query,
+  ]);
+  foreach ($results as $result) {
+    if ($result->amount == 10900) {
+      dd($result->toArray());
+    }
+  }
 });
 
 Artisan::command('ttm', function() {

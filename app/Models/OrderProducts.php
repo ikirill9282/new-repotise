@@ -46,8 +46,14 @@ class OrderProducts extends Model
 
       return $this->price;
     }
+    
     public function getTotal(): int
     {
       return round($this->getPrice() * $this->count ?? 1, 2);
+    }
+
+    public function getTotalWithoutDiscount(): int
+    {
+      return round($this->getPriceWithoutDiscount() * $this->count ?? 1, 2);
     }
 }

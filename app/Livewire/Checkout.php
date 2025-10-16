@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Jobs\CancelPaymentIntents;
 use App\Models\Order;
+use App\Models\Payments;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -16,7 +17,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\PaymentMethod;
 use Livewire\Attributes\On;
+use Stripe\PaymentIntent;
 use Stripe\PaymentMethod as StripePaymentMethod;
+use App\Enums\Order as EnumsOrder;
+use App\Jobs\ProcessOrder;
 
 class Checkout extends Component
 {
@@ -92,19 +96,31 @@ class Checkout extends Component
     public function incrementProductCount(int $product_id): void
     {
       $order = $this->getOrder();
-      $product = $order->products->where('id', $product_id)->first();
+      $order_product = $order->order_products->where('product_id', $product_id)->first();
 
-      $new_count = $product->pivot->count + 1;
-      $product->pivot->update(['count' => $new_count]);
+      $new_count = $order_product->count + 1;
+
+      $order_product->count = $new_count;
+      $order_product->update([
+        'count' => $new_count,
+        'total' => $order_product->getTotal(),
+        'total_without_discount' => $order_product->getTotalWithoutDiscount(),
+      ]);
     }
 
     public function decrementProductCount(int $product_id): void
     {
       $order = $this->getOrder();
-      $product = $order->products->where('id', $product_id)->first();
-      if ($product->pivot->count > 1) {
-        $new_count = $product->pivot->count - 1;
-        $product->pivot->update(['count' => $new_count]);
+      $order_product = $order->order_products->where('product_id', $product_id)->first();
+      if ($order_product->count > 1) {
+        $new_count = $order_product->count - 1;
+
+        $order_product->count = $new_count;
+        $order_product->update([
+          'count' => $new_count,
+          'total' => $order_product->getTotal(),
+          'total_without_discount' => $order_product->getTotalWithoutDiscount(),
+        ]);
       }
     }
 
@@ -284,6 +300,15 @@ class Checkout extends Component
 
     public function paymentResult(string $result, string $paymentIntentId)
     {
+      $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($paymentIntentId);
+      Payments::where('stripe_id', $paymentIntent->id)->update(['status' => $paymentIntent->status]);
+      
+      if ($paymentIntent->status == PaymentIntent::STATUS_SUCCEEDED) {
+        $order = $this->getOrder();
+        $order->update(['status_id' => EnumsOrder::PAID]);
+        ProcessOrder::dispatch($order);
+      }
+
       $url = route("payment.$result") . '/?payment_intent=' . $paymentIntentId;
       return redirect($url);
     }

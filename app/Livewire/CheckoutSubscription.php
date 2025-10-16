@@ -4,6 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Attributes\On;
 use App\Models\Order;
+use App\Models\Payments;
+use App\Models\Product;
+use App\Models\Subscriptions;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
@@ -14,12 +17,12 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Laravel\Cashier\Payment;
+use Laravel\Cashier\PaymentMethod;
+use Stripe\PaymentMethod as StripePaymentMethod;
+
 
 class CheckoutSubscription extends Component
 {
-
-    public string $order_id;
 
     public array $form = [
       'username' => null,
@@ -27,31 +30,39 @@ class CheckoutSubscription extends Component
       'paymentMethod' => null,
     ];
 
-    public function mount(string $order_id)
+    public string $product_id;
+    public string $period;
+
+    public int $discount = 0;
+
+    public int $tax = 0;
+
+    public function mount(string $product_id, string $period)
     {
-      $this->order_id = $order_id;
       $this->form = [
         'username' => Auth::user()?->username,
         'email' => Auth::user()?->email,
       ];
+      $this->product_id = $product_id;
+      $this->period = $period;
     }
 
-    public function getOrder(): ?Order
+    public function getProduct(): ?Product
     {
-      return Order::where('id', Crypt::decrypt($this->order_id))
-        ->with('user', 'order_products.product')
+      return Product::where('id', Crypt::decrypt($this->product_id))
+        ->with('subprice')
         ->first();
     }
 
     #[On('makeSubscription')]
     public function onMakeSubscription(string $pm_id)
     {
-      $order = $this->getOrder();
-      $order_product = $order->order_products->first();
+
+      $product = $this->getProduct();
 
       DB::beginTransaction();
       try {
-        if ($order->user_id == 0) {
+        if (Auth::guest()) {
           $pwd = User::makePassword();
           $user = User::firstOrCreate(
             ['email' => $this->form['email']],
@@ -63,7 +74,7 @@ class CheckoutSubscription extends Component
           $user->sendPassword($pwd);
           $user->sendVerificationCode();
         } else {
-          $user = $order->user;
+          $user = Auth::user();
         }
       } catch (\Exception $e) {
         Log::critical('Cant create new user for subscription', [
@@ -77,16 +88,15 @@ class CheckoutSubscription extends Component
 
       DB::commit();
 
-      $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
-      if ($paymentMethod->customer !== $user->stripe_id) {
-        $user->addPaymentMethod($pm_id);
-      }
+      $paymentMethod = $this->addUserPaymentMethod($user, $pm_id);
 
-      $subscription = $user->subscription($order->getSubscriptionType());
+      $subscription = $user->subscription($this->makeSubscriptionType());
+
       if ($subscription && $subscription->hasIncompletePayment()) {
         $paymentIntent = $subscription->latestPayment()->asStripePaymentIntent();
+        
         $paymentIntent = Cashier::stripe()->paymentIntents->confirm($paymentIntent->id, [
-          'payment_method' => $pm_id,
+          // 'payment_method' => $pm_id,
         ]);
 
         if (in_array($paymentIntent->status, ['requires_action', 'requires_confirmation'])) {
@@ -103,17 +113,14 @@ class CheckoutSubscription extends Component
       }
 
       try {
-        $price_id = $order_product->product->subprice->getPeriodId($order->sub_period);
-        $sub_name = $order->getSubscriptionType();
-        $sub = $user->newSubscription($sub_name, $price_id)->create($pm_id, [
-          'metadata' => [
-            'order_id' => $order->id,
-          ]
-        ]);
+        $price_id = $product->subprice->getPeriodId($this->period);
+        $sub_name = $this->makeSubscriptionType();
+        $sub = $user->newSubscription($sub_name, $price_id)->create($pm_id);
+        $this->addPayment($sub, $user);
+
       } catch (\Exception $e) {
-        $sub = $user->subscription($order->getSubscriptionType());
-        $paymentIntent = $sub->latestPayment()->asStripePaymentIntent();
-        $order->update(['payment_id' => $paymentIntent->id]);
+        $sub = $user->subscription($this->makeSubscriptionType());
+        $this->addPayment($sub, $user);
 
         if (in_array($paymentIntent->status, ['requires_action', 'requires_confirmation'])) {
           $this->dispatch('requires-action', [
@@ -125,21 +132,77 @@ class CheckoutSubscription extends Component
 
         $this->dispatch('toastError', ['message' => 'Something went wrong ... Please contact with administration!']);
         Log::critical('Subscription error', [
-          'order' => $order,
+          'order' => $sub,
           'error' => $e,
         ]);
 
         return ;
       }
-
-      $payment_id = $sub->latestInvoice()->payment_intent;
-      $order->update([
-        'payment_id' => $payment_id,
-        'user_id' => $user->id,
-      ]);
       
-      $url = route('payment.success') . '/?payment_intent=' . $payment_id;
-      return redirect($url);
+      return $this->paymentResult('success', $paymentIntent->id);
+    }
+
+    public function addPayment($sub, $user)
+    {
+      $paymentIntent = $sub->latestPayment()->asStripePaymentIntent();
+      if (!Payments::where('stripe_id', $paymentIntent->id)->exists()) {
+        Subscriptions::find($sub->id)->payments()->create([
+          'user_id' => $user->id,
+          'stripe_id' => $paymentIntent->id,
+          'status' => $paymentIntent->status,
+          'amount' => $paymentIntent->amount / 100, // cents!
+        ]);
+      }
+    }
+
+
+    public function addUserPaymentMethod(User $user, string $pm_id): PaymentMethod|StripePaymentMethod
+    {
+      $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
+      $pmType = $paymentMethod->type;
+
+      $newFingerprint = $paymentMethod->card->fingerprint;
+
+      $existingMethods = Cashier::stripe()->paymentMethods->all([
+        'customer' => $user->stripe_id,
+        'type' => $pmType,
+      ]);
+
+      $pm = null;
+      if ($pmType === 'card') {
+          $newFingerprint = $paymentMethod->card->fingerprint;
+
+          foreach ($existingMethods->data as $method) {
+              if ($method->card->fingerprint === $newFingerprint) {
+                  $pm = $method;
+                  break;
+              }
+          }
+      } elseif ($pmType === 'sepa_debit') {
+          $newBankDetails = $paymentMethod->sepa_debit;
+          foreach ($existingMethods->data as $method) {
+              $existingBankDetails = $method->sepa_debit;
+              if (
+                  $existingBankDetails->last4 === $newBankDetails->last4 &&
+                  $existingBankDetails->bank_code === $newBankDetails->bank_code
+              ) {
+                  $pm = $method;
+                  break;
+              }
+          }
+      }
+
+      if (is_null($pm)) {
+        $user->addPaymentMethod($paymentMethod->id);
+        $pm = $paymentMethod;
+      }
+
+      return $pm;
+    }
+
+    public function makeSubscriptionType()
+    {
+      return "plan_{$this->period}_" . Crypt::decrypt($this->product_id);
     }
 
     public function checkValidation()
@@ -166,15 +229,14 @@ class CheckoutSubscription extends Component
 
     public function render()
     {
-      $order = $this->getOrder();
-      $paymentMethods = $order->user_id !== 0 ? $order->user->paymentMethods() : null;
+      $product = $this->getProduct();
+      $paymentMethods = Auth::check() ? Auth::user()->paymentMethods() : null;
 
       return view('livewire.checkout-subscription', [
-        'order' => $this->getOrder(),
         'intent' => Cashier::stripe()->setupIntents->create([
           'payment_method_types' => ['card'],
         ]),
-        'user' => $order->user,
+        'product' => $product,
         'paymentMethods' => $paymentMethods,
       ]);
     }
