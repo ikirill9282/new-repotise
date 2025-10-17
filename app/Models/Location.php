@@ -19,6 +19,7 @@ class Location extends Model
     self::creating(function ($model) {
 
       $model->title = Purifier::clean($model->title);
+      $model->title = str_replace('&amp;', '&', $model->title);
 
       if (!isset($model->slug) || empty($model->slug)) {
         $model->generateSlug();

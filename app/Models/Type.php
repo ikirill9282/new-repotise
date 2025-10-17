@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Helpers\Slug;
 use Illuminate\Database\Eloquent\Model;
+use Mews\Purifier\Facades\Purifier;
 
 class Type extends Model
 {
@@ -13,6 +14,9 @@ class Type extends Model
     parent::boot();
 
     self::creating(function ($model) {
+
+      $model->title = Purifier::clean($model->title);
+      $model->title = str_replace('&amp;', '&', $model->title);
 
       if (!isset($model->slug) || empty($model->slug)) {
         $model->generateSlug();

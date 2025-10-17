@@ -39,6 +39,7 @@ class Article extends Model
       $model->text = Purifier::clean($model->text);
       $model->seo_title = Purifier::clean($model->seo_title);
       $model->seo_text = Purifier::clean($model->seo_text);
+      $model->title = str_replace('&amp;', '&', $model->title);
 
       // SLUG
       if (!isset($model->slug) || empty($model->slug)) {

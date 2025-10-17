@@ -17,8 +17,9 @@ class Tag extends Model
 
         // PURIFY
         $model->title = Purifier::clean($model->title);
+        $model->title = str_replace('&amp;', '&', $model->title);
 
-        // SLIG
+        // SLUG
         if (!isset($model->slug) || empty($model->slug)) {
           $model->generateSlug();
         }
