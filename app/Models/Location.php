@@ -29,6 +29,7 @@ class Location extends Model
     self::updating(function ($model) {
       
       $model->title = Purifier::clean($model->title);
+      $model->title = str_replace('&amp;', '&', $model->title);
 
       if ($model->isDirty('title')) {
         $model->generateSlug();

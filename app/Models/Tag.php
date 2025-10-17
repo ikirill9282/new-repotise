@@ -28,6 +28,7 @@ class Tag extends Model
       self::updating(function ($model) {
         // PURIFY
         $model->title = Purifier::clean($model->title);
+        $model->title = str_replace('&amp;', '&', $model->title);
 
         // SLUG
         if ($model->isDirty('title')) {
