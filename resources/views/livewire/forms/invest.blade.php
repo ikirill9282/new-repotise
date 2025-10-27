@@ -20,23 +20,25 @@
         }"
         class="flex flex-col justify-between items-stretch !gap-3">
         <div class="">
-          <x-form.input wire:model="fields.name" name="name" placeholder="Company name" />
+          <x-form.input wire:model="fields.name" :tooltip="false" name="name" placeholder="Company name" />
         </div>
 
         <div class="">
           <x-form.select 
-            wire:model="fields.topic"
+            wire:model="fields.topic" :tooltip="false"
             label="Select a topic" 
             name="topic"
             :options="[
-              'topic1' => 'topic1', 
-              'topic2' => 'topic2', 
-              'topic3' => 'topic3',
+              'General Inquiry, Partnerships' => 'General Inquiry, Partnerships', 
+              'Investing' => 'Investing', 
+              'Marketing' => 'Marketing',
+              'Collaborations' => 'Collaborations',
+              'Other' => 'Other',
             ]" 
           />
         </div>
 
-        <x-form.textarea-counter wire:model="fields.text" name="text" placeholder="Text your message"></x-form.textarea-counter>
+        <x-form.textarea-counter wire:model="fields.text" :tooltip="false" name="text" placeholder="Text your message"></x-form.textarea-counter>
 
         <x-btn wire:click.prevent="submit" class="sm:!w-auto self-center lg:self-start sm:!px-12">Start Partnership</x-btn>
       </div>

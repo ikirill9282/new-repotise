@@ -68,7 +68,7 @@
                   data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}"
                   data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $product->id]) }}"
                 >
-                  {{ $cart->inCart($product?->id) ? 'In cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
+                  {{ $cart->inCart($product?->id) ? 'View Cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
                 </x-btn>
             </div>
             <div class="text-gray text-nowrap overflow-hidden text-ellipsis">

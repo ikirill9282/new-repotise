@@ -698,6 +698,7 @@ header .about_block .right_group_block .login svg {
   gap: 8px;
   margin-bottom: 5px;
 }
+
 .popular_products .about_block .products_item .item .cost p {
   color: var(--black, #212121);
   font-size: 16px;
@@ -706,6 +707,30 @@ header .about_block .right_group_block .login svg {
   line-height: 140%;
 }
 .popular_products .about_block .products_item .item .cost span {
+  color: var(--gray, #A4A0A0);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  text-decoration: line-through;
+}
+.swiper-slide .cost{
+	display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+textarea {
+  resize: none;
+}
+.swiper-slide .cost p{
+	color: var(--black, #212121);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+}
+.swiper-slide .cost span{
   color: var(--gray, #A4A0A0);
   font-size: 14px;
   font-style: normal;
@@ -3667,6 +3692,7 @@ header .about_block .right_group_block .login svg {
 .filter_products .about_block .filter_products_group .filter .accordion-button:not(.collapsed)::after {
   background-image: url(../img/accardion_arrow2.svg);
   rotate: 180deg;
+	opacity: 0;
 }
 .filter_products .about_block .filter_products_group .filter .accordion-body {
   padding: 0;
@@ -6647,6 +6673,10 @@ footer .bottom_by_des .by_to {
 
 .swiper-button-next:after, .swiper-rtl .swiper-button-prev:after {
   display: none;
+}
+
+.products_item .swiper-button-next, .products_item .swiper-button-prev {
+	top: 27%;
 }
 
 .swiper-button-prev, .swiper-rtl .swiper-button-next {

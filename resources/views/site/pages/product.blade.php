@@ -117,7 +117,7 @@
                                               stroke="white" stroke-width="1.5" stroke-linecap="round"
                                               stroke-linejoin="round" />
                                       </svg>
-                                      {{ auth()->user()?->inCart($product->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                      {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
                                   </a>
                                   <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
                                       checkout</span>
@@ -188,7 +188,7 @@
                                               stroke="white" stroke-width="1.5" stroke-linecap="round"
                                               stroke-linejoin="round" />
                                       </svg>
-                                      {{ auth()->user()?->inCart($product->id) ? 'In cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                      {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
                                   </a>
                                   <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
                                       checkout</span>

@@ -8,6 +8,9 @@
     30 => '30 Days',
   ],
   'name' => null,
+	'tooltip' => true,
+  'tooltipModal' => false,
+  'tooltipText' => 'tooltip',
 ])
 <div 
   x-data="{
@@ -75,7 +78,13 @@
       <span class="transition group-has-[.opened]:rotate-180">
         @include('icons.arrow_down', ['width' => 18, 'height' => 18])
       </span>
-      <x-tooltip message="tooltip" class=""></x-tooltip>
+			@if($tooltip)
+				<x-tooltip 
+					class="!right-3" 
+					:message="$tooltipText" 
+					:tooltipClass="$tooltipModal ? 'sm:!max-w-sm !transform-none !translate-x-[-100%] after:!hidden' : ''" 
+					></x-tooltip>
+			@endif
     </div>
   </div>
   <div class="w-full relative">

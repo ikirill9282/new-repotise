@@ -405,7 +405,36 @@ function initModal() {
         );
     }
 }
+function goRightCart() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('modal') === 'cart') {
+    const cartOverlay = document.querySelector('.cartMayBe');
+    if (cartOverlay) {
+      cartOverlay.classList.add('goRight');
+    }
+  }
+}
 
+// function goRightCart() {
+// 	console.log('Cart modal opened');
+// 	const cartMayBeNode = document.querySelector('.cartMayBe');
+// 	console.log(cartMayBeNode);
+	
+// 	if (cartMayBeNode && window.location.href.includes('/?modal=cart')) {
+// 		console.log(cartMayBeNode);
+
+// 		cartMayBeNode.classList.add('goRight');
+// 	}
+// 	let cartMayBeTrue = document.querySelector('.scrollbar-custom')
+// 	console.log(cartMayBeTrue);
+// 	cartMayBeTrue.style.backgroundColor = 'blue';
+// 	let cartMayBeTrueOne = document.querySelector('.scrollbar-custom')
+// 	console.log(cartMayBeTrueOne);
+// 	const siblingHeight = 10;
+// 	$('.scrollbar-custom').css({ height: siblingHeight + 'px' });
+// 	console.log($('.scrollbar-custom'));
+	
+// }
 function initCartSlider() {
     const heigth = $('.cart-order').outerHeight();
     
@@ -462,9 +491,51 @@ function initCartSlider() {
     });
 }
 
+/**
+ * Limit visible tags on product cards to keep layout tidy.
+ */
+function limitProductCardTags() {
+    const maxVisibleTags = 2;
+    const containers = document.querySelectorAll(".inf_cards");
+
+    containers.forEach((container) => {
+        if (container.dataset.tagsLimited === "true") {
+            return;
+        }
+
+        const tags = Array.from(container.querySelectorAll("a"));
+        if (tags.length <= maxVisibleTags) {
+            return;
+        }
+
+        const hiddenTags = tags.slice(maxVisibleTags);
+        hiddenTags.forEach((tag) => {
+            tag.setAttribute("hidden", "hidden");
+        });
+
+        const hiddenCount = hiddenTags.length;
+        if (hiddenCount > 0) {
+            const indicator = document.createElement("span");
+            indicator.className = "text-nowrap product-tags-more";
+            indicator.textContent = `+${hiddenCount}`;
+            indicator.addEventListener("click", () => {
+                hiddenTags.forEach((tag) => {
+                    tag.removeAttribute("hidden");
+                });
+                indicator.remove();
+                container.dataset.tagsLimited = "expanded";
+            });
+            container.appendChild(indicator);
+        }
+
+        container.dataset.tagsLimited = "true";
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     initModal();
     initCartSlider();
+    limitProductCardTags();
 });
 
 document.querySelectorAll(".counter").forEach((counter) => {
@@ -488,3 +559,4 @@ document.querySelectorAll(".counter").forEach((counter) => {
         }
     });
 });
+

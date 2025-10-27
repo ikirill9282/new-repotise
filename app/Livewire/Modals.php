@@ -111,8 +111,8 @@ class Modals extends Component
 
     public function modalMaxWidth()
     {
-      if (in_array($this->modal, ['cart', 'levels'])) return '!max-w-none';
-
+			if (in_array($this->modal, ['cart', 'levels'])) return '!max-w-none';
+    
       if (in_array($this->modal, ['promocodes'])) return '!max-w-7xl';
 
       if (in_array($this->modal, ['product', 'twofa'])) return '!max-w-4xl';

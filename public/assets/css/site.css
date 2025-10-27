@@ -236,13 +236,16 @@ header .about_block .right_group_block .rection_groups span {
 }
 
 .in-cart {
-  background: #A4A0A0 !important;
-  border: #a4a0a0 !important;
+  background: #FFFFFF !important;
+	border: 1px solid #FC7361!important;
+	color: #212121 !important;
 }
 
 .in-cart:hover {
   box-shadow: none !important;
-  cursor: auto !important;
+  cursor: pointer !important;
+	background: #FC7361 !important;	
+	color: #FFFFFF !important;
 }
 
 .cart-drop {

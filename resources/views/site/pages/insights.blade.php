@@ -19,7 +19,8 @@
             <x-card size="sm" class="item_group basis-9/12 lg:basis-4/5">
                 <x-title tag="h3" class="!font-normal !mb-10">Travel Insights</x-title>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 !gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 !gap-6 insights-articles">
+
                   @foreach($articles as $item)
                     <div class="cards_group">
                         <a href="{{ $item->makeFeedUrl() }}">
@@ -40,15 +41,20 @@
                         </div>
                     </div>
                   @endforeach
-                </div>
+								</div>
 
-                @include('site.components.paginator', ['paginator' => $articles])
+                {{-- @include('site.components.paginator', ['paginator' => $articles]) --}}
             </x-card>
             <div class="basis-3/12 lg:basis-1/5">
               <x-title class="!font-normal md:!text-[1.7rem] !mb-6">Travel News</x-title>
+							
               <x-last-news></x-last-news>
             </div>
         </div>
     </div>
   </section>
+@push('js')
+    <script src="{{ asset('assets/js/insights.js') }}"></script>
+@endpush
+
 @endsection

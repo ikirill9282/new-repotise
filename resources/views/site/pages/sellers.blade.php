@@ -316,7 +316,7 @@
                                 <li>Best Rates for Top Sellers</li>
                                 <li>Unlimited</li>
                             </ul>
-                            <x-link>Contact us</x-link>
+                            <x-link href="{{ route('help-center') }}">Contact us</x-link>
                         </div>
                     </div>
                 </div>
@@ -349,110 +349,119 @@
                 <x-card class="lg:!p-12 border">
                     <h2 class="section-title !text-2xl md:!text-3xl !mb-8 md:!mb-18">Frequently Asked Questions</h2>
 
-                    <div class="!mb-12">
-                        <h4 class="text-lg md:text-xl font-bold !mb-4">Getting Started</h4>
-                        <x-accordion parent="#faq" :items="[
-                            [
-                                'title' => 'Who can become a seller on TrekGuider?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'How do I get verified on TrekGuider?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                        ]"></x-accordion>
-                    </div>
+                    @php
+$faqGettingStarted = [
+    [
+        'title' => 'Who can become a seller on TrekGuider?',
+        'text' => 'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our Terms and Conditions.',
+    ],
+    [
+        'title' => 'How do I get verified on TrekGuider?',
+        'text' => 'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our Terms and Conditions.',
+    ],
+];
 
-                    <div class="!mb-12">
-                        <h4 class="text-lg md:text-xl font-bold !mb-4">Selling Your Content</h4>
-                        <x-accordion parent="#faq" :items="[
-                            [
-                                'title' => 'What kind of content can I sell on TrekGuider?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'How does TrekGuider protect my content and copyrights?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'How do refunds work on TrekGuider, and how can I manage them?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                        ]"></x-accordion>
-                    </div>
+$faqSelling = [
+    [
+        'title' => 'What kind of content can I sell on TrekGuider?',
+        'text' => 'On TrekGuider, you can sell any type of digital product for travelers. This includes travel guides, custom itineraries, interactive maps, audio guides, video tutorials, photo presets, travel templates, checklists, eBooks, animations, spreadsheets, and much more. Offer your content as one-time purchases or create subscription options for exclusive content.',
+    ],
+    [
+        'title' => 'How does TrekGuider protect my content and copyrights?',
+        'text' => 'TrekGuider takes the protection of your copyrights and content very seriously. As a platform registered in the U.S. jurisdiction, we adhere to strict U.S. copyright and intellectual property laws. We also implement advanced technical security measures to safeguard your content from unauthorized access and copying. You can be confident that your copyrights are reliably protected on TrekGuider.',
+    ],
+    [
+        'title' => 'How do refunds work on TrekGuider, and how can I manage them?',
+        'text' => 'TrekGuider gives you complete control over the refund policy for your products. In your account settings, you can select from pre-set refund policy options (e.g., 7 days, 30 days, 160 days, no refunds). You can manage refund requests yourself and easily issue refunds to buyers through your seller dashboard. Our flexible refund system allows you to set terms that best suit your business and customer needs.',
+    ],
+];
 
-                    <div class="!mb-12">
-                        <h4 class="text-lg md:text-xl font-bold !mb-4">Your Creator Page & Features</h4>
-                        <x-accordion parent="#faq" :items="[
-                            [
-                                'title' => 'What is a TrekGuider Creator Page and why do I need one?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'How do I accept tips (donations) from fans on my Creator Page?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                        ]"></x-accordion>
-                    </div>
+$faqCreatorPage = [
+    [
+        'title' => 'What is a TrekGuider Creator Page and why do I need one?',
+        'text' => "Your TrekGuider Creator Page is your own personal landing page, specifically designed to promote your brand and content. It's your online presence where you can share your story, highlight your expertise, showcase your product portfolio, link to your social media, and provide contact information for collaborations. You don't need a separate website – your TrekGuider Creator Page provides everything you need to succeed!",
+    ],
+    [
+        'title' => 'How do I accept tips (donations) from fans on my Creator Page?',
+        'text' => 'The tips (donations) feature allows your fans to support you directly and show their appreciation for your content. Any visitor to your Creator Page can send you a one-time tip or set up a recurring subscription for ongoing support. Tips received are credited to your platform balance, and TrekGuider charges a low 5% commission on tips.',
+    ],
+];
 
-                    <div class="!mb-12">
-                        <h4 class="text-lg md:text-xl font-bold !mb-4">Earnings, Payouts & Fees</h4>
-                        <x-accordion parent="#faq" :items="[
-                            [
-                                'title' => 'How much can I earn on TrekGuider?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'In which countries can I sell and accept payments on TrekGuider?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'How quickly and easily can I withdraw my earnings from TrekGuider?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'What fees and commissions does TrekGuider charge?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'How can I reduce my TrekGuider platform commission?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                        ]"></x-accordion>
-                    </div>
+$faqEarnings = [
+    [
+        'title' => 'How much can I earn on TrekGuider?',
+        'text' => 'Your earning potential on TrekGuider is unlimited! Your income depends entirely on you and the quality of your content. There are no caps on how much you can earn. For example, with average monthly sales of $2,000, your annual income (after platform and payment processing fees) could be over $22,000. To maximize your earnings, take advantage of all TrekGuider offers: sell more products, offer subscriptions, accept tips, publish articles to attract a wider audience, and in the future, offer travel services and tours.',
+    ],
+    [
+        'title' => 'In which countries can I sell and accept payments on TrekGuider?',
+        'text' => "You can sell your products to travelers worldwide! TrekGuider supports international sales in virtually every country where Stripe is available. Buyers can pay for your products in any currency and using local payment methods supported by Stripe. All your earnings are automatically converted to U.S. Dollars and credited to your balance. For more details on Stripe's supported payment methods, please see Stripe's Payment Methods page.",
+    ],
+    [
+        'title' => 'How quickly and easily can I withdraw my earnings from TrekGuider?',
+        'text' => 'TrekGuider offers fast and convenient payout options:
+						Standard Payout: to your local bank account (available in most countries). Processing Time: 1-3 business days. Stripe Fee: 0.25% + $0.25.
+						Instant Payout: to your debit card (available in supported countries). Processing Time: Within 20 minutes, even on weekends and holidays. Stripe Fee: 1%.
+						Other Options: Bank transfer, PayPal, and local payment methods (depending on your country). Processing times and fees may vary.
+						Minimum Withdrawal Amount: $40.
+						First payouts for new sellers may be held for up to 7 business days for security reasons. Subsequent payouts are processed within standard timeframes.
+						Choose the payout method that works best for you and access your earnings quickly and hassle-free!.',
+    ],
+    [
+        'title' => 'What fees and commissions does TrekGuider charge?',
+        'text' => "TrekGuider operates with transparent and competitive fees:
+						Platform Commission: 4% to 10% of the sale price, depending on your seller level. New sellers enjoy a special rate of just 5% for the first 30 days!
+						Stripe Payment Processing Fee (Acquiring): Varies depending on the payment method and buyer's region. For U.S. cards, it's 2.9% + $0.30 per transaction. For international cards, it's +1.5% on top of the acquiring fee. For a complete breakdown of Stripe fees for different payment methods, please visit Stripe's Fees page.
+						Payout Fee (Stripe): 0.25% + $0.25 for standard payouts, 1% for instant payouts.
+						Currency Conversion Fee (Stripe, if applicable): 1% (if currency conversion is required for payout).
+						Form 1099-K Issuance Fee (for U.S. Sellers): $2.99 (charged annually if your earnings exceed $600).",
+    ],
+    [
+        'title' => 'How can I reduce my TrekGuider platform commission?',
+        'text' => "Lowering your TrekGuider platform commission is easy – simply increase your sales volume! Our flexible commission tier system automatically reduces your commission rate as your sales grow. Start at Level 1 (10% commission) and advance to Level 3 (5% commission) by reaching the corresponding sales thresholds. Once you reach a commission level, it's locked in forever! Stripe payment processing fees are standard and are not controlled by TrekGuider.",
+    ],
+];
 
-                    <div class="">
-                        <h4 class="text-lg md:text-xl font-bold !mb-4">Legal & Support</h4>
-                        <x-accordion parent="#faq" :items="[
-                            [
-                                'title' => 'Who is responsible for licenses, taxes, and legal permits?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'Does TrekGuider provide tax forms and reporting for sellers?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                            [
-                                'title' => 'How do I get help and support from TrekGuider?',
-                                'text' =>
-                                    'Anyone who creates travel content and is 18 years of age or older can become a seller on TrekGuider, regardless of citizenship or country of residence. We welcome both U.S. residents and non-U.S. residents, as well as creators from most countries worldwide. The only exceptions are regions currently under international sanctions. For detailed registration requirements and a list of excluded regions, please refer to our [link to Terms and Conditions] Terms and Conditions.',
-                            ],
-                        ]"></x-accordion>
-                    </div>
+$faqLegal = [
+    [
+        'title' => 'Who is responsible for licenses, taxes, and legal permits?',
+        'text' => 'As a seller on TrekGuider, you are solely responsible for complying with all applicable laws and regulations, including obtaining any necessary licenses and permits, and paying taxes according to the laws of your country and region. TrekGuider provides you with the tools to run your business, but does not assume responsibility for your legal compliance.',
+    ],
+    [
+        'title' => 'Does TrekGuider provide tax forms and reporting for sellers?',
+        'text' => "Yes, TrekGuider automatically generates and provides tax forms for U.S. sellers. If your earnings exceed $600 per year, we will automatically generate Form 1099-K and send a copy to both you and the U.S. Internal Revenue Service (IRS). You don't need to worry about creating these forms yourself. For non-U.S. sellers, TrekGuider does not provide automatic tax reporting. You are fully responsible for paying taxes and complying with tax laws in your country and, if applicable, in the U.S. Full automated tax calculation and tax reporting will be available in future updates.",
+    ],
+    [
+        'title' => 'How do I get help and support from TrekGuider?',
+        'text' => "If you have any questions or need assistance, our support team is always ready to help! The quickest way to reach us is to fill out the contact form on our Help Center page. We'll respond promptly to your inquiry and do our best to assist you.",
+    ],
+];
+@endphp
+
+<div class="!mb-12">
+    <h4 class="text-lg md:text-xl font-bold !mb-4">Getting Started</h4>
+    <x-accordion parent="#faq" :items="$faqGettingStarted"></x-accordion>
+</div>
+
+<div class="!mb-12">
+    <h4 class="text-lg md:text-xl font-bold !mb-4">Selling Your Content</h4>
+    <x-accordion parent="#faq" :items="$faqSelling"></x-accordion>
+</div>
+
+<div class="!mb-12">
+    <h4 class="text-lg md:text-xl font-bold !mb-4">Your Creator Page & Features</h4>
+    <x-accordion parent="#faq" :items="$faqCreatorPage"></x-accordion>
+</div>
+
+<div class="!mb-12">
+    <h4 class="text-lg md:text-xl font-bold !mb-4">Earnings, Payouts & Fees</h4>
+    <x-accordion parent="#faq" :items="$faqEarnings"></x-accordion>
+</div>
+
+<div class="">
+    <h4 class="text-lg md:text-xl font-bold !mb-4">Legal & Support</h4>
+    <x-accordion parent="#faq" :items="$faqLegal"></x-accordion>
+</div>
+
                 </x-card>
 
         </section>

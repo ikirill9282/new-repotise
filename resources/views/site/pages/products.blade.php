@@ -112,8 +112,7 @@
                         <div class="accordion" id="accordionExample">
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse">
                                         {{ print_var('filter_title', $variables) }}
                                     </button>
                                 </h2>
@@ -130,7 +129,7 @@
                                                             {{ print_var('filter_rating', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                                    <div id="flush-collapseOne" class="accordion-collapse collapse show"
                                                         data-bs-parent="#accordionFlushExample">
                                                         <div class="accordion-body">
                                                             <div class="stars_filter">
@@ -209,10 +208,10 @@
                                                                     > --}}
                                                                         <div class="slider-track"></div>
                                                                         <input type="range" min="0"
-                                                                            max="50000" value="0" id="slider-1"
+                                                                            max="10000" value="0" id="slider-1"
                                                                             oninput="slideOne()">
                                                                         <input type="range" min="0"
-                                                                            max="50000" value="30000" id="slider-2"
+                                                                            max="10000" value="30000" id="slider-2"
                                                                             oninput="slideTwo()">
                                                                     </div>
                                                                     <div class="price-range">
@@ -234,7 +233,7 @@
                                                             {{ print_var('filter_type', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapseTwo" class="accordion-collapse collapse"
+                                                    <div id="flush-collapseTwo" class="accordion-collapse collapse show"
                                                         data-bs-parent="#accordionFlushExample">
                                                         <div class="accordion-body">
                                                             <div class="type_products">
@@ -257,7 +256,7 @@
                                                             {{ print_var('filter_category', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapseThree" class="accordion-collapse collapse"
+                                                    <div id="flush-collapseThree" class="accordion-collapse collapse show"
                                                         data-bs-parent="#accordionFlushExample">
                                                         <div class="accordion-body">
                                                             @include('site.components.search', [
@@ -288,7 +287,7 @@
                                                             {{ print_var('filter_location', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapse1" class="accordion-collapse collapse"
+                                                    <div id="flush-collapse1" class="accordion-collapse collapse show"
                                                         data-bs-parent="#accordionFlushExample">
                                                         <div class="accordion-body">
                                                             @include('site.components.search', [
@@ -346,7 +345,7 @@
                                 @foreach ($paginator->all() as $item)
                                     @include('site.components.cards.product', ['model' => $item])
                                 @endforeach
-                                @include('site.components.paginator', ['paginator' => $paginator])
+                                {{-- @include('site.components.paginator', ['paginator' => $paginator]) --}}
                             @else
                                 <div class="not_found_products">
                                     <h3>Great journeys start here! Exciting travel products <br> arriving soon.</h3>
@@ -363,6 +362,10 @@
 @endsection
 
 @push('js')
+		<script>
+			// window.productsLastPage = {{ $paginator->lastPage() ?? 1 }};
+			window.productsCurrentPage = {{ $paginator->currentPage() ?? 1 }};
+		</script>
     <script src="{{ asset('/assets/js/all_products.js') }}"></script>
     <script>
         $(document).ready(function() {

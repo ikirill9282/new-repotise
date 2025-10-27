@@ -33,11 +33,12 @@
                 <div class="about_block">
                     <div class="right_select">
                         <span>Sort by:</span>
-                        <select>
+                        <select class="custom-select">
                             <option>Relevance</option>
                             <option>Relevance1</option>
                             <option>Relevance2</option>
                         </select>
+												
                     </div>
                     <div class="result_cards">
                         @foreach ($search_results as $item)
@@ -50,8 +51,10 @@
                                         </div>
                                         <div class="profile_commendor">
                                             <div class="img-wrap">
+																							<a href="{{ url("/products/{$item['slug']}?pid=" . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $item['id']])) }}">
                                                 <img src="{{ url(print_key('preview', $item)) }}" alt=""
                                                     class="img_profile rounded-full">
+																							</a>
                                             </div>
                                             <div class="right_text">
                                                 <h3>
@@ -112,8 +115,10 @@
                                         </div>
                                         <div class="profile_commendor">
                                             <div class="img-wrap">
+																							<a href="{{ url('/users/profile/' . print_key('profile', $item)) }}">
                                                 <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile"
                                                     class="img_profile rounded-full object-cover">
+																							</a>
                                             </div>
 
                                             <div class="right_text">
@@ -152,8 +157,10 @@
                                         </div>
                                         <div class="profile_commendor">
                                             <div class="img-wrap">
+																							<a href="{{ url('/insights/feed?aid=' . print_key('id', $item)) }}">
                                                 <img src="{{ url(print_key('preview', $item)) }}" alt="Insight"
                                                     class="img_profile rounded-full">
+																							</a>
                                             </div>
                                             <div class="right_text">
                                                 <h3><a class="!text-inherit"
@@ -200,7 +207,7 @@
                     <p>{{ print_var('subtitle', $variables) }}</p>
                     <div class="block_cards">
                         <div class="row">
-                            <div class="col-lg-4 col-md-6">
+                            {{-- <div class="col-lg-4 col-md-6">
                                 <div class="item">
                                     @include('site.components.heading', ['variables' => $variables->filter(fn($var) => str_contains($var->name, 'box1'))])
                                     <a
@@ -213,14 +220,38 @@
                                     <a
                                         href="{{ print_var('box2_link', $variables) }}">{{ print_var('box2_button_label', $variables) }}</a>
                                 </div>
+                            </div> --}}
+														<div class="col-lg-4 col-md-6">
+                                <div class="item">
+                                    <h4>
+																				Discover Trending Articles
+																		</h4>
+                                    <a href="/insights">Travel Insights</a>
+                                </div>
                             </div>
-                            <div class="col-lg-4 col-md-6">
+														<div class="col-lg-4 col-md-6">
+                                <div class="item">
+                                    <h4>
+																				Explore Travel Products
+																		</h4>
+                                    <a href="/products">Product Catalog</a>
+                                </div>
+                            </div>
+														<div class="col-lg-4 col-md-6">
+                                <div class="item">
+                                    <h4>
+																				Meet Our Travel Experts
+																		</h4>
+                                    <a href="/creators">Creators</a>
+                                </div>
+                            </div>
+                            {{-- <div class="col-lg-4 col-md-6">
                                 <div class="item">
                                     @include('site.components.heading', ['variables' => $variables->filter(fn($var) => str_contains($var->name, 'box3'))])
                                     <a
                                         href="{{ print_var('box3_link', $variables) }}">{{ print_var('box3_button_label', $variables) }}</a>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>

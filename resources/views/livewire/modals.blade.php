@@ -1,11 +1,20 @@
 <div class="">
-    <div class="fixed top-0 left-0 w-screen h-screen px-1.5 py-3 z-[1200] flex justify-center items-center 
+    <div class="fixed top-0 left-0 w-screen h-screen px-1.5 py-3 z-[1200] flex justify-center items-center cartMayBe
               bg-stone-900/50 overflow-y-scroll
                 {{ $isVisible ? 'modal-fade-in' : ($this->inited ? 'modal-fade-out' : 'hidden') }} 
                 @if ($this->inited && $this->modal == false) hidden @endif
                 "
         wire:keydown.escape="closeModal" tabindex="0" x-data="{}" 
-        x-init="window.addEventListener('modalClosing', () => {
+        x-init="
+								if (@js($isVisible)) {
+										document.body.classList.add('overflow-hidden');
+								}
+								if (@js($isVisible) && @js($modal) === 'cart') {
+										requestAnimationFrame(goRightCart);
+								}
+
+								
+								window.addEventListener('modalClosing', () => {
                     setTimeout(() => {
                         @this.call('finalizeClose')
                     }, 300)
@@ -19,14 +28,28 @@
                     @this.call('startShowAnimation')
                 });
                 Livewire.on('modal-opened', event => {
+										document.body.classList.add('overflow-hidden');
                     const modalName = event[0].modal;
                     const url = new URL(window.location.href);
                     url.searchParams.set('modal', modalName);
                     window.history.replaceState({}, document.title, url.toString());
+                    if (modalName === 'cart') {
+        							requestAnimationFrame(goRightCart);
+
+										} else {
+											document.querySelector('.cartMayBe')?.classList.remove('goRight');
+
+										}
                     setTimeout(() => {
                       initCartSlider();
                     }, 10);
-                });"
+                });
+								window.addEventListener('modalClosing', () => {
+									document.querySelector('.cartMayBe')?.classList.remove('goRight');
+									document.body.classList.remove('overflow-hidden');
+								});
+								"
+								
         >
         <div class="popUp-wrap flex justify-center items-center h-full min-w-full sm:min-w-lg">
             <div class="popUp-wrap w-full max-h-full overflow-y-scroll overflow-x-hidden scrollbar-custom">

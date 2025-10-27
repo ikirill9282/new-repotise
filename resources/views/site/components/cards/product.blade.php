@@ -40,8 +40,10 @@
   </div>
 @else
   <div class="item flex flex-col {{ isset($class) ? $class : '' }}">
-    <div class="img_products relative">
+    <div class="img_products relative" x-data="{}">
+				<a href="{{ $model->makeUrl() }}" class="block">
         <img class="main_img object-cover" src="{{ url($model->preview->image) }}" alt="model {{ $model->id }} image">
+				</a>
 
         @include('site.components.favorite.button', [
           'stroke' => '#FF2C0C',
@@ -55,20 +57,26 @@
               @if(auth()->user()->subscribed($model->id))
                 Subscribed
               @else
-                Subscribe
+                Add to cart
               @endif
             @else
-              Subscribe
+              Add to cart 
             @endif
           </x-btn>
         @else
           <a 
-            href="{{ url('/cart') }}" 
+					@if ($cart->inCart($model->id))
+							@click.prevent="$dispatch('openModal', { modalName: 'cart' })"
+							href="#"
+					@else
+							href="{{ url('/cart') }}"
+					@endif
+             
             class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" 
             data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}"
             data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $model->id]) }}"
           >
-            {{ $cart->inCart($model?->id) ? 'In cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
+            {{ $cart->inCart($model?->id) ? 'View Cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
           </a>
         @endif
     </div>
@@ -94,6 +102,7 @@
         @foreach ($model->locations->shuffle()->slice(0, 3) as $location)
           <a class="text-nowrap" href="{{ url("/products/{$location->slug}") }}">{{ $location->title }}</a>
         @endforeach
+				
     </div>
     <div class="stars_block !mt-auto">
         <div class="stars">

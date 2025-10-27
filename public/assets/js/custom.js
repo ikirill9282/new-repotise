@@ -463,15 +463,18 @@ const CartButtons = function() {
     if (buttons.length) {
       buttons.each((key, btn) => {
         const button = $(btn);
-        
+
         button.on('click', function(evt) {
+          if ($(this).hasClass('in-cart')) {
+            return;
+          }
+
           evt.preventDefault();
-          if (!$(this).hasClass('in-cart')) {
-            $.ajax({
-              method: 'POST',
-              url: '/api/cart/push',
-              data: {
-                _token: getCSRF(),
+          $.ajax({
+            method: 'POST',
+            url: '/api/cart/push',
+            data: {
+              _token: getCSRF(),
                 item: $(this).data('value'),
               },
               headers: {
@@ -483,10 +486,14 @@ const CartButtons = function() {
                 $('.cart-counter').removeClass('hidden');
                 $('.cart-counter').attr('style', '');
                 $(this).addClass('in-cart');
-                $(this).html($(this).html().replace('Add to cart', 'In cart'));
+                $(this).attr('href', '/payment/checkout');
+                $(this).html($(this).html().replace('Add to cart', 'View Cart'));
+								if (window.Livewire?.dispatch) {
+									Livewire.dispatch('openModal', { modalName: 'cart' });
+								}
+								
               }
             });
-          }
         });
       })
     }
@@ -496,6 +503,14 @@ const CartButtons = function() {
     discover: this.discover,
   }
 }
+
+$(document).on('click', '.add-to-cart.in-cart', function (evt) {
+  evt.preventDefault();
+  if (window.Livewire?.dispatch) {
+    Livewire.dispatch('openModal', { modalName: 'cart' });
+  }
+});
+
 
 const ReviewForms = function () {
   this.forms = {};

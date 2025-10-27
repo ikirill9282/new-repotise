@@ -27,6 +27,10 @@
                               <div class="text-[#A4A0A0]">
                                   {{ (strlen($product->title) > 30) ? trim(mb_substr($product->title, 0, 30)).'...' : $product->title }}
                               </div>
+															<div class="cost">
+                                <p>{{ currency($product->getPrice()) }}</p>
+                                <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
+                            </div>
                           </div>
                       </a>
                   </div>
@@ -103,7 +107,7 @@
                 </div>
             </div>
             <a wire:click.prevent="moveCheckout" href="#" class="place_button inline-block">Place Order</a>
-            <p class="terms_service !m-0 !p-0">By placing your order, you agree to our <a href="{{ url('/all-policies') }}">Terms of
+            <p class="terms_service !m-0 !p-0">By placing your order, you agree to our <a href="{{ url('/policies/privacy-policy') }}">Terms of
                     Service & Privacy Policy.</a>
             </p>
         </div>

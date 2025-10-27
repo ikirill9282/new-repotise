@@ -40,10 +40,6 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-      // if ($this->order->status_id == EnumsOrder::NEW) {
-      //   $this->order->update(['status_id' => EnumsOrder::PAID]);
-      // }
-
       if ($this->order->status_id == EnumsOrder::PAID) {
         $paymentIntent = $this->order->getSuccessPayment()?->asStripePaymentIntent();
         
@@ -84,7 +80,6 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
               'net_amount' => $net_amount,
               'author_amount' => $author_amount,
               'service_amount' => $service_amount,
-              'paid_at' => Carbon::now(),
             ];
 
             if ($referal_reward > 0) {
@@ -102,14 +97,13 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
             ]);
           }
 
-          // dd($rewards);
           $this->order->update([
             'stripe_fee' => $stripe_reward,
             'base_reward' => $base_reward,
             'seller_reward' => $this->order->order_products()->sum('seller_reward'),
             'referal_reward' => $this->order->order_products()->sum('referal_reward'),
             'platform_reward' => $this->order->order_products()->sum('platform_reward'),
-            'status_id' => EnumsOrder::COMPLETE,
+            'status_id' => EnumsOrder::REWARDING,
           ]);
 
           foreach ($rewards as $item) {
@@ -118,9 +112,12 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
         }
 
         ReferalFreeProduct::dispatch($this->order->user);
+        
         if ($this->order->gift) {
           DeliveryGift::dispatch($this->order);
         }
+
+        PayReward::dispatch($this->order);
       }
     }
 

@@ -7,6 +7,6 @@
               <a href="{{ url('/creators') }}" class="connect">Connect with Creators</a>
           </div>
       </div>
-      <img src="{{ asset('assets/img/women_img.png') }}" alt="Women" class="women_img">
+      {{-- <img src="{{ asset('assets/img/women_img.png') }}" alt="Women" class="women_img"> --}}
   </div>
 </div>

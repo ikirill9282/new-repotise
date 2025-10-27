@@ -106,27 +106,27 @@
             ],
             [
               'title' => 'How are referral bonuses paid out and when will they appear in my account?',
-              'text' => 'There’s no limit – the more referrals, the higher your earnings. For example, if you refer 100 sellers with an average annual revenue of $10K, you could earn over $5,400 in passive income over 12 months.',
+              'text' => 'Bonuses are processed through Stripe and typically appear in your account within 1-3 business days. Withdrawals can be made anytime with a fee of 0.25%+$0.25 per transaction (Stripe fee only) and no additional platform fee. The minimum payout is $40.',
             ],
             [
               'title' => 'Is there a verification process for withdrawals?',
-              'text' => 'There’s no limit – the more referrals, the higher your earnings. For example, if you refer 100 sellers with an average annual revenue of $10K, you could earn over $5,400 in passive income over 12 months.',
+              'text' => 'Yes. Basic verification using SSN (for US users) or non-US ID is required. Once your balance reaches $40. It can be found under the “referral program” tab in the account. In some cases, additional verification may be requested.',
             ],
             [
               'title' => 'What qualifies as a successful referral?',
-              'text' => 'There’s no limit – the more referrals, the higher your earnings. For example, if you refer 100 sellers with an average annual revenue of $10K, you could earn over $5,400 in passive income over 12 months.',
+              'text' => 'A referral is considered successful when the referred user makes a qualifying purchase (for buyers) or, for sellers, completes a withdrawal of their earnings.',
             ],
             [
               'title' => 'Who can participate in the program?',
-              'text' => 'There’s no limit – the more referrals, the higher your earnings. For example, if you refer 100 sellers with an average annual revenue of $10K, you could earn over $5,400 in passive income over 12 months.',
+              'text' => 'Anyone can join – whether you’re a buyer, seller, or simply enjoy sharing great opportunities. You can even just refer new sellers to earn commissions on their revenue. (Note: Participation from sanctioned regions is restricted as per our Terms and Conditions.)',
             ],
             [
               'title' => 'How can I track my referral earnings and progress?',
-              'text' => 'There’s no limit – the more referrals, the higher your earnings. For example, if you refer 100 sellers with an average annual revenue of $10K, you could earn over $5,400 in passive income over 12 months.',
+              'text' => 'All your referral stats – including your balance, list of referrals, and earned bonuses – are available in your account dashboard.',
             ],
             [
               'title' => 'Who should I contact if I have issues with the referral program?',
-              'text' => 'There’s no limit – the more referrals, the higher your earnings. For example, if you refer 100 sellers with an average annual revenue of $10K, you could earn over $5,400 in passive income over 12 months.',
+              'text' => 'If you experience any issues, please reach out to our support team via the Help Center page using the provided form.',
             ],
           ]" />
         </x-card>

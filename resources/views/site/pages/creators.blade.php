@@ -52,9 +52,9 @@
                             <div class="" x-data="{
                                       minGap: 0,
                                       sliderOneValue: {{ request()->has('followers_min') ? request()->get('followers_min') : 0 }},
-                                      sliderTwoValue: {{ request()->has('followers_max') ? request()->get('followers_max') : 9999999 }},
+                                      sliderTwoValue: {{ request()->has('followers_max') ? request()->get('followers_max') : 1000000 }},
                                       sliderMinValue: 0,
-                                      sliderMaxValue: 9999999,
+                                      sliderMaxValue: 1000000,
                                       sliderOne(evt) {
                                           if (this.sliderOneValue === null) {
                                               this.sliderOneValue = this.sliderMinValue;
@@ -344,7 +344,12 @@
                 {{-- AUTHORS --}}
                 <div class="col-span-1">
                   @if($creators->isEmpty())
-                    <div class="!text-2xl text-center">Creators not found... Try another filters combination.</div>
+									<div class="not_found_creators">
+												<h3 class="text-center"> No creators found... for now <br>  Our community of creators is growing every day. Try broadening your search criteria.</h3>
+												<img src="{{ asset('/assets/img/women_img.png') }}" alt=""
+														class="women_img">
+										</div>
+
                   @else
                     <div x-data="{}" class="flex justify-end items-center !mb-6">
                       <label class="text-gray" for="sorting-table">Sort By:</label>

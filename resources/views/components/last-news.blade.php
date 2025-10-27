@@ -2,6 +2,10 @@
   'items' => \App\Models\Article::getLastNews(),
 ])
 
+@php
+  // Подсчёт новостей
+  $totalNews = \App\Models\Article::whereHas('author', fn($query) => $query->where('id', 0))->count();
+@endphp
 
 <div class="">
   <div class="swiper" id="last_news_swiper">
@@ -18,4 +22,7 @@
           @endforeach
       </div>
   </div>
+  
+  <!-- Вывод счётчика под слайдером -->
+  <p class="text-gray-500 text-sm mt-2">Total news: {{ $totalNews }}</p>
 </div>

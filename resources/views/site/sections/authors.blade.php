@@ -32,8 +32,8 @@ if (!empty($authors)) {
                     @include('icons.analog_arrow_prev')
                   </div>
               </div>
-              <a href="{{ print_var('more_link', $variables) }}" class="look_more">
-                {{ print_var('more_text', $variables) }}
+              <a href="/creators" class="look_more">
+								Connect with Creators
               </a>
           </div>
       </div>

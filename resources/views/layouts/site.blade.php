@@ -33,7 +33,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@8.5.1/themes/satellite-min.css" integrity="sha256-woeV7a4SRDsjDc395qjBJ4+ZhDdFn8AqswN1rlTO64E=" crossorigin="anonymous">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('/favicon.svg') }}">
-    <title>@yield('title', config('app.name'))</title>
+    <title>@yield('title', 'TrekGuider')</title>
+		<!-- {{-- @yield('title', config('app.name')) --}} -->
 
     @livewireStyles
 

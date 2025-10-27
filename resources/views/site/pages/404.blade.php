@@ -16,7 +16,7 @@
                 <a href="{{ print_var('product_link', $variables) }}" class="product_all">
                   {{ print_var('product_message', $variables) }}
                 </a>
-                <a href="{{ print_var('report_link', $variables) }}" class="report_problem">
+                <a href="/help-center" class="report_problem">
                   {{ print_var('report_message', $variables) }}
                 </a>
             </div>

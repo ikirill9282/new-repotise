@@ -17,7 +17,12 @@
                     <h3 class="flex justify-between !mb-4"><span>Partnerships</span> <span
                             class="stroke-[#A4A0A0] rotate-180 transition md:hidden">@include('icons.arrow_footer')</span></h3>
                     <ul class="overflow-hidden">
-                        <li><a href="{{ route('sellers') }}">For Creators</a></li>
+												<li>
+													<a href="{{ auth()->check() && auth()->user()->hasRole('creator') ? url('/profile/dashboard') : route('sellers') }}">
+														For Creators
+													</a>
+												</li>
+
                         <li><a href="{{ route('investments') }}">For Investors & Partners</a></li>
                         <li><a href="{{ route('referal') }}">Referral Program</a></li>
                         <li><a href="{{ route('help-center') }}">Help Center</a></li>
@@ -74,6 +79,6 @@
           <span class="TrekGuider_span">{{ date('Y', time()) }} TrekGuider Ink.</span>
         </div>
 
-        <div class="text-gray font-thin"><span class="inline-block">Designed by</span><span class="inline-block text-white !px-3 !py-1 bg-[#046D53] rounded-lg !ml-3">moloko69</span></div>
+        <div class="text-gray font-thin"><span class="inline-block">Designed by</span><a href="https://milksite.ru/"><span class="inline-block text-white !px-3 !py-1 bg-[#046D53] rounded-lg !ml-3">moloko69</span></a></div>
     </div>
 </footer>

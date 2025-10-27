@@ -37,7 +37,7 @@ class StatusSeeder extends Seeder
         ];
         
         foreach ($data as $item) {
-          \App\Models\Status::create($item);
+          \App\Models\Status::firstOrCreate($item);
         }
     }
 }
