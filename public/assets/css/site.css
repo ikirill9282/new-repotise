@@ -391,7 +391,9 @@ header .about_block .right_group_block .cart svg:hover {
 
 .parallax-home {
     opacity: 0.9;
-    background-image: url(../img/bg_home.png);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../img/bg_home.png);
+		background-size: cover !important;
+		background-position: center center !important;
 }
 
 .parallax-favorite {
@@ -2213,7 +2215,7 @@ header .search_group input[name="q"]::placeholder {
 .card_monthly {
   display: -ms-grid !important;
   display: grid !important;
-  -ms-grid-columns: (1fr)[3];
+  /* -ms-grid-columns: (1fr)[3]; */
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
   gap: 5px;
@@ -2808,7 +2810,7 @@ header .search_group input[name="q"]::placeholder {
     }
 
     .parallax-home {
-        background-image: url(../img/bg_home_mobile.jpeg) !important;
+        background-image: url(../img/bg_home.png) !important;
         opacity: 0.6;
     }
 

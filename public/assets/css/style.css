@@ -8684,3 +8684,122 @@ footer .bottom_by_des .by_to {
     display: none;
   }
 }
+
+body.product-lightbox-open {
+  overflow: hidden;
+}
+
+.product-lightbox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 24px;
+  z-index: 1050;
+}
+
+.product-lightbox.is-open {
+  display: flex;
+}
+
+.product-lightbox__inner {
+  width: min(90vw, 1100px);
+  max-height: 90vh;
+  position: relative;
+  margin: 0 auto;
+}
+
+.product-lightbox-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.product-lightbox-swiper .swiper-wrapper {
+  align-items: center;
+}
+
+.product-lightbox-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-lightbox-swiper .swiper-slide img {
+  max-width: 100%;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.product-lightbox__close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  z-index: 3;
+}
+
+.product-lightbox__close:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.product-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  margin-top: -26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+  z-index: 2;
+}
+
+.product-lightbox__nav:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.product-lightbox__nav--prev {
+  left: 16px;
+	transform: rotate(180deg);
+}
+
+.product-lightbox__nav--next {
+  right: 16px;
+}
+
+.product-lightbox__nav svg {
+  pointer-events: none;
+}
+
+.product-lightbox__close svg {
+  pointer-events: none;
+}
+
+.product-lightbox-swiper .swiper-button-disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.product_page_home .about_block .img_products .mySwiper14 .swiper-slide img {
+  cursor: zoom-in;
+}

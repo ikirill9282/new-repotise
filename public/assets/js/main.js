@@ -311,6 +311,141 @@ const swiper14 = new Swiper(".mySwiper14", {
     },
 });
 
+function initProductLightbox() {
+    const lightbox = document.getElementById("product-lightbox");
+    if (!lightbox) {
+        return;
+    }
+
+    const body = document.body;
+    const swiperEl = lightbox.querySelector(".product-lightbox-swiper");
+    const wrapper = swiperEl.querySelector(".swiper-wrapper");
+    const prevBtn = lightbox.querySelector("[data-lightbox-prev]");
+    const nextBtn = lightbox.querySelector("[data-lightbox-next]");
+    const closeTriggers = lightbox.querySelectorAll("[data-lightbox-close]");
+    const navControls = lightbox.querySelectorAll(".product-lightbox__nav");
+    const slides = Array.from(
+        document.querySelectorAll(".mySwiper14 .swiper-slide img")
+    );
+    let slidesPopulated = false;
+    let lightboxSwiper = null;
+
+    const buildSlides = () => {
+        if (slidesPopulated) {
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        slides.forEach((img, index) => {
+            const slide = document.createElement("div");
+            slide.className = "swiper-slide";
+            slide.dataset.index = index;
+
+            const picture = document.createElement("img");
+            picture.src = img.dataset.full || img.getAttribute("src");
+            picture.alt = img.alt || "";
+            picture.loading = "lazy";
+
+            slide.appendChild(picture);
+            fragment.appendChild(slide);
+        });
+
+        wrapper.appendChild(fragment);
+        slidesPopulated = true;
+
+        if (slides.length <= 1) {
+            navControls.forEach((control) => {
+                control.setAttribute("hidden", "hidden");
+            });
+        } else {
+            navControls.forEach((control) => {
+                control.removeAttribute("hidden");
+            });
+        }
+    };
+
+    const ensureSwiper = () => {
+        if (lightboxSwiper) {
+            lightboxSwiper.update();
+            return;
+        }
+
+        lightboxSwiper = new Swiper(swiperEl, {
+            navigation: {
+                nextEl: nextBtn,
+                prevEl: prevBtn,
+            },
+            loop: slides.length > 1,
+            allowTouchMove: slides.length > 1,
+            speed: 300,
+        });
+    };
+
+    const openLightbox = (index = 0) => {
+        if (!slides.length) {
+            return;
+        }
+
+        buildSlides();
+        ensureSwiper();
+
+        if (lightboxSwiper.params.loop) {
+            lightboxSwiper.slideToLoop(index, 0);
+        } else {
+            lightboxSwiper.slideTo(index, 0);
+        }
+
+        lightbox.classList.add("is-open");
+        lightbox.setAttribute("aria-hidden", "false");
+        body.classList.add("product-lightbox-open");
+    };
+
+    const closeLightbox = () => {
+        lightbox.classList.remove("is-open");
+        lightbox.setAttribute("aria-hidden", "true");
+        body.classList.remove("product-lightbox-open");
+    };
+
+    slides.forEach((img, index) => {
+        img.style.cursor = "zoom-in";
+        img.setAttribute("role", "button");
+        img.setAttribute("tabindex", "0");
+        img.setAttribute("aria-label", "Expand product image");
+
+        img.addEventListener("click", () => openLightbox(index));
+        img.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openLightbox(index);
+            }
+        });
+    });
+
+    lightbox.addEventListener("click", (event) => {
+        if (event.target === lightbox) {
+            closeLightbox();
+        }
+    });
+
+    closeTriggers.forEach((btn) => {
+        btn.addEventListener("click", closeLightbox);
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (!lightbox.classList.contains("is-open")) {
+            return;
+        }
+
+        if (event.key === "Escape") {
+            closeLightbox();
+        } else if (event.key === "ArrowRight") {
+            lightboxSwiper?.slideNext();
+        } else if (event.key === "ArrowLeft") {
+            lightboxSwiper?.slidePrev();
+        }
+    });
+}
+
 // const swiperProfileProducts = new Swiper("#profile-product-slider", {
 //     slidesPerView: 3,
 //     spaceBetween: 10,
@@ -535,6 +670,7 @@ function limitProductCardTags() {
 document.addEventListener("DOMContentLoaded", function () {
     initModal();
     initCartSlider();
+    initProductLightbox();
     limitProductCardTags();
 });
 
@@ -559,4 +695,3 @@ document.querySelectorAll(".counter").forEach((counter) => {
         }
     });
 });
-

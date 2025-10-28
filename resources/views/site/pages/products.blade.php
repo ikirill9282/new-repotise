@@ -353,6 +353,12 @@
                                         class="women_img">
                                 </div>
                             @endif
+                            <span
+                                class="js-products-pagination"
+                                data-current-page="{{ $paginator->currentPage() }}"
+                                data-last-page="{{ $paginator->lastPage() }}"
+                                hidden
+                            ></span>
                         </div>
                     </div>
                 </div>
@@ -363,7 +369,7 @@
 
 @push('js')
 		<script>
-			// window.productsLastPage = {{ $paginator->lastPage() ?? 1 }};
+			window.productsLastPage = {{ $paginator->lastPage() ?? 1 }};
 			window.productsCurrentPage = {{ $paginator->currentPage() ?? 1 }};
 		</script>
     <script src="{{ asset('/assets/js/all_products.js') }}"></script>

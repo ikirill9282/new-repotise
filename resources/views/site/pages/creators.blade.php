@@ -56,6 +56,8 @@
                                       sliderMinValue: 0,
                                       sliderMaxValue: 1000000,
                                       sliderOne(evt) {
+                                          this.sliderOneValue = this.normalizeNumber(this.sliderOneValue);
+                                          this.sliderTwoValue = this.normalizeNumber(this.sliderTwoValue);
                                           if (this.sliderOneValue === null) {
                                               this.sliderOneValue = this.sliderMinValue;
                                               this.fillColor();
@@ -75,6 +77,8 @@
                                           this.fillColor();
                                       },
                                       sliderTwo(evt) {
+                                          this.sliderOneValue = this.normalizeNumber(this.sliderOneValue);
+                                          this.sliderTwoValue = this.normalizeNumber(this.sliderTwoValue);
                                           if (this.sliderTwoValue === null) {
                                               this.sliderTwoValue = this.sliderMaxValue;
                                               this.fillColor();
@@ -94,10 +98,53 @@
                                           this.fillColor();
                                       },
                                       fillColor() {
+                                          this.syncInputs();
                                           percent1 = this.sliderOneValue == 0 ? 0 : (this.sliderOneValue / this.sliderMaxValue) * 100;
                                           percent2 = (this.sliderTwoValue / this.sliderMaxValue) * 100;
                                           this.$refs.sliderTrack.style.background = `linear-gradient(to right, #dadae5 ${percent1}% , rgb(252, 115, 97) ${percent1}% , rgb(252, 115, 97) ${percent2}%, #dadae5 ${percent2}%)`;
-                                      }
+                                      },
+                                      normalizeNumber(value) {
+                                          const clamp = (num) => Math.min(num, this.sliderMaxValue);
+
+                                          if (typeof value === 'number') {
+                                              return clamp(value);
+                                          }
+
+                                          if (typeof value === 'string') {
+                                              const trimmed = value.trim();
+                                              if (!trimmed.length) {
+                                                  return 0;
+                                              }
+
+                                              if (/m\+?$/i.test(trimmed)) {
+                                                  return this.sliderMaxValue;
+                                              }
+
+                                              const sanitized = trimmed.replace(/[^0-9]/g, '');
+                                              if (!sanitized.length) {
+                                                  return 0;
+                                              }
+
+                                              return clamp(Number(sanitized));
+                                          }
+
+                                          return 0;
+                                      },
+                                      formatNumber(value) {
+                                          const normalized = this.normalizeNumber(value);
+                                          if (normalized >= this.sliderMaxValue) {
+                                              return '1M+';
+                                          }
+                                          return new Intl.NumberFormat('en-US').format(normalized);
+                                      },
+                                      syncInputs() {
+                                          if (this.$refs.followersMinInput) {
+                                              this.$refs.followersMinInput.value = this.formatNumber(this.sliderOneValue);
+                                          }
+                                          if (this.$refs.followersMaxInput) {
+                                              this.$refs.followersMaxInput.value = this.formatNumber(this.sliderTwoValue);
+                                          }
+                                      },
                                   }" x-init="() => {
                                       sliderOne();
                                       sliderTwo();
@@ -118,9 +165,13 @@
                                             type="range">
                                     </div>
                                     <div class="flex px-1 !text-gray !text-sm followers-inputs">
-                                        <input x-model="sliderOneValue" x-on:input="(evt) => sliderOne(evt)"
+                                        <input x-ref="followersMinInput"
+                                            x-bind:value="formatNumber(sliderOneValue)"
+                                            x-on:input="() => { sliderOneValue = normalizeNumber($event.target.value); sliderOne($event); }"
                                             type="text" class="price-input followers-min" data-input="integer">
-                                        <input x-model="sliderTwoValue" x-on:input="(evt) => sliderTwo(evt)"
+                                        <input x-ref="followersMaxInput"
+                                            x-bind:value="formatNumber(sliderTwoValue)"
+                                            x-on:input="() => { sliderTwoValue = normalizeNumber($event.target.value); sliderTwo($event); }"
                                             type="text" class="price-input text-right followers-max" data-input="integer">
                                     </div>
                                 </div>
@@ -143,7 +194,7 @@
                                       <span class="inline-block">Language</span>
                                   </button>
                                 </div>
-                                <div id="collapse-lang" class="accordion-collapse collapse relative" data-bs-parent="lang">
+                                <div id="collapse-lang" class="accordion-collapse collapse relative show" data-bs-parent="lang">
                                   <div class=" !p-3 !pt-0 text-[15px]">
                                     @include('site.components.search', [
                                         'icon' => false,
@@ -181,7 +232,7 @@
                                       <span class="inline-block">Country</span>
                                   </button>
                                 </div>
-                                <div x-ref="collapse" id="collapse-country" class="accordion-collapse collapse relative" data-bs-parent="country" style="">
+                                <div x-ref="collapse" id="collapse-country" class="accordion-collapse collapse relative show" data-bs-parent="country" style="">
                                   <div class=" !p-3 !pt-0 text-[15px]">
                                     @include('site.components.search', [
                                         'icon' => false,
@@ -414,7 +465,7 @@
                           @endforeach
                         
                     </div>
-                    @include('site.components.paginator', ['paginator' => $creators])
+                    {{-- @include('site.components.paginator', ['paginator' => $creators]) --}}
                   @endif
                 </div>
 
@@ -512,14 +563,26 @@
           $(this).toggleClass('bg-active text-white active');
         });
 
+        const normalizeFollowersValue = (value) => {
+          const raw = String(value ?? '').trim();
+          if (!raw.length) return 0;
+
+          if (/m\+$/i.test(raw)) {
+            return 500000000;
+          }
+
+          const cleaned = raw.replace(/[^0-9]/g, '');
+          return cleaned.length ? Number(cleaned) : 0;
+        };
+
         $('#apply-filters').on('click', (evt) => {
           evt.preventDefault();
           const collab = Number($('#collaboration').is(':checked'));
           const search = (new URLSearchParams(window.location.search)).get('q');
           const sort = (new URLSearchParams(window.location.search)).get('sort');
           const formData = {
-            followers_min: $('#accordion').find('.followers-min').val(),
-            followers_max: $('#accordion').find('.followers-max').val(),
+            followers_min: normalizeFollowersValue($('#accordion').find('.followers-min').val()),
+            followers_max: normalizeFollowersValue($('#accordion').find('.followers-max').val()),
             langs: $('#accordion').find('#lang').find('.search-item').map((k, el) => $(el).data('value')).get(),
             countries: $('#accordion').find('#country').find('.search-item').map((k, el) => $(el).data('value')).get(),
             platforms: $('#accordion').find('#platform').find('.platform-item.active').map((k, el) => $(el).data('value')).get(),

@@ -78,6 +78,29 @@
                                 'stroke' => '#FF2C0C',
                             ])
                         </div>
+                        <div id="product-lightbox" class="product-lightbox" aria-hidden="true" role="dialog" aria-modal="true">
+                            <button type="button" class="product-lightbox__close" data-lightbox-close aria-label="Close image">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <div class="product-lightbox__inner">
+                                <div class="swiper product-lightbox-swiper">
+                                    <div class="swiper-wrapper"></div>
+                                    <div class="swiper-button-prev product-lightbox__nav product-lightbox__nav--prev" data-lightbox-prev>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none">
+                                            <path d="M15.5 19L8.5 12L15.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="swiper-button-next product-lightbox__nav product-lightbox__nav--next" data-lightbox-next>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none">
+                                            <path d="M8.5 19L15.5 12L8.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="information_product">
                             <h3>{{ $product->title }}</h3>
                             <div class="stars_block">
@@ -241,7 +264,8 @@
                                     </div>
                                 </a>
                                 <div class="creator-description read-more" data-text="Read More" data-color="#fff">
-                                    {!! $product->author->description !!}</div>
+                                    {!! $product->author->description !!}
+                                </div>
                                 {{-- <span class="read-more">Read More</span> --}}
                             </div>
                             <div class="share">
@@ -362,7 +386,8 @@
                                 </div>
                             </a>
                             <div class="creator-description read-more" data-text="Read More" data-color="#fff">
-                                {!! $product->author->getShortDescription() !!}</div>
+                                {!! $product->author->getShortDescription() !!}
+                            </div>
                             {{-- <span class="read-more">Read More</span> --}}
                         </div>
                         <div class="share">

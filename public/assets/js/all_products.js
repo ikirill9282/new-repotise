@@ -122,96 +122,139 @@ function fillColor() {
 
 
 // Infinite Scroll
+const PRODUCTS_SCROLL_OFFSET = 500;
+const PRODUCTS_SPINNER_CLASS = "products-loading-spinner";
+const PRODUCTS_END_CLASS = "products-end-of-list";
 let loading = false;
-let currentPage = 1;
+let finished = false;
+let currentPage = window.productsCurrentPage || 1;
+let lastPage = window.productsLastPage || currentPage;
 
 $(document).ready(function() {
-    $(window).on('scroll', function() {
-        if (loading) {
-            console.log('Already loading, skip');
-            return;
-        }
-        
-        // Проверка: пользователь долистал до конца (500px от низа)
-        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 500) {
-            loading = true; // Заблокировать новые запросы
-            currentPage++;
-            
-            console.log('Loading page:', currentPage);
-            
-            // Показать индикатор загрузки
-            if ($('.loading-spinner').length === 0) {
-                $('.filtercards__group, .filtercards__item').last().after('<div class="loading-spinner" style="width:100%; text-align:center; padding:20px;"><p style="color:#FC7361; font-size:16px;">Loading...</p></div>');
+    const $container = $(".filter_cards_group");
+    if (!$container.length) return;
+
+    syncPaginationState();
+
+    if (currentPage >= lastPage) {
+        finished = true;
+        renderEndMessage();
+    }
+
+    $(window)
+        .off("scroll.products")
+        .on("scroll.products", function() {
+            if (finished || loading) return;
+
+            const scrolledToBottom = $(window).scrollTop() + $(window).height() >= $(document).height() - PRODUCTS_SCROLL_OFFSET;
+            if (!scrolledToBottom) return;
+
+            const nextPage = currentPage + 1;
+            if (nextPage > lastPage) {
+                finished = true;
+                renderEndMessage();
+                return;
             }
-            
-            // Получить текущие параметры URL
-            let currentParams = getUrlParams();
-            currentParams.page = currentPage;
-            
-            // AJAX запрос
+
+            loading = true;
+            renderSpinner();
+
+            const params = getUrlParams();
+            params.page = nextPage;
+
             $.ajax({
                 url: window.location.pathname,
-                type: 'GET',
-                data: currentParams,
-								success: function(response) {
-								$('.loading-spinner').remove();
-								
-								// Парсим HTML
-								const parser = new DOMParser();
-								const doc = parser.parseFromString(response, 'text/html');
-								
-								// Ищем товары
-								const allItems = doc.querySelectorAll('.item');
-								console.log('Found .item elements:', allItems.length);
-								
-								if (allItems.length > 0) {
-										// ИСПОЛЬЗУЙ ПРАВИЛЬНОЕ ИМЯ КЛАССА: filter_cards_group
-										let targetContainer = document.querySelector('.filter_cards_group');
-										
-										if (!targetContainer) {
-												console.error('Container .filter_cards_group not found on current page!');
-												loading = true;
-												return;
-										}
-										
-										console.log('Target container found:', targetContainer.className);
-										
-										let addedCount = 0;
-										allItems.forEach(item => {
-												// Проверяем что это товар
-												if (item.querySelector('a[href*="/products/"]')) {
-														targetContainer.appendChild(item.cloneNode(true));
-														addedCount++;
-												}
-										});
-										
-										console.log('Products added:', addedCount);
-										
-										if (addedCount > 0) {
-												setTimeout(function() {
-														loading = false;
-												}, 500);
-										} else {
-												console.log('No products were added');
-												loading = true;
-										}
-								} else {
-										console.log('No more products');
-										loading = true;
-								}
-						},
+                type: "GET",
+                data: params,
+                success: function(response) {
+                    removeSpinner();
 
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(response, "text/html");
 
+                    updatePaginationFromDoc(doc);
 
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
-                    $('.loading-spinner').remove();
-                    loading = false; // Разблокировать при ошибке
-                    currentPage--; // Откатить счетчик страниц
-                }
+                    const newItems = doc.querySelectorAll(".filter_cards_group .item");
+
+                    if (newItems.length === 0) {
+                        finished = true;
+                        renderEndMessage();
+                        loading = false;
+                        return;
+                    }
+
+                    newItems.forEach(function(item) {
+                        $container.append(item.cloneNode(true));
+                    });
+
+                    currentPage = nextPage;
+                    syncMetaCurrentPage();
+
+                    if (currentPage >= lastPage) {
+                        finished = true;
+                        renderEndMessage();
+                    }
+
+                    loading = false;
+                },
+                error: function() {
+                    removeSpinner();
+                    loading = false;
+                },
             });
+        });
+
+    function syncPaginationState() {
+        const $meta = $(".js-products-pagination").first();
+        if (!$meta.length) return;
+
+        const metaCurrent = parseInt($meta.data("current-page"), 10);
+        const metaLast = parseInt($meta.data("last-page"), 10);
+
+        if (!Number.isNaN(metaCurrent)) currentPage = metaCurrent;
+        if (!Number.isNaN(metaLast)) lastPage = metaLast;
+    }
+
+    function updatePaginationFromDoc(doc) {
+        const meta = doc.querySelector(".js-products-pagination");
+        if (!meta) return;
+
+        const metaLast = parseInt(meta.getAttribute("data-last-page"), 10);
+        if (!Number.isNaN(metaLast)) {
+            lastPage = metaLast;
         }
-    });
+    }
+
+    function syncMetaCurrentPage() {
+        const $meta = $(".js-products-pagination").first();
+        if ($meta.length) {
+            $meta.attr("data-current-page", currentPage);
+        }
+    }
+
+    function renderSpinner() {
+        if ($container.find("." + PRODUCTS_SPINNER_CLASS).length) return;
+
+        $container.append(
+            '<div class="' +
+                PRODUCTS_SPINNER_CLASS +
+                '" style="width:100%;text-align:center;padding:20px;"><p style="color:#FC7361;font-size:16px;">Loading...</p></div>'
+        );
+    }
+
+    function removeSpinner() {
+        $container.find("." + PRODUCTS_SPINNER_CLASS).remove();
+    }
+
+    function renderEndMessage() {
+        if ($container.find("." + PRODUCTS_END_CLASS).length) return;
+
+        $container.append(
+            '<div class="' +
+                PRODUCTS_END_CLASS +
+                '" style="width:100%;text-align:center;padding:20px;"><p style="color:#FC7361;font-size:16px;">Great journeys start here! Exciting travel products arriving soon</p></div>'
+        );
+    }
 });
 
 

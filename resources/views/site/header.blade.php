@@ -76,7 +76,7 @@
             <div class="menu__btn self-end !static menu_open" id="close_menu">
                 <span></span>
             </div>
-            <form class="search relative" method="GET" action="{{ route('search') }}">
+            <form class="search relative search-form" method="GET" action="{{ route('search') }}">
                 <label for="search">
                     @include('icons.search')
                 </label>
@@ -84,6 +84,7 @@
                     autocomplete="off" placeholder="Search the site...">
                 @include('site.components.hits', ['id' => 'menu-search'])
             </form>
+            <div class="search-error text-sm text-red-500 mt-2 hidden"></div>
             <ul class="mob_menu">
                 <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
                 <li><a class="text-nowrap" href="{{ route('products') }}">All Products</a></li>

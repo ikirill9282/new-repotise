@@ -769,12 +769,12 @@ const ReadMoreButtons = function() {
               const height = 150;
               $(elem).css({ height: `${height}px` });
             }
-            btn.text('Read More');
+            btn.text('Learn More');
+            // btnWrap.show();
           } else {
             const height = text.outerHeight() + btn.outerHeight();
             $(elem).css({ height: `${height}px` });
-            btn.text('Read Less');
-            console.log(btn);
+            btnWrap.hide();
           }
         });
 
@@ -986,7 +986,10 @@ $('#close_menu').on('click', function(evt) {
 
 $('.search-button').on('click', function(evt) {
   evt.preventDefault();
-  $('.search-form').submit();
+  const form = $(this).closest('.search-form');
+  if (form.length) {
+    form.trigger('submit');
+  }
 });
 
 $('[data-input="integer"]').on('input', function(evt) {

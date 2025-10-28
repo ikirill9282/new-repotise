@@ -132,7 +132,7 @@ class SiteController extends Controller
     return view('site.pages.creators', [
       'page' => $page,
       'tags' => $tags,
-      'creators' => $query->paginate(5),
+      'creators' => $query->paginate(50),
     ]);
   }
 

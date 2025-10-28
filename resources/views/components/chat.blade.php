@@ -95,12 +95,15 @@
                               $emoji_hash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id])
                             @endphp
 
+                            @php
+                              $placeholder = ($type === 'review') ? 'Add a Review...' : 'Add a comment...';
+                            @endphp
                             <x-form.text-counter 
                               max="1000" 
                               :emoji="true" 
                               :id="$emoji_hash"
                               :author="(!$can_write || $type == 'comment') ? auth()->user()->profile : null"
-                              placeholder="Add a comment..."
+                              placeholder="{{ $placeholder }}"
                             ></x-form.text-counter>
                             
                             @if ($can_write && $type == 'review')
