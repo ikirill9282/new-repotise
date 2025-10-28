@@ -263,8 +263,9 @@
                                         <span>{{ $product->author->profile }}</span>
                                     </div>
                                 </a>
-                                <div class="creator-description read-more" data-text="Read More" data-color="#fff">
+                                <div class="creator-description"  data-color="#fff">
                                     {!! $product->author->description !!}
+																		<div class="read-more-wrap" style="box-shadow: rgb(255, 255, 255) 0px 0px 30px 30px; background-color: rgb(255, 255, 255); display: none;"><a href="{{ $product->author->makeProfileUrl() }}" class="read-more-btn">Read More</a></div>
                                 </div>
                                 {{-- <span class="read-more">Read More</span> --}}
                             </div>
@@ -385,8 +386,9 @@
                                     <span>{{ $product->author->profile }}</span>
                                 </div>
                             </a>
-                            <div class="creator-description read-more" data-text="Read More" data-color="#fff">
+                            <div class="creator-description " data-color="#fff">
                                 {!! $product->author->getShortDescription() !!}
+																<div class="read-more-wrap" style="box-shadow: rgb(255, 255, 255) 0px 0px 30px 30px; background-color: rgb(255, 255, 255); position:relative"><a href="{{ $product->author->makeProfileUrl() }}" class="read-more-btn">Read More</a></div>
                             </div>
                             {{-- <span class="read-more">Read More</span> --}}
                         </div>
