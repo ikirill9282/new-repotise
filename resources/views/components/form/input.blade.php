@@ -37,6 +37,6 @@
   </div>
 
   @error($name)
-    <div class="!mt-3 text-red-500">{{ $message }}</div>
+    <div class="!mt-3 text-red-500">{!! $message !!}</div>
   @enderror
 </div>

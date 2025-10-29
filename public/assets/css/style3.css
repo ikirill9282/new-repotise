@@ -5678,3 +5678,72 @@ input[type="search"]::-webkit-search-cancel-button {
 .col-span-1 .accordion-arrow::after{
 	opacity: 0;
 }
+.jq-toast-wrap{
+	width: fit-content;
+	max-width: 50vw;
+}
+
+.jq-icon-success{
+	background-color: #1CC527;
+	background-image: none;
+	padding: 10px 30px 10px 10px !important;
+	display: flex;
+	gap: 10px;
+	border-radius: 10px;
+}
+
+.jq-icon-success h2{
+	font-weight: 800;
+}
+
+.spotted_a_mistake{
+	padding: 14px 13px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	border-radius: 8px;
+	background: var(--bg, #F9F9F9);
+	width: fit-content;
+	color: var(--gray, #A4A0A0);
+	text-align: center;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 140%;
+	transition: 0.5s all ease;
+	cursor: pointer;
+}
+.emojiPicker section{
+	overflow-x: hidden !important;
+}
+
+.emojiPicker section::-webkit-scrollbar {
+    width: 10px;
+}
+
+.emojiPicker section::-webkit-scrollbar-track {
+    background: var(--sb-track-color);
+    border-radius: 25px;
+}
+
+.emojiPicker section::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb-color);
+    border-radius: 25px;
+}
+
+.search-wrap > div::-webkit-scrollbar {
+    width: 10px;
+}
+
+.search-wrap > div::-webkit-scrollbar-track {
+    background: var(--sb-track-color);
+    border-radius: 25px;
+}
+
+.search-wrap > div::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb-color);
+    border-radius: 25px;
+}
+.sign-in-res{
+	color: #000 !important;
+}

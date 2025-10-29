@@ -10,7 +10,7 @@
   $type = $message instanceof \App\Models\Review ? 'review' : 'comment';
 @endphp
 
-<div class="message text-sm sm:text-base py-3 flex justify-start items-stretch gap-1 sm:gap-3 w-full overflow-x-scroll {{ $child ? '' : 'border-b border-gray/50 border-collapse' }}">
+<div class="message text-sm sm:text-base py-3 flex justify-start items-stretch gap-1 sm:gap-3 w-full {{ $child ? '' : 'border-b border-gray/50 border-collapse' }}">
     <div class="avatar flex flex-col justify-center items-center gap-2 select-none">
         <div class="w-9 h-9 sm:w-15 sm:h-15 rounded-full overflow-hidden">
             <a href="{{ $message->author->makeProfileUrl() }}">
@@ -74,7 +74,7 @@
                 <div class="flex">
                     @foreach ($message->likes as $k => $like)
                         <div class="rounded-full overflow-hidden w-4 h-4 sm:w-6 sm:h-6 {{ $k > 0 ? 'ml-[-5px]' : '' }}">
-                            <a href="{{ $like->author->makeProfileUrl() }}" class="">
+                            <a class="">
                                 <img class="object-cover w-full h-full" src="{{ $like->author->avatar }}"
                                     alt="{{ $like->author->getName() }}">
                             </a>

@@ -8,7 +8,7 @@
 
   <form wire:submit="submit" class="!space-y-4">
     @csrf
-    <x-form.input wire:model="form.email" name="email" placeholder="Email Address" :tooltipModal="true" />
+    <x-form.input wire:model="form.email" name="email" placeholder="Email Address" :tooltipModal="false" :tooltip="false" />
 
     <div class="flex justify-start items-stretch gap-3">
       <a wire:click.prevent="$dispatch('openModal', {modalName: 'auth'})" href="#" class="w-full border text-center !text-[#FC7361] !border-[#FC7361] hover:!border-[#484134] hover:!text-[#484134] font-medium !py-2.5 !rounded-lg transition">
@@ -16,7 +16,7 @@
       </a>
 
       <button class="w-full !bg-[#FC7361] hover:!bg-[#484134] text-white font-medium !py-2.5 !rounded-lg transition">
-        Send reset code
+        Send Reset Code
       </button>
     </div>
   </form>

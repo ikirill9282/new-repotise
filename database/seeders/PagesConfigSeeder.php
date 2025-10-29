@@ -80,7 +80,7 @@ class PagesConfigSeeder extends Seeder
           'comment_edit_message' => 'Edit',
           'comment_delete_message' => 'Delete',
           'analog_heading' => 'h2',
-          'analog_header' => 'You Might Also Like',
+          'analog_header' => 'Dont Miss Out! Subscribe for Exclusive Content',
         ],
       ],
       [

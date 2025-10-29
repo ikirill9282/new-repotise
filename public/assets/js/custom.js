@@ -722,14 +722,14 @@ const FollowButtons = function() {
 
               if (response.sub) {
                 $.toast({
-                  text: 'Success! You’re now following and won’t miss any updates.',
+                  text: 'You’re now following and won’t miss any updates.',
                   icon: 'success',
                   heading: 'Success',
                   position: 'top-right',
                 });
               } else {
                 $.toast({
-                  text: 'Success! You have unfollowed the user\'s updates.',
+                  text: 'You have unfollowed the user\'s updates.',
                   icon: 'success',
                   heading: 'Success',
                   position: 'top-right',

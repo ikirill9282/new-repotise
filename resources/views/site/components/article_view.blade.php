@@ -29,9 +29,15 @@
           <span>{{ $article->views }} Views</span>
       </div>
       {!! $article->getText() !!}
+			<a class="spotted_a_mistake" title="See you soon">
+					<span class="text-nowrap">Spotted a mistake?</span>
+			</a>
     </div>
     <div class="follow_to_canal">
-        @include('site.components.heading', ['title' => 'subscribe'])
+        {{-- @include('site.components.heading', ['title' => 'subscribe']) --}}
+				<h2>
+						Don't Miss Out! Subscribe for Exclusive Content
+				</h2>
         <a 
           href="{{ $article->author->makeSubscribeUrl() }}"
           class="follow-btn {{ auth()->check() ? '' : 'open_auth' }}"
@@ -53,7 +59,7 @@
             @if ($article->likes_count > 0)
                 <div class="avatar">
                     @foreach ($article->likes as $k => $like)
-                      <a href="{{ $like->author->makeProfileUrl() }}" class="inline-block @if ($k > 0) last_img @endif !w-4 !h-4 sm:!w-6 sm:!h-6">
+                      <a  class="inline-block @if ($k > 0) last_img @endif !w-4 !h-4 sm:!w-6 sm:!h-6">
                         <img class="object-cover"
                           src="{{ $like->author->avatar }}" alt="Avatar">
                       </a>

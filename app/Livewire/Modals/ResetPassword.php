@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\HtmlString;
 
 class ResetPassword extends Component
 {
@@ -26,17 +27,27 @@ class ResetPassword extends Component
     public function getMessages()
     {
         return [
-            'form.email.required' => 'The email field is required.',
-            'form.email.email' => 'The email must be a valid email address.',
-            'form.email.exists' => 'The email does not exist.',
+            'form.email.required' => 'Please enter your email address.',
+            'form.email.email' => 'Please enter a valid email address.',
+            'form.email.exists' => new HtmlString('Email address not found. Please check your email or <a href="#" onclick="Livewire.dispatch(\'openModal\', { modalName: \'auth\' }); return false;" class="text-active underline sign-in-res">Sign Up</a> instead?'),
         ];
     }
 
     public function submit()
     {
-        $validator = Validator::make($this->form, [
-          'email' => 'required|email|exists:users,email',
-        ]);
+        $messages = [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.exists' => new HtmlString('Email address not found. Please check your email or <a href="#" onclick="Livewire.dispatch(\'openModal\', { modalName: \'auth\' }); return false;" class="text-active underline sign-in-res">Sign Up</a> instead?'),
+        ];
+
+        $validator = Validator::make(
+            $this->form,
+            [
+                'email' => 'required|email|exists:users,email',
+            ],
+            $messages
+        );
         if ($validator->fails()) {
           throw new ValidationException($validator);
         }
