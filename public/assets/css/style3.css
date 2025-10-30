@@ -5626,7 +5626,7 @@ input[type="search"]::-webkit-search-cancel-button {
   cursor: pointer;
 }
 .text-dark{
-	background-color: #212121 !important;
+	/* background-color: #212121 !important; */
 }
 
 .product-tags-more{
