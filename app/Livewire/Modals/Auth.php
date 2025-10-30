@@ -29,9 +29,16 @@ class Auth extends Component
 
     public function prepareEmail()
     {
-      $validator = Validator::make($this->form, [
-        'email' => 'required|email|exists:users,email',
-      ]);
+      $validator = Validator::make(
+        $this->form,
+        [
+          'email' => 'required|email',
+        ],
+        [
+          'email.required' => 'Please enter your email address.',
+          'email.email' => 'Please enter a valid email address.',
+        ]
+      );
 
       if ($validator->fails()) {
         throw new ValidationException($validator);
@@ -39,6 +46,12 @@ class Auth extends Component
 
       $valid = $validator->validated();
       $user = User::firstWhere('email', $valid['email']);
+
+      if (!$user) {
+        $this->resetValidation();
+        $this->dispatch('openModal', 'register', ['email' => $valid['email']]);
+        return;
+      }
 
       $this->user_id = Crypt::encrypt($user->id);
       $this->step = 2;

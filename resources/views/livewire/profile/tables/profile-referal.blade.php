@@ -4,7 +4,7 @@
     @else
     @endif --}}
 
-    <div class="relative overflow-x-scroll max-w-full scrollbar-custom mb-5">
+    <div class="relative overflow-x-scroll max-w-full scrollbar-custom mb-5" inert>
       <table class="min-w-full bg-inherit">
         <thead>
           <tr class="">

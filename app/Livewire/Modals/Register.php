@@ -21,6 +21,13 @@ class Register extends Component
     'as_seller' => false,
   ];
 
+  public function mount(?string $email = null)
+  {
+    if ($email) {
+      $this->form['email'] = $email;
+    }
+  }
+
   public function attempt()
   {
     $validator = Validator::make($this->form, [

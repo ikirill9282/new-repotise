@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\RefundRequest;
 
 class OrderProducts extends Model
 {
@@ -35,6 +36,10 @@ class OrderProducts extends Model
       return $this->belongsTo(OrderProducts::class);
     }
 
+    public function refundRequest()
+    {
+      return $this->hasOne(RefundRequest::class, 'order_product_id');
+    }
     public function getPrice()
     {
       return $this->price - $this->sale_price;

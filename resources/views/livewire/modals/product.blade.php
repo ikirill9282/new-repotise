@@ -1,96 +1,107 @@
+@php
+    use Illuminate\Support\Facades\Crypt;
+
+    $product = $orderProduct?->product;
+    $files = $product?->files ?? collect();
+    $links = $product?->links ?? collect();
+    $orderProductHash = $orderProduct ? Crypt::encryptString((string) $orderProduct->id) : null;
+@endphp
+
 <div class="w-full">
-  {{-- HEADER --}}
-  <div class="text-2xl font-semibold pb-6 mb-4 border-b-1 border-gray/30">Your Product</div>
-
-  {{-- DESCRIPTION --}}
-  <div class="mb-4">
-    <div class="text-lg font-semibold mb-3">Description from Creator:</div>
-    <div class="">This luxury watch combines Swiss quality, stylish design and excellent performance. Classics. Original wristwatch. The mechanism has 8 stones. The round steel case is decorated with diamond pavé. Mother-of-pearl dial. No second hand. Markers in the form of Roman numerals. The date window is located</div>
+  <div class="text-2xl font-semibold pb-6 mb-4 border-b-1 border-gray/30">
+    {{ $product?->title ?? 'Your Product' }}
   </div>
 
-  {{-- FILES --}}
-  <div class="overflow-y-scroll scrollbar-custom max-h-50 flex flex-col gap-3 mb-6 product-popup-images">
-    <div class="flex justify-start items-center gap-4 product-popup-images__item">
-      <x-link class="flex justify-start items-center gap-3 border-none group bg-light p-3 rounded-lg product-popup-images__button">
-        <span class="text-active">@include('icons.docs')</span>
-        <span class="border-b border-dashed transition group-hover:border-active">Download</span>
-      </x-link>
-      <div class="">This luxury watch combines Swiss quality, stylish</div>
+  @if(!empty($errorMessage))
+    <div class="p-4 bg-red-50 text-red-500 rounded-lg">{{ $errorMessage }}</div>
+  @elseif(!$orderProduct || !$product)
+    <div class="p-4 bg-light rounded-lg text-gray">
+      We couldn’t find any digital assets for this purchase yet.
     </div>
-    <div class="flex justify-start items-center gap-4 product-popup-images__item">
-      <x-link class="flex justify-start items-center gap-3 border-none group bg-light p-3 rounded-lg product-popup-images__button">
-        <span class="text-active">@include('icons.docs')</span>
-        <span class="border-b border-dashed transition group-hover:border-active">Download</span>
-      </x-link>
-      <div class="">This luxury watch combines Swiss quality, stylish</div>
-    </div>
-    <div class="flex justify-start items-center gap-4 product-popup-images__item">
-      <x-link class="flex justify-start items-center gap-3 border-none group bg-light p-3 rounded-lg product-popup-images__button">
-        <span class="text-active">@include('icons.docs')</span>
-        <span class="border-b border-dashed transition group-hover:border-active">Download</span>
-      </x-link>
-      <div class="">This luxury watch combines Swiss quality, stylish</div>
-    </div>
-    <div class="flex justify-start items-center gap-4 product-popup-images__item">
-      <x-link class="flex justify-start items-center gap-3 border-none group bg-light p-3 rounded-lg product-popup-images__button">
-        <span class="text-active">@include('icons.docs')</span>
-        <span class="border-b border-dashed transition group-hover:border-active">Download</span>
-      </x-link>
-      <div class="">This luxury watch combines Swiss quality, stylish</div>
-    </div>
-    <div class="flex justify-start items-center gap-4 product-popup-images__item">
-      <x-link class="flex justify-start items-center gap-3 border-none group bg-light p-3 rounded-lg product-popup-images__button">
-        <span class="text-active">@include('icons.docs')</span>
-        <span class="border-b border-dashed transition group-hover:border-active">Download</span>
-      </x-link>
-      <div class="">This luxury watch combines Swiss quality, stylish</div>
-    </div>
-    <div class="flex justify-start items-center gap-4 product-popup-images__item">
-      <x-link class="flex justify-start items-center gap-3 border-none group bg-light p-3 rounded-lg product-popup-images__button">
-        <span class="text-active">@include('icons.docs')</span>
-        <span class="border-b border-dashed transition group-hover:border-active">Download</span>
-      </x-link>
-      <div class="">This luxury watch combines Swiss quality, stylish</div>
-    </div>
-  </div>
-
-  {{-- IMAGES --}}
-  <div class="flex flex-col gap-3 pb-6 mb-4 border-b-1 border-gray/30">
-    <div 
-      class="copyToClipboard flex justify-start !gap-3 group transition hover:text-active hover:cursor-pointer"
-      data-target="file1"
-      >
-      <div class="bg-light rounded-lg w-full !p-3 flex justify-between items-center">
-        <span data-copyId="file1">https://ru.freepik.com </span>
-        <span>@include('icons.copy')</span>
+  @else
+    @if(!empty($product->text))
+      <div class="mb-6">
+        <div class="text-lg font-semibold mb-3">Description from Creator:</div>
+        <div class="prose max-w-none text-gray-700">{!! $product->getText() !!}</div>
       </div>
-      <x-btn outlined class="w-auto !rounded">View</x-btn>
-    </div>
-    <div 
-      class="copyToClipboard flex justify-start !gap-3 group transition hover:text-active hover:cursor-pointer"
-      data-target="file2"
-      >
-      <div class="bg-light rounded-lg w-full !p-3 flex justify-between items-center">
-        <span data-copyId="file2">https://ru.freepik.com </span>
-        <span>@include('icons.copy')</span>
-      </div>
-      <x-btn outlined class="w-auto !rounded">View</x-btn>
-    </div>
-    <div 
-      class="copyToClipboard flex justify-start !gap-3 group transition hover:text-active hover:cursor-pointer"
-      data-target="file3"
-      >
-      <div class="bg-light rounded-lg w-full !p-3 flex justify-between items-center">
-        <span data-copyId="file3">https://ru.freepik.com </span>
-        <span>@include('icons.copy')</span>
-      </div>
-      <x-btn outlined class="w-auto !rounded">View</x-btn>
-    </div>
-  </div>
+    @endif
 
-  {{-- BUTTONS --}}
-  <div class="flex justify-center items-center gap-3 max-w-xl mx-auto">
-    <x-btn class="!text-sm sm:!text-base w-auto m-0" wire:click.prevent="$dispatch('closeModal')" outlined>Cancel</x-btn>
-    <x-btn class="!text-sm sm:!text-base w-auto m-0 grow" >Download All Files (ZIP)</x-btn>
-  </div>
+    <div class="mb-6">
+      <div class="text-lg font-semibold mb-3">Downloadable files</div>
+
+      @if($files->isNotEmpty())
+        <div class="flex flex-col gap-3">
+          @foreach($files as $file)
+            @php
+                $fileHash = Crypt::encryptString((string) $file->id);
+            @endphp
+            <div class="flex flex-col sm:flex-row sm:items-start gap-3 bg-light rounded-lg p-4">
+              <div class="flex items-start gap-3">
+                <span class="text-active shrink-0">@include('icons.docs')</span>
+                <div>
+                  <div class="font-medium">{{ $file->name ?? 'File '.$loop->iteration }}</div>
+                  <div class="text-xs text-gray">{{ number_format($file->size ?? 0, 2) }} MB</div>
+                </div>
+              </div>
+              <div class="sm:ml-auto flex flex-col gap-2 w-full sm:w-auto">
+                @if(!empty($file->description))
+                  <div class="prose max-w-none text-sm text-gray">{!! $file->description !!}</div>
+                @endif
+                <x-link 
+                  href="{{ route('orders.files.download', ['orderProduct' => $orderProductHash, 'file' => $fileHash]) }}"
+                  class="inline-flex items-center justify-center !border-[#FC7361] !text-[#FC7361] hover:!border-[#484134] hover:!text-[#484134] !py-2 !px-4 !rounded transition text-sm"
+                >
+                  Download
+                </x-link>
+              </div>
+            </div>
+          @endforeach
+        </div>
+      @else
+        <div class="p-4 bg-white rounded-lg text-gray">
+          The creator hasn’t attached downloadable files yet.
+        </div>
+      @endif
+    </div>
+
+    <div class="mb-6">
+      <div class="text-lg font-semibold mb-3">Additional resources</div>
+
+      @if($links->isNotEmpty())
+        <div class="flex flex-col gap-3">
+          @foreach($links as $link)
+            <div class="bg-light rounded-lg p-4">
+              <div class="font-medium mb-1">{{ $link->name ?? $link->link }}</div>
+              <a 
+                href="{{ $link->link }}" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 text-[#FC7361] hover:text-[#484134] transition text-sm"
+              >
+                <span>Open link</span>
+                @include('icons.arrow_right')
+              </a>
+            </div>
+          @endforeach
+        </div>
+      @else
+        <div class="p-4 bg-white rounded-lg text-gray">
+          No external resources were provided for this product.
+        </div>
+      @endif
+    </div>
+
+    <div class="flex justify-center items-center gap-3 max-w-xl mx-auto">
+      <x-btn class="!text-sm sm:!text-base w-auto m-0" wire:click.prevent="$dispatch('closeModal')" outlined>Close</x-btn>
+      @if($product)
+        <x-link 
+          href="{{ $product->makeUrl() }}" 
+          target="_blank" 
+          class="!text-sm sm:!text-base w-auto m-0 !border-[#FC7361] !text-[#FC7361] hover:!border-[#484134] hover:!text-[#484134] !py-2.5 !px-6 !rounded transition"
+        >
+          View Product Page
+        </x-link>
+      @endif
+    </div>
+  @endif
 </div>

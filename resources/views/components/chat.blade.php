@@ -11,7 +11,7 @@
   $count = ($type == 'review') ? $model->reviews_count : $model->messages()->count();
 @endphp
 
-<div class="bg-light">
+<div class="bg-light" id="review">
     <div class="container">
         <div class="chat w-full bg-white !px-0 !py-6 sm:!p-6 lg:!p-7 rounded-xl">
             <h2 class="font-bold sm:text-xl flex justify-start items-end gap-3 !mb-4 md:!mb-8">

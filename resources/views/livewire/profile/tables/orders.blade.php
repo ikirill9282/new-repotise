@@ -15,6 +15,11 @@
           <tbody>
             @foreach($orders as $order)
               @foreach ($order->order_products as $order_product)
+                @php
+                  $encryptedOrderProductId = \Illuminate\Support\Facades\Crypt::encryptString((string) $order_product->id);
+                  $encryptedOrderId = \Illuminate\Support\Facades\Crypt::encryptString((string) $order->id);
+                  $refundRequest = $order_product->refundRequest;
+                @endphp
                 <tr class="">
                   <td class="bg-clip-content !px-0 !text-gray !border-light !rounded-tl-2xl !rounded-bl-2xl">
                     <div class="!p-3 rounded-tl-lg rounded-bl-lg ">{{ \Illuminate\Support\Carbon::parse($order->created_at)->format('d.m.Y') }}</div>
@@ -39,13 +44,32 @@
                     <div class="!p-3 flex items-start justify-start gap-4 group ">
                       @if($order->status_id !== \App\Enums\Order::NEW)
                         <div class="flex group">
-                          <x-link class="group-has-[a]:!text-active" wire:click.prevent="$dispatch('openModal', { modalName: 'product' })">View & Download</x-link>
+                          <x-link 
+                            class="group-has-[a]:!text-active" 
+                            wire:click.prevent="openProductModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')"
+                          >
+                            View & Download
+                          </x-link>
                         </div>
                         <div class="flex flex-col items-start justify-start gap-2">
                           @if ($user->canWriteReview($order_product->product))
-                            <x-link class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Leave Review</x-link>
+                            <x-link 
+                              href="{{ $order_product->product->makeUrl() }}#review" 
+                              class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
+                            >
+                              Leave Review
+                            </x-link>
                           @endif
-                          <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'refund' })" class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black">Refund</x-link>
+                          @if($refundRequest)
+                            <span class="text-gray-400 cursor-not-allowed">Return Requested</span>
+                          @else
+                            <x-link 
+                              wire:click.prevent="openRefundModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')" 
+                              class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
+                            >
+                              Refund
+                            </x-link>
+                          @endif
                         </div>
                       @else
                         <div class="flex group opacity-0">View & Download</div>

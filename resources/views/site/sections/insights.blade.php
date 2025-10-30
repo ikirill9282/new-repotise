@@ -30,7 +30,7 @@
                                         <a class="group w-full flex items-center justify-start gap-2" href="{{ $article->author->makeProfileUrl() }}" class="author-link">
                                           <img class="rounded-full object-cover" src="{{ $article->author->avatar }}"
                                               alt="Avatar">
-                                          <p class="">Author <span class="group-hover:!text-black transition">{{ $article->author->name }}</span></p>
+                                          <p class=""><span class="group-hover:!text-black transition">{{ $article->author->name }}</span></p>
                                         </a>
                                       </div>
                                     </div>

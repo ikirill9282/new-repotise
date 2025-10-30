@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\OrderProductFileController;
 
 require __DIR__ . '/api.php';
 
@@ -63,6 +64,9 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/articles/create', [CabinetController::class, 'create_article'])->name('profile.articles.create');
   Route::get('/profile/products/create', [CabinetController::class, 'create_product'])->name('profile.products.create');
   Route::get('/profile/products/create/media', [CabinetController::class, 'create_product_media'])->name('profile.products.create.media');
+
+  Route::get('/orders/files/{orderProduct}/{file}', OrderProductFileController::class)
+    ->name('orders.files.download');
 });
 
 // Public Profile
