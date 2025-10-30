@@ -108,8 +108,8 @@
                         </div>
 
                         {{-- PROMOCODE --}}
-                        <div class="promo_cod flex-col !items-start !gap-3">
-                            <div class="flex w-full gap-3">
+                        <div class="promo_cod flex-col !items-start !gap-3" inert>
+                            <div class="flex w-full gap-3" >
                                 <div class="input_block">
                                     <input wire:model="promocode" type="text"
                                         class="promocode-input grow @error('promocode') !border-red-500 @enderror"
