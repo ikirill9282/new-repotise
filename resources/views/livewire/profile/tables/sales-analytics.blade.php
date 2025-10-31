@@ -43,33 +43,43 @@
             </div>
           </div>
         </div>
-        <table class="table">
-            <thead>
-              <tr class="">
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Date</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Order #</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Product Name</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Status</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Gross Revenue</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Commissions</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Net Earnings</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for($i = 0; $i < 10; $i++)
-                <tr>
-                  <td class="!border-b-gray/15 !py-4 !text-gray">05.28.2026</td>
-                  <td class="!border-b-gray/15 !py-4 !text-gray">#J4RW45Z</td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap">A Guide to Getting to Know North Korea</td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap">Refund Processing</td>
-                  <td class="!border-b-gray/15 !py-4 text-center">$300</td>
-                  <td class="!border-b-gray/15 !py-4 text-center">$300</td>
-                  <td class="!border-b-gray/15 !py-4 text-center">$300</td>
+        @if($rows->isEmpty())
+          <div class="py-6 text-center text-gray">There are no sales in this period.</div>
+        @else
+          <table class="table text-sm md:text-base">
+              <thead>
+                <tr class="">
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Date</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Order #</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Product Name</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Status</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4 text-center">Gross Revenue</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4 text-center">Commissions</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4 text-center">Net Earnings</th>
                 </tr>
-              @endfor
-            </tbody>
-            <tfoot></tfoot>
-          </table>
+              </thead>
+              <tbody>
+                @foreach($rows as $row)
+                  <tr>
+                    <td class="!border-b-gray/15 !py-4 !text-gray">{{ $row['date']?->format('m.d.Y H:i') ?? '—' }}</td>
+                    <td class="!border-b-gray/15 !py-4 !text-gray">{{ $row['order_id'] ? '#'.$row['order_id'] : '—' }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap">
+                      @if($row['product'])
+                        <x-link :href="$row['product']->makeUrl()" :border="false">{{ $row['product']->title }}</x-link>
+                      @else
+                        <span class="text-gray">Product removed</span>
+                      @endif
+                    </td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap">{{ $row['status'] }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-center">{{ currency($row['gross']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-center">{{ currency($row['commissions']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-center">{{ currency($row['net']) }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+              <tfoot></tfoot>
+            </table>
+        @endif
       </div>
     </x-card>
 </div>

@@ -4,7 +4,7 @@
     <x-profile.wrap colClass="overflow-hidden">
         <div class="dashboard-content max-w-full">
             <x-profile.complete-verify class="mb-4" />
-            <x-profile.resend-verify class="mb-4" />
+            {{-- <x-profile.resend-verify class="mb-4" /> --}}
 
             <div class="flex flex-col lg:flex-row justify-start items-stretch gap-3 mb-4">
                 <div class="basis-1/2">

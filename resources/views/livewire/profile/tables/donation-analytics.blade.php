@@ -21,35 +21,40 @@
             </div>
           </div>
         </div>
-        <table class="table text-sm md:text-[15px]">
-            <thead>
-              <tr class="">
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Donor Name</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Date & Time</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Transaction ID</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Gross Donation</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Commission</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Net Earnings</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Message</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Donation Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for($i = 0; $i < 10; $i++)
-                <tr>
-                  <td class="!border-b-gray/15 !py-4 ">@talmaev1</td>
-                  <td class="!border-b-gray/15 !py-4 ">05.28.2025</td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap">100000000000</td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap">$3 000</td>
-                  <td class="!border-b-gray/15 !py-4 ">$3</td>
-                  <td class="!border-b-gray/15 !py-4 ">$3 000</td>
-                  <td class="!border-b-gray/15 !py-4 min-w-3xs">A Guide to Getting to Know North Korea</td>
-                  <td class="!border-b-gray/15 !py-4 ">Recurring</td>
+        @if($rows->isEmpty())
+          <div class="py-6 text-center text-gray">No donations recorded for this period.</div>
+        @else
+          <table class="table text-sm md:text-[15px]">
+              <thead>
+                <tr class="">
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Donor Name</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Date & Time</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Transaction ID</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Gross Donation</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Commission</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Net Earnings</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Donation Type</th>
                 </tr>
-              @endfor
-            </tbody>
-            <tfoot></tfoot>
-        </table>
+              </thead>
+              <tbody>
+                @foreach($rows as $row)
+                  @php
+                    $donor = $row['donor'];
+                  @endphp
+                  <tr>
+                    <td class="!border-b-gray/15 !py-4 ">{{ $donor?->username ?? $donor?->name ?? 'Anonymous' }}</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ $row['date']?->format('m.d.Y H:i') ?? '—' }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap">{{ $row['transaction_id'] }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap">{{ currency($row['gross']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ currency($row['commission']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ currency($row['net']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ $row['type'] }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+              <tfoot></tfoot>
+          </table>
+        @endif
       </div>
     </x-card>
 </div>

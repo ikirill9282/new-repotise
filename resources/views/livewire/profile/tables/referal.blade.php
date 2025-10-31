@@ -11,11 +11,11 @@
                 class="flex flex-col sm:flex-row items-start sm:items-center !gap-2 lg:!gap-4 text-sm justify-between lg:justify-start">
                 <div class="flex justify-start items-start gap-2">
                     <div class="text-gray">Referral Earnings:</div>
-                    <div class="text-nowrap">$10 000</div>
+                    <div class="text-nowrap">{{ currency($summary['earnings'] ?? 0) }}</div>
                 </div>
                 <div class="flex justify-start items-start gap-2">
                     <div class="text-gray">Referrals Invited:</div>
-                    <div class="text-nowrap">10 000</div>
+                    <div class="text-nowrap">{{ number_format($summary['invited'] ?? 0) }}</div>
                 </div>
             </div>
         </div>

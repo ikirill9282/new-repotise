@@ -21,44 +21,60 @@
             </div>
           </div>
         </div>
-        <table class="table text-sm md:text-base">
-            <thead>
-              <tr class="">
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Product Name</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Image</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Views</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Units Sold</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Conversion Rate</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Average Rating</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Total Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for($i = 0; $i < 10; $i++)
-                <tr>
-                  <td class="!border-b-gray/15 !py-4 min-w-2xs">
-                    <x-link :border="false">A Guide to Getting to Know North Korea</x-link>
-                  </td>
-                  <td class="!border-b-gray/15 !py-4 !text-gray">
-                    <div class="!w-28 !h-18 rounded overflow-hidden">
-                      <img class="object-cover w-full h-full" src="http://localhost:9990/storage/images/product_1.jpg" alt="Product">
-                    </div>
-                  </td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap !text-gray">10 000 000</td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap">10 000 000</td>
-                  <td class="!border-b-gray/15 !py-4 ">10 000</td>
-                  <td class="!border-b-gray/15 !py-4 ">
-                    <div class="flex justify-start items-center h-full">
-                      <span class="text-yellow">@include('icons.star')</span>
-                      <span>4,9</span>
-                    </div>
-                  </td>
-                  <td class="!border-b-gray/15 !py-4 ">$30 000</td>
+        @if($rows->isEmpty())
+          <div class="py-6 text-center text-gray">No product analytics available for this period.</div>
+        @else
+          <table class="table text-sm md:text-base">
+              <thead>
+                <tr class="">
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Product Name</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Image</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Views</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Units Sold</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Conversion Rate</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Average Rating</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Total Revenue</th>
                 </tr>
-              @endfor
-            </tbody>
-            <tfoot></tfoot>
-          </table>
+              </thead>
+              <tbody>
+                @foreach($rows as $row)
+                  @php
+                    $product = $row['product'];
+                    $preview = $product?->preview?->image;
+                  @endphp
+                  <tr>
+                    <td class="!border-b-gray/15 !py-4 min-w-2xs">
+                      @if($product)
+                        <x-link :border="false" :href="$product->makeUrl()">{{ $product->title }}</x-link>
+                      @else
+                        <span class="text-gray">Product removed</span>
+                      @endif
+                    </td>
+                    <td class="!border-b-gray/15 !py-4 !text-gray">
+                      <div class="!w-28 !h-18 rounded overflow-hidden bg-light flex items-center justify-center">
+                        @if($preview)
+                          <img class="object-cover w-full h-full" src="{{ $preview }}" alt="{{ $product?->title ?? 'Product' }}">
+                        @else
+                          <span class="text-sm text-gray">No image</span>
+                        @endif
+                      </div>
+                    </td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap !text-gray">{{ number_format($row['views']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap">{{ number_format($row['units_sold']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ number_format($row['conversion_rate'], 2) }}%</td>
+                    <td class="!border-b-gray/15 !py-4 ">
+                      <div class="flex justify-start items-center h-full gap-1">
+                        <span class="text-yellow">@include('icons.star')</span>
+                        <span>{{ number_format($row['average_rating'], 1) }}</span>
+                      </div>
+                    </td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ currency($row['gross_revenue']) }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+              <tfoot></tfoot>
+            </table>
+        @endif
       </div>
     </x-card>
 </div>

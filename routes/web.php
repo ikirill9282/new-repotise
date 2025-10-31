@@ -44,6 +44,7 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/products/subscribe', [PaymentController::class, 'subscribe']);
 
   Route::get('/profile', [CabinetController::class, 'profile'])->name('profile');
+  Route::get('/profile/edit', [CabinetController::class, 'edit'])->name('profile.edit');
   Route::get('/profile/verify', [CabinetController::class, 'verify'])->name('verify');
   Route::post('/profile/verify', [CabinetController::class, 'verificate']);
   Route::get('/profile/verify/complete', [CabinetController::class, 'verifyComplete']);

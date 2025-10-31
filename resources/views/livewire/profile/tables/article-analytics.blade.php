@@ -21,39 +21,51 @@
             </div>
           </div>
         </div>
-        <table class="table text-sm md:text-base">
-            <thead>
-              <tr class="">
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Article Title</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Image</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Views</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Likes</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Comments</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Engagement Rate</th>
-                <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Avg. Read Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for($i = 0; $i < 10; $i++)
-                <tr>
-                  <td class="!border-b-gray/15 !py-4 min-w-2xs">
-                    <x-link :border="false">A Guide to Getting to Know North Korea</x-link>
-                  </td>
-                  <td class="!border-b-gray/15 !py-4 !text-gray">
-                    <div class="!w-28 !h-18 rounded overflow-hidden">
-                      <img class="object-cover w-full h-full" src="http://localhost:9990/storage/images/product_1.jpg" alt="Product">
-                    </div>
-                  </td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap !text-gray">10 000 000</td>
-                  <td class="!border-b-gray/15 !py-4 text-nowrap">10 000 000</td>
-                  <td class="!border-b-gray/15 !py-4 ">10 000</td>
-                  <td class="!border-b-gray/15 !py-4 ">80%</td>
-                  <td class="!border-b-gray/15 !py-4 ">1 000</td>
+        @if($rows->isEmpty())
+          <div class="py-6 text-center text-gray">No article analytics available.</div>
+        @else
+          <table class="table text-sm md:text-base">
+              <thead>
+                <tr class="">
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Article Title</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Image</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Views</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Likes</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Comments</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Engagement Rate</th>
+                  <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">Avg. Read Time</th>
                 </tr>
-              @endfor
-            </tbody>
-            <tfoot></tfoot>
-          </table>
+              </thead>
+              <tbody>
+                @foreach($rows as $row)
+                  @php
+                    $article = $row['article'];
+                    $preview = $article?->preview?->image;
+                  @endphp
+                  <tr>
+                    <td class="!border-b-gray/15 !py-4 min-w-2xs">
+                      <x-link :border="false" :href="$article->makeFeedUrl()">{{ $article->title }}</x-link>
+                    </td>
+                    <td class="!border-b-gray/15 !py-4 !text-gray">
+                      <div class="!w-28 !h-18 rounded overflow-hidden bg-light flex items-center justify-center">
+                        @if($preview)
+                          <img class="object-cover w-full h-full" src="{{ $preview }}" alt="{{ $article->title }}">
+                        @else
+                          <span class="text-sm text-gray">No image</span>
+                        @endif
+                      </div>
+                    </td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap !text-gray">{{ number_format($row['views']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 text-nowrap">{{ number_format($row['likes']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ number_format($row['comments']) }}</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ number_format($row['engagement_rate'], 2) }}%</td>
+                    <td class="!border-b-gray/15 !py-4 ">{{ $row['avg_read_time'] ?? '—' }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+              <tfoot></tfoot>
+            </table>
+        @endif
       </div>
     </x-card>
 </div>

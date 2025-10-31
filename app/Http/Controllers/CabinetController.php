@@ -162,6 +162,23 @@ class CabinetController extends Controller
     ]);
   }
 
+  public function edit(Request $request)
+  {
+    $user = Auth::user();
+
+    if (!$user) {
+      return redirect('/unknown');
+    }
+
+    if (!$user->hasRole('creator')) {
+      return redirect()->route('profile');
+    }
+
+    return view('site.pages.profile-edit', [
+      'user' => $user,
+    ]);
+  }
+
   public function public_profile(Request $request, string $slug)
   {
     $user = User::where('username', $slug)->first();

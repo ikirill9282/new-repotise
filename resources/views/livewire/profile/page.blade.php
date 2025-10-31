@@ -191,7 +191,7 @@
                   top-[80px] rightt-0 col-span-1 bg-white !p-2 sm:!p-4 rounded">
 
                     @if(auth()->user()?->id == $user->id && auth()->user()?->hasRole('creator'))
-                      <x-btn class="!py-2 !max-w-none">Edit Profile</x-btn>
+                      <x-btn href="{{ route('profile.edit') }}" class="!py-2 !max-w-none">Edit Profile</x-btn>
                     @else
                       <x-btn 
                         href="{{ $user->makeSubscribeUrl() }}" 
