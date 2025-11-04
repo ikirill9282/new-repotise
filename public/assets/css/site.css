@@ -409,7 +409,10 @@ header .about_block .right_group_block .cart svg:hover {
 }
 
 .parallax-products {
-    background-image: url(../img/home_discover.png);
+		opacity: 0.9;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../img/home_discover.png);
+		background-size: cover !important;
+		background-position: center center !important;
 }
 
 .parallax-invite {

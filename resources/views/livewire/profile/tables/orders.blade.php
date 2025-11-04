@@ -52,7 +52,11 @@
                           </x-link>
                         </div>
                         <div class="flex flex-col items-start justify-start gap-2">
-                          @if ($user->canWriteReview($order_product->product))
+                          @php
+                            $canLeaveReview = $user->canWriteReview($order_product->product)
+                              && !($refundRequest && $refundRequest->status === 'approved');
+                          @endphp
+                          @if ($canLeaveReview)
                             <x-link 
                               href="{{ $order_product->product->makeUrl() }}#review" 
                               class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
@@ -61,7 +65,28 @@
                             </x-link>
                           @endif
                           @if($refundRequest)
-                            <span class="text-gray-400 cursor-not-allowed">Return Requested</span>
+                            @php
+                              $status = $refundRequest->status ?? 'pending';
+                              $statusLabel = match ($status) {
+                                'approved' => 'Returned',
+                                'rejected' => 'Return Denied',
+                                'pending' => 'Return Requested',
+                                default => ucfirst(str_replace('_', ' ', (string) $status)),
+                              };
+                              $reason = $refundRequest->reason
+                                ? ucfirst(str_replace('_', ' ', $refundRequest->reason))
+                                : null;
+                              $details = trim(strip_tags($refundRequest->details ?? ''));
+                            @endphp
+                            <div class="text-left max-w-xs">
+                              <span class="text-gray-400 cursor-not-allowed block">{{ $statusLabel }}</span>
+                              @if($reason)
+                                <span class="text-xs text-gray-400 block">{{ $reason }}</span>
+                              @endif
+                              @if($details)
+                                <span class="text-xs text-gray-400 block">{{ $details }}</span>
+                              @endif
+                            </div>
                           @else
                             <x-link 
                               wire:click.prevent="openRefundModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')" 

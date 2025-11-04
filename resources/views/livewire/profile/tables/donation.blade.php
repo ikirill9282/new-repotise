@@ -1,4 +1,4 @@
-<div>
+<div id="donation">
     <div class="bg-light rounded-lg px-3 py-2.5 mb-5">
       <div class="flex flex-col !gap-2 lg:!gap-0 lg:flex-row">
         <div class="mr-auto">Donation Summary</div>
@@ -66,12 +66,12 @@
         </table>
       </div>
 
-      @if($hasMore)
-        <div class="text-right">
-          <x-btn href="{{ route('profile.sales') }}" outlined class="!border-active hover:!border-second !w-auto !px-12">
-            View All Donations
-          </x-btn>
-        </div>
-      @endif
+     
     @endif
+
+    <div class="text-right mt-4">
+      <x-btn href="{{ route('profile.sales') }}#donation-analytics" outlined class="!border-active hover:!border-second !w-auto !px-12">
+        View All Donations
+      </x-btn>
+    </div>
 </div>

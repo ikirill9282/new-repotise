@@ -3,7 +3,7 @@
 @section('content')
     <x-profile.wrap>
         <div class="the-content__content">
-            @if(!$user->verified)
+            @if(!$user->hasRole('creator'))
               <x-profile.begin-verify class="mb-4" />
             @endif
 

@@ -51,8 +51,7 @@
                 <li class="!list-disc">All new creators start with a 30-day Level 3 bonus period. To maintain Level 3
                     benefits, reach $300 in sales within the first 30 days</li>
                 <li class="!list-disc">Levels are permanent. Once you reach a level, you will never be downgraded.</li>
-                <li class="!list-disc">Special conditions apply for creators referred through the Referral Program.
-                    Learn More</li>
+                <li class="!list-disc">Special conditions apply for creators referred through the Referral Program. <a href="{{ route('referal') }}" class="text-second !text-active">Learn More</a></li>
             </ol>
         </div>
     </div>

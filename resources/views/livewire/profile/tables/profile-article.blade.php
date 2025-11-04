@@ -25,14 +25,20 @@
                 />
               </div>
               <div class="rounded-lg overflow-hidden h-24 md:h-30">
-                <img class="w-full h-full object-cover" src="{{ $article->preview->image }}" alt="Preview">
+                <img class="w-full h-full object-cover" src="{{ $article->preview?->image }}" alt="Preview">
               </div>
               <div class="flex justify-start items-start md:items-center flex-col md:flex-row w-full !gap-16 overflow-hidden">
                 <div class="w-full md:w-auto md:overflow-hidden">
                   <div class="text-gray truncate mb-2 w-full">{{ $article->title }}</div>
                   <div class="flex justify-start items-center gap-2 text-sm mb-2">
-                      <p class="text-gray bg-light px-2 py-1 rounded-full">{{ \Illuminate\Support\Carbon::parse($article->published_at ?? $article->create_at)->format('d.m.Y') }}</p>
-                      <p class="text-gray bg-light px-2 py-1 rounded-full">{{ $article->views }} Views</p>
+                      @php
+                        $displayDate = $article->published_at ?? $article->created_at;
+                        $formattedDate = $displayDate
+                          ? $displayDate->copy()->timezone(config('app.timezone'))->format('d.m.Y')
+                          : '—';
+                      @endphp
+                      <p class="text-gray bg-light px-2 py-1 rounded-full">{{ $formattedDate }}</p>
+                      <p class="text-gray bg-light px-2 py-1 rounded-full">{{ number_format($article->views_total ?? 0) }} Views</p>
                   </div>
                   <div class="">
                     <x-like type="article" count="{{ $article->likes()->count() }}" :id="$article->id"></x-like>

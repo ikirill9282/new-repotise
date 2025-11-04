@@ -1,7 +1,7 @@
 <div class="relative">
   <h2 class="text-2xl font-bold text-gray-900 !mb-6 text-center select-none">Sign In</h2>
   
-  <form wire:submit="submit" class="!space-y-4 !mb-10">
+  <form wire:submit.prevent="attempt" class="!space-y-4 !mb-10">
     @csrf
 
     {{-- STEP 1 --}}

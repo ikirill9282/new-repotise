@@ -1,4 +1,4 @@
-<div>
+<div id="insights">
     <div class="bg-light rounded-lg px-3 py-2.5 mb-5">
       <div class="flex flex-col !gap-2 lg:!gap-0 lg:flex-row">
         <div class="mr-auto">Content Insights</div>
@@ -61,12 +61,12 @@
         </table>
       </div>
 
-      @if($hasMore)
-        <div class="text-right">
-          <x-btn wire:click.prevent="loadAll" outlined class="!border-active hover:!border-second !w-auto !px-12">
-            View All Insights
-          </x-btn>
-        </div>
-      @endif
+     
     @endif
+
+    <div class="text-right mt-4">
+      <x-btn href="{{ route('profile.articles') }}" outlined class="!border-active hover:!border-second !w-auto !px-12">
+        View All Insights
+      </x-btn>
+    </div>
 </div>

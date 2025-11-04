@@ -9,7 +9,7 @@
       </div>
       <div class="flex gap-2 sm:gap-4 w-full sm:w-auto">
         <x-btn class="text-nowrap !text-sm sm:!text-base !w-full sm:w-auto sm:!px-16" href="{{ route('verify') }}" outlined>Become a Creator</x-btn>
-        <x-btn class="text-nowrap !text-sm sm:!text-base !w-full sm:w-auto sm:!px-16" href="{{ route('verify') }}">Learn More</x-btn>
+        <x-btn class="text-nowrap !text-sm sm:!text-base !w-full sm:w-auto sm:!px-16" href="{{ route('sellers') }}">Learn More</x-btn>
       </div>
     </div>
 </x-card>

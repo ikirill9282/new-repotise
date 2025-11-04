@@ -1,4 +1,4 @@
-<div>
+<div id="refunds">
   <div class="flex justify-between items-center mb-4">
     <div class="font-bold text-2xl">Refunds</div>
     <div class="block">
@@ -14,6 +14,18 @@
       </select>
     </div>
   </div>
+
+  @if($statusMessage)
+    <div class="mb-4 text-sm text-emerald-600">
+      {{ $statusMessage }}
+    </div>
+  @endif
+
+  @if($statusError)
+    <div class="mb-4 text-sm text-red-600">
+      {{ $statusError }}
+    </div>
+  @endif
 
   @if($refunds->isEmpty())
     <div class="text-center text-gray py-6">
@@ -38,12 +50,15 @@
               $product = $refund['product'];
               $preview = $refund['preview'];
               $reason = $refund['reason'] ?: '—';
+              $details = $refund['details'];
               $timeLeft = $refund['time_left'];
-              $status = ucfirst(str_replace('_', ' ', $refund['status'] ?? 'pending'));
+              $statusLabel = $refund['status_label'] ?? 'Return Requested';
+              $statusRaw = $refund['status'] ?? 'pending';
               $createdAt = $refund['model']->created_at?->copy()->timezone(config('app.timezone'));
+              $resolvedAt = $refund['resolved_at']?->copy()?->timezone(config('app.timezone'));
               $avatar = $buyer?->avatar ?? asset('assets/img/avatar.svg');
             @endphp
-            <tr>
+            <tr id="refund-{{ $refund['model']->id }}">
               <td class="!border-b-gray/15 !py-4 text-nowrap align-middle">
                 <div class="flex justify-start items-center gap-2">
                   <div class="!w-12 !h-12 rounded-full overflow-hidden shrink-0 bg-light">
@@ -58,10 +73,19 @@
                 </div>
               </td>
               <td class="align-middle min-w-2xs whitespace-normal">
-                <div class="font-semibold text-sm mb-1">{{ $status }}</div>
+                <div class="font-semibold text-sm mb-1">{{ $statusLabel }}</div>
                 <div class="text-gray">{{ $reason }}</div>
+                @if($details)
+                  <div class="text-xs text-gray mt-1">{{ $details }}</div>
+                @endif
               </td>
-              <td class="text-nowrap align-middle">{{ $timeLeft }}</td>
+              <td class="text-nowrap align-middle">
+                @if($statusRaw === 'pending' && $timeLeft)
+                  {{ $timeLeft }}
+                @else
+                  <span class="text-gray">—</span>
+                @endif
+              </td>
               <td class="!border-b-gray/15 !py-4 ">
                 <div class="flex items-center justify-start gap-2">
                   <div class="!w-14 !h-22 rounded overflow-hidden shrink-0 bg-light">
@@ -79,10 +103,29 @@
                 </div>
               </td>
               <td class="!border-b-gray/15 !py-4 text-nowrap align-middle ">
-                <div class="flex flex-col justify-start items-start gap-2">
-                  <x-link href="{{ route('profile.sales') }}">Approve Refund</x-link>
-                  <x-link href="{{ route('profile.sales') }}">Reject Refund</x-link>
-                </div>
+                @if($statusRaw === 'pending')
+                  <div class="flex flex-col justify-start items-start gap-2">
+                    <x-link
+                      href="#"
+                      wire:click.prevent="approveRefund({{ $refund['model']->id }})"
+                    >
+                      Approve Refund
+                    </x-link>
+                    <x-link
+                      href="#"
+                      wire:click.prevent="rejectRefund({{ $refund['model']->id }})"
+                    >
+                      Reject Refund
+                    </x-link>
+                  </div>
+                @else
+                  <div class="flex flex-col justify-start items-start gap-1">
+                    <span class="text-gray">{{ $statusLabel }}</span>
+                    @if($resolvedAt)
+                      <span class="text-xs text-gray">Updated {{ $resolvedAt->format('m.d.Y H:i') }}</span>
+                    @endif
+                  </div>
+                @endif
               </td>
             </tr>
           @endforeach

@@ -11,7 +11,10 @@ class Levels extends Component
 
     public function mount()
     {
-      $this->levels = Level::all();
+      $this->levels = Level::query()
+        ->orderBy('id')
+        ->limit(4)
+        ->get();
     }
 
     public function render()

@@ -1,4 +1,4 @@
-<div>
+<div id="reviews">
   <div class="flex justify-between items-center mb-4">
     <div class="font-bold text-2xl">Reviews</div>
     <div class="block">

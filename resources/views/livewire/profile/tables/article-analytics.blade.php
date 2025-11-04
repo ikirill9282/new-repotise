@@ -1,4 +1,4 @@
-<div>
+<div id="article-analytics">
     {{-- @if(empty($this->data))
       <div class="text-lg text-center">There are no sales yet.</div>
     @else

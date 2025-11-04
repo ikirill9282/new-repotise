@@ -1,4 +1,4 @@
-<div>
+<div id="refunds-summary">
     <div class="bg-light rounded-lg px-3 py-2.5 mb-5">
       <div class="flex flex-col !gap-2 lg:!gap-0 lg:flex-row">
         <div class="mr-auto">Refunds Summary</div>
@@ -31,7 +31,7 @@
               <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">
                 <div class="relative inline-block !pr-6">
                   Act on Request
-                  <x-tooltip message="Open the request in the sales dashboard to respond." />
+                  <x-tooltip message="Open the request in Reviews & Refunds to respond." />
                 </div>
               </th>
             </tr>
@@ -45,8 +45,22 @@
                 $formattedDate = $date
                   ? $date->copy()->timezone(config('app.timezone'))->format('m.d.Y H:i')
                   : '—';
-                $status = ucfirst(str_replace('_', ' ', $refund->status));
+                $status = $refund->status;
+                $statusLabel = match ($status) {
+                  'approved' => 'Returned',
+                  'rejected' => 'Return Denied',
+                  'pending' => 'Return Requested',
+                  default => ucfirst(str_replace('_', ' ', (string) $status)),
+                };
                 $reason = $refund->reason ?? $refund->details;
+                $totalReviewDays = 30;
+                $daysLeft = $totalReviewDays;
+
+                if ($refund->created_at) {
+                  $deadline = $refund->created_at->copy()->addDays($totalReviewDays);
+                  $diff = now()->diffInDays($deadline, false);
+                  $daysLeft = max(0, min($totalReviewDays, (int) $diff));
+                }
               @endphp
               <tr>
                 <td class="!border-b-gray/15 !py-4 text-nowrap">{{ $formattedDate }}</td>
@@ -58,10 +72,12 @@
                 </td>
                 <td class="!border-b-gray/15 !py-4">
                   @if($refund->status === 'pending')
-                    <x-link href="{{ route('profile.sales') }}">Review request</x-link>
+                    <x-link href="{{ route('profile.reviews') }}#refund-{{ $refund->id }}">
+                      {{ $daysLeft }}/{{ $totalReviewDays }} Act on Request
+                    </x-link>
                   @else
                     <div class="flex flex-col gap-1">
-                      <span class="text-gray">{{ $status }}</span>
+                      <span class="text-gray">{{ $statusLabel }}</span>
                       @if($reason)
                         <span class="text-xs text-gray">{{ \Illuminate\Support\Str::limit($reason, 80) }}</span>
                       @endif
@@ -75,12 +91,12 @@
         </table>
       </div>
 
-      @if($hasMore)
-        <div class="text-right">
-          <x-btn href="{{ route('profile.sales') }}" outlined class="!border-active hover:!border-second !w-auto !px-12">
-            View All Refunds
-          </x-btn>
-        </div>
-      @endif
+      
     @endif
+
+    <div class="text-right mt-4">
+      <x-btn href="{{ route('profile.reviews') }}#refunds" outlined class="!border-active hover:!border-second !w-auto !px-12">
+        View All Refunds
+      </x-btn>
+    </div>
 </div>

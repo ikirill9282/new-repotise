@@ -29,9 +29,14 @@ class ProfileArticle extends Component
 
     return view('livewire.profile.tables.profile-article', [
       'articles' => Auth::user()->articles()
+        ->with('preview')
         ->whereIn('status_id', $statuses)
         ->orderByDesc('id')
         ->get()
+        ->map(function (Article $article) {
+          $article->views_total = (int) ($article->views ?? 0);
+          return $article;
+        })
     ]);
   }
 }
