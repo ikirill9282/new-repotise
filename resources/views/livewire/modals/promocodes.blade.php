@@ -43,8 +43,8 @@
     <div class="col-span-6 md:col-span-4">
       <x-btn outlined>Save</x-btn>
     </div>
-    <div class="col-span-12 md:col-span-6">
-      <x-btn class="!w-auto !max-w-none">Generate</x-btn>
+    <div class="col-span-12 md:col-span-6" title="Unlock professional tools like Promo Codes, Email Marketing, and Unlimited Storage. Click to learn more">
+      <x-btn class="!w-auto !max-w-none" inert >Generate 👑</x-btn>
     </div>
   </div>
 

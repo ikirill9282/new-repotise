@@ -8,6 +8,18 @@ use Illuminate\Support\Facades\Log;
 class UserOptions extends Model
 {
 
+    protected $guarded = [];
+
+    protected $casts = [
+        'collaboration' => 'boolean',
+        'return_policy_id' => 'integer',
+        'creator_visible' => 'boolean',
+        'show_donate' => 'boolean',
+        'show_products' => 'boolean',
+        'show_insights' => 'boolean',
+        'notification_settings' => 'array',
+    ];
+
     protected float $default_fee = 10;
     protected float $default_space = 0.3;
     protected float $default_sales_treshold = 100;

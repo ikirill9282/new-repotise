@@ -21,6 +21,7 @@ use App\Jobs\ProcessOrder;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
 use App\Models\Payments;
+use Illuminate\Support\Facades\Crypt;
 
 
 class PaymentController extends Controller
@@ -72,6 +73,14 @@ class PaymentController extends Controller
         'payments', 
         fn($query) => $query->where('stripe_id', $valid['payment_intent'])
       )
+      ->with([
+        'products.preview',
+        'products.types',
+        'products.locations',
+        'order_products.product.preview',
+        'order_products.product.types',
+        'order_products.product.locations',
+      ])
       ->first();
 
     if (!$order) {
@@ -89,13 +98,24 @@ class PaymentController extends Controller
     
     // $order->update(['status_id' => EnumsOrder::PAID]);
     ProcessOrder::dispatch($order);
-    
+    $encryptedOrderId = Crypt::encryptString((string) $order->id);
+
+    $order->order_products->each(function ($orderProduct) use ($encryptedOrderId) {
+      $orderProduct->downloadModalArgs = [
+        'order_product_id' => Crypt::encryptString((string) $orderProduct->id),
+        'order_id' => $encryptedOrderId,
+      ];
+    });
+
+    $downloadModalArgs = $order->order_products->first()->downloadModalArgs ?? null;
+
     return view('site.pages.payment-success', [
       'page' => Page::where('slug', 'payment-success')->with('config')->first(),
       'user' => Auth::user() ?? null,
       'order' => $order,
       'paymentIntent' => $paymentIntent,
       'paymentMethod' => $paymentMethod,
+      'downloadModalArgs' => $downloadModalArgs,
     ]);
   }
 

@@ -2,6 +2,7 @@
 
 @php
   $variables = $page->variables;
+  $downloadModalArgs = $downloadModalArgs ?? null;
 @endphp
 
 @section('content')
@@ -16,7 +17,16 @@
                     @include('site.components.heading', ['variables' => $variables->filter(fn($item) => str_contains($item->name, 'page'))])
                     <p>{{ print_var('page_subtitle', $variables) }}</p>
                     <div class="block_view">
-                        <a href="{{ url(print_var('left_button_link', $variables)) }}" class="download open_auth">{{ print_var('left_button_text', $variables) }}</a>
+                        <a 
+                          href="{{ auth()->check() ? (empty($downloadModalArgs) ? route('profile.purchases') : '#') : '#' }}"
+                          class="download {{ auth()->check() ? '' : 'open_auth' }}"
+                          @if(auth()->check() && !empty($downloadModalArgs))
+                            x-data="{}"
+                            x-on:click.prevent='Livewire.dispatch("openModal", { modalName: "product", args: @json($downloadModalArgs) })'
+                          @endif
+                        >
+                          {{ print_var('left_button_text', $variables) }}
+                        </a>
                         <a href="{{ route('profile.purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">{{ print_var('right_button_text', $variables) }}</a>
                     </div>
                 </div>
@@ -71,32 +81,49 @@
                     <div class="left_orders_group">
                         <div class="title_block">
                             <h3>Your order</h3>
-                            <p>Items <span>({{ $order->products->count() }})</span></p>
+                            <p>Items <span>({{ $order->order_products->count() }})</span></p>
                         </div>
                         <div class="items_group">
-                            @foreach($order->products as $product)
+                            @foreach($order->order_products as $orderProduct)
+                              @php
+                                $product = $orderProduct->product;
+                                $productModalArgs = $orderProduct->downloadModalArgs ?? null;
+                              @endphp
                               <div class="item">
-                                  <img src="{{ $product->preview->image }}" alt="Preview" class="order_img">
+                                  <img src="{{ $product?->preview?->image }}" alt="Preview" class="order_img">
                                   <div class="description_orders">
                                       <div class="title_description">
-                                          <h4><a href="{{ $product->makeUrl() }}" class="link-black">{{ $product->title }} x {{ $product->pivot->count }}</a></h4>
+                                          <h4><a href="{{ $product?->makeUrl() }}" class="link-black">{{ $product?->title }} x {{ $orderProduct->count }}</a></h4>
                                           <h5>
                                             @if ($order->type == 'sub')
-                                              {{ currency($product->subprice->getPrice()) }} per {{ $order->sub_period }}
+                                              {{ currency($product?->subprice?->getPrice()) }} per {{ $order->sub_period }}
                                             @else
-                                              {{ currency($product->getPrice()) }} 
-                                              <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
+                                              {{ currency($orderProduct->getPrice()) }} 
+                                              <span>{{ currency($orderProduct->getPriceWithoutDiscount()) }}</span>
                                             @endif
                                           </h5>
+                                          @if(auth()->check() && !empty($productModalArgs))
+                                            <x-link
+                                              href="#"
+                                              x-data="{}"
+                                              x-on:click.prevent='Livewire.dispatch("openModal", { modalName: "product", args: @json($productModalArgs) })'
+                                              class="group-has-[a]:!text-active text-sm mt-2 inline-flex items-center gap-1"
+                                            >
+                                              View &amp; Download
+                                            </x-link>
+                                          @endif
                                       </div>
-                                      <p>
-                                        @foreach($product->types as $type)
-                                          {{ $type->title }}, 
-                                        @endforeach
-                                        @foreach($product->locations as $location)
-                                          {{ $location->title }},
-                                        @endforeach
-                                      </p>
+                                      @if($product)
+                                        @php
+                                          $productMeta = collect([
+                                            $product->types?->pluck('title')->implode(', '),
+                                            $product->locations?->pluck('title')->implode(', '),
+                                          ])->filter()->implode(', ');
+                                        @endphp
+                                        @if($productMeta)
+                                          <p>{{ $productMeta }}</p>
+                                        @endif
+                                      @endif
                                   </div>
                               </div>
                             @endforeach
