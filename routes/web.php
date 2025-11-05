@@ -54,6 +54,10 @@ Route::middleware('auth:web')->group(function() {
   Route::get('/profile/purchases', [CabinetController::class, 'purchases'])->name('profile.purchases');
   Route::get('/profile/purchases/{type}', [CabinetController::class, 'purchases'])->name('profile.purchases.subscriptions');
   Route::get('/profile/settings', [CabinetController::class, 'settings'])->name('profile.settings');
+  Route::get(
+    '/profile/settings/email/verify/{token}',
+    [CabinetController::class, 'confirmEmailChange']
+  )->name('profile.settings.email.verify')->middleware('signed');
   Route::get('/profile/referal', [CabinetController::class, 'referal'])->name('profile.referal');
   
   Route::get('/profile/dashboard', [CabinetController::class, 'dashboard'])->name('profile.dashboard');

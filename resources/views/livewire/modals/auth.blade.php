@@ -28,7 +28,7 @@
         </x-form.input>
       </div>
       
-      @if($this->getUser()?->getAttribute('2fa'))
+      @if($this->getUser()?->twofa)
         <div class="!mb-3">
           <x-form.input wire:model="form.2fa" name="2fa" placeholder="Authenticator App Code" />
         </div>

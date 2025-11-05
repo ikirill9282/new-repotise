@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class Auth extends Component
 {
@@ -63,19 +64,26 @@ class Auth extends Component
         return $this->prepareEmail();
       }
 
-      $validator = Validator::make($this->form, [
-        'email' => 'required|email|exists:users,email',
-        'password' => 'required|string',
-        '2fa' => 'sometimes|nullable|string',
-        'backup' => 'sometimes|nullable|boolean',
-      ]);
+      $validator = Validator::make(
+        $this->form,
+        [
+          'email' => 'required|email|exists:users,email',
+          'password' => 'required|string',
+          '2fa' => 'sometimes|nullable|string',
+          'backup' => 'sometimes|nullable|boolean',
+        ],
+        [
+          'email.required' => 'Please enter your email address.',
+          'email.email' => 'Please enter a valid email address.',
+          'email.exists' => 'Account with this email was not found.',
+          'password.required' => 'Please enter your password.',
+        ]
+      );
 
       if ($validator->fails()) {
-        dd($validator->errors());
         throw new ValidationException($validator);
       }
 
-      // TODO: 2fa here
       $valid = $validator->validated();
       $user = $this->getUser();
 
@@ -85,15 +93,7 @@ class Auth extends Component
       }
 
       if ($user->twofa) {
-        if (!isset($valid['2fa']) && !isset($valid['backup'])) {
-          $validator->errors()->add('2fa', 'Please enter the two-factor authentication code to proceed.');
-          throw new ValidationException($validator);
-        }
-
-        if (isset($valid['backup']) && $valid['backup']) {
-          $this->dispatch('openModal', 'backup', ['user_id' => Crypt::encrypt($user->id)]);
-          return ;
-        }
+        $this->verifyTwofa($user, $validator, $valid);
       }
 
       if (AuthFacade::attempt(['email' => $valid['email'], 'password' => $valid['password']], true)) {
@@ -125,6 +125,52 @@ class Auth extends Component
     public function getUser(): ?User
     {
       return $this->user_id ? User::find(Crypt::decrypt($this->user_id)) : null;
+    }
+
+    protected function verifyTwofa(User $user, $validator, array $valid): void
+    {
+      $code = isset($valid['2fa']) ? trim((string) $valid['2fa']) : '';
+      $useBackup = (bool) ($valid['backup'] ?? false);
+
+      if ($useBackup) {
+        if ($code === '') {
+          $validator->errors()->add('2fa', 'Please enter your backup code.');
+          throw new ValidationException($validator);
+        }
+
+        $backup = $user->backup()->where('code', $code)->first();
+
+        if (!$backup) {
+          $validator->errors()->add('2fa', 'Invalid backup code.');
+          throw new ValidationException($validator);
+        }
+
+        $backup->delete();
+
+        return;
+      }
+
+      if ($code === '') {
+        $validator->errors()->add('2fa', 'Enter the code from your authenticator app.');
+        throw new ValidationException($validator);
+      }
+
+      if (empty($user->google2fa_secret)) {
+        $validator->errors()->add('2fa', 'Two-factor authentication is not configured. Please contact support.');
+        throw new ValidationException($validator);
+      }
+
+      try {
+        $secret = Crypt::decryptString($user->google2fa_secret);
+      } catch (\Throwable $e) {
+        $validator->errors()->add('2fa', 'Unable to verify the authentication code. Please try again later.');
+        throw new ValidationException($validator);
+      }
+
+      if (!Google2FA::verifyKey($secret, preg_replace('/\s+/', '', $code), 4)) {
+        $validator->errors()->add('2fa', 'Invalid authenticator app code.');
+        throw new ValidationException($validator);
+      }
     }
 
     public function render()

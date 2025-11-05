@@ -8,11 +8,16 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\UserOptions;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Livewire\Component;
 
 class Edit extends Component
 {
     public ?User $user = null;
+
+    public string $user_id;
+
+    public string $container = '';
 
     public array $social = [];
 
@@ -62,6 +67,8 @@ class Edit extends Component
         if (!$this->user) {
             abort(403);
         }
+
+        $this->user_id = Crypt::encrypt($this->user->id);
 
         $this->socialLabels = UserOptions::getSocialLables();
 

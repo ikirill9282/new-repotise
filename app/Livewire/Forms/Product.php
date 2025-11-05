@@ -206,6 +206,10 @@ class Product extends Component
       $data['price'] = str_ireplace('$', '', $data['price']);
       $data['sale_price'] = str_ireplace('$', '', $data['sale_price']);
 
+      if ($data['sale_price'] === '' || $data['sale_price'] === null) {
+        $data['sale_price'] = null;
+      }
+
       return $data;
     }
 

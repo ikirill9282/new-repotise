@@ -29,16 +29,26 @@
             {{-- SECURITY --}}
             <x-profile.section title="Security">
               <div class="flex flex-col justify-start items-start !gap-6">
-                <x-form.input 
-                  label="Email"
-                  type="email" 
-                  wire:model.defer="security.email"
-                  :tooltip="false"
-                />
+                <div 
+                  x-data="{}" 
+                  x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'change-email' })" 
+                  class="w-full cursor-pointer"
+                >
+                  <x-form.input 
+                    label="Email"
+                    type="email" 
+                    wire:model.defer="security.email"
+                    :tooltip="false"
+                    readonly
+                    class="cursor-pointer"
+                  />
+                  <div class="text-xs text-gray mt-1 pl-1">Click to change your email address.</div>
+                </div>
 
                 <x-form.input 
                   label="New Password"
                   type="password"
+                  name="security.password"
                   wire:model.defer="security.password"
                   :tooltip="false"
                 />
@@ -46,6 +56,7 @@
                 <x-form.input 
                   label="Confirm Password"
                   type="password"
+                  name="security.password_confirmation"
                   wire:model.defer="security.password_confirmation"
                   :tooltip="false"
                 />
@@ -53,6 +64,8 @@
                 <x-form.toggle 
                   label="Two-Factor Authentication"
                   wire:model="security.twofa"
+									:tooltip="false"
+                  wire:change="handleTwofaToggle($event.target.checked)"
                 />
               </div>
             </x-profile.section>

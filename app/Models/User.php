@@ -188,6 +188,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->hasOne(UserOptions::class);
     }
 
+    public function getCountryAttribute(): ?string
+    {
+      return $this->options?->country?->name;
+    }
+
     public function products()
     {
       return $this->hasMany(Product::class);

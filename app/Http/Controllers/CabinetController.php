@@ -10,6 +10,7 @@ use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\EmailChange;
 use App\Models\UserVerify;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
@@ -365,6 +366,42 @@ class CabinetController extends Controller
       return view('site.pages.create-product-media', ['product_id' => $id]);
     }
     return redirect()->route('profile.products.create');
+  }
+
+  public function confirmEmailChange(Request $request, string $token)
+  {
+    $user = $request->user();
+
+    $hashedToken = hash('sha256', $token);
+
+    $emailChange = EmailChange::where('token', $hashedToken)->first();
+
+    if (!$emailChange || !$user || $emailChange->user_id !== $user->id) {
+      session()->flash('email_change_error', 'The email change link is invalid or has already been used.');
+      return redirect()->route('profile.settings');
+    }
+
+    if ($emailChange->created_at->lt(Carbon::now()->subHour())) {
+      $emailChange->delete();
+      session()->flash('email_change_error', 'The email change link has expired. Please request a new one.');
+      return redirect()->route('profile.settings');
+    }
+
+    if (User::where('email', $emailChange->new_email)->where('id', '<>', $user->id)->exists()) {
+      $emailChange->delete();
+      session()->flash('email_change_error', 'The email address is already in use. Please choose another.');
+      return redirect()->route('profile.settings');
+    }
+
+    $user->email = $emailChange->new_email;
+    $user->email_verified_at = Carbon::now();
+    $user->save();
+
+    $emailChange->delete();
+
+    session()->flash('email_change_success', 'Your email address has been updated.');
+
+    return redirect()->route('profile.settings');
   }
 
   protected function getUser(string $slug)
