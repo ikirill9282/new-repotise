@@ -11,4 +11,14 @@ class Subscriptions extends Subscription
     {
       return $this->morphMany(Payments::class, 'paymentable');
     }
+
+    public function getForeignKey()
+    {
+      return 'subscription_id';
+    }
+
+    public function getForeignKeyName()
+    {
+      return $this->getForeignKey();
+    }
 }

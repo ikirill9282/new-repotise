@@ -16,65 +16,56 @@
         <tbody>
           @foreach($subs as $sub)
             @php
-              $product = $sub->order_products->first();
-              $paymentMethodId = $sub->getTransaction()?->payment_method;
-              $paymentMethod = $paymentMethodId ? $sub->user->findPaymentMethod($paymentMethodId) : null;
+              $product = $sub->productModel;
+              $latestPayment = $sub->latestPayment;
+              $paymentIntent = $sub->latestPaymentIntent;
+              $paymentMethodDetails = $paymentIntent?->charges->data[0]->payment_method_details->card ?? null;
+              $encryptedSubscriptionId = \Illuminate\Support\Facades\Crypt::encryptString((string) $sub->id);
             @endphp
+            @continue(!$product)
             <tr>
               <td class="!border-none bg-clip-content !px-0 !text-gray !rounded-tl-2xl !rounded-bl-2xl">
                 <div class="!p-3 flex justify-start items-start gap-3 group">
                   <div class="w-20 h-24 rounded overflow-hidden shrink-0">
-                    <img class="w-full h-full object-cover" src="{{ $product->product->preview->image }}" alt="Image">
+                    <img class="w-full h-full object-cover" src="{{ $product->preview->image ?? asset('assets/img/checked.png') }}" alt="Image">
                   </div>
-                  <x-link class="!border-0 group-has-[a]:!text-black text-nowrap">{{ $product->product->title }}</x-link>
+                  <x-link class="!border-0 group-has-[a]:!text-black text-nowrap">{{ $product->title }}</x-link>
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 !text-gray">
                 <div class="!p-3 ">
-                  @if($paymentMethod)
-                    {{ \Illuminate\Support\Carbon::parse($sub->created_at)->format('d.m.Y') }}
-                  @endif
+                  {{ optional($sub->nextBillingDate)->format('d.m.Y') ?? '—' }}
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 !text-gray">
                 <div class="!p-3 ">
-                  @if($paymentMethod && $paymentMethod->type == 'card')
-                    {{ ucfirst($paymentMethod->card->brand) }} **** {{ $paymentMethod->card->last4 }}
+                  @if($paymentMethodDetails)
+                    {{ ucfirst($paymentMethodDetails->brand) }} **** {{ $paymentMethodDetails->last4 }}
+                  @else
+                    —
                   @endif
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 ">
                 <div class="!p-3 ">
-                  {{ currency($product->total) }}/{{ $sub->sub_period }}
+                  {{ currency($latestPayment->amount ?? ($paymentIntent?->amount / 100 ?? 0)) }}/{{ $sub->periodLabel ?? '—' }}
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 text-nowrap !rounded-tr-2xl !rounded-br-2xl">
-                <div class="!p-3 ">
-                  @if($sub->status_id !== \App\Enums\Order::NEW)
-                    @if(!$sub->user->subscription($sub->getSubscriptionType())?->asStripeSubscription()->cancel_at_period_end)
-                      <x-link 
-                        wire:click.prevent="$dispatch('openModal', { modalName: 'cancelsub', args: { order_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}' } })" 
-                        class="group-has-[a]:hover:!text-black"
-                      >
-                        Cancel Subscription
-                      </x-link>
-                    @endif
-                  @else
-                    <div class="flex flex-col !gap-3 items-start">
-                      <x-link 
-                          wire:click.prevent="completePayment('{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}')" 
-                          class="group-has-[a]:hover:!text-black"
-                        >
-                          Complete Payment
-                        </x-link>
-                      <x-link 
-                          wire:click.prevent="$dispatch('openModal', {modalName: 'delete-subscription', args: { order_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($sub->id) }}' }})"
-                          class="group-has-[a]:hover:!text-black"
-                        >
-                          Delete Subscription
-                        </x-link>
-                    </div>
-                  @endif
+                <div class="!p-3 flex flex-col gap-2 items-start text-left">
+                  <x-link 
+                    wire:click.prevent="openSubscriptionModal('{{ $encryptedSubscriptionId }}')" 
+                    class="group-has-[a]:!text-active"
+                  >
+                    View & Download
+                  </x-link>
+                  <x-link
+                    wire:click.prevent="openCancelModal('{{ $encryptedSubscriptionId }}')"
+                    class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
+                  >
+                    Cancel Subscription
+                  </x-link>
+                  <span class="uppercase text-xs tracking-wide text-gray">{{ $sub->stripe_status }}</span>
                 </div>
               </td>
             </tr>

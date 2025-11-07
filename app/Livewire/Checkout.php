@@ -249,6 +249,10 @@ class Checkout extends Component
 
     public function addUserPaymentMethod(User $user, string $pm_id): PaymentMethod|StripePaymentMethod
     {
+      if (empty($user->stripe_id)) {
+        $user->createOrGetStripeCustomer();
+      }
+
       $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
       $pmType = $paymentMethod->type;
 

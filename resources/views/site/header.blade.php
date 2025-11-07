@@ -1,4 +1,4 @@
-<header class="@if (!auth()->check()) authorization_header @else authorized @endif w-full !z-[120] bg-white">
+<header class="@if (!auth()->check()) authorization_header @else authorized @endif w-full !z-[120] bg-white sticky top-0 left-0">
     <div class="container !mx-auto">
         <div class="about_block">
             <div class="logo">
@@ -44,17 +44,76 @@
                         <span class="text-nowrap">Join / Sign in</span>
                     </a>
                 @else
-                    <a href="{{ route('profile') }}" class="profile">
-                        <img src="{{ auth()->user()?->avatar }}" alt="avatar"
-                            class="profile_img">{{-- rounded-full w-8 --}}
-                        <div class="right_text">
-                            <div class="name flex flex-col">
-                                <h3>{{ auth()->user()?->profile }}</h3>
-                                {{-- <div class="text-sm">{{ currency(auth()->user()?->balance) }}</div> --}}
+                    @php
+                        $baseMenu = auth()->user()->hasRole('creator')
+                            ? [
+                                ['route' => 'profile.dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard'],
+                                ['route' => 'profile', 'icon' => 'monitor', 'label' => 'Creator Page'],
+                                ['route' => 'profile.products', 'icon' => 'pic', 'label' => 'My Products'],
+                                ['route' => 'profile.articles', 'icon' => 'document', 'label' => 'My Articles'],
+                                ['route' => 'profile.reviews', 'icon' => 'stari', 'label' => 'Reviews & Refunds'],
+                                ['route' => 'profile.sales', 'icon' => 'graph', 'label' => 'Sales Analytics'],
+                                ['route' => 'profile.referal', 'icon' => 'gift', 'label' => 'Referal Program'],
+                                ['route' => 'profile.purchases', 'icon' => 'bag', 'label' => 'My Purchases'],
+                                ['route' => 'profile.settings', 'icon' => 'cog', 'label' => 'Account Settings'],
+                            ]
+                            : [
+                                ['route' => 'profile.purchases', 'icon' => 'bag', 'label' => 'My Purchases'],
+                                ['route' => 'profile.referal', 'icon' => 'gift', 'label' => 'Referal Program'],
+                                ['route' => 'profile.settings', 'icon' => 'cog', 'label' => 'Account Settings'],
+                            ];
+
+                        $profileMenu = array_map(function ($item) {
+                            return [
+                                'url' => route($item['route']),
+                                'icon' => $item['icon'],
+                                'label' => $item['label'],
+                            ];
+                        }, $baseMenu);
+
+                        $profileMenu[] = [
+                            'url' => route('favorites'),
+                            'icon' => 'favorite',
+                            'label' => 'Favorites',
+                        ];
+                    @endphp
+                    <div class="profile-dropdown group">
+                        <a href="{{ route('profile') }}" class="profile">
+                            <img src="{{ auth()->user()?->avatar }}" alt="avatar"
+                                class="profile_img">
+                            <div class="right_text">
+                                <div class="name flex flex-col">
+                                    <h3>{{ auth()->user()?->profile }}</h3>
+                                </div>
+                                <img class="hidden" src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
                             </div>
-                            <img class="hidden" src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
+                        </a>
+                        <div class="profile-dropdown__menu">
+                            <ul>
+                                @foreach ($profileMenu as $item)
+                                    @php
+                                        $iconParams = ['width' => 16, 'height' => 16];
+                                        if ($item['icon'] === 'favorite') {
+                                            $iconParams['stroke'] = 'currentColor';
+                                        }
+                                    @endphp
+                                    <li>
+                                        <a href="{{ $item['url'] }}">
+                                            @includeIf('icons.' . $item['icon'], $iconParams)
+                                            <span>{{ $item['label'] }}</span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                                <li class="profile-dropdown__divider"></li>
+                                <li>
+                                    <a href="{{ route('signout') }}" class="profile-dropdown__logout">
+                                        @include('icons.logout', ['width' => 16, 'height' => 16])
+                                        <span>Sign out</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-                    </a>
+                    </div>
 
                     <a href="{{ route('favorites') }}" class="like rection_groups !text-transparent">
                         @include('icons.favorite')

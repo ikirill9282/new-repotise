@@ -85,15 +85,15 @@
             </div>
             <div class="flex flex-wrap gap-1.5">
                 @foreach ($product->types->shuffle()->slice(0, 3) as $type)
-                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/products/?type={$type->slug}") }}">{{ $type->title }}</a>
+                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ route('products', ['type' => $type->slug]) }}">{{ $type->title }}</a>
                 @endforeach
 
                 @foreach ($product->categories->shuffle()->slice(0, 3) as $category)
-                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/search?q={$category->title}") }}">{{ $category->title }}</a>
+                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ route('products', ['categories' => $category->slug]) }}">{{ $category->title }}</a>
                 @endforeach
                 
                 @foreach ($product->locations->shuffle()->slice(0, 3) as $location)
-                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ url("/products/{$location->slug}") }}">{{ $location->title }}</a>
+                  <a class="text-xs !text-gray !bg-light text-nowrap px-2 py-1 rounded !transition hover:!bg-second hover:!text-light" href="{{ route('products', ['locations' => $location->slug]) }}">{{ $location->title }}</a>
                 @endforeach
             </div>
             <div class="flex justify-between items-center pt-2 !mt-auto">
@@ -139,4 +139,3 @@
     </div>
   </div>
 </div>
-

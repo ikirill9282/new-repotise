@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
+use Laravel\Cashier\Cashier;
+use App\Models\Subscriptions;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
       Model::unguard();
+
+      Cashier::useSubscriptionModel(Subscriptions::class);
 
       // LogViewer::auth(function ($request) {
       //   return $request->user() && ($request->user()->hasRole('admin') || $request->user()->hasRole('super-admin'));

@@ -18,6 +18,7 @@ class Settings extends Component
     protected $listeners = [
         'twofa-enabled' => 'onTwofaEnabled',
         'twofa-disabled' => 'onTwofaDisabled',
+        'payment-method-added' => 'refreshPaymentMethods',
     ];
 
     protected bool $skipTwofaWatcher = false;
@@ -218,6 +219,20 @@ class Settings extends Component
 
         $this->selectedPaymentMethod = $this->options->preferred_payment_method ?? ($this->paymentMethods[0]['id'] ?? null);
         $this->selectedPayoutMethod = $this->options->preferred_payout_method ?? ($this->payoutMethods[0]['id'] ?? null);
+    }
+
+    public function startAddPaymentMethod(): void
+    {
+        $this->dispatch('openModal', 'payment-method');
+    }
+
+    public function refreshPaymentMethods(?string $paymentMethodId = null): void
+    {
+        $this->loadPaymentData();
+
+        if ($paymentMethodId) {
+            $this->selectedPaymentMethod = $paymentMethodId;
+        }
     }
 
     protected function fetchStripePaymentMethods(): array

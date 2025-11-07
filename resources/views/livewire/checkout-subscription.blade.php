@@ -130,7 +130,7 @@
 @script
   <script>
       const stripe = Stripe(
-        'pk_test_51R4kScFkz2A7XNTioqDGOwaj9SuLpkVaOLCHhOfyGvq5iYdtJLPTju3OvoTCCS7tW7BdDR2xqes9mZdyQEbsEYeR00NHvVUfKl'
+        'pk_test_51QyRYMAcKvFfYWUGHWNhmA3IueKw7pitQONcJire1VVLx4t36rfGx54OB78EFZj6kKaS12M6GmzsOofOzfSjApKS00B8mwb7tR'
       );
       const clientSecret = '{{ $intent->client_secret }}';
       const elements = stripe.elements({clientSecret});

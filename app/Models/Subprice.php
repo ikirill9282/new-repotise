@@ -15,7 +15,7 @@ class Subprice extends Model
   public function stripeData(): Attribute
   {
     return Attribute::make(
-      get: fn(?string $val) => json_decode($val, true),
+      get: fn(?string $val) => $val ? json_decode($val, true) ?? [] : [],
       set: fn(array $val) => json_encode($val),
     );
   }
@@ -104,19 +104,19 @@ class Subprice extends Model
     return round($this->yearWithoutDiscount() * 12, 2);
   }
 
-  public function getMonthId(): string
+  public function getMonthId(): ?string
   {
-    return $this->stripe_data['month'];
+    return $this->stripe_data['month'] ?? null;
   }
 
-  public function getQuarterId(): string
+  public function getQuarterId(): ?string
   {
-    return $this->stripe_data['quarter'];
+    return $this->stripe_data['quarter'] ?? null;
   }
 
-  public function getYearId(): string
+  public function getYearId(): ?string
   {
-    return $this->stripe_data['year'];
+    return $this->stripe_data['year'] ?? null;
   }
 
   public function getPeriodId(string $period): ?string

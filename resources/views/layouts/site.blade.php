@@ -90,7 +90,6 @@
     @stack('js')
 
     @yield('js')
-		<a href="/auth/signout">logout</a>
 </body>
 
 </html>

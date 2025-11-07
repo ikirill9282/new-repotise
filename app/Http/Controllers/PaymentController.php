@@ -22,6 +22,9 @@ use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
 use App\Models\Payments;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Subscriptions;
+use App\Models\Product;
+use Illuminate\Support\Carbon;
 
 
 class PaymentController extends Controller
@@ -68,35 +71,53 @@ class PaymentController extends Controller
   public function success(Request $request)
   {
     $valid = $request->validate(['payment_intent' => 'required|string']);
-    
-    $order = Order::whereHas(
-        'payments', 
-        fn($query) => $query->where('stripe_id', $valid['payment_intent'])
-      )
-      ->with([
-        'products.preview',
-        'products.types',
-        'products.locations',
-        'order_products.product.preview',
-        'order_products.product.types',
-        'order_products.product.locations',
-      ])
-      ->first();
-
-    if (!$order) {
-      return (new FallbackController)($request);
-    }
 
     $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($valid['payment_intent']);
     $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($paymentIntent->payment_method);
 
-    if ($paymentIntent->status == PaymentIntent::STATUS_SUCCEEDED) {
-      Payments::query()
-        ->where('stripe_id', $paymentIntent->id)
-        ->update(['status' => $paymentIntent->status]);
+    $payment = Payments::with('paymentable')
+      ->where('stripe_id', $valid['payment_intent'])
+      ->first();
+
+    if (!$payment) {
+      return (new FallbackController)($request);
     }
-    
-    // $order->update(['status_id' => EnumsOrder::PAID]);
+
+    if ($paymentIntent->status == PaymentIntent::STATUS_SUCCEEDED) {
+      $payment->update(['status' => $paymentIntent->status]);
+    }
+
+    $paymentable = $payment->paymentable;
+
+    if ($paymentable instanceof Order) {
+      return $this->renderOrderSuccess($request, $paymentable, $paymentIntent, $paymentMethod);
+    }
+
+    if ($paymentable instanceof Subscriptions) {
+      return $this->renderSubscriptionSuccess($paymentable, $paymentIntent, $paymentMethod);
+    }
+
+    return (new FallbackController)($request);
+  }
+
+  public function error(Request $request)
+  {
+    return view('site.pages.payment-error', [
+      'page' => Page::where('slug', 'payment-error')->with('config')->first(),
+    ]);
+  }
+
+  protected function renderOrderSuccess(Request $request, Order $order, PaymentIntent $paymentIntent, PaymentMethod $paymentMethod)
+  {
+    $order->load([
+      'products.preview',
+      'products.types',
+      'products.locations',
+      'order_products.product.preview',
+      'order_products.product.types',
+      'order_products.product.locations',
+    ]);
+
     ProcessOrder::dispatch($order);
     $encryptedOrderId = Crypt::encryptString((string) $order->id);
 
@@ -119,10 +140,64 @@ class PaymentController extends Controller
     ]);
   }
 
-  public function error(Request $request)
+  protected function renderSubscriptionSuccess(Subscriptions $subscription, PaymentIntent $paymentIntent, PaymentMethod $paymentMethod)
   {
-    return view('site.pages.payment-error', [
-      'page' => Page::where('slug', 'payment-error')->with('config')->first(),
+    $subscription->load('user');
+
+    $product = $this->resolveSubscriptionProduct($subscription);
+    $latestPayment = $subscription->payments()->latest()->first();
+    $periodLabel = $this->resolveSubscriptionPeriod($subscription);
+
+    $subscription->loadMissing('user');
+
+    return view('site.pages.subscription-success', [
+      'page' => Page::where('slug', 'payment-success')->with('config')->first(),
+      'user' => Auth::user() ?? $subscription->user,
+      'subscription' => $subscription,
+      'paymentIntent' => $paymentIntent,
+      'paymentMethod' => $paymentMethod,
+      'product' => $product,
+      'latestPayment' => $latestPayment,
+      'periodLabel' => $periodLabel,
+      'nextBillingDate' => $this->resolveNextBillingDate($subscription),
     ]);
+  }
+
+  protected function resolveSubscriptionProduct(Subscriptions $subscription): ?Product
+  {
+    if (!str_starts_with($subscription->type, 'plan_')) {
+      return null;
+    }
+
+    $parts = explode('_', $subscription->type);
+    $productId = $parts[2] ?? null;
+
+    return $productId ? Product::with(['preview', 'types', 'locations'])->find($productId) : null;
+  }
+
+  protected function resolveSubscriptionPeriod(Subscriptions $subscription): ?string
+  {
+    if (!str_starts_with($subscription->type, 'plan_')) {
+      return null;
+    }
+
+    $parts = explode('_', $subscription->type);
+    $period = $parts[1] ?? null;
+
+    return $period ? ucfirst($period) : null;
+  }
+
+  protected function resolveNextBillingDate(Subscriptions $subscription): ?Carbon
+  {
+    try {
+      $stripeSub = $subscription->asStripeSubscription();
+      if (!empty($stripeSub->current_period_end)) {
+        return Carbon::createFromTimestamp($stripeSub->current_period_end);
+      }
+    } catch (\Throwable $e) {
+      return null;
+    }
+
+    return null;
   }
 }

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\PaymentMethod;
 use Stripe\PaymentMethod as StripePaymentMethod;
+use Stripe\PaymentIntent as StripePaymentIntent;
 
 
 class CheckoutSubscription extends Component
@@ -60,6 +61,51 @@ class CheckoutSubscription extends Component
 
       $product = $this->getProduct();
 
+      if (!$product) {
+        Log::critical('Subscription product not found', [
+          'product_id' => $this->product_id,
+          'period' => $this->period,
+        ]);
+        $this->dispatch('toastError', ['message' => 'Subscription product is unavailable.']);
+        return;
+      }
+
+      $subprice = $product->subprice;
+      if (!$subprice) {
+        Log::critical('Subscription plan missing pricing', [
+          'product_id' => $product->id,
+          'period' => $this->period,
+        ]);
+        $this->dispatch('toastError', ['message' => 'Subscription plan is not configured.']);
+        return;
+      }
+
+      $price_id = $subprice->getPeriodId($this->period);
+      if (!$price_id) {
+        try {
+          $product->publishInStripe();
+          $product->refresh();
+          $subprice = $product->subprice;
+          $price_id = $subprice?->getPeriodId($this->period);
+        } catch (\Throwable $e) {
+          Log::critical('Failed to publish product in Stripe', [
+            'product_id' => $product->id,
+            'period' => $this->period,
+            'error' => $e->getMessage(),
+          ]);
+        }
+      }
+
+      if (!$price_id) {
+        Log::critical('Subscription price id not configured', [
+          'product_id' => $product->id,
+          'period' => $this->period,
+          'stripe_data' => $subprice?->stripe_data,
+        ]);
+        $this->dispatch('toastError', ['message' => 'Subscription price is not configured for this period.']);
+        return;
+      }
+
       DB::beginTransaction();
       try {
         if (Auth::guest()) {
@@ -91,6 +137,7 @@ class CheckoutSubscription extends Component
       $paymentMethod = $this->addUserPaymentMethod($user, $pm_id);
 
       $subscription = $user->subscription($this->makeSubscriptionType());
+      $paymentIntent = null;
 
       if ($subscription && $subscription->hasIncompletePayment()) {
         $paymentIntent = $subscription->latestPayment()->asStripePaymentIntent();
@@ -113,16 +160,15 @@ class CheckoutSubscription extends Component
       }
 
       try {
-        $price_id = $product->subprice->getPeriodId($this->period);
         $sub_name = $this->makeSubscriptionType();
         $sub = $user->newSubscription($sub_name, $price_id)->create($pm_id);
-        $this->addPayment($sub, $user);
+        $paymentIntent = $this->addPayment($sub, $user);
 
       } catch (\Exception $e) {
         $sub = $user->subscription($this->makeSubscriptionType());
-        $this->addPayment($sub, $user);
+        $paymentIntent = $this->addPayment($sub, $user);
 
-        if (in_array($paymentIntent->status, ['requires_action', 'requires_confirmation'])) {
+        if ($paymentIntent && in_array($paymentIntent->status, ['requires_action', 'requires_confirmation'])) {
           $this->dispatch('requires-action', [
             'clientSecret' => $paymentIntent->client_secret,
             'paymentMethod' => $pm_id,
@@ -139,25 +185,43 @@ class CheckoutSubscription extends Component
         return ;
       }
       
-      return $this->paymentResult('success', $paymentIntent->id);
+      return $this->paymentResult('success', $paymentIntent?->id ?? 'subscription');
     }
 
-    public function addPayment($sub, $user)
+    public function addPayment($sub, $user): ?StripePaymentIntent
     {
-      $paymentIntent = $sub->latestPayment()->asStripePaymentIntent();
+      if (!$sub) {
+        return null;
+      }
+
+      $latestPayment = $sub->latestPayment();
+      if (!$latestPayment) {
+        return null;
+      }
+
+      $paymentIntent = $latestPayment->asStripePaymentIntent();
+
       if (!Payments::where('stripe_id', $paymentIntent->id)->exists()) {
-        Subscriptions::find($sub->id)->payments()->create([
+        $subscriptionModel = $sub instanceof Subscriptions ? $sub : Subscriptions::find($sub->id);
+
+        $subscriptionModel?->payments()->create([
           'user_id' => $user->id,
           'stripe_id' => $paymentIntent->id,
           'status' => $paymentIntent->status,
           'amount' => $paymentIntent->amount / 100, // cents!
         ]);
       }
+
+      return $paymentIntent;
     }
 
 
     public function addUserPaymentMethod(User $user, string $pm_id): PaymentMethod|StripePaymentMethod
     {
+      if (empty($user->stripe_id)) {
+        $user->createOrGetStripeCustomer();
+      }
+
       $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($pm_id);
       $pmType = $paymentMethod->type;
 
@@ -223,7 +287,8 @@ class CheckoutSubscription extends Component
 
     public function paymentResult(string $result, string $paymentIntentId)
     {
-      $url = route("payment.$result") . '/?payment_intent=' . $paymentIntentId;
+      $route = $result === 'success' ? 'subscription.success' : "payment.$result";
+      $url = route($route) . '/?payment_intent=' . $paymentIntentId;
       return redirect($url);
     }
 

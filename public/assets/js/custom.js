@@ -866,7 +866,10 @@ const CartCounter = function() {
 }
 
 const header = $('header');
-const headerHeight = header.outerHeight();
+if (header.length) {
+  header.addClass('!sticky top-0 left-0 !translate-y-0');
+  header.removeClass('translate-y-[-100%]');
+}
 
 window.FavoriteButtons = new FavoriteButtons();
 window.CartButtons = new CartButtons();
@@ -905,9 +908,6 @@ $(document).ready(function() {
 });
 
 
-let lastPoint = 0;
-
-
 function setCosts(data)
 {
   const blocks = $('.costs');
@@ -931,25 +931,13 @@ function setCosts(data)
 }
 
 
-$(window).on('scroll', function(evt) {
+$(window).on('scroll', function() {
     const point = $(this).scrollTop();
-    if (point > (headerHeight + 10)) {
-        if (!header.hasClass('!sticky')) {
-            header.addClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
-        }
-        if (point <= lastPoint) {
-            header.addClass('transition !translate-y-0');
-        } else if (!$('#mobile_menu').data('open')) {
-            header.removeClass('!translate-y-0');
-        }
+    if (point > 0) {
+        header.addClass('shadow-md');
+    } else {
+        header.removeClass('shadow-md');
     }
-
-    if (point == 0) {
-        header.removeClass('!sticky top-0 left-0 translate-y-[-100%] shadow-md');
-        header.removeClass('transition');
-    }
-
-    lastPoint = point;
 });
 
 $('.hamburger-menu').on('click', function(evt) {

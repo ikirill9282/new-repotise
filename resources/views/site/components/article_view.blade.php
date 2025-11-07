@@ -2,6 +2,7 @@
     @php
       $group = \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $article->author->id]);
       $resource = \Illuminate\Support\Facades\Crypt::encrypt($article->author->id);
+      $reportHash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $article->id]);
     @endphp
     <h2>{{ $article->title }}</h2>
     <div class="theme_articles">
@@ -29,7 +30,15 @@
           <span>{{ $article->views }} Views</span>
       </div>
       {!! $article->getText() !!}
-			<a class="spotted_a_mistake" title="See you soon">
+			<a
+        href="#"
+        class="spotted_a_mistake {{ auth()->check() ? '' : 'open_auth' }}"
+        title="Tell us about the mistake"
+        @if(auth()->check())
+          x-data="{}"
+          x-on:click.prevent='Livewire.dispatch("openModal", { modalName: "report", args: @json(['model' => $reportHash, 'resource' => 'article']) })'
+        @endif
+      >
 					<span class="text-nowrap">Spotted a mistake?</span>
 			</a>
     </div>

@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\OrderProductFileController;
+use App\Http\Controllers\SubscriptionFileController;
 
 require __DIR__ . '/api.php';
 
@@ -72,6 +73,8 @@ Route::middleware('auth:web')->group(function() {
 
   Route::get('/orders/files/{orderProduct}/{file}', OrderProductFileController::class)
     ->name('orders.files.download');
+  Route::get('/subscriptions/files/{subscription}/{file}', SubscriptionFileController::class)
+    ->name('subscriptions.files.download');
 });
 
 // Public Profile

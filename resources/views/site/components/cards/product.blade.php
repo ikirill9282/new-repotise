@@ -90,17 +90,17 @@
     <div class="inf_cards flex flex-wrap">
         {{-- TYPES --}}
         @foreach ($model->types->shuffle()->slice(0, 3) as $type)
-          <a class="text-nowrap" href="{{ url("/products/?type={$type->slug}") }}">{{ $type->title }}</a>
+          <a class="text-nowrap" href="{{ route('products', ['type' => $type->slug]) }}">{{ $type->title }}</a>
         @endforeach
 
         {{-- CATEGORIES --}}
         @foreach ($model->categories->shuffle()->slice(0, 3) as $category)
-          <a class="text-nowrap" href="{{ url("/search?q={$category->title}") }}">{{ $category->title }}</a>
+          <a class="text-nowrap" href="{{ route('products', ['categories' => $category->slug]) }}">{{ $category->title }}</a>
         @endforeach
 
         {{-- LOCATIONS --}}
         @foreach ($model->locations->shuffle()->slice(0, 3) as $location)
-          <a class="text-nowrap" href="{{ url("/products/{$location->slug}") }}">{{ $location->title }}</a>
+          <a class="text-nowrap" href="{{ route('products', ['locations' => $location->slug]) }}">{{ $location->title }}</a>
         @endforeach
 				
     </div>

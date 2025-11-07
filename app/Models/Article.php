@@ -14,13 +14,14 @@ use App\Traits\HasKeywords;
 use App\Helpers\Slug;
 use App\Helpers\SessionExpire;
 use App\Traits\HasMessages;
+use App\Traits\HasReport;
 use App\Traits\HasStatus;
 use Illuminate\Support\Facades\Crypt;
 use Mews\Purifier\Facades\Purifier;
 
 class Article extends Model
 {
-  use HasAuthor, HasGallery, Searchable, HasKeywords, HasStatus, HasMessages;
+  use HasAuthor, HasGallery, Searchable, HasKeywords, HasStatus, HasMessages, HasReport;
 
   protected Collection|array $all_comments = [];
 

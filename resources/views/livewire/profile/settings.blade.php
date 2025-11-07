@@ -74,8 +74,7 @@
             <x-profile.section title="Payment Methods">
               <x-slot name="titleSlot">
                 <x-btn class="!text-sm !px-4 !py-1.5 !w-auto sm:ml-auto transition !bg-second !border-second hover:!bg-active hover:!border-active"
-                  x-data="{}"
-                  x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'payout-method' })"
+                  wire:click="startAddPaymentMethod"
                 >
                   Add Payment Method
                 </x-btn>
@@ -100,15 +99,14 @@
                     </div>
                   </div>
                 @empty
-                  <div class="bg-light rounded !p-4 text-gray flex flex-col gap-2 w-full">
-                    <span>No payment methods saved yet.</span>
-                    <x-btn second class="!inline-block !text-sm !px-3 !py-1 w-auto"
-                      x-data="{}"
-                      x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'payout-method' })"
-                    >
-                      + Add Payment Method
-                    </x-btn>
-                  </div>
+                    <div class="bg-light rounded !p-4 text-gray flex flex-col gap-2 w-full">
+                      <span>No payment methods saved yet.</span>
+                      <x-btn second class="!inline-block !text-sm !px-3 !py-1 w-auto"
+                        wire:click="startAddPaymentMethod"
+                      >
+                        + Add Payment Method
+                      </x-btn>
+                    </div>
                 @endforelse
               </div>
             </x-profile.section>
