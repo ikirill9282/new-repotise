@@ -44,12 +44,16 @@
                     <div class="!p-3 flex items-start justify-start gap-4 group ">
                       @if($order->status_id !== \App\Enums\Order::NEW)
                         <div class="flex group">
-                          <x-link 
-                            class="group-has-[a]:!text-active" 
-                            wire:click.prevent="openProductModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')"
-                          >
-                            View & Download
-                          </x-link>
+                          @if(!$order_product->refunded)
+                            <x-link 
+                              class="group-has-[a]:!text-active" 
+                              wire:click.prevent="openProductModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')"
+                            >
+                              View & Download
+                            </x-link>
+                          @else
+                            <div class="flex group opacity-0">View &amp; Download</div>
+                          @endif
                         </div>
                         <div class="flex flex-col items-start justify-start gap-2">
                           @php

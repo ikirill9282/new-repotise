@@ -3,9 +3,12 @@
 namespace App\Livewire\Profile\Tables;
 
 use App\Models\RefundRequest;
+use App\Services\RefundProcessingException;
+use App\Services\StripeRefundProcessor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class ProfileRefunds extends Component
@@ -84,48 +87,75 @@ class ProfileRefunds extends Component
 
     public function approveRefund(int $refundId): void
     {
-        $this->updateRefundStatus($refundId, 'approved', 'Refund approved successfully.');
-    }
-
-    public function rejectRefund(int $refundId): void
-    {
-        $this->updateRefundStatus($refundId, 'rejected', 'Refund rejected.');
-    }
-
-    protected function updateRefundStatus(int $refundId, string $status, string $message): void
-    {
         $this->resetStatusMessages();
 
-        $userId = Auth::id();
-
-        if (!$userId) {
-            $this->statusError = 'You need to be signed in to manage refunds.';
-            return;
-        }
-
-        $refund = RefundRequest::query()
-            ->where('seller_id', $userId)
-            ->find($refundId);
+        $refund = $this->findRefundForSeller($refundId);
 
         if (!$refund) {
-            $this->statusError = 'Refund request not found.';
             return;
         }
 
         if ($refund->status !== 'pending') {
-            if ($refund->status === $status) {
-                $this->statusMessage = 'Refund already marked as ' . $status . '.';
-            } else {
-                $this->statusError = 'Only pending refund requests can be updated.';
-            }
+            $this->statusError = 'Only pending refund requests can be approved.';
             return;
         }
 
-        $refund->status = $status;
+        try {
+            app(StripeRefundProcessor::class)->process($refund);
+            $this->statusMessage = 'Refund approved and sent to Stripe.';
+        } catch (RefundProcessingException $e) {
+            $this->statusError = $e->getMessage();
+        } catch (\Throwable $e) {
+            Log::error('Stripe refund processing failed', [
+                'refund_id' => $refundId,
+                'seller_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+            $this->statusError = 'Unable to complete the refund right now. Please try again.';
+        }
+    }
+
+    public function rejectRefund(int $refundId): void
+    {
+        $this->resetStatusMessages();
+
+        $refund = $this->findRefundForSeller($refundId);
+
+        if (!$refund) {
+            return;
+        }
+
+        if ($refund->status !== 'pending') {
+            $this->statusError = 'Only pending refund requests can be updated.';
+            return;
+        }
+
+        $refund->status = 'rejected';
         $refund->resolved_at = Carbon::now();
         $refund->save();
 
-        $this->statusMessage = $message;
+        $this->statusMessage = 'Refund rejected.';
+    }
+
+    protected function findRefundForSeller(int $refundId): ?RefundRequest
+    {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            $this->statusError = 'You need to be signed in to manage refunds.';
+            return null;
+        }
+
+        $refund = RefundRequest::query()
+            ->where('seller_id', $userId)
+            ->with(['orderProduct'])
+            ->find($refundId);
+
+        if (!$refund) {
+            $this->statusError = 'Refund request not found.';
+        }
+
+        return $refund;
     }
 
     protected function resetStatusMessages(): void

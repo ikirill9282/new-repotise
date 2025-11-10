@@ -223,12 +223,11 @@ class Checkout extends Component
 
       } catch (\Exception $e) {
         Log::critical('Error while payement creation', [
-          'order' => $order,
+          'order' => $order ?? null,
           'error' => $e,
         ]);
         DB::rollBack();
-        $this->dispatch('toastError', ['message' => 'Something went wrong ... Please contact with administration!']);
-        return ;
+        return redirect()->route('payment.error', ['reason' => 'internal_error']);
       }
       DB::commit();
 

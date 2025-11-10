@@ -17,16 +17,16 @@
                     @include('site.components.heading', ['variables' => $variables->filter(fn($item) => str_contains($item->name, 'page'))])
                     <p>{{ print_var('page_subtitle', $variables) }}</p>
                     <div class="block_view">
-                        <a 
-                          href="{{ auth()->check() ? (empty($downloadModalArgs) ? route('profile.purchases') : '#') : '#' }}"
-                          class="download {{ auth()->check() ? '' : 'open_auth' }}"
-                          @if(auth()->check() && !empty($downloadModalArgs))
+                        @if(auth()->check() && !empty($downloadModalArgs))
+                          <a 
+                            href="#"
+                            class="download"
                             x-data="{}"
                             x-on:click.prevent='Livewire.dispatch("openModal", { modalName: "product", args: @json($downloadModalArgs) })'
-                          @endif
-                        >
-                          {{ print_var('left_button_text', $variables) }}
-                        </a>
+                          >
+                            {{ print_var('left_button_text', $variables) }}
+                          </a>
+                        @endif
                         <a href="{{ route('profile.purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">{{ print_var('right_button_text', $variables) }}</a>
                     </div>
                 </div>
@@ -111,6 +111,10 @@
                                             >
                                               View &amp; Download
                                             </x-link>
+                                          @elseif($orderProduct->refunded)
+                                            <span class="text-xs text-gray mt-2 inline-flex items-center gap-1">
+                                              Access removed after refund
+                                            </span>
                                           @endif
                                       </div>
                                       @if($product)

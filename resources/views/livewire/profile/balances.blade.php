@@ -17,21 +17,21 @@
     <div class="group mb-4">
       <div class="text-gray mb-1 text-sm">Available Balance</div>
       <div class="px-3 py-2.5 bg-light rounded relative text-gray">
-        $10 000
+        ${{ number_format($availableBalance, 2, '.', ' ') }}
         <x-tooltip message="tooltip" class="!right-3" />
       </div>
     </div>
     <div class="group mb-4">
       <div class="text-gray mb-1 text-sm">Pending Balance</div>
       <div class="px-3 py-2.5 bg-light rounded relative text-gray">
-        $10 000
+        ${{ number_format($pendingBalance, 2, '.', ' ') }}
         <x-tooltip message="tooltip" class="!right-3" />
       </div>
     </div>
     <div class="group mb-4">
       <div class="text-gray mb-1 text-sm">Total Balance</div>
       <div class="px-3 py-2.5 bg-light rounded relative text-gray">
-        $10 000
+        ${{ number_format($totalBalance, 2, '.', ' ') }}
         <x-tooltip message="tooltip" class="!right-3" />
       </div>
     </div>

@@ -30,6 +30,10 @@ class OrderProductFileController extends Controller
             abort(403);
         }
 
+        if ($orderProduct->refunded) {
+            abort(403);
+        }
+
         $file = ProductFiles::query()
             ->whereNull('expires_at')
             ->where('product_id', $orderProduct->product_id)

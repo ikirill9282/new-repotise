@@ -7,7 +7,10 @@ use Laravel\Cashier\Subscription;
 
 class RevenueShare extends Model
 {
-  
+    protected $casts = [
+        'refunded_at' => 'datetime',
+    ];
+
   public function user()
   {
     return $this->belongsTo(User::class);
@@ -30,5 +33,10 @@ class RevenueShare extends Model
   
   public function subscription() {
     return $this->belongsTo(Subscription::class);
+  }
+
+  public function refundRequest()
+  {
+    return $this->belongsTo(RefundRequest::class);
   }
 }

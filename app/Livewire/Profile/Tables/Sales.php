@@ -32,7 +32,8 @@ class Sales extends Component
         }
 
         $baseQuery = RevenueShare::query()
-            ->where('author_id', $userId);
+            ->where('author_id', $userId)
+            ->whereNull('refunded_at');
 
         $rowsQuery = (clone $baseQuery)
             ->with(['order', 'product'])

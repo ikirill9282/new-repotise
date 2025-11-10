@@ -52,7 +52,7 @@
         ])
 
         @if ($model->subscription)
-          <x-btn href="{{ $model->makeUrl() }}" :disabled="auth()->user()?->subscribed($model->id)" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5">
+          <x-btn href="{{ $model->makeUrl() }}" :disabled="auth()->user()?->subscribed($model->id)" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5 in-cart">
             @if(auth()->check())
               @if(auth()->user()->subscribed($model->id))
                 Subscribed

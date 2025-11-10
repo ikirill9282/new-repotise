@@ -5844,3 +5844,6 @@ input[type="search"]::-webkit-search-cancel-button {
 .profile-wrap{
 	background: #F9F9F9;
 }
+.trending_cards .swiper-slide{
+	height: 360px;
+}

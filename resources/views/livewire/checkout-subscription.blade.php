@@ -132,6 +132,21 @@
       const stripe = Stripe(
         'pk_test_51QyRYMAcKvFfYWUGHWNhmA3IueKw7pitQONcJire1VVLx4t36rfGx54OB78EFZj6kKaS12M6GmzsOofOzfSjApKS00B8mwb7tR'
       );
+      const paymentErrorUrl = '{{ route('payment.error') }}';
+      const redirectToPaymentError = (code = null, declineCode = null) => {
+        try {
+          const target = new URL(paymentErrorUrl, window.location.origin);
+          if (code) {
+            target.searchParams.set('reason', code);
+          }
+          if (declineCode) {
+            target.searchParams.set('decline_reason', declineCode);
+          }
+          window.location.href = target.toString();
+        } catch (err) {
+          window.location.href = paymentErrorUrl;
+        }
+      };
       const clientSecret = '{{ $intent->client_secret }}';
       const elements = stripe.elements({clientSecret});
       const paymentMethods = elements.create('payment');
@@ -149,7 +164,7 @@
               });
               
               if (error) {
-                $wire.dispatch('toastError', [{message: error.message}]);
+                redirectToPaymentError(error.code || null, error.decline_code || null);
               } else {
                 $wire.dispatch('makeSubscription', { pm_id: setupIntent.payment_method });
               }

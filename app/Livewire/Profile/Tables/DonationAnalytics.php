@@ -50,6 +50,7 @@ class DonationAnalytics extends Component
             ->where('author_id', $userId)
             ->whereNull('product_id')
             ->where('created_at', '>=', $from)
+            ->whereNull('refunded_at')
             ->with('user')
             ->orderByDesc('created_at')
             ->limit(25)

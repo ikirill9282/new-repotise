@@ -280,6 +280,21 @@
 @script
   <script>
       const stripe = Stripe('pk_test_51QyRYMAcKvFfYWUGHWNhmA3IueKw7pitQONcJire1VVLx4t36rfGx54OB78EFZj6kKaS12M6GmzsOofOzfSjApKS00B8mwb7tR');
+      const paymentErrorUrl = '{{ route('payment.error') }}';
+      const redirectToPaymentError = (code = null, declineCode = null) => {
+        try {
+          const target = new URL(paymentErrorUrl, window.location.origin);
+          if (code) {
+            target.searchParams.set('reason', code);
+          }
+          if (declineCode) {
+            target.searchParams.set('decline_reason', declineCode);
+          }
+          window.location.href = target.toString();
+        } catch (err) {
+          window.location.href = paymentErrorUrl;
+        }
+      };
       const clientSecret = '{{ $this->clientSecret }}';
       const elements = stripe.elements({clientSecret});
       const paymentMethod = elements.create('payment');
@@ -287,6 +302,23 @@
       if (document.getElementById('payment')) {
         paymentMethod.mount('#payment');
       }
+
+      // Скрываем/показываем Stripe элемент при выборе сохраненной карты
+      Livewire.on('livewire:init', () => {
+        Livewire.hook('morph.updated', ({ el, component }) => {
+          if (component.name === 'checkout') {
+            const paymentMethod = component.get('form.payment_method');
+            const stripeContainer = document.getElementById('stripe-payment-container');
+            if (stripeContainer) {
+              if (paymentMethod && paymentMethod !== '') {
+                stripeContainer.style.display = 'none';
+              } else {
+                stripeContainer.style.display = '';
+              }
+            }
+          }
+        });
+      });
 
       const btn = document.getElementById('submit-btn');
       btn.addEventListener('click', (evt) => {
@@ -302,7 +334,7 @@
               });
               
               if (error) {
-                $wire.dispatch('toastError', [{message: error.message}]);
+                redirectToPaymentError(error.code || null, error.decline_code || null);
               } else {
                 $wire.dispatch('makePayment', { pm_id: setupIntent.payment_method });
               }

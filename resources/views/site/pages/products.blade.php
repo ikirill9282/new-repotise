@@ -2,7 +2,30 @@
 
 @push('css')
     <style>
-        
+        /* Скрываем блок search_results, если он пустой или все элементы скрыты */
+        .filter_products .about_block .search_filter .search_results:empty {
+            display: none !important;
+        }
+        /* Убираем отступы и высоту для пустого блока */
+        .filter_products .about_block .search_filter .search_results {
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: auto !important;
+        }
+        /* Если в блоке нет видимых элементов, скрываем его */
+        .filter_products .about_block .search_filter .search_results:not(:has(span:not([hidden]):not([style*="display: none"]):not([style*="display:none"]))) {
+            display: none !important;
+        }
+        /* Скрываем блок inf_cards (теги в карточках продуктов), если все теги скрыты */
+        .inf_cards:empty,
+        .inf_cards:not(:has(a:not([hidden]):not([style*="display: none"]):not([style*="display:none"]))) {
+            display: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 0 !important;
+            height: 0 !important;
+        }
     </style>
 @endpush
 
@@ -373,6 +396,79 @@
 			window.productsCurrentPage = {{ $paginator->currentPage() ?? 1 }};
 		</script>
     <script src="{{ asset('/assets/js/all_products.js') }}"></script>
+    <script>
+        // Скрываем блок search_results, если все его элементы скрыты
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchResults = document.querySelector('.filter_products .about_block .search_filter .search_results');
+            if (searchResults) {
+                const checkVisibility = () => {
+                    const visibleChildren = Array.from(searchResults.children).filter(child => {
+                        const style = window.getComputedStyle(child);
+                        return style.display !== 'none' && !child.hasAttribute('hidden');
+                    });
+                    if (visibleChildren.length === 0) {
+                        searchResults.style.display = 'none';
+                    } else {
+                        searchResults.style.display = '';
+                    }
+                };
+                checkVisibility();
+                // Проверяем при изменении DOM
+                const observer = new MutationObserver(checkVisibility);
+                observer.observe(searchResults, { childList: true, attributes: true, attributeFilter: ['hidden', 'style'] });
+            }
+        });
+        
+        // Скрываем блоки inf_cards (теги в карточках продуктов), если все теги скрыты
+        function hideEmptyInfCards() {
+            const infCardsBlocks = document.querySelectorAll('.inf_cards');
+            infCardsBlocks.forEach(block => {
+                const visibleTags = Array.from(block.querySelectorAll('a')).filter(tag => {
+                    const style = window.getComputedStyle(tag);
+                    return style.display !== 'none' && !tag.hasAttribute('hidden');
+                });
+                if (visibleTags.length === 0) {
+                    block.style.display = 'none';
+                    block.style.margin = '0';
+                    block.style.padding = '0';
+                    block.style.minHeight = '0';
+                    block.style.height = '0';
+                } else {
+                    block.style.display = '';
+                    block.style.margin = '';
+                    block.style.padding = '';
+                    block.style.minHeight = '';
+                    block.style.height = '';
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Запускаем сразу
+            hideEmptyInfCards();
+            
+            // Запускаем после небольшой задержки, чтобы убедиться, что limitProductCardTags() выполнился
+            setTimeout(hideEmptyInfCards, 100);
+            setTimeout(hideEmptyInfCards, 500);
+            
+            // Проверяем при изменении DOM (когда теги скрываются/показываются)
+            const observer = new MutationObserver(hideEmptyInfCards);
+            const containers = document.querySelectorAll('.inf_cards');
+            containers.forEach(container => {
+                observer.observe(container, { 
+                    childList: true, 
+                    attributes: true, 
+                    attributeFilter: ['hidden', 'style'],
+                    subtree: true 
+                });
+            });
+        });
+        
+        // Также запускаем после загрузки всех скриптов
+        window.addEventListener('load', function() {
+            setTimeout(hideEmptyInfCards, 100);
+        });
+    </script>
     <script>
         $(document).ready(function() {
             // Init filters page

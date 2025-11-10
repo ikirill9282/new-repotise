@@ -38,6 +38,11 @@ class Product extends Component
             return;
         }
 
+        if ($orderProduct->refunded) {
+            $this->errorMessage = 'Access to this product was removed after the refund was approved.';
+            return;
+        }
+
         $this->orderProduct = $orderProduct;
     }
 

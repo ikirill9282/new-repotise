@@ -51,6 +51,7 @@ class SalesAnalytics extends Component
             ->where('author_id', $userId)
             ->whereNotNull('product_id')
             ->where('created_at', '>=', $from)
+            ->whereNull('refunded_at')
             ->with(['product', 'order'])
             ->orderByDesc('created_at')
             ->limit(25)

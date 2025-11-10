@@ -4,15 +4,16 @@ namespace App\Livewire\Modals;
 
 use App\Livewire\Profile\Settings as SettingsComponent;
 use App\Models\User;
+use App\Traits\StoresStripePaymentMethods;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\PaymentMethod as CashierPaymentMethod;
 use Livewire\Component;
-use Stripe\PaymentMethod as StripePaymentMethod;
 
 class PaymentMethod extends Component
 {
+    use StoresStripePaymentMethods;
+
     public string $clientSecret;
     public string $publishableKey;
 
@@ -55,7 +56,7 @@ class PaymentMethod extends Component
         }
 
         try {
-            $paymentMethod = $this->storePaymentMethod($user, $paymentMethodId);
+            $paymentMethod = $this->storeStripePaymentMethod($user, $paymentMethodId);
 
             $user->updateDefaultPaymentMethod($paymentMethod->id);
 
@@ -73,51 +74,6 @@ class PaymentMethod extends Component
             $this->dispatch('payment-method-add-failed');
             $this->dispatch('toastError', ['message' => 'Unable to add payment method. Please try again.']);
         }
-    }
-
-    protected function storePaymentMethod(User $user, string $paymentMethodId): CashierPaymentMethod|StripePaymentMethod
-    {
-        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve($paymentMethodId);
-        $type = $paymentMethod->type;
-
-        $existingMethods = Cashier::stripe()->paymentMethods->all([
-            'customer' => $user->stripe_id,
-            'type' => $type,
-        ]);
-
-        $matchedMethod = null;
-
-        if ($type === 'card') {
-            $fingerprint = $paymentMethod->card->fingerprint ?? null;
-
-            foreach ($existingMethods->data as $method) {
-                if (($method->card->fingerprint ?? null) === $fingerprint) {
-                    $matchedMethod = $method;
-                    break;
-                }
-            }
-        } elseif ($type === 'sepa_debit') {
-            $newBank = $paymentMethod->sepa_debit;
-
-            foreach ($existingMethods->data as $method) {
-                $existingBank = $method->sepa_debit;
-
-                if (
-                    ($existingBank->last4 ?? null) === ($newBank->last4 ?? null) &&
-                    ($existingBank->bank_code ?? null) === ($newBank->bank_code ?? null)
-                ) {
-                    $matchedMethod = $method;
-                    break;
-                }
-            }
-        }
-
-        if (!$matchedMethod) {
-            $user->addPaymentMethod($paymentMethod->id);
-            $matchedMethod = $paymentMethod;
-        }
-
-        return $matchedMethod;
     }
 
     public function render()

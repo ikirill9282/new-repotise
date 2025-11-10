@@ -8,6 +8,7 @@ class RefundRequest extends Model
 {
     protected $casts = [
         'resolved_at' => 'datetime',
+        'refund_amount' => 'float',
     ];
 
     public function order()

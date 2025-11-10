@@ -128,8 +128,7 @@ class CheckoutSubscription extends Component
           'error' => $e,
         ]);
         DB::rollBack();
-        $this->dispatch('toastError', ['message' => 'Something went wrong... Please contact with administration!']);
-        return ;
+        return redirect()->route('payment.error', ['reason' => 'internal_error']);
       }
 
       DB::commit();
@@ -176,13 +175,16 @@ class CheckoutSubscription extends Component
           return ;
         }
 
-        $this->dispatch('toastError', ['message' => 'Something went wrong ... Please contact with administration!']);
         Log::critical('Subscription error', [
           'order' => $sub,
           'error' => $e,
         ]);
 
-        return ;
+        if ($paymentIntent?->id) {
+          return $this->paymentResult('error', $paymentIntent->id);
+        }
+
+        return redirect()->route('payment.error', ['reason' => 'internal_error']);
       }
       
       return $this->paymentResult('success', $paymentIntent?->id ?? 'subscription');

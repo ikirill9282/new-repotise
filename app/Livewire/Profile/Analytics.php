@@ -103,7 +103,8 @@ class Analytics extends Component
     {
         $revenueQuery = RevenueShare::query()
             ->where('author_id', $user->id)
-            ->where('created_at', '>=', $from);
+            ->where('created_at', '>=', $from)
+            ->whereNull('refunded_at');
 
         $totalRevenue = (clone $revenueQuery)->sum('amount_paid');
         $productRevenue = (clone $revenueQuery)->whereNotNull('product_id')->sum('author_amount');
@@ -147,6 +148,7 @@ class Analytics extends Component
             ->where('author_id', $user->id)
             ->where('created_at', '>=', $from)
             ->whereNotNull('subscription_id')
+            ->whereNull('refunded_at')
             ->sum('author_amount');
 
         $refundCount = RefundRequest::query()
@@ -201,6 +203,7 @@ class Analytics extends Component
             ->where('author_id', $user->id)
             ->where('created_at', '>=', $from)
             ->whereNotNull('product_id')
+            ->whereNull('refunded_at')
             ->select('product_id', DB::raw('SUM(author_amount) as revenue'))
             ->groupBy('product_id')
             ->orderByDesc('revenue')
@@ -253,7 +256,8 @@ class Analytics extends Component
         $donationQuery = RevenueShare::query()
             ->where('author_id', $user->id)
             ->where('created_at', '>=', $from)
-            ->whereNull('product_id');
+            ->whereNull('product_id')
+            ->whereNull('refunded_at');
 
         $recurringDonations = (clone $donationQuery)
             ->whereNotNull('subscription_id')

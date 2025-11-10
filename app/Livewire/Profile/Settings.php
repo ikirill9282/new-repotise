@@ -5,16 +5,23 @@ namespace App\Livewire\Profile;
 use App\Models\Policies;
 use App\Models\User;
 use App\Models\UserOptions;
+use App\Traits\StoresStripePaymentMethods;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Laravel\Cashier\Cashier;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 
 class Settings extends Component
 {
+    use StoresStripePaymentMethods, WithFileUploads;
+
     protected $listeners = [
         'twofa-enabled' => 'onTwofaEnabled',
         'twofa-disabled' => 'onTwofaDisabled',
@@ -59,11 +66,16 @@ class Settings extends Component
     public array $payoutMethods = [];
     public ?string $selectedPaymentMethod = null;
     public ?string $selectedPayoutMethod = null;
+    public bool $showPaymentForm = false;
+    public ?string $paymentSetupSecret = null;
+    public string $stripePublishableKey = '';
 
     public array $returnPolicies = [];
     public ?int $selectedReturnPolicy = null;
 
     public bool $isSeller = false;
+
+    public $avatar = null;
 
     protected array $messages = [
         'security.password.same' => 'Passwords do not match.',
@@ -90,10 +102,17 @@ class Settings extends Component
         if (session()->has('email_change_error')) {
             $this->dispatch('toastError', ['message' => session()->pull('email_change_error')]);
         }
+
+        $this->stripePublishableKey = config('cashier.key') ?? env('STRIPE_KEY', '');
     }
 
     public function updated($propertyName): void
     {
+        if ($propertyName === 'avatar') {
+            $this->uploadAvatar();
+            return;
+        }
+
         if (!in_array($propertyName, ['security.password', 'security.password_confirmation'], true)) {
             return;
         }
@@ -208,6 +227,10 @@ class Settings extends Component
         $this->selectedReturnPolicy = $this->options->return_policy_id;
 
         $this->loadPaymentData();
+
+        if ($this->showPaymentForm) {
+            $this->cancelPaymentMethodForm();
+        }
     }
 
     protected function loadPaymentData(): void
@@ -223,7 +246,82 @@ class Settings extends Component
 
     public function startAddPaymentMethod(): void
     {
-        $this->dispatch('openModal', 'payment-method');
+        if ($this->showPaymentForm) {
+            return;
+        }
+
+        if ($this->stripePublishableKey === '') {
+            Log::error('Stripe publishable key missing for settings payment form.');
+            $this->dispatch('toastError', ['message' => 'Payment configuration is missing. Please contact support.']);
+            return;
+        }
+
+        try {
+            if (empty($this->user->stripe_id)) {
+                $this->user->createOrGetStripeCustomer();
+            }
+
+            $intent = Cashier::stripe()->setupIntents->create([
+                'customer' => $this->user->stripe_id,
+                'payment_method_types' => ['card'],
+                'usage' => 'off_session',
+            ]);
+
+            $this->paymentSetupSecret = $intent->client_secret;
+            $this->showPaymentForm = true;
+
+            $this->dispatch('settings-payment-form-ready', [
+                'publishableKey' => $this->stripePublishableKey,
+                'clientSecret' => $this->paymentSetupSecret,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to initialize Stripe setup intent for settings page.', [
+                'user_id' => $this->user->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->dispatch('toastError', ['message' => 'Unable to start card registration. Please try again.']);
+        }
+    }
+
+    public function cancelPaymentMethodForm(): void
+    {
+        $this->showPaymentForm = false;
+        $this->paymentSetupSecret = null;
+        $this->dispatch('settings-payment-form-reset');
+    }
+
+    #[On('settings-payment-method-submitted')]
+    public function completeAddPaymentMethod(string|array $paymentMethodId): void
+    {
+        if (is_array($paymentMethodId)) {
+            $paymentMethodId = $paymentMethodId['paymentMethodId'] ?? '';
+        }
+
+        if ($paymentMethodId === '') {
+            $this->dispatch('settings-payment-form-error');
+            $this->dispatch('toastError', ['message' => 'Payment method identifier missing.']);
+            return;
+        }
+
+        try {
+            $paymentMethod = $this->storeStripePaymentMethod($this->user, $paymentMethodId);
+            $this->user->updateDefaultPaymentMethod($paymentMethod->id);
+
+            $this->cancelPaymentMethodForm();
+            $this->refreshPaymentMethods($paymentMethod->id);
+
+            $this->dispatch('toastSuccess', ['message' => 'Card saved successfully.']);
+        } catch (\Throwable $e) {
+            Log::error('Failed to attach payment method from settings form.', [
+                'user_id' => $this->user->id ?? null,
+                'payment_method' => $paymentMethodId,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->dispatch('settings-payment-form-error');
+            $this->dispatch('toastError', ['message' => 'Unable to add payment method. Please try again.']);
+        }
     }
 
     public function refreshPaymentMethods(?string $paymentMethodId = null): void
@@ -385,6 +483,55 @@ class Settings extends Component
     {
         $this->refreshState();
         $this->setTwofaToggle(false);
+    }
+
+    public function uploadAvatar(): void
+    {
+        if (!$this->avatar) {
+            return;
+        }
+
+        $this->validate([
+            'avatar' => 'required|image|max:2048|mimes:jpeg,jpg,png,gif',
+        ]);
+
+        try {
+            // Удаляем старую аватарку, если она не дефолтная
+            $oldAvatar = $this->options->avatar;
+            if ($oldAvatar && $oldAvatar !== '/storage/images/default_avatar.png' && strpos($oldAvatar, 'default_avatar') === false) {
+                $oldPath = str_replace('/storage/', '', $oldAvatar);
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            // Сохраняем новую аватарку
+            $path = $this->avatar->store('images/avatars', 'public');
+            $avatarPath = "/storage/$path";
+
+            // Обновляем аватарку в user_options
+            $this->options->avatar = $avatarPath;
+            $this->options->save();
+
+            // Сбрасываем загруженный файл
+            $this->avatar = null;
+
+            // Обновляем состояние
+            $this->refreshState();
+
+            $this->dispatch('toastSuccess', ['message' => 'Avatar updated successfully.']);
+        } catch (ValidationException $e) {
+            $this->dispatch('toastError', ['message' => 'Please select a valid image file (max 2MB, jpeg/jpg/png/gif).']);
+            $this->avatar = null;
+        } catch (\Throwable $e) {
+            Log::error('Failed to upload avatar.', [
+                'user_id' => $this->user->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->dispatch('toastError', ['message' => 'Failed to upload avatar. Please try again.']);
+            $this->avatar = null;
+        }
     }
 
     public function render()
