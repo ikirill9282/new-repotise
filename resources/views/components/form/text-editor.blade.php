@@ -3,6 +3,8 @@
   'placeholder' => '',
   'id' => 'id'.uniqid(),
   'image' => true,
+  'tooltip' => false,
+  'tooltipText' => null,
 ])
         
 <div 
@@ -18,7 +20,9 @@
     data-image="{{ $image ? 'true' : 'false' }}"
   >
   </div>
-  <x-tooltip class="!right-3 !top-32 xs:!top-25" message="tooltip"></x-tooltip>
+  @if($tooltip && filled($tooltipText))
+    <x-tooltip class="!right-3 !top-32 xs:!top-25" :message="$tooltipText"></x-tooltip>
+  @endif
 
   @if ($attributes->get('name'))
     @error($attributes->get('name'))

@@ -9,14 +9,16 @@
           <div class="font-bold text-2xl">Filters</div>
           <div class="flex justify-start items-start sm:items-center !gap-4 2xl:!gap-8 flex-col sm:flex-row">
             <div class="block">
-              <label class="text-gray" for="sorting-reviews">Product Type:</label>
+              <label class="text-gray" for="donation-analytics-type">Donation Type:</label>
               <select
-                id="sorting-reviews"
-                class="outline-0 pr-1 hover:cursor-pointer"
+                class="tg-select"
+                wire:model.live="donationType"
+                id="donation-analytics-type"
                 >
                 <option value="">All Types</option>
-                <option value="">All Types</option>
-                <option value="">All Types</option>
+                @foreach($donationTypes as $value => $label)
+                  <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
               </select>
             </div>
           </div>

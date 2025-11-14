@@ -147,10 +147,17 @@ class Checkout extends Component
     #[On('makePayment')]
     public function onMakePayment(string $pm_id)
     { 
+    $order = $this->getOrder();
+    if (!$order) {
+      return redirect()->route('payment.error', ['reason' => 'internal_error']);
+    }
+
+    if (Auth::check() && $this->orderContainsSelfProduct($order, Auth::user())) {
+      return redirect()->route('payment.error', ['reason' => 'self_purchase']);
+    }
+
       DB::beginTransaction();
       try {
-        $order = $this->getOrder();
-
         if (!Auth::check()) {
           $pwd = User::makePassword();
           $user = User::firstOrCreate(
@@ -167,6 +174,11 @@ class Checkout extends Component
         } else {
           $user = $order->user;
         }
+
+      if ($this->orderContainsSelfProduct($order, $user)) {
+        DB::rollBack();
+        return redirect()->route('payment.error', ['reason' => 'self_purchase']);
+      }
 
         if ($this->form['gift'] && $this->form['recipient'] !== $order->user->email) {
           $order->update([
@@ -327,4 +339,13 @@ class Checkout extends Component
         'paymentMethods' => $paymentMethods,
       ]);
     }
+
+  protected function orderContainsSelfProduct(Order $order, User $user): bool
+  {
+    $order->loadMissing('order_products.product');
+
+    return $order->order_products->contains(function ($orderProduct) use ($user) {
+      return $orderProduct->product && $orderProduct->product->user_id === $user->id;
+    });
+  }
 }

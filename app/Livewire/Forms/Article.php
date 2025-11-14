@@ -22,6 +22,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\Collapse;
 use Mews\Purifier\Facades\Purifier;
+use App\Jobs\OptimizeMedia;
 
 class Article extends Component
 {
@@ -177,6 +178,7 @@ class Article extends Component
             'preview' => 1,
             'size' => Collapse::bytesToMegabytes($this->banner->getSize()),
           ]);
+          OptimizeMedia::dispatch('public', $path);
         }
       } catch (\Exception $e) {
         if (isset($path)) Storage::disk('public')->delete(str_ireplace(('/storage' . '/'), '', $path));

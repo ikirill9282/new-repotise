@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use App\Helpers\Collapse;
 use App\Models\ProductFiles;
 use App\Models\ProductLinks;
+use App\Jobs\OptimizeMedia;
 use Livewire\Component;
 use Mews\Purifier\Facades\Purifier;
 
@@ -297,7 +298,7 @@ class ProductMedia extends Component
 
     protected function resetBanner(Product $product, array $data)
     {
-      if (!empty($data['banner']['uploaded'])) {
+        if (!empty($data['banner']['uploaded'])) {
         $image = $data['banner']['uploaded'];
         $path = $image->store('images', 'public');
 
@@ -314,6 +315,8 @@ class ProductMedia extends Component
           'placement' => 'site',
           'size' => Collapse::bytesToMegabytes($image->getSize()),
         ]);
+
+          OptimizeMedia::dispatch('public', $path);
       }
     }
 
@@ -335,6 +338,7 @@ class ProductMedia extends Component
             'placement' => 'gallery',
             'size' => Collapse::bytesToMegabytes($item['uploaded']->getSize()),
           ]);
+          OptimizeMedia::dispatch('public', $path);
         } elseif (empty($item['preview']) && !empty($item['id'])) {
           Gallery::where('id', Crypt::decrypt($item['id']))->update(['expires_at' => Carbon::now()]);
         }

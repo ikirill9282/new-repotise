@@ -51,6 +51,8 @@ class User extends Authenticatable implements HasName, FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'deletion_requested_at' => 'datetime',
+            'deletion_scheduled_for' => 'datetime',
         ];
     }
 

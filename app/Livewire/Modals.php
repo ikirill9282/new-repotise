@@ -4,6 +4,10 @@ namespace App\Livewire;
 
 use Livewire\Attributes\On;
 use Livewire\Component;
+use App\Services\Cart as CartService;
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class Modals extends Component
 {
@@ -66,6 +70,24 @@ class Modals extends Component
     public function finalizeClose()
     {
         $this->modal = false;
+    }
+
+    public function moveCheckout()
+    {
+        $cart = new CartService();
+
+        if (!$cart->hasProducts()) {
+            return;
+        }
+
+        $order = Order::preparing($cart);
+        $order->user_id = Auth::id() ?? 0;
+        $order = $order->savePrepared();
+
+        $cart->flushCart();
+        Session::put('checkout', $order->id);
+
+        return redirect()->route('checkout');
     }
 
     public function modalHasLogo()

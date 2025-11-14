@@ -502,6 +502,15 @@ const counterChanged = (elem, count) => {
             $(".cart-counter").removeClass("hidden");
             setCosts(response.costs);
         }
+    }).fail((xhr) => {
+        const message = xhr?.responseJSON?.message || "Unable to update cart item.";
+        $.toast({
+            text: message,
+            icon: "error",
+            heading: "Error",
+            position: "top-right",
+            hideAfter: 5000,
+        });
     });
 };
 

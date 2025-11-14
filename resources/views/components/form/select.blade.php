@@ -10,7 +10,7 @@
   'name' => null,
 	'tooltip' => true,
   'tooltipModal' => false,
-  'tooltipText' => 'tooltip',
+  'tooltipText' => null,
 ])
 <div 
   x-data="{
@@ -78,7 +78,7 @@
       <span class="transition group-has-[.opened]:rotate-180">
         @include('icons.arrow_down', ['width' => 18, 'height' => 18])
       </span>
-			@if($tooltip)
+			@if($tooltip && filled($tooltipText))
 				<x-tooltip 
 					class="!right-3" 
 					:message="$tooltipText" 

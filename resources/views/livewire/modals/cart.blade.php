@@ -2,72 +2,128 @@
   $trending_products = auth()->check()
       ? auth()->user()->getRecomendProducts(10)
       : \App\Models\Product::limit(10)->latest()->get();
+  $cartService = new \App\Services\Cart();
 @endphp
 
-<div class="flex flex-col md:flex-row-reverse justify-between items-stretch gap-2 cart-modal md:min-w-3xl rounded-lg 
-            {{-- max-h-[97vh] overflow-y-scroll overflow-x-hidden md:overflow-hidden  --}}
-            select-none
-            ">
-   <style>
-      .swiper-scrollbar-drag {
-          background: #FC7361 !important;
+<style>
+  .cart-modal .recommendations-scroll::-webkit-scrollbar {
+      width: 6px;
+  }
+  .cart-modal .recommendations-scroll::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 9999px;
+  }
+  .cart-modal .recommendations-scroll::-webkit-scrollbar-thumb {
+      background: #FC7361;
+      border-radius: 9999px;
+  }
+  .cart-modal .recommendations-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #FC7361 #f1f1f1;
+  }
+  .cart-modal .item .img_products {
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      padding: 0 8px;
+  }
+  .cart-modal .item .img_products .main_img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+  }
+  .cart-modal .item .img_products > a {
+      display: block;
+      width: 100%;
+      height: 100%;
+  }
+  .cart-modal .item .img_products .cart-modal-add-btn {
+      position: absolute;
+      left: calc(10%);
+      bottom: 0px;
+      /* transform: translateX(-50%); */
+      width: calc(80%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+  }
+  .cart-modal .item .product-title {
+      font-size: 18px !important;
+      font-weight: 500 !important;
+      color: #1f1f1f !important;
+  }
+  @media (min-width: 768px) {
+      .cart-modal .item .img_products {
+          height: 130px;
+          padding: 0 10px;
       }
-  </style>
-  <div class="md:basis-1/4 order-2 md:!order-1 relative md:!pr-2">
-      <div id="cart-slider" class="md:max-w-[280px] h-full overflow-hidden md:rounded-lg relative">
-          <div class="swiper-wrapper">
+  }
+  .cart-modal .item .cost p,
+  .cart-modal .item .cost span {
+      color: #A4A0A0 !important;
+  }
+  .cart-modal .item .cost span {
+      color: #C0BCBC !important;
+  }
+</style>
+
+<div class="flex flex-col md:flex-row-reverse justify-between items-stretch gap-2 cart-modal md:min-w-3xl rounded-lg select-none h-full md:h-[85vh] max-h-[90vh]">
+  <div class="md:basis-1/4 order-2 md:!order-1 relative md:!pr-2 h-full">
+      <div class="md:max-w-[280px] md:rounded-lg h-full">
+          <div class="products_item flex flex-col gap-3 pr-2 md:pr-0 h-full overflow-y-auto recommendations-scroll">
               @foreach ($trending_products as $product)
-                  <div class="swiper-slide">
-                      <a href="{{ $product->makeUrl() }}">
-                          <div class="flex flex-col justify-start items-stretch h-full">
-                              <div class="mb-0 md:mb-auto h-[180px] md:h-[140px] md:!mb-2 rounded-lg md:overflow-hidden">
-                                  <img src="{{ url($product->preview->image) }}" alt="Preview"
-                                      class="w-full h-full object-cover">
-                              </div>
-                              <div class="text-[#A4A0A0]">
-                                  {{ (strlen($product->title) > 30) ? trim(mb_substr($product->title, 0, 30)).'...' : $product->title }}
-                              </div>
-															<div class="cost">
-                                <p>{{ currency($product->getPrice()) }}</p>
-                                <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
-                            </div>
-                          </div>
-                      </a>
+                  @php
+                      $preview = $product->preview?->image
+                          ? url($product->preview->image)
+                          : asset('assets/img/default_avatar.png');
+                      $title = strlen($product->title) > 50
+                          ? trim(mb_substr($product->title, 0, 50)) . '...'
+                          : $product->title;
+                      $productHash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]);
+                      $productKey = \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $product->id]);
+                      $inCart = $cartService->inCart($product->id);
+                      $isOwner = auth()->check() && (int) $product->user_id === auth()->id();
+                  @endphp
+                  <div class="item flex flex-col gap-2">
+                      <div class="img_products relative rounded-lg overflow-hidden">
+                          <a href="{{ $product->makeUrl() }}" class="block">
+                              <img src="{{ $preview }}" alt="Preview of {{ $title }}" class="main_img object-cover w-full h-full">
+                          </a>
+                          @if (! $inCart && ! $isOwner)
+                              <x-btn
+                                  type="button"
+                                  class="add-to-cart cart-modal-add-btn to_basket"
+                                  data-hide-on-add="true"
+                                  data-refresh-only="true"
+                                  data-value="{{ $productHash }}"
+                                  data-key="{{ $productKey }}"
+                              >
+                                  Add to cart
+                              </x-btn>
+                          @endif
+                      </div>
+                      <h4 class="product-title">
+                          <a href="{{ $product->makeUrl() }}" class="transition !text-inherit hover:!text-black block text-ellipsis overflow-hidden whitespace-nowrap">
+                              {{ $title }}
+                          </a>
+                      </h4>
+                      <div class="cost text-[#A4A0A0] flex items-center gap-2">
+                          <span class="!text-[#A4A0A0]">{{ currency($product->getPrice()) }}</span>
+                          @if($product->getPriceWithoutDiscount())
+                              <span class="!text-[#C0BCBC] line-through">{{ currency($product->getPriceWithoutDiscount()) }}</span>
+                          @endif
+                      </div>
                   </div>
               @endforeach
           </div>
-
-          <div class="swiper-button-next hover:!cursor-pointer !z-40 md:!bottom-10 md:!top-auto md:!left-[50%] md:!right-auto md:translate-x-[-50%] md:!rotate-[90deg]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none"
-                  class="hover:!cursor-pointer">
-                  <g opacity="0.6">
-                      <path fill-rule="evenodd" clip-rule="evenodd"
-                          d="M20.4173 4.5835C11.904 4.5835 5.00065 11.4852 5.00065 20.0002C5.00065 28.5135 11.904 35.4168 20.4173 35.4168C28.9306 35.4168 35.834 28.5135 35.834 20.0002C35.834 11.4852 28.9307 4.5835 20.4173 4.5835Z"
-                          fill="#212121" stroke="#212121" stroke-width="1.5" stroke-linecap="square" />
-                      <path d="M17 14L22.81 19.785L17 25.57" stroke="white" stroke-width="1.5"
-                          stroke-linecap="round" />
-                  </g>
-              </svg>
-          </div>
-          <div class="swiper-button-prev hover:!cursor-pointer !block !z-40 md:!top-10 md:!left-[50%] md:!right-auto md:translate-x-[-50%] md:!rotate-[-90deg]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none"
-                  class="hover:!cursor-pointer">
-                  <g opacity="0.6">
-                      <path fill-rule="evenodd" clip-rule="evenodd"
-                          d="M20.4173 4.5835C11.904 4.5835 5.00065 11.4852 5.00065 20.0002C5.00065 28.5135 11.904 35.4168 20.4173 35.4168C28.9306 35.4168 35.834 28.5135 35.834 20.0002C35.834 11.4852 28.9307 4.5835 20.4173 4.5835Z"
-                          fill="#212121" stroke="#212121" stroke-width="1.5" stroke-linecap="square" />
-                      <path d="M17 14L22.81 19.785L17 25.57" stroke="white" stroke-width="1.5"
-                          stroke-linecap="round" />
-                  </g>
-              </svg>
-          </div>
-      </div>
-
-      <div class="swiper-scrollbar swiper-pagination swiper-pagination-progressbar swiper-pagination-vertical hidden md:block md:!top-0 md:!right-0 md:!left-auto md:!bottom-auto">
       </div>
     </div>
     <div class=" md:basis-3/4 bg-white pt-4 px-2 pb-2 md:p-2 
-                rounded-lg flex flex-col transition overflow-y-scroll
+                rounded-lg flex flex-col transition overflow-y-auto h-full
                 cart-order
                 "
         >

@@ -73,6 +73,7 @@ class Orders extends Component
             'order_products.product.preview',
             'order_products.refundRequest',
           ])
+          ->orderByDesc('created_at')
           ->get(),
       ]);
     }

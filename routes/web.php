@@ -98,6 +98,7 @@ Route::get('/favorites', [SiteController::class, 'favorites'])->name('favorites'
 Route::get('/search', [SiteController::class, 'search'])->name('search');
 
 Route::get('/insights', [SiteController::class, 'insights'])->name('insights');
+Route::get('/insights/news', [SiteController::class, 'insightsNews'])->name('insights.news');
 Route::get('/insights/{article}', [SiteController::class, 'feed'])->name('feed');
 
 Route::get('/creators', [SiteController::class, 'creators'])->name('creators');

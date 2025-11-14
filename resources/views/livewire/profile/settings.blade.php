@@ -15,19 +15,19 @@
                 <x-form.input 
                   label="Full Name" 
                   wire:model.defer="profile.full_name"
-                  :tooltip="false"
+                  tooltipText="Enter your full name as it appears on your payment method for billing purposes."
                 />
 
                 <x-form.input 
                   label="Username" 
                   wire:model.defer="profile.username"
-                  :tooltip="false"
+                  tooltipText="Username is the user's public identifier. Can only be changed once."
                 />
               </div>
             </x-profile.section>
 
             {{-- SECURITY --}}
-            <x-profile.section title="Security">
+            <x-profile.section title="Security" :tooltip="false">
               <div class="flex flex-col justify-start items-start !gap-6">
                 <div 
                   x-data="{}" 
@@ -38,7 +38,7 @@
                     label="Email"
                     type="email" 
                     wire:model.defer="security.email"
-                    :tooltip="false"
+                    tooltipText="Email is used for account security, product updates and news."
                     readonly
                     class="cursor-pointer"
                   />
@@ -50,7 +50,7 @@
                   type="password"
                   name="security.password"
                   wire:model.defer="security.password"
-                  :tooltip="false"
+                  tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols."
                 />
 
                 <x-form.input 
@@ -58,33 +58,35 @@
                   type="password"
                   name="security.password_confirmation"
                   wire:model.defer="security.password_confirmation"
-                  :tooltip="false"
+                  tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols."
                 />
 
                 <x-form.toggle 
                   label="Two-Factor Authentication"
                   wire:model="security.twofa"
-									:tooltip="false"
+                  tooltipText="Enable 2FA for extra security using an authenticator app."
                   wire:change="handleTwofaToggle($event.target.checked)"
                 />
               </div>
             </x-profile.section>
 
             {{-- PAYMENT --}}
-            <x-profile.section title="Payment/Payout Methods">
+            <x-profile.section title="Payment/Payout Methods" :tooltip="false">
               <x-slot name="titleSlot">
                 @push('head')
                   <script src="https://js.stripe.com/v3/"></script>
                 @endpush
 
-                <x-btn class="!text-sm !px-4 !py-1.5 !w-auto sm:ml-auto transition !bg-second !border-second hover:!bg-active hover:!border-active disabled:opacity-60 disabled:cursor-not-allowed"
-                  wire:click="startAddPaymentMethod"
-                  wire:loading.attr="disabled"
-                  wire:target="startAddPaymentMethod"
-                  :disabled="$showPaymentForm"
-                >
-                  {{ $showPaymentForm ? 'Card form active' : 'Add Payment Method' }}
-                </x-btn>
+                <div class="flex items-center gap-2 sm:ml-auto">
+                  <x-btn class="!text-sm !px-4 !py-1.5 !w-auto transition !bg-second !border-second hover:!bg-active hover:!border-active disabled:opacity-60 disabled:cursor-not-allowed"
+                    wire:click="startAddPaymentMethod"
+                    wire:loading.attr="disabled"
+                    wire:target="startAddPaymentMethod"
+                    :disabled="$showPaymentForm"
+                  >
+                    {{ $showPaymentForm ? 'Card form active' : 'Add Payment Method' }}
+                  </x-btn>
+                </div>
               </x-slot>
               
               <div class="flex flex-col justify-start items-start gap-2">
@@ -167,17 +169,17 @@
                   wire:model="selectedReturnPolicy"
                   label="Return Policy" 
                   labelClass="{{ $selectedReturnPolicy ? '' : 'text-gray' }}"
-                  :tooltip="false"
+                  tooltipText="Specify the return policy that will apply to all your products. Buyers will see this information on your product pages."
                   :options="collect($returnPolicies)->pluck('title', 'id')->toArray()"
                 />
 
-                <x-form.toggle label="Creator Page Visibility" wire:model="preferences.creator_visible" />
+                <x-form.toggle label="Creator Page Visibility" wire:model="preferences.creator_visible" tooltipText="Control whether your Creator Page is publicly visible on the marketplace." />
                 
-                <x-form.toggle label="Show 'Donate' Button" wire:model="preferences.show_donate" />
+                <x-form.toggle label="Show 'Donate' Button" wire:model="preferences.show_donate" tooltipText="Show or hide the 'Donate' button on your Creator Page." />
                 
-                <x-form.toggle label="Show 'Products' Section" wire:model="preferences.show_products" />
+                <x-form.toggle label="Show 'Products' Section" wire:model="preferences.show_products" tooltipText="Control whether the 'Products' section is displayed on your Creator Page." />
                 
-                <x-form.toggle label="Show 'Travel Insights'" wire:model="preferences.show_insights" />
+                <x-form.toggle label="Show 'Travel Insights'" wire:model="preferences.show_insights" tooltipText="Control whether the 'Travel Insights' section is displayed on your Creator Page." />
 
               </div>
             </x-profile.section>
@@ -186,6 +188,21 @@
 
             {{-- EMAIL NOTIFICATIONS --}}
             <x-profile.section title="Email Notifications">
+              @php
+                $notificationTooltips = $isSeller
+                  ? [
+                      'product_updates' => 'Get emails about product updates and new releases.',
+                      'referral_updates' => 'Updates on your referral program.',
+                      'news_updates' => 'TrekGuider News & Updates.',
+                      'insights_updates' => 'Get notifications about new articles by creators you follow.',
+                    ]
+                  : [
+                      'product_updates' => 'Receive emails about updates to your purchased products and new product releases.',
+                      'referral_updates' => 'Updates on your referral program.',
+                      'news_updates' => 'Platform news and updates, new features.',
+                      'insights_updates' => 'Notifications about new articles by authors you have subscribed to.',
+                    ];
+              @endphp
               <div class="grid grid-cols-1 sm:grid-cols-2 items-stretch gap-2.5">
                 @foreach($notificationLabels as $key => $label)
                   <x-form.toggle 
@@ -193,6 +210,7 @@
                     labelClass="gap-2 md:gap-0" 
                     :label="$label"
                     wire:model="notifications.{{ $key }}"
+                    :tooltipText="$notificationTooltips[$key] ?? 'Manage your notification preferences.'"
                   />
                 @endforeach
               </div>
@@ -234,6 +252,7 @@
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <span class="text-white text-xs font-medium">Change</span>
             </div>
+            <x-tooltip class="!absolute -top-3 right-0" message="Visible to other users. Upload JPG, PNG, or JPEG (max 5MB)."></x-tooltip>
             <input 
                 type="file" 
                 id="avatar-upload" 

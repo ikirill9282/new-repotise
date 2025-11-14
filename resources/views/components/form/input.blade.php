@@ -5,7 +5,7 @@
   'value' => null,
   'tooltip' => true,
   'tooltipModal' => false,
-  'tooltipText' => 'tooltip',
+  'tooltipText' => null,
   'inputWrapClass' => '',
 ])
 
@@ -26,7 +26,7 @@
       value="{{ $value }}"
       {{ $attributes }}
     >
-    @if($tooltip)
+    @if($tooltip && filled($tooltipText))
       <x-tooltip 
         class="!right-3" 
         :message="$tooltipText" 

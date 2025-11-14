@@ -85,7 +85,14 @@ window.addEventListener('DOMContentLoaded', function() {
                 const searchForm = $(this).closest('form');
                 resolveErrorElement(searchForm).addClass('hidden');
                 
-                if ((autoSubmit === undefined || autoSubmit !== false) && searchForm.length) {
+                const shouldSubmit = !(
+                  autoSubmit === false ||
+                  autoSubmit === 'false' ||
+                  autoSubmit === 0 ||
+                  autoSubmit === '0'
+                );
+
+                if (shouldSubmit && searchForm.length) {
                   searchForm.trigger('submit');
                 }
               });

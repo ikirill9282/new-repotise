@@ -6,6 +6,8 @@
   'max' => 5,
   'entangle' => null,
   'create' => true,
+  'tooltip' => true,
+  'tooltipText' => null,
 ])
 
 <div class="relative dropdown text-sm sm:text-base"
@@ -148,7 +150,9 @@
       </div>
     </div>
 
-    <x-tooltip class="!right-3" message="tooltip"></x-tooltip>
+    @if($tooltip && filled($tooltipText))
+      <x-tooltip class="!right-3" :message="$tooltipText"></x-tooltip>
+    @endif
   </div>
 
   <template x-if="error && error.length">

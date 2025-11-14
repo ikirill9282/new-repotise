@@ -9,14 +9,16 @@
           <div class="font-bold text-2xl">Filters</div>
           <div class="flex justify-start items-start sm:items-center !gap-4 2xl:!gap-8 flex-col sm:flex-row">
             <div class="block">
-              <label class="text-gray" for="sorting-reviews">Payment Status:</label>
+              <label class="text-gray" for="product-analytics-status">Product Status:</label>
               <select
-                id="sorting-reviews"
-                class="outline-0 pr-1 hover:cursor-pointer"
+                class="tg-select"
+                wire:model.live="statusFilter"
+                id="product-analytics-status"
                 >
                 <option value="">All Statuses</option>
-                <option value="">All Statuses</option>
-                <option value="">All Statuses</option>
+                @foreach($statusOptions as $value => $label)
+                  <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
               </select>
             </div>
           </div>

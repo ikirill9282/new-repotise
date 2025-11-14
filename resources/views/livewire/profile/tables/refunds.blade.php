@@ -31,7 +31,7 @@
               <th class="text-nowrap font-normal !border-b-gray/15 !pb-4">
                 <div class="relative inline-block !pr-6">
                   Act on Request
-                  <x-tooltip message="Open the request in Reviews & Refunds to respond." />
+                  <x-tooltip message="Respond to this refund request within 30 days to avoid automatic refund to the customer." />
                 </div>
               </th>
             </tr>

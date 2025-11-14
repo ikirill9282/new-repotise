@@ -2,6 +2,8 @@
   'id' => 'id'.uniqid(),
   'name' => uniqid(),
   'label' => null,
+  'tooltip' => false,
+  'tooltipText' => null,
 ])
 
 <div class="relative datepicker"
@@ -22,6 +24,8 @@
     <div x-on:click.prevent="() => $refs.input.focus()" class="!text-gray hover:cursor-pointer !px-1">
       @include('icons.calendar')
     </div>
-    <x-tooltip class="!right-3" message="tooltip"></x-tooltip>
+    @if($tooltip && filled($tooltipText))
+      <x-tooltip class="!right-3" :message="$tooltipText"></x-tooltip>
+    @endif
   </div>
 </div>

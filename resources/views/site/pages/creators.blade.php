@@ -203,7 +203,9 @@
                                         'hits' => 'filter-language',
                                         'attributes' => [
                                           'data-source' => 'language',
+                                          'data-autosubmit' => 'false',
                                         ],
+                                        'form_class' => 'filter-search-form',
                                         'wrapClass' => 'flex items-center justify-start !gap-2 bg-light rounded !p-2 !py-3',
                                         'inputClass' => '!outline-0 w-full',
                                         'labelClass' => '!mb-0',
@@ -241,7 +243,9 @@
                                         'hits' => 'filter-country',
                                         'attributes' => [
                                             'data-source' => 'country',
+                                            'data-autosubmit' => 'false',
                                         ],
+                                        'form_class' => 'filter-search-form',
                                         'wrapClass' => 'flex items-center justify-start !gap-2 bg-light rounded !p-2 !py-3',
                                         'inputClass' => '!outline-0 w-full',
                                         'labelClass' => '!mb-0',
@@ -404,10 +408,12 @@
                   @else
                     <div x-data="{}" class="flex justify-end items-center !mb-6">
                       <label class="text-gray" for="sorting-table">Sort By:</label>
+                      @php
+                        $currentSort = $sortOption ?? request()->get('sort', 'name_asc');
+                      @endphp
                       <select
-                        wire:model.live="sorting" 
+                        class="tg-select"
                         id="sorting-table"
-                        class="outline-0 pr-1 hover:cursor-pointer"
                         x-on:change="(evt) => {
                           const url = new URL(window.location.href);
                           const params = new URLSearchParams(url.search);
@@ -416,19 +422,20 @@
                           window.location.href = url.toString();
                         }"
                         >
-                          <option value="newest" {{ request()->has('sort') && request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
-                          <option value="followed" {{ request()->has('sort') && request()->get('sort') == 'followed' ? 'selected' : '' }}>Most Followers</option>
+                          <option value="name_asc" {{ $currentSort === 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
+                          <option value="name_desc" {{ $currentSort === 'name_desc' ? 'selected' : '' }}>Name (Z-A)</option>
+                          <option value="followers_desc" {{ $currentSort === 'followers_desc' ? 'selected' : '' }}>Followers (High to Low)</option>
                       </select>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 !gap-3 lg:!gap-6 !mb-6">
                         
                           @foreach ($creators as $creator)
                             <div class="relative group flex flex-col items-stretch justify-start !gap-1 group/card">
-                              @include('site.components.favorite.button', [
+                              @include('site.components.follow.button', [
                                 'stroke' => '#FF2C0C',
-                                'type' => 'author',
                                 'item_id' => $creator->id,
                                 'class' => 'absolute !bg-white/50 hover:!bg-white !p-2 !rounded-lg !top-2 !right-2 group-has-[.favorite-active]:!bg-white',
+                                'is_following' => auth()->check() ? $creator->hasFollower(auth()->id()) : false,
                               ])
                               <x-link href="{{ $creator->makeProfileUrl() }}" class="rounded overflow-hidden !leading-0 !border-none">
                                 <img class="object-cover w-full h-full" src="{{ $creator->avatar }}" alt="" class="" />
@@ -602,6 +609,35 @@
           
           const query = objectToQueryString(formData);
           window.location.href = '/creators?' + query;
+        });
+
+        $('.filter-search-form').on('submit', function(evt) {
+          evt.preventDefault();
+          evt.stopImmediatePropagation();
+
+          const $form = $(this);
+          const $input = $form.find('.search-input').first();
+          const value = ($input.val() || '').trim();
+
+          if (!value.length) {
+            return false;
+          }
+
+          const data = {
+            label: value,
+            slug: value,
+          };
+
+          $input.trigger('searchItemSelected', data);
+
+          const hitsId = $input.data('hits');
+          if (hitsId) {
+            $(`#${hitsId}`).fadeOut();
+          }
+
+          $input.val('');
+
+          return false;
         });
 
 

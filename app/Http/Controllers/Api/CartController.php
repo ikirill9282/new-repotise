@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Services\Cart;
+use App\Models\Product;
 use Exception;
 
 class CartController extends Controller
@@ -21,6 +22,21 @@ class CartController extends Controller
       try {
         $cart = new Cart();
         $product_id = CustomEncrypt::getId($valid['item']);
+        $product = Product::find($product_id);
+        if (!$product) {
+          return response()->json([
+            'status' => 'error',
+            'message' => 'Selected product is unavailable.',
+          ], 404);
+        }
+
+        if (Auth::check() && $product->user_id === Auth::id()) {
+          return response()->json([
+            'status' => 'error',
+            'message' => 'You cannot purchase your own product.',
+          ], 422);
+        }
+
         $cart->addProduct($product_id, 1);
 
       } catch (\Exception $e) {
@@ -40,6 +56,21 @@ class CartController extends Controller
       ]);
       $cart = new Cart();
       $product_id = CustomEncrypt::getId($valid['item']);
+      $product = Product::find($product_id);
+      if (!$product) {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'Selected product is unavailable.',
+        ], 404);
+      }
+
+      if (Auth::check() && $product->user_id === Auth::id()) {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'You cannot purchase your own product.',
+        ], 422);
+      }
+
       $cart->addProduct($product_id, $valid['count']);
       $order = Order::preparing($cart);
 

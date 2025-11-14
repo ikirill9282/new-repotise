@@ -25,7 +25,16 @@
             'name' => 'articles-draft',
             'title' => "Draft (". $user->articles()->where('status_id', 2)->count() .")",
           ]
-        ]
+        ],
+        'args' => [],
+        'defaultSorting' => 'newest',
+        'sortingOptions' => [
+          'newest' => 'Newest First',
+          'oldest' => 'Oldest First',
+          'views' => 'Most Viewed',
+          'likes' => 'Most Liked',
+          'alphabetical' => 'Title A–Z',
+        ],
       ])
     </x-card>
   </x-profile.wrap>

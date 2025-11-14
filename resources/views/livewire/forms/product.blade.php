@@ -55,7 +55,7 @@
                 <div x-data="{ show: @entangle('fields.subscription') }" x-show="show" class="">
                   <div class="!font-semibold !text-2xl inline-block relative !pr-6 !mb-10">
                     Prepayment Discounts:
-                    <x-tooltip message="tooltip"></x-tooltip>
+                    <x-tooltip message="Specify the discounts you want to give to users who subscribe for a longer period of time."></x-tooltip>
                   </div>
                   <div class="grid grid-cols-3 !gap-3">
                     <div class="">
@@ -86,11 +86,11 @@
                 <div class="!font-semibold !text-2xl !py-4">Product Description</div>
 
                 <div class="">
-                  <x-form.chips max="3" entangle="locations" source="locations" label="Location" placeholder="Enter city or country...(Up to 3)" />
+                  <x-form.chips max="3" entangle="locations" source="locations" label="Location" placeholder="Enter city or country...(Up to 3)" tooltipText="Enter relevant key locations for your product. Use up to 3 locations. Locations will help customers find your product and improve their search experience." />
                 </div>
 
                 <div class="">
-                  <x-form.chips entangle="categories" source="categories" label="Categories" placeholder="Search or create сategories...(Up to 5)" />
+                  <x-form.chips entangle="categories" source="categories" label="Categories" placeholder="Search or create сategories...(Up to 5)" tooltipText="Enter relevant keywords to categorize your product. Use up to 5 categories. Categories help customers find your product and improve searchability." />
                 </div>
             </div>
         </div>

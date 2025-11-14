@@ -5,7 +5,7 @@
     <div class="text-gray">Product Page Views:</div>
     <div class="text-nowrap relative !pr-6">
       <span>{{ number_format($stats['page_views'] ?? 0) }}</span>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Total views of your product pages during the selected time period.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-center gap-1.5 flex-wrap">
@@ -15,7 +15,7 @@
         <span class="text-yellow">@include('icons.star')</span>
         <span>{{ number_format($stats['average_rating'] ?? 0, 1) }}</span>
       </div>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Average customer rating based on published reviews.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-start gap-1.5 flex-wrap md:!flex-nowrap">
@@ -27,28 +27,28 @@
       @else
         <span class="text-gray">—</span>
       @endif
-      <x-tooltip class="!top-1 !translate-y-[0]" message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip class="!top-1 !translate-y-[0]" message="Product with the highest sales volume during the selected time period.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-center gap-1.5 flex-wrap">
     <div class="text-gray">Average Order Value:</div>
     <div class="text-nowrap relative !pr-6">
       <span>{{ currency($stats['average_order_value'] ?? 0) }}</span>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Average revenue per order generated from your products.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-center gap-1.5 flex-wrap">
     <div class="text-gray">Product Conversion Rate:</div>
     <div class="text-nowrap relative !pr-6">
       <span>{{ number_format($stats['conversion_rate'] ?? 0, 2) }}%</span>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Percentage of product page visits that resulted in a purchase.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-center gap-1.5 flex-wrap">
     <div class="text-gray">Referral Income Earned:</div>
     <div class="text-nowrap relative !pr-6">
       <span>{{ currency($stats['referral_income'] ?? 0) }}</span>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Referral commission earned from product sales in the selected time period.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
 </div>

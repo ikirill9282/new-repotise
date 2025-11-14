@@ -119,32 +119,37 @@
                                 <p>{{ currency($product->getPrice()) }}</p>
                                 <span>{{ currency($product->getPriceWithoutDiscount()) }}</span>
                             </div>
+                            @php
+                              $isOwner = auth()->check() && (int) auth()->id() === (int) $product->user_id;
+                            @endphp
                             @if($product->subscription)
                               @if(!auth()->user()?->subscribed($product->id))
                                 @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
                               @endif
                             @else
-                              <div class="add_to_card_block">
-                                  <a href="#"
-                                      class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
-                                      data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
-                                          viewBox="0 0 20 21" fill="none">
-                                          <path fill-rule="evenodd" clip-rule="evenodd"
-                                              d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
-                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                          <path fill-rule="evenodd" clip-rule="evenodd"
-                                              d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
-                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                          <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
-                                              stroke="white" stroke-width="1.5" stroke-linecap="round"
-                                              stroke-linejoin="round" />
-                                      </svg>
-                                      {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
-                                  </a>
-                                  <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
-                                      checkout</span>
-                              </div>
+                              @if (! $isOwner)
+                                <div class="add_to_card_block">
+                                    <a href="#"
+                                        class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
+                                        data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
+                                            viewBox="0 0 20 21" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
+                                                fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
+                                                fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                            <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
+                                                stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                    </a>
+                                    <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
+                                        checkout</span>
+                                </div>
+                              @endif
                             @endif
 
                             <div class="bottom_informations">
@@ -195,27 +200,29 @@
                                 @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
                               @endif
                             @else
-                              <div class="add_to_card_block">
-                                  <a href="#"
-                                      class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
-                                      data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
-                                          viewBox="0 0 20 21" fill="none">
-                                          <path fill-rule="evenodd" clip-rule="evenodd"
-                                              d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
-                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                          <path fill-rule="evenodd" clip-rule="evenodd"
-                                              d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
-                                              fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
-                                          <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
-                                              stroke="white" stroke-width="1.5" stroke-linecap="round"
-                                              stroke-linejoin="round" />
-                                      </svg>
-                                      {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
-                                  </a>
-                                  <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
-                                      checkout</span>
-                              </div>
+                              @if (! $isOwner)
+                                <div class="add_to_card_block">
+                                    <a href="#"
+                                        class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
+                                        data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
+                                            viewBox="0 0 20 21" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M6.38208 16.7439C6.62375 16.7439 6.81885 16.9398 6.81885 17.1807C6.81885 17.4223 6.62375 17.6182 6.38208 17.6182C6.14041 17.6182 5.94531 17.4223 5.94531 17.1807C5.94531 16.9398 6.14041 16.7439 6.38208 16.7439Z"
+                                                fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M15.4368 16.7439C15.6784 16.7439 15.8743 16.9398 15.8743 17.1807C15.8743 17.4223 15.6784 17.6182 15.4368 17.6182C15.1951 17.6182 15 17.4223 15 17.1807C15 16.9398 15.1951 16.7439 15.4368 16.7439Z"
+                                                fill="white" stroke="white" stroke-width="1.5" stroke-linecap="square" />
+                                            <path d="M4.68503 5.93182H17.7057L16.6479 13.9607H5.40869L4.3445 3.38165H2.28906"
+                                                stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                    </a>
+                                    <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
+                                        checkout</span>
+                                </div>
+                              @endif
                             @endif
                             <div class="bottom_informations">
                                 <div class="text_inf">

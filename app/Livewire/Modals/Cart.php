@@ -7,6 +7,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 use App\Models\Order;
 use App\Services\Cart as CartService;
+use Livewire\Attributes\On;
 
 class Cart extends Component
 {
@@ -22,6 +23,12 @@ class Cart extends Component
     {
       $cart = $this->getCart();
       $this->order = Order::preparing($cart);
+    }
+
+    #[On('refreshCart')]
+    public function refreshCart(): void
+    {
+      $this->prepareOrder();
     }
 
     public function getCart()
@@ -52,6 +59,23 @@ class Cart extends Component
       $cart = new CartService();
       if ($cart->hasProducts()) {
         $order = Order::preparing($cart);
+        $blockedProductIds = [];
+
+        if (Auth::check()) {
+          foreach ($order->products as $product) {
+            if ($product->user_id === Auth::id()) {
+              $cart->removeFromCart($product->id);
+              $blockedProductIds[] = $product->id;
+            }
+          }
+        }
+
+        if (!empty($blockedProductIds)) {
+          $this->prepareOrder();
+          $this->dispatch('toastError', ['message' => 'You cannot purchase your own products.']);
+          return;
+        }
+
         $order->user_id = Auth::user()?->id ?? 0;
         $order = $order->savePrepared();
 

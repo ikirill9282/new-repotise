@@ -1,6 +1,7 @@
 @php
   $hash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]);
   $cart = new \App\Services\Cart();
+  $isOwner = auth()->check() && (int) auth()->id() === (int) $model->user_id;
 @endphp
 
 @if(isset($template) && $template == 'cart')
@@ -51,33 +52,33 @@
           'item_id' => $model->id,
         ])
 
-        @if ($model->subscription)
-          <x-btn href="{{ $model->makeUrl() }}" :disabled="auth()->user()?->subscribed($model->id)" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5 in-cart">
-            @if(auth()->check())
-              @if(auth()->user()->subscribed($model->id))
-                Subscribed
+        @if (! $isOwner)
+          @if ($model->subscription)
+            <x-btn href="{{ $model->makeUrl() }}" :disabled="auth()->user()?->subscribed($model->id)" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5 in-cart">
+              @if(auth()->check())
+                @if(auth()->user()->subscribed($model->id))
+                  Subscribed
+                @else
+                  Add to cart
+                @endif
               @else
-                Add to cart
+                Add to cart 
               @endif
-            @else
-              Add to cart 
-            @endif
-          </x-btn>
-        @else
-          <a 
-					@if ($cart->inCart($model->id))
-							@click.prevent="$dispatch('openModal', { modalName: 'cart' })"
-							href="#"
-					@else
-							href="{{ url('/cart') }}"
-					@endif
-             
-            class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" 
-            data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}"
-            data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $model->id]) }}"
-          >
-            {{ $cart->inCart($model?->id) ? 'View Cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
-          </a>
+            </x-btn>
+          @else
+            <a
+              href="#"
+              role="button"
+              @if ($cart->inCart($model->id))
+                @click.prevent="$dispatch('openModal', { modalName: 'cart' })"
+              @endif
+              class="to_basket !left-[50%] translate-x-[-50%] add-to-cart {{ $cart->inCart($model->id) ? 'in-cart' : '' }}" 
+              data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $model->id]) }}"
+              data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $model->id]) }}"
+            >
+              {{ $cart->inCart($model?->id) ? 'View Cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
+            </a>
+          @endif
         @endif
     </div>
     <h3 class="text-nowrap overflow-hidden text-ellipsis">

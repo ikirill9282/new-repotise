@@ -13,7 +13,7 @@
         </div>
 
         <div class="">
-          <x-form.chips entangle="tags" source="tags" name="tags" label="Tags" placeholder="Search or create tags...(Up to 5)" />
+          <x-form.chips entangle="tags" source="tags" name="tags" label="Tags" placeholder="Search or create tags...(Up to 5)" tooltipText="Enter relevant keywords to categorize your article. Use up to 5 tags. Tags help readers find your article and improve searchability." />
         </div>
         
         @if(!$this->fields['published_at'] ?? null)
@@ -40,8 +40,9 @@
         @endif
       </div>
 
-      <div class="flex flex-col justify-start items-stretch">
-        <x-form.file wire:model="banner" accept="image/*" placeholder="350x100 px"></x-form.file>
+      <div class="flex flex-col justify-start items-stretch relative">
+        <x-form.file wire:model="banner" accept="image/*" placeholder="Recommended: 1200 x 675 px (16:9)"></x-form.file>
+        <x-tooltip class="!absolute -top-4 right-0" message="Upload a visually appealing image to represent your article. Recommended dimensions: 1200 x 675 pixels (16:9 aspect ratio)."></x-tooltip>
       </div>
 
       @error('banner')

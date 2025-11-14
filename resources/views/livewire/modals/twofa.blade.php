@@ -28,7 +28,7 @@
         <input type="hidden" value="{{ strtoupper($manualKey ?? '') }}" data-copyId="twofa_setup_key" readonly />
         <span class="text-sm text-gray">Скопировать ключ</span>
         <img src="{{ asset('assets/img/copy-icon.svg') }}" alt="Copy">
-        <x-tooltip message="tooltip" class="right-3"></x-tooltip>
+        <x-tooltip message="Copy this key to your clipboard." class="right-3"></x-tooltip>
       </div>
     </div>
     @if($otpAuthUrl)
@@ -48,7 +48,7 @@
             <input type="hidden" value="{{ $backupCode }}" data-copyId="twofa_backup_{{ $index }}" readonly />
             <div class="font-mono text-base">{{ $backupCode }}</div>
             <img src="{{ asset('assets/img/copy-icon.svg') }}" alt="Copy">
-            <x-tooltip message="tooltip" class="right-3"></x-tooltip>
+            <x-tooltip message="Copy this backup code to your clipboard." class="right-3"></x-tooltip>
           </div>
         @endforeach
       </div>

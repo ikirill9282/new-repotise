@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Carbon;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class Auth extends Component
@@ -85,7 +86,17 @@ class Auth extends Component
       }
 
       $valid = $validator->validated();
-      $user = $this->getUser();
+      $user = $this->getUser()?->fresh();
+
+      if ($user && !$user->active && $this->canRestoreFromDeletion($user)) {
+        $user->forceFill([
+          'active' => 1,
+          'deletion_requested_at' => null,
+          'deletion_scheduled_for' => null,
+        ])->save();
+
+        $user->refresh();
+      }
 
       if (!$user || !$user->active) {
         $validator->errors()->add('email', 'Your account is temporarily locked. Please try again later or contact support.');
@@ -126,6 +137,15 @@ class Auth extends Component
     {
       return $this->user_id ? User::find(Crypt::decrypt($this->user_id)) : null;
     }
+
+  protected function canRestoreFromDeletion(User $user): bool
+  {
+    if (!$user->deletion_scheduled_for) {
+      return false;
+    }
+
+    return Carbon::parse($user->deletion_scheduled_for)->isFuture();
+  }
 
     protected function verifyTwofa(User $user, $validator, array $valid): void
     {

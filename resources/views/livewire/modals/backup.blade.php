@@ -5,7 +5,7 @@
   <form wire:submit="submit" class="!space-y-4">
     @csrf
 
-    <x-form.input wire:model="form.code" name="code" placeholder="Backup Code" autocomplete="one-time-code" :tooltipModal="true" />
+    <x-form.input wire:model="form.code" name="code" placeholder="Backup Code" autocomplete="one-time-code" :tooltipModal="true" tooltipText="Enter the Backup Reset Code you saved when you enabled Two-Factor Authentication." />
 
     <div class="flex justify-start items-stretch gap-3 group">
       <div class="basis-1/4">

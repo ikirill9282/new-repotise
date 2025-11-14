@@ -5,13 +5,13 @@
   {{-- FORM --}}
   <div class="grid grid-cols-1 md:grid-cols-12 items-center !gap-4 xl:!gap-6 !mb-4 xl:!mb-6">
     <div class="md:col-span-6">
-      <x-form.input label="Promo Code" placeholder="Enter promo code or generate one" />
+      <x-form.input label="Promo Code" placeholder="Enter promo code or generate one" tooltipText="Enter promo or generate a random, unique promo code." />
     </div>
     <div class="md:col-span-6">
-      <x-form.input label="Discount Amount ($)" placeholder="Enter fixed dollar discount" />
+      <x-form.input label="Discount Amount ($)" placeholder="Enter fixed dollar discount" tooltipText="Enter a fixed dollar amount to be deducted from the product price." />
     </div>
     <div class="md:col-span-8">
-      <x-form.input label="Discount Percentage (%)" placeholder="Enter percentage discount" />
+      <x-form.input label="Discount Percentage (%)" placeholder="Enter percentage discount" tooltipText="Enter a percentage value to be deducted from the product price." />
     </div>
     <div class="md:col-span-4 text-sm self-end">
       <div class="lg:!mb-2">Choose products to which this promo code will apply. Leave unchecked to apply to all products.</div>
@@ -20,18 +20,18 @@
       <x-form.select title="Choose products" placeholder="Select Products"></x-form.select>
     </div>
     <div class="md:col-span-6">
-      <x-form.input label="Activation Limit" placeholder="Enter maximum activations (leave blank for unlimited)" />
+      <x-form.input label="Activation Limit" placeholder="Enter maximum activations (leave blank for unlimited)" tooltipText="Set a limit on the total number of times this promo code can be used. Leave blank for unlimited activations." />
     </div>
     <div class="md:col-span-4 xl:col-span-2">
       <div class="mt-4">
-        <x-form.checkbox label="Generate multiple codes" class="text-nowrap" />
+        <x-form.checkbox label="Generate multiple codes" class="text-nowrap" :tooltip="true" tooltipText="Check this box to generate multiple unique promo codes instead of a single code." />
       </div>
     </div>
     <div class="md:col-span-4 xl:col-span-5">
-      <x-form.input label="Number of Codes to Generate" placeholder="Enter number of codes" />
+      <x-form.input label="Number of Codes to Generate" placeholder="Enter number of codes" tooltipText="Enter the number of unique promo codes you want to generate." />
     </div>
     <div class="md:col-span-4 xl:col-span-5">
-      <x-form.input label="Expiration Date" placeholder="Select expiration date (optional)" />
+      <x-form.input label="Expiration Date" placeholder="Select expiration date (optional)" tooltipText="Set an expiration date for this promo code. After this date, the promo code will no longer be valid. Leave blank for no expiration date." />
     </div>
   </div>
 

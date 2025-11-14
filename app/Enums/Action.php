@@ -18,6 +18,7 @@ enum Action
   public const PROMOCODE_CREATED = 'Promocode Created';
   public const REFERAL_PROMOCODE_CREATED = 'Referal Promocode Created';
   public const GIFT_SEND = 'Gift sended.';
+  public const ACCOUNT_DELETION_CODE = 'Account Deletion Verification';
 
   public function toArray(): array
   {
@@ -35,6 +36,7 @@ enum Action
       self::PROMOCODE_CREATED,
       self::REFERAL_PROMOCODE_CREATED,
       self::GIFT_SEND,
+      self::ACCOUNT_DELETION_CODE,
     ];
   }
 }

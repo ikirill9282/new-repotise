@@ -26,27 +26,42 @@
               @if($this->activeTable == $table['name']) bg-second text-light @endif
             "
           >
-            {{ $table['title'] }}
+            <span>
+              {{ $table['title'] }}
+            </span>
           </div>
         @endforeach
       </div>
-      @if($this->sortable)
+      @if($this->sortable && !empty($this->sortingOptions))
         <div class="sm:ml-auto">
-          <label class="text-gray" for="sorting-{{ $table['name'] }}">Sort By:</label>
+          <label class="text-gray" for="table-sorting-select">Sort By:</label>
           <select
-            wire:model.live="sorting" 
-            id="sorting-{{ $table['name'] }}"
-            class="outline-0 pr-1 hover:cursor-pointer"
+            class="tg-select"
+            wire:model.live="sorting"
+            id="table-sorting-select"
             >
-            <option value="">Newest First 1</option>
-            <option value="">Newest First 2</option>
-            <option value="">Newest First 3</option>
+            @foreach($this->sortingOptions as $value => $label)
+              <option value="{{ $value }}">{{ $label }}</option>
+            @endforeach
           </select>
         </div>
       @endif
     </div>
 
     @if(view()->exists("livewire.".$this->getTableName()))
-      @livewire($this->getTableName(), ['active' => $this->activeTable, ...$this->args], key($this->activeTable))
+      @php
+        $childArguments = array_merge(
+          ['active' => $this->activeTable, 'sorting' => $this->sorting],
+          $this->args ?? []
+        );
+        $argsSignature = !empty($this->args)
+          ? md5(json_encode($this->args))
+          : 'noargs';
+      @endphp
+      @livewire(
+        $this->getTableName(),
+        $childArguments,
+        key($this->activeTable . '-' . ($this->sorting ?? 'default') . '-' . $argsSignature)
+      )
     @endif
 </div>

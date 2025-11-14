@@ -2,6 +2,8 @@
   'type' => 'text',
   'name' => uniqid(),
   'label' => null,
+  'tooltip' => true,
+  'tooltipText' => null,
 ])
 
 @php
@@ -27,6 +29,8 @@
         >
         <span class="toggle-switch shrink-0"></span>
     </label>
-    <x-tooltip class="!right-4" message="tooltip"></x-tooltip>
+    @if($tooltip && filled($tooltipText))
+      <x-tooltip class="!right-4" :message="$tooltipText"></x-tooltip>
+    @endif
   </div>
 </div>

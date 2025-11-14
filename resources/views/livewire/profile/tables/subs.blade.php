@@ -52,7 +52,7 @@
                 </div>
               </td>
               <td class="!border-none bg-clip-content !px-0 text-nowrap !rounded-tr-2xl !rounded-br-2xl">
-                <div class="!p-3 flex flex-col gap-2 items-start text-left">
+                <div class="!p-3 flex flex-col gap-2 items-start text-left group">
                   <x-link 
                     wire:click.prevent="openSubscriptionModal('{{ $encryptedSubscriptionId }}')" 
                     class="group-has-[a]:!text-active"

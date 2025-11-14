@@ -1,12 +1,39 @@
 <div>
     @php
       $user = \App\Models\User::find(\Illuminate\Support\Facades\Crypt::decrypt($this->user_id));
+      $options = $user?->options;
+      $isOwner = auth()->check() && auth()->user()->id === $user->id;
+      $creatorVisible = $options->creator_visible ?? true;
+      $showDonate = $options->show_donate ?? true;
+      $showProducts = $options->show_products ?? true;
+      $showInsights = $options->show_insights ?? true;
+      $collaborationOpen = (bool) ($options->collaboration ?? false);
     @endphp
 
-    <section class="creatorPage bg-light">
+    @if(!$creatorVisible && !$isOwner)
+      <section class="creatorPage bg-light">
+        <div class="container {{ $container }}">
+          <div class="max-w-xl mx-auto text-center py-16 space-y-3">
+            <h2 class="text-2xl font-semibold">This creator profile is private.</h2>
+            <p class="text-gray">
+              {{ $user->getName() }} has chosen to keep their seller page hidden for now. Check back later or follow them for updates.
+            </p>
+            <x-link href="{{ route('creators') }}" class="inline-block">Browse other creators</x-link>
+          </div>
+        </div>
+      </section>
+    @else
+      <section class="creatorPage bg-light">
         <div class="container {{ $container }}">
             <div class="grid grid-cols-1 md:!gap-3 items-start md:grid-cols-[1fr_1fr_280px] lg:grid-cols-[1fr_1fr_380px]">
                 <div class="order-2 md:!order-1 col-span-2">
+                  @if(!$creatorVisible && $isOwner)
+                    <x-card size="sm" class="!mb-3 !border-amber-300 !bg-amber-50">
+                      <p class="text-sm text-amber-700">
+                        Your seller page is currently hidden from visitors. Toggle on “Creator Page Visibility” in Seller Settings to publish it.
+                      </p>
+                    </x-card>
+                  @endif
 
                   {{-- PROFILE --}}
                   <x-card size="sm" class="!mb-3">
@@ -30,8 +57,8 @@
                                   </svg>
                               </div>
                               <p class="">
-                                  <span class="text-gray">Open for Collaboration:</span>
-                                  <span>{{ $user->options->collaboration ? 'Yes' : 'No' }}</span>
+                    <span class="text-gray">Open for Collaboration:</span>
+                                  <span>{{ $collaborationOpen ? 'Yes' : 'No' }}</span>
                               </p>
                               <p class="">
                                   <span class="text-gray">Country:</span>
@@ -53,7 +80,13 @@
                   </x-card>
                   
                   {{-- PRODUCTS --}}
+                  @if($showProducts || $isOwner)
                   <x-card size="sm" class="!mb-3">
+                    @if(!$showProducts && $isOwner)
+                      <div class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-3 py-2 mb-4">
+                        Hidden for visitors. Enable “Show ‘Products’ Section” in Seller Settings to make it visible.
+                      </div>
+                    @endif
                     <h4 class="creatorPage__content-title !mb-8">
                         @if($user->products()->exists())
                           <span>Products</span>
@@ -80,9 +113,16 @@
                       </div>
                     @endif
                   </x-card>
+                  @endif
 
                   {{-- ARTICLES --}}
+                  @if($showInsights || $isOwner)
                   <x-card size="sm" >
+                    @if(!$showInsights && $isOwner)
+                      <div class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-3 py-2 mb-4">
+                        Hidden for visitors. Enable “Show ‘Travel Insights’” in Seller Settings to make it visible.
+                      </div>
+                    @endif
                     <h4 class="!mb-8">
                         @if($user->articles()->exists())
                           <span>Travel Insights</span>
@@ -111,14 +151,16 @@
                                         <span>Edit Insights</span>
                                       </x-btn>
                                     @else
-                                      <x-btn 
-                                        href="{{ $user->makeSubscribeUrl() }}" 
-                                        class="follow follow-btn sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3 {{ auth()->check() ? '' : 'open_auth' }}"
-                                        data-resource="{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}"
-                                        data-group="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $user->id]); }}"
-                                      >
-                                        {{ $user->hasFollower(auth()->user()?->id) ? 'Unsubscribe' : 'Subscribe' }}
-                                      </x-btn>
+                                      @if(!$user->hasFollower(auth()->user()?->id))
+                                        <x-btn 
+                                          href="{{ $user->makeSubscribeUrl() }}" 
+                                          class="follow follow-btn sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3 {{ auth()->check() ? '' : 'open_auth' }}"
+                                          data-resource="{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}"
+                                          data-group="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $user->id]); }}"
+                                        >
+                                          Subscribe
+                                        </x-btn>
+                                      @endif
                                     @endif
                                 </div>
                                 <div class="flex justify-start items-center gap-2 text-sm mb-4">
@@ -184,6 +226,7 @@
                       </div>
                     @endif
                   </x-card>
+                  @endif
                 </div>
 
 
@@ -254,31 +297,18 @@
                         </div>
                     </div>
                     
-
-                    <x-btn 
-                      wire:click.prevent="$dispatch('openModal', { modalName: '{{ auth()->check() ? 'donate' : 'auth' }}' })" 
-                      class="!py-2 !max-w-none !flex items-center justify-center gap-2 group"
-                      outlined
-                    >
-                      <span class="text-red">
-                        <svg width="20" height="18" viewBox="0 0 20 18" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M14.5835 0.0971069C13.6451 0.111703 12.7272 0.373651 11.9224 0.856499C11.1177 1.33935 10.4546 2.026 10.0001 2.84711C9.54566 2.026 8.88257 1.33935 8.07783 0.856499C7.27308 0.373651 6.35517 0.111703 5.41679 0.0971069C3.92091 0.162099 2.51155 0.816485 1.49661 1.9173C0.481678 3.01812 -0.0563308 4.47588 0.000128002 5.97211C0.000128002 9.76127 3.98846 13.8996 7.33346 16.7054C8.08031 17.333 9.02459 17.6771 10.0001 17.6771C10.9757 17.6771 11.9199 17.333 12.6668 16.7054C16.0118 13.8996 20.0001 9.76127 20.0001 5.97211C20.0566 4.47588 19.5186 3.01812 18.5036 1.9173C17.4887 0.816485 16.0793 0.162099 14.5835 0.0971069ZM11.596 15.4304C11.1493 15.8066 10.5841 16.0129 10.0001 16.0129C9.41617 16.0129 8.85098 15.8066 8.40429 15.4304C4.12263 11.8379 1.66679 8.39127 1.66679 5.97211C1.60983 4.9177 1.9721 3.88355 2.6746 3.09519C3.37709 2.30683 4.36282 1.82823 5.41679 1.76377C6.47077 1.82823 7.45649 2.30683 8.15899 3.09519C8.86149 3.88355 9.22376 4.9177 9.16679 5.97211C9.16679 6.19312 9.25459 6.40508 9.41087 6.56136C9.56715 6.71764 9.77911 6.80544 10.0001 6.80544C10.2211 6.80544 10.4331 6.71764 10.5894 6.56136C10.7457 6.40508 10.8335 6.19312 10.8335 5.97211C10.7765 4.9177 11.1388 3.88355 11.8413 3.09519C12.5438 2.30683 13.5295 1.82823 14.5835 1.76377C15.6374 1.82823 16.6232 2.30683 17.3257 3.09519C18.0282 3.88355 18.3904 4.9177 18.3335 5.97211C18.3335 8.39127 15.8776 11.8379 11.596 15.4271V15.4304Z"
-                                fill="currentColor" />
-                        </svg>
-                      </span>
-                      <span>Donation</span>
-                    </x-btn>
+                    @if(false)
+                      {{-- Donation feature temporarily disabled site-wide. --}}
+                    @endif
 
                     {{-- SOCIALS --}}
                     <div class="">
                         <h5 class="mb-3">Connect Online</h5>
 
-                        <x-profile.social-aside 
-                          :owner="$user->id == auth()->user()?->id"
-                          :social="$user->options->getSocial()"
-                        />
+                        @livewire('profile.social-aside', [
+                          'userId' => $user->id,
+                          'owner' => $isOwner,
+                        ], key('profile-social-aside-' . $user->id))
 
                         @if(auth()->user()?->id == $user->id)
                           <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social', args: { user_id: '{{ $this->user_id }}' } })" class="inline-block !mt-3">Add Social Link</x-link>
@@ -286,20 +316,23 @@
                     </div>
                     
                     
-                    <x-btn 
-                      wire:click.prevent="$dispatch('openModal', { 
-                        modalName: '{{ (auth()->check() && auth()->user()?->id == $user->id) ? 'edit-contacts' : 'contact' }}',
-                        args: { user_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}' }
-                      })"
-                      class="!py-2 !max-w-none"
-                    >
-                      Contact Creator
-                    </x-btn>
+                    @if($collaborationOpen || $isOwner)
+                      <x-btn 
+                        wire:click.prevent="$dispatch('openModal', { 
+                          modalName: '{{ (auth()->check() && auth()->user()?->id == $user->id) ? 'edit-contacts' : 'contact' }}',
+                          args: { user_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($user->id) }}' }
+                        })"
+                        class="!py-2 !max-w-none"
+                      >
+                        Contact Creator
+                      </x-btn>
+                    @endif
                   
                 </aside>
             </div>
         </div>
-    </section>
+      </section>
+    @endif
 </div>
 
 @script

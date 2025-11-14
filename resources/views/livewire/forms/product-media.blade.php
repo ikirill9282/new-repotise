@@ -133,7 +133,7 @@
         <div class="">
           <h2 class="!font-bold !text-2xl !mb-10 relative !inline-block !pr-6">
             Video Link (Optional)
-            <x-tooltip message="tooltip"></x-tooltip>
+            <x-tooltip message="Optional links to video content that will be delivered to the customer after purchase. Use this to provide access to video courses, tutorials, or exclusive video content hosted on platforms like YouTube or Vimeo."></x-tooltip>
           </h2>
           <div class="flex flex-col justify-start items-stretch !gap-2">
             @foreach ($this->fields['links'] as $key => $link)

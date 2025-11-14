@@ -2,6 +2,7 @@
   'id' => "checkbox-" . uniqid(),
   'label' => '',
   'tooltip' => false,
+  'tooltipText' => null,
   'checked' => false,
 ])
 
@@ -28,7 +29,7 @@
       {{ $label }}
   </label>
 
-  @if($tooltip)
-    <x-tooltip message="tooltip" class="right-4" />
+  @if($tooltip && filled($tooltipText))
+    <x-tooltip :message="$tooltipText" class="right-4" />
   @endif
 </div>

@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use App\Models\Form;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\OptimizeMedia;
 
 class ContactUs extends Component
 {
@@ -30,7 +31,7 @@ class ContactUs extends Component
         'email' => 'required|email',
         'subject' => 'required|string',
         'text' => 'required|string',
-        'file' => 'sometimes|nullable|file|max:25600',
+        'file' => 'sometimes|nullable|file',
       ]);
 
       if ($validator->fails()) {
@@ -39,7 +40,11 @@ class ContactUs extends Component
 
       $valid = $validator->validated();
       if (!empty($valid['file'])) {
-        $valid['file'] = $valid['file']->store('forms');
+        $disk = config('filesystems.default');
+        $path = $valid['file']->store('forms', $disk);
+        $valid['file'] = $path;
+
+        OptimizeMedia::dispatch($disk, $path);
       }
 
       Form::create([

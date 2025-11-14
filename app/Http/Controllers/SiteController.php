@@ -26,6 +26,7 @@ use App\Services\Cart;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
 use PDO;
+use Illuminate\Support\Facades\DB;
 
 class SiteController extends Controller
 {
@@ -68,16 +69,16 @@ class SiteController extends Controller
       'sort' => 'sometimes|nullable|string',
     ]);
 
-    $sort = ['created_at', 'desc'];
-    if (isset($valid['sort'])) {
-      $sort = match($valid['sort']) {
-        'newsest' => ['created_at', 'desc'],
-        'followed' => ['followers_count', 'desc'],
-        default => $sort,
-      };
-    }
+    $sortValue = $valid['sort'] ?? 'name_asc';
+    $sort = match($sortValue) {
+      'name_asc' => ['username', 'asc'],
+      'name_desc' => ['username', 'desc'],
+      'followers_desc' => ['followers_count', 'desc'],
+      default => ['username', 'asc'],
+    };
 
     $query = User::query()
+      ->whereHas('roles', fn($query) => $query->whereIn('name', ['creator', 'seller']))
       ->withCount('followers')
       ->when(
         isset($valid['creator']),
@@ -123,7 +124,13 @@ class SiteController extends Controller
           $client = new SearchClient();
           $creators = $client->findIn($valid['q'], 'users', 5000);
           $creators_ids = array_column($creators, 'id');
-          $query->orWhereIn('id', $creators_ids);
+
+          if (empty($creators_ids)) {
+            $query->whereRaw('1 = 0');
+            return;
+          }
+
+          $query->whereIn('id', $creators_ids);
         },
       )
       ->orderBy(...$sort)
@@ -132,7 +139,8 @@ class SiteController extends Controller
     return view('site.pages.creators', [
       'page' => $page,
       'tags' => $tags,
-      'creators' => $query->paginate(50),
+      'creators' => $query->paginate(50)->appends(['sort' => $sortValue]),
+      'sortOption' => $sortValue,
     ]);
   }
 
@@ -148,17 +156,64 @@ class SiteController extends Controller
 
     $valid = $request->validate([
       'author' => 'sometimes|nullable|string',
+      'sort' => 'sometimes|nullable|string|in:rating,popular,newest,oldest',
     ]);
+
+    $newsPerPage = 10;
+    $newsQuery = Article::query()
+      ->whereHas('author', fn($query) => $query->where('id', 0))
+      ->orderByDesc('id');
+
+    $newsPaginator = (clone $newsQuery)->paginate($newsPerPage, ['*'], 'news_page');
+    $newsTotal = (clone $newsQuery)->count();
+
+    $sortOption = $valid['sort'] ?? 'rating';
+
+    $articlesQuery = Article::query()
+      ->when(
+        isset($valid['author']),
+        fn($q) => $q->whereHas('author', fn($sq) => $sq->where('users.username', str_ireplace('@', '', $valid['author']))),
+      )
+      ->withCount('likes');
+
+    $articlesQuery = match ($sortOption) {
+      'popular' => $articlesQuery->orderByDesc('views')->orderByDesc('likes_count'),
+      'newest' => $articlesQuery->orderByDesc('created_at'),
+      'oldest' => $articlesQuery->orderBy('created_at'),
+      default => $articlesQuery->orderByDesc('likes_count')->orderByDesc('views'),
+    };
 
     return view('site.pages.insights', [
       'page' => $page,
-      'articles' => Article::query()
-        ->when(
-          isset($valid['author']),
-          fn($q) => $q->whereHas('author', fn($sq) => $sq->where('users.username', str_ireplace('@', '', $valid['author']))),
-        )
-        ->orderByDesc('id')
-        ->paginate(9),
+      'articles' => $articlesQuery->paginate(9)->appends(['sort' => $sortOption]),
+      'news' => $newsPaginator,
+      'newsTotal' => $newsTotal,
+      'sortOption' => $sortOption,
+    ]);
+  }
+
+  public function insightsNews(Request $request)
+  {
+    $valid = $request->validate([
+      'page' => 'sometimes|nullable|integer|min:1',
+      'per_page' => 'sometimes|nullable|integer|min:1|max:50',
+    ]);
+
+    $page = $valid['page'] ?? 1;
+    $perPage = $valid['per_page'] ?? 10;
+
+    $news = Article::query()
+      ->whereHas('author', fn($query) => $query->where('id', 0))
+      ->orderByDesc('id')
+      ->paginate($perPage, ['*'], 'page', $page);
+
+    $html = view('site.pages.insights.partials.news-items', [
+      'items' => $news->items(),
+    ])->render();
+
+    return response()->json([
+      'html' => $html,
+      'next_page' => $news->hasMorePages() ? $news->currentPage() + 1 : null,
     ]);
   }
 
@@ -210,6 +265,19 @@ class SiteController extends Controller
   {
     if (!Auth::check()) return redirect('/');
 
+    $valid = $request->validate([
+      'products_sort' => 'sometimes|nullable|string|in:rating,popular,newest,oldest,price_high,price_low,price_desc,price_asc',
+      'creators_sort' => 'sometimes|nullable|string|in:name_asc,name_desc,followers_desc',
+    ]);
+
+    $productsSortRaw = $valid['products_sort'] ?? 'rating';
+    $productsSort = match ($productsSortRaw) {
+      'price_desc' => 'price_high',
+      'price_asc' => 'price_low',
+      default => $productsSortRaw,
+    };
+    $creatorsSort = $valid['creators_sort'] ?? 'name_asc';
+
     $page = Page::where('slug', 'favorites')
       ->with('config')
       ->first();
@@ -218,7 +286,66 @@ class SiteController extends Controller
       return (new FallbackController())($request);
     }
 
-    return view('site.pages.favorites', ['page' => $page]);
+    $user = Auth::user();
+
+    $favoriteProducts = $user->favorite_products()
+      ->select('products.*', 'user_favorites.created_at as favorited_at')
+      ->with(['preview', 'types', 'categories', 'locations'])
+      ->withCount(['reviews' => fn($query) => $query->whereNull('parent_id')])
+      ->get();
+
+    $favoriteProducts = match ($productsSort) {
+      'price_low' => $favoriteProducts
+        ->sortBy(fn($product) => $product->getPrice())
+        ->values(),
+      'price_high' => $favoriteProducts
+        ->sortByDesc(fn($product) => $product->getPrice())
+        ->values(),
+      'rating' => $favoriteProducts
+        ->sortByDesc(fn($product) => (float) ($product->rating ?? 0))
+        ->values(),
+      'popular' => $favoriteProducts
+        ->sortByDesc(fn($product) => (int) ($product->views ?? 0))
+        ->values(),
+      'newest' => $favoriteProducts
+        ->sortByDesc(fn($product) => $product->published_at ?? $product->created_at ?? $product->favorited_at)
+        ->values(),
+      'oldest' => $favoriteProducts
+        ->sortBy(fn($product) => $product->published_at ?? $product->created_at ?? $product->favorited_at)
+        ->values(),
+      default => $favoriteProducts
+        ->sortByDesc(fn($product) => (float) ($product->rating ?? 0))
+        ->values(),
+    };
+
+    $favoriteAuthors = $user->favorite_authors()
+      ->select('users.*', 'user_favorites.created_at as favorited_at')
+      ->with('options')
+      ->withCount('followers')
+      ->get();
+
+    $favoriteAuthors = match ($creatorsSort) {
+      'followers_desc' => $favoriteAuthors
+        ->sortByDesc(fn($author) => (int) ($author->followers_count ?? 0))
+        ->values(),
+      'name_desc' => $favoriteAuthors
+        ->sortByDesc(fn($author) => strtolower($author->username ?? $author->name ?? ''))
+        ->values(),
+      'name_asc' => $favoriteAuthors
+        ->sortBy(fn($author) => strtolower($author->username ?? $author->name ?? ''))
+        ->values(),
+      default => $favoriteAuthors
+        ->sortBy(fn($author) => strtolower($author->username ?? $author->name ?? ''))
+        ->values(),
+    };
+
+    return view('site.pages.favorites', [
+      'page' => $page,
+      'favoriteProducts' => $favoriteProducts,
+      'favoriteAuthors' => $favoriteAuthors,
+      'productsSort' => $productsSort,
+      'creatorsSort' => $creatorsSort,
+    ]);
   }
 
   public function search(Request $request)
@@ -231,8 +358,54 @@ class SiteController extends Controller
       return (new FallbackController())($request);
     }
 
+    $valid = $request->validate([
+      'sort' => 'sometimes|nullable|string|in:rating,popular,newest,oldest,price_high,price_low,price_desc,price_asc',
+    ]);
+
     $query = ($request->has('q') && !empty($request->get('q'))) ? $request->get('q') : null;
+    $sortOption = $valid['sort'] ?? 'relevance';
+
     $search_results = is_null($query) ? [] : SearchClient::full($query);
+
+    if (!empty($search_results) && $sortOption !== 'relevance') {
+      $sortResolver = function(array $item) use ($sortOption) {
+        return match ($sortOption) {
+          'newest' => isset($item['created_at']) ? Carbon::parse($item['created_at'])->timestamp : null,
+          'oldest' => isset($item['created_at']) ? Carbon::parse($item['created_at'])->timestamp : null,
+          'popular' => match ($item['index']) {
+            'products' => $item['reviews_count'] ?? $item['rating'] ?? null,
+            'users' => $item['followers_count'] ?? null,
+            'articles' => $item['views'] ?? null,
+            default => null,
+          },
+          default => null,
+        };
+      };
+
+      $collection = collect($search_results)->map(function ($item, $index) {
+        $item['_original_index'] = $index;
+        return $item;
+      });
+
+      $sortable = $collection->filter(fn($item) => !is_null($sortResolver($item)));
+      $unsortable = $collection->reject(fn($item) => !is_null($sortResolver($item)));
+
+      $descendingSorts = ['newest', 'popular'];
+
+      $sorted = in_array($sortOption, $descendingSorts, true)
+        ? $sortable->sortByDesc(fn($item) => $sortResolver($item))
+        : $sortable->sortBy(fn($item) => $sortResolver($item));
+
+      $search_results = $sorted
+        ->concat($unsortable->sortBy('_original_index'))
+        ->values()
+        ->map(function ($item) {
+          unset($item['_original_index']);
+          return $item;
+        })
+        ->all();
+    }
+
     $tags = SearchClient::getTagsFromItem($search_results[0] ?? []);
 
     if (!is_null($query)) {
@@ -247,6 +420,7 @@ class SiteController extends Controller
       'search_results' => $search_results,
       'tags' => $tags,
       'query' => $query,
+      'sortOption' => $sortOption,
     ]);
   }
 
@@ -332,7 +506,11 @@ class SiteController extends Controller
       'type' => 'sometimes|nullable|string',
       'author' => 'sometimes|nullable|string',
       'q' => 'sometimes|nullable|string',
+      'sort' => 'sometimes|nullable|string|in:rating,popular,newest,oldest,price_high,price_low,price_desc,price_asc',
     ]);
+
+    $sortOptionRaw = $valid['sort'] ?? 'rating';
+    unset($valid['sort']);
 
     if (isset($valid['categories'])) {
       $valid['categories'] = is_null($valid['categories']) ? null : explode(',', $valid['categories']);
@@ -344,6 +522,9 @@ class SiteController extends Controller
     $valid = array_filter($valid, fn($item) => !is_null($item));
 
     $query = Product::query()
+      ->withCount([
+        'reviews as reviews_count' => fn($q) => $q->whereNull('parent_id'),
+      ])
       ->when(
         isset($valid['rating']),
         fn($q) => $q->where('rating', '>=', $valid['rating']),
@@ -388,11 +569,39 @@ class SiteController extends Controller
       )
     ;
 
-    $paginator = $query->orderByDesc('id')->paginate(20);
+    $sortOption = match ($sortOptionRaw) {
+      'price_desc' => 'price_high',
+      'price_asc' => 'price_low',
+      default => $sortOptionRaw,
+    };
+
+    $paginator = (match ($sortOption) {
+      'price_high' => $query
+        ->orderByRaw('(price - COALESCE(sale_price, 0)) DESC')
+        ->orderByDesc('id'),
+      'price_low' => $query
+        ->orderByRaw('(price - COALESCE(sale_price, 0)) ASC')
+        ->orderByDesc('id'),
+      'popular' => $query
+        ->orderByDesc(DB::raw('COALESCE(views, 0)'))
+        ->orderByDesc('reviews_count')
+        ->orderByDesc('id'),
+      'newest' => $query
+        ->orderByDesc(DB::raw('COALESCE(published_at, created_at, updated_at)'))
+        ->orderByDesc('id'),
+      'oldest' => $query
+        ->orderBy(DB::raw('COALESCE(published_at, created_at, updated_at)'))
+        ->orderByDesc('id'),
+      default => $query
+        ->orderByDesc('rating')
+        ->orderByDesc('reviews_count')
+        ->orderByDesc('id'),
+    })->paginate(20);
 
     return view('site.pages.products', [
       'page' => $page,
       'paginator' => $paginator,
+      'sortOption' => $sortOption,
     ]);
   }
 

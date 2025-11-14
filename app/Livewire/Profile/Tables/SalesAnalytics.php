@@ -13,6 +13,12 @@ class SalesAnalytics extends Component
 
     public ?string $active = null;
 
+    public ?int $paymentStatus = null;
+
+    public ?int $productFilter = null;
+
+    public ?string $orderType = null;
+
     public function mount(?string $active = null, ?string $period = null): void
     {
         $this->active = $active;
@@ -47,14 +53,32 @@ class SalesAnalytics extends Component
 
         $from = $this->dateFrom();
 
-        $rows = RevenueShare::query()
+        $rowsQuery = RevenueShare::query()
             ->where('author_id', $userId)
             ->whereNotNull('product_id')
             ->where('created_at', '>=', $from)
             ->whereNull('refunded_at')
             ->with(['product', 'order'])
+            ->when(
+                !empty($this->paymentStatus),
+                fn($query) => $query->whereHas('order', fn($sub) => $sub->where('status_id', $this->paymentStatus))
+            )
+            ->when(
+                !empty($this->productFilter),
+                fn($query) => $query->where('product_id', $this->productFilter)
+            )
+            ->when(
+                $this->orderType === 'subscription',
+                fn($query) => $query->whereNotNull('subscription_id')
+            )
+            ->when(
+                $this->orderType === 'one_time',
+                fn($query) => $query->whereNull('subscription_id')
+            )
             ->orderByDesc('created_at')
-            ->limit(25)
+            ->limit(25);
+
+        $rows = $rowsQuery
             ->get()
             ->map(function (RevenueShare $share) {
                 $order = $share->order;
@@ -79,6 +103,11 @@ class SalesAnalytics extends Component
 
         return view('livewire.profile.tables.sales-analytics', [
             'rows' => $rows,
+            'statuses' => OrderStatus::toArray(),
+            'productOptions' => Auth::user()?->products()
+                ->select('id', 'title')
+                ->orderBy('title')
+                ->get() ?? collect(),
         ]);
     }
 }

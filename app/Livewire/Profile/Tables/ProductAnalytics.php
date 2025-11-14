@@ -15,6 +15,8 @@ class ProductAnalytics extends Component
 
     public ?string $active = null;
 
+    public ?int $statusFilter = null;
+
     public function mount(?string $active = null, ?string $period = null): void
     {
         $this->active = $active;
@@ -70,6 +72,10 @@ class ProductAnalytics extends Component
             ->select('products.*')
             ->selectRaw('COALESCE(order_stats.units_sold, 0) as units_sold')
             ->selectRaw('COALESCE(order_stats.gross_revenue, 0) as gross_revenue')
+            ->when(
+                !empty($this->statusFilter),
+                fn($query) => $query->where('products.status_id', $this->statusFilter)
+            )
             ->orderByDesc(DB::raw('COALESCE(order_stats.gross_revenue, 0)'))
             ->limit(20)
             ->get()
@@ -94,6 +100,17 @@ class ProductAnalytics extends Component
 
         return view('livewire.profile.tables.product-analytics', [
             'rows' => $products,
+            'statusOptions' => $this->statusOptions(),
         ]);
+    }
+
+    protected function statusOptions(): array
+    {
+        return [
+            \App\Enums\Status::ACTIVE => 'Active',
+            \App\Enums\Status::DRAFT => 'Draft',
+            \App\Enums\Status::PENDING => 'Pending Review',
+            \App\Enums\Status::SCHEDULED => 'Scheduled',
+        ];
     }
 }

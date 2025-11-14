@@ -9,36 +9,41 @@
           <div class="font-bold text-2xl">Filters</div>
           <div class="flex justify-start items-start sm:items-center !gap-4 2xl:!gap-8 flex-col sm:flex-row">
             <div class="block">
-              <label class="text-gray" for="sorting-reviews">Payment Status:</label>
+              <label class="text-gray" for="sales-analytics-status">Payment Status:</label>
               <select
-                id="sorting-reviews"
-                class="outline-0 pr-1 hover:cursor-pointer"
+                class="tg-select"
+                wire:model.live="paymentStatus"
+                id="sales-analytics-status"
                 >
                 <option value="">All Statuses</option>
-                <option value="">All Statuses</option>
-                <option value="">All Statuses</option>
+                @foreach($statuses as $value => $label)
+                  <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
               </select>
             </div>
             <div class="block">
-              <label class="text-gray" for="sorting-reviews">Product:</label>
+              <label class="text-gray" for="sales-analytics-product">Product:</label>
               <select 
-                id="sorting-reviews"
-                class="outline-0 pr-1 hover:cursor-pointer"
+                class="tg-select"
+                wire:model.live="productFilter"
+                id="sales-analytics-product"
                 >
                 <option value="">All Products</option>
-                <option value="">All Products</option>
-                <option value="">All Products</option>
+                @foreach($productOptions as $product)
+                  <option value="{{ $product->id }}">{{ $product->title }}</option>
+                @endforeach
               </select>
             </div>
             <div class="block">
-              <label class="text-gray" for="sorting-reviews">Order Type:</label>
+              <label class="text-gray" for="sales-analytics-order-type">Order Type:</label>
               <select
-                id="sorting-reviews"
-                class="outline-0 pr-1 hover:cursor-pointer"
+                class="tg-select"
+                wire:model.live="orderType"
+                id="sales-analytics-order-type"
                 >
                 <option value="">All Order Types</option>
-                <option value="">All Order Types</option>
-                <option value="">All Order Types</option>
+                <option value="one_time">One-time Purchase</option>
+                <option value="subscription">Subscription</option>
               </select>
             </div>
           </div>

@@ -14,10 +14,10 @@
                 <div class="left_form">
                     <div>
                         <div class="!mb-3">
-                          <x-form.input wire:model="form.username" name="username" placeholder="Your Full Name" tooltipText='Enter your valid full name. e.g. "John Doe".' />
+                          <x-form.input wire:model="form.username" name="username" placeholder="Your Full Name" tooltipText="Enter your full name as it appears on your billing information." />
                         </div>
                         <div class="!mb-6">
-                          <x-form.input wire:model="form.email" name="email" type="email" placeholder="Your Email" tooltipText="Enter your valid email. We will send you validation link." />
+                          <x-form.input wire:model="form.email" name="email" type="email" placeholder="Your Email" tooltipText="Your order confirmation will be sent here." />
                         </div>
 
                         @if (!is_null($paymentMethods) && !$paymentMethods->isEmpty())
@@ -71,7 +71,33 @@
                         </div>
 
                         <div class="!mb-4">
-                          <x-btn id="payment-btn" class="!max-w-none">Confirm Payment</x-btn>
+                          <x-btn 
+                            id="payment-btn" 
+                            type="button" 
+                            class="!max-w-none flex items-center justify-center gap-2"
+                          >
+                            <span data-role="label">Confirm Payment</span>
+                            <span data-role="spinner" class="inline-flex" style="display: none;">
+                              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                                <style>
+                                  .spinner-circle {
+                                    opacity: 0.25;
+                                  }
+                                  .spinner-path {
+                                    transform-origin: center;
+                                    animation: spinner-rotate .75s linear infinite;
+                                  }
+                                  @keyframes spinner-rotate {
+                                    100% {
+                                      transform: rotate(360deg);
+                                    }
+                                  }
+                                </style>
+                                <path class="spinner-circle" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" />
+                                <path class="spinner-path" d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z" />
+                              </svg>
+                            </span>
+                          </x-btn>
                         </div>
 
                         <div class="text-sm w-full !mb-6 text-gray group">By confirm your payment, you agree to our 
@@ -153,27 +179,93 @@
       paymentMethods.mount("#payment");
 
       const btn = document.getElementById('payment-btn');
-      btn.addEventListener('click', async (evt) => {
-        evt.preventDefault();
-        $wire.checkValidation().then(async response => {
-          if (response) {
+      const togglePaymentButtonLoading = (isLoading) => {
+        if (!btn) {
+          return;
+        }
+        const labelEl = btn.querySelector('[data-role="label"]');
+        const spinnerEl = btn.querySelector('[data-role="spinner"]');
+
+        if (isLoading) {
+          btn.dataset.loading = 'true';
+          btn.setAttribute('aria-busy', 'true');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.classList.add('pointer-events-none');
+          if ('disabled' in btn) {
+            btn.disabled = true;
+          }
+          if (labelEl) {
+            if (!btn.dataset.originalLabel) {
+              btn.dataset.originalLabel = labelEl.textContent?.trim() ?? '';
+            }
+            labelEl.textContent = 'Processing...';
+          }
+          if (spinnerEl) {
+            spinnerEl.style.display = '';
+          }
+        } else {
+          btn.dataset.loading = 'false';
+          btn.removeAttribute('aria-busy');
+          btn.removeAttribute('aria-disabled');
+          btn.classList.remove('pointer-events-none');
+          if ('disabled' in btn) {
+            btn.disabled = false;
+          }
+          const originalText = btn.dataset.originalLabel;
+          if (labelEl && typeof originalText === 'string') {
+            labelEl.textContent = originalText;
+          }
+          if (spinnerEl) {
+            spinnerEl.style.display = 'none';
+          }
+        }
+      };
+
+      if (btn) {
+        btn.dataset.loading = 'false';
+        btn.addEventListener('click', async (evt) => {
+          evt.preventDefault();
+          if (btn.dataset.loading === 'true') {
+            return;
+          }
+
+          togglePaymentButtonLoading(true);
+
+          try {
+            const response = await $wire.checkValidation();
+            if (!response) {
+              togglePaymentButtonLoading(false);
+              return;
+            }
+
             if (response.action === 'create') {
-              const { error, setupIntent } = await stripe.confirmSetup({
-                elements,
-                redirect: 'if_required',
-              });
-              
-              if (error) {
-                redirectToPaymentError(error.code || null, error.decline_code || null);
-              } else {
+              try {
+                const { error, setupIntent } = await stripe.confirmSetup({
+                  elements,
+                  redirect: 'if_required',
+                });
+
+                if (error) {
+                  togglePaymentButtonLoading(false);
+                  redirectToPaymentError(error.code || null, error.decline_code || null);
+                  return;
+                }
+
                 $wire.dispatch('makeSubscription', { pm_id: setupIntent.payment_method });
+              } catch (setupError) {
+                console.error('Stripe setup confirmation failed', setupError);
+                togglePaymentButtonLoading(false);
+                redirectToPaymentError(setupError?.code || null, setupError?.decline_code || null);
               }
             } else {
               $wire.dispatch('makeSubscription', { pm_id: response.action });
             }
+          } catch (validationError) {
+            console.error('Validation error', validationError);
+            togglePaymentButtonLoading(false);
           }
         });
-      });
+      }
 
       $wire.on('requires-action', async (data) => {
         const params = data[0];

@@ -4,9 +4,9 @@
     <div class="block">
       <label class="text-gray" for="sorting-refunds">Sort By:</label>
       <select
+        class="tg-select"
         wire:model="sorting"
         id="sorting-refunds"
-        class="outline-0 pr-1 hover:cursor-pointer"
       >
         <option value="newest">Newest First</option>
         <option value="oldest">Oldest First</option>

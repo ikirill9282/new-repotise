@@ -122,6 +122,11 @@ class PaymentController extends Controller
       'message' => 'A processing error occurred. Please try again or use a different payment method. If the issue persists, contact support.',
       'push' => 'Processing error — try again.',
     ],
+    'self_purchase' => [
+      'title' => 'Purchase unavailable',
+      'message' => 'You cannot purchase your own product. Please choose a different item.',
+      'push' => 'You cannot buy your own product.',
+    ],
     'payment_method_provider_timeout' => [
       'title' => 'Provider timeout',
       'message' => 'We couldn’t reach the payment provider. Please try again in a few minutes or use another payment method.',

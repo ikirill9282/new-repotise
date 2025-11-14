@@ -282,7 +282,7 @@
                     
 
                     <x-btn 
-                      wire:click.prevent="$dispatch('openModal', { modalName: '{{ auth()->check() ? 'donate' : 'auth' }}' })" 
+                      wire:click.prevent="$dispatch('openModal', { modalName: 'donate' })" 
                       class="!py-2 !max-w-none !flex items-center justify-center gap-2 group"
                       outlined
                     >
@@ -301,10 +301,10 @@
                     <div class="">
                         <h5 class="mb-3">Connect Online</h5>
 
-                        <x-profile.social-aside 
-                          :owner="$user->id == auth()->user()?->id"
-                          :social="$user->options->getSocial()"
-                        />
+                    @livewire('profile.social-aside', [
+                      'userId' => $user->id,
+                      'owner' => true,
+                    ], key('profile-social-aside-edit-' . $user->id))
 
                         @if(auth()->user()?->id == $user->id)
                           <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social', args: { user_id: '{{ $this->user_id }}' } })" class="inline-block !mt-3">Add Social Link</x-link>

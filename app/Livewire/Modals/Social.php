@@ -54,12 +54,19 @@ class Social extends Component
       }
 
       $valid = $validator->validated();
+      $user = $this->getUser();
+      $options = $user->options()->firstOrCreate([]);
+      $visibility = $options->getSocialVisibility();
+
       foreach($valid as $key => &$val) {
-        if (!is_null($val) && UserOptions::whereNot('user_id', $this->getUser()->id)->where($key, $val)->exists()) {
+        if (!is_null($val) && UserOptions::whereNot('user_id', $user->id)->where($key, $val)->exists()) {
           $validator->errors()->add($key, 'The link already exists.');
         }
         if (empty($val)) {
           $val = null;
+          $visibility[$key] = false;
+        } else {
+          $visibility[$key] = true;
         }
       }
 
@@ -67,7 +74,9 @@ class Social extends Component
         throw new ValidationException($validator);
       }
 
-      $this->getUser()->options->update($valid);
+      $options->update(array_merge($valid, [
+        'social_visibility' => $visibility,
+      ]));
       $this->dispatch('toastSuccess', ['message' => 'You links was updated successfull!']);
       $this->dispatch('closeModal');
       $this->dispatch('resetPage');

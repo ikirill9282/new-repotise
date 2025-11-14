@@ -76,7 +76,12 @@
 
                     {{-- CONTENT --}}
                     @if (view()->exists('livewire.modals.' . $this->modal))
-                        @livewire('modals.' . $this->modal, key($this->modal), [...$this->args])
+                      @php
+                        $componentName = 'modals.' . $this->modal;
+                        $componentParams = is_array($this->args) ? $this->args : [];
+                        $componentKey = 'modal-' . $this->modal . '-' . md5(json_encode($componentParams));
+                      @endphp
+                      @livewire($componentName, $componentParams, key($componentKey))
                     @endif
               </x-card>
             </div>

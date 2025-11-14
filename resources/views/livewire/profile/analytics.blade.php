@@ -23,35 +23,35 @@
             <div class="text-gray">Total Revenue:</div>
             <div class="text-nowrap relative !pr-6">
               <span>{{ currency($summary['total_revenue'] ?? 0) }}</span>
-              <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+              <x-tooltip message="Total revenue earned from all sources (product sales, donations, etc.) within the selected time period.">@include('icons.shield')</x-tooltip>
             </div>
           </div>
           <div class="flex justify-start items-center gap-1.5">
             <div class="text-gray">Product Revenue:</div>
             <div class="text-nowrap relative !pr-6">
               <span>{{ currency($summary['product_revenue'] ?? 0) }}</span>
-              <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+              <x-tooltip message="Total revenue specifically from product sales within the selected time period.">@include('icons.shield')</x-tooltip>
             </div>
           </div>
           <div class="flex justify-start items-center gap-1.5">
             <div class="text-gray">Donations Revenue:</div>
             <div class="text-nowrap relative !pr-6">
               <span>{{ currency($summary['donation_revenue'] ?? 0) }}</span>
-              <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+              <x-tooltip message="Total revenue received from donations within the selected time period.">@include('icons.shield')</x-tooltip>
             </div>
           </div>
           <div class="flex justify-start items-center gap-1.5">
             <div class="text-gray">Insights Views:</div>
             <div class="text-nowrap relative !pr-6">
               <span>{{ number_format($summary['insights_views'] ?? 0) }}</span>
-              <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+              <x-tooltip message="Total views of all articles published by you within the selected time period.">@include('icons.shield')</x-tooltip>
             </div>
           </div>
           <div class="flex justify-start items-center gap-1.5">
             <div class="text-gray">Creator Page Views:</div>
             <div class="text-nowrap relative !pr-6">
               <span>{{ number_format($summary['creator_page_views'] ?? 0) }}</span>
-              <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+              <x-tooltip message="Total views of your Creator Page within the selected time period.">@include('icons.shield')</x-tooltip>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@
           'title' => 'Donations',
         ],
       ],
-      'active' => $table,
+      'active' => $table ?? 'sales-analytics',
       'args' => ['period' => $period],
     ])
   </x-profile.wrap>

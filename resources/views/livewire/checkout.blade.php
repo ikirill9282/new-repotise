@@ -21,7 +21,7 @@
                             wire:model="form.fullname" 
                             name="fullname"
                             placeholder="Your Full Name"
-                            tooltipText='Enter your valid full name. e.g. "John Doe".'
+                            tooltipText="Enter your full name as it appears on your billing information."
                           />
                         </div>
                         
@@ -31,7 +31,7 @@
                               name="email"
                               type="email"
                               placeholder="Your email"
-                              tooltipText="Enter your valid email. We will send you validation link."
+                              tooltipText="Your order confirmation will be sent here."
                             />
                         </div>
 
@@ -60,6 +60,10 @@
                                         aria-controls="pills-profile"
                                         aria-selected="{{ $this->form['gift'] ? 'true' : 'false' }}">
                                         Send as Gift
+                                        <x-tooltip class="!opacity-100 !absolute -top-2 -right-6"
+                                            message="Select this option to send this product as a gift to someone else. You will be prompted to enter the recipient's email and a gift message.">
+                                            @include('icons.shield')
+                                        </x-tooltip>
                                     </label>
                                 </li>
                             </ul>
@@ -77,7 +81,7 @@
                                             placeholder="Gift Recipient Email"
                                             class="@error('form.recipient') border !border-red-500 @enderror">
                                         <x-tooltip class="!opacity-100 !absolute top-4 right-2"
-                                            message='Enter recipient email. We will send email notification about gift.'>
+                                            message="Recipient's email for gift notification.">
                                             @include('icons.shield')
                                         </x-tooltip>
 
@@ -90,7 +94,7 @@
                                             class="text-area-gift @error('form.recipient_message') border !border-red-500 @enderror" name="recipient_message"
                                             placeholder="Add a Gift Message (Optional)"></textarea>
                                         <x-tooltip class="!opacity-100 !absolute top-4 right-2"
-                                            message='Add a Gift Message (Optional)'>
+                                            message='Add a personal touch! Write a special message for your gift (optional).'>
                                             @include('icons.shield', [
                                                 'style' => 'position: static;',
                                             ])
@@ -116,7 +120,7 @@
                                         name="promocode" placeholder="Promo Code"
                                         value="{{ $order?->promocode->code ?? '' }}">
                                     <x-tooltip class="!opacity-100 !absolute top-5 right-2"
-                                        message='If you know promocode, enter here.'>
+                                        message='Got a promo code? Enter it here.'>
                                         @include('icons.shield')
                                     </x-tooltip>
                                 </div>
@@ -183,7 +187,33 @@
                             </div>
                         </div>
 
-                        <x-btn id="submit-btn" class="!max-w-none !mb-3">Confirm Payment</x-btn>
+                        <x-btn 
+                          id="submit-btn" 
+                          type="button" 
+                          class="!max-w-none !mb-3 flex items-center justify-center gap-2"
+                        >
+                          <span data-role="label">Confirm Payment</span>
+                          <span data-role="spinner" class="inline-flex" style="display: none;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                              <style>
+                                .spinner-circle {
+                                  opacity: 0.25;
+                                }
+                                .spinner-path {
+                                  transform-origin: center;
+                                  animation: spinner-rotate .75s linear infinite;
+                                }
+                                @keyframes spinner-rotate {
+                                  100% {
+                                    transform: rotate(360deg);
+                                  }
+                                }
+                              </style>
+                              <path class="spinner-circle" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" />
+                              <path class="spinner-path" d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z" />
+                            </svg>
+                          </span>
+                        </x-btn>
 
                         <p class="text-sm group !mb-6">By confirm your payment, you agree to our <x-link
                               class="!border-none group-has-[a]:!text-active"  
@@ -321,31 +351,94 @@
       });
 
       const btn = document.getElementById('submit-btn');
-      btn.addEventListener('click', (evt) => {
-        evt.preventDefault();
-        $wire.checkValidtion().then(async response => {
-          if (response) {
-            
-            if (response.action == 'create') {
+      const toggleButtonLoading = (isLoading) => {
+        if (!btn) {
+          return;
+        }
+        const labelEl = btn.querySelector('[data-role="label"]');
+        const spinnerEl = btn.querySelector('[data-role="spinner"]');
 
-              const { error, setupIntent } = await stripe.confirmSetup({
-                elements,
-                redirect: 'if_required',
-              });
-              
-              if (error) {
-                redirectToPaymentError(error.code || null, error.decline_code || null);
-              } else {
+        if (isLoading) {
+          btn.dataset.loading = 'true';
+          btn.setAttribute('aria-busy', 'true');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.classList.add('pointer-events-none');
+          if ('disabled' in btn) {
+            btn.disabled = true;
+          }
+          if (labelEl) {
+            if (!btn.dataset.originalLabel) {
+              btn.dataset.originalLabel = labelEl.textContent?.trim() ?? '';
+            }
+            labelEl.textContent = 'Processing...';
+          }
+          if (spinnerEl) {
+            spinnerEl.style.display = '';
+          }
+        } else {
+          btn.dataset.loading = 'false';
+          btn.removeAttribute('aria-busy');
+          btn.removeAttribute('aria-disabled');
+          btn.classList.remove('pointer-events-none');
+          if ('disabled' in btn) {
+            btn.disabled = false;
+          }
+          const originalText = btn.dataset.originalLabel;
+          if (labelEl && typeof originalText === 'string') {
+            labelEl.textContent = originalText;
+          }
+          if (spinnerEl) {
+            spinnerEl.style.display = 'none';
+          }
+        }
+      };
+
+      if (btn) {
+        btn.dataset.loading = 'false';
+        btn.addEventListener('click', async (evt) => {
+          evt.preventDefault();
+          if (btn.dataset.loading === 'true') {
+            return;
+          }
+
+          toggleButtonLoading(true);
+
+          try {
+            const response = await $wire.checkValidtion();
+
+            if (!response) {
+              toggleButtonLoading(false);
+              return;
+            }
+
+            if (response.action === 'create') {
+              try {
+                const { error, setupIntent } = await stripe.confirmSetup({
+                  elements,
+                  redirect: 'if_required',
+                });
+
+                if (error) {
+                  toggleButtonLoading(false);
+                  redirectToPaymentError(error.code || null, error.decline_code || null);
+                  return;
+                }
+
                 $wire.dispatch('makePayment', { pm_id: setupIntent.payment_method });
+              } catch (setupError) {
+                console.error('Stripe setup confirmation failed', setupError);
+                toggleButtonLoading(false);
+                redirectToPaymentError(setupError?.code || null, setupError?.decline_code || null);
               }
-
             } else {
               $wire.dispatch('makePayment', { pm_id: response.action });
             }
-
+          } catch (validationError) {
+            console.error('Validation error', validationError);
+            toggleButtonLoading(false);
           }
         });
-      });
+      }
 
       $wire.on('requires-action', async (data) => {
         const params = data[0];

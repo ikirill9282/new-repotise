@@ -18,6 +18,7 @@ class UserOptions extends Model
         'show_products' => 'boolean',
         'show_insights' => 'boolean',
         'notification_settings' => 'array',
+        'social_visibility' => 'array',
     ];
 
     protected float $default_fee = 10;
@@ -62,6 +63,22 @@ class UserOptions extends Model
         'website' => $this->website,
         'other' => $this->other,
       ];
+    }
+
+    public function getSocialVisibility(): array
+    {
+      $defaults = array_fill_keys(array_keys(self::getSocialIcons()), true);
+      $stored = $this->social_visibility ?? [];
+
+      foreach ($defaults as $key => $value) {
+        $defaults[$key] = (bool) ($stored[$key] ?? $value);
+
+        if (empty($this->{$key})) {
+          $defaults[$key] = false;
+        }
+      }
+
+      return $defaults;
     }
 
     public static function getSocialIcons(): array

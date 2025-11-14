@@ -70,6 +70,11 @@ class CheckoutSubscription extends Component
         return;
       }
 
+      if (Auth::check() && $product->user_id === Auth::id()) {
+        $this->dispatch('toastError', ['message' => 'You cannot purchase your own product.']);
+        return;
+      }
+
       $subprice = $product->subprice;
       if (!$subprice) {
         Log::critical('Subscription plan missing pricing', [
@@ -121,6 +126,11 @@ class CheckoutSubscription extends Component
           $user->sendVerificationCode();
         } else {
           $user = Auth::user();
+        }
+
+        if ($product->user_id === $user->id) {
+          DB::rollBack();
+          return redirect()->route('payment.error', ['reason' => 'self_purchase']);
         }
       } catch (\Exception $e) {
         Log::critical('Cant create new user for subscription', [

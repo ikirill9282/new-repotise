@@ -31,14 +31,17 @@
         <section class="results_seach">
             <div class="container !mx-auto">
                 <div class="about_block">
+                    @php
+                        $currentSort = $sortOption ?? request()->get('sort', 'relevance');
+                    @endphp
                     <div class="right_select">
                         <span>Sort by:</span>
-                        <select class="custom-select">
-                            <option>Relevance</option>
-                            <option>Relevance1</option>
-                            <option>Relevance2</option>
+                        <select id="search-sort" class="tg-select">
+                            <option value="relevance" {{ $currentSort === 'relevance' ? 'selected' : '' }}>Relevance</option>
+                            <option value="popular" {{ $currentSort === 'popular' ? 'selected' : '' }}>Most Popular</option>
+                            <option value="newest" {{ $currentSort === 'newest' ? 'selected' : '' }}>Newest First</option>
+                            <option value="oldest" {{ $currentSort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
                         </select>
-												
                     </div>
                     <div class="result_cards">
                         @foreach ($search_results as $item)
@@ -259,3 +262,26 @@
         </section>
     @endif
 @endsection
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchSort = document.getElementById('search-sort');
+            if (!searchSort) {
+                return;
+            }
+
+            searchSort.addEventListener('change', (event) => {
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+                if (event.target.value === 'relevance') {
+                    params.delete('sort');
+                } else {
+                    params.set('sort', event.target.value);
+                }
+                url.search = params.toString();
+                window.location.href = url.toString();
+            });
+        });
+    </script>
+@endpush

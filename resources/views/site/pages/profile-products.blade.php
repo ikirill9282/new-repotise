@@ -26,7 +26,17 @@
             'name' => 'products-pending',
             'title' => "Pending Review (". $user->products()->where('status_id', 3)->count() .")",
           ]
-        ]
+        ],
+        'args' => [],
+        'defaultSorting' => 'newest',
+        'sortingOptions' => [
+          'newest' => 'Newest First',
+          'oldest' => 'Oldest First',
+          'price_high' => 'Price: High to Low',
+          'price_low' => 'Price: Low to High',
+          'rating' => 'Top Rated',
+          'alphabetical' => 'Title A–Z',
+        ],
       ])
     </x-card>
   </x-profile.wrap>

@@ -5,21 +5,21 @@
     <div class="text-gray">Average Article Views:</div>
     <div class="text-nowrap relative !pr-6">
       <span>{{ number_format($stats['average_views'] ?? 0, 1) }}</span>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Average number of views each article received during the selected time period.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-center gap-1.5 flex-wrap">
     <div class="text-gray">Article Likes:</div>
     <div class="text-nowrap relative !pr-6">
       <span>{{ number_format($stats['likes'] ?? 0) }}</span>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Total likes your articles received during the selected time period.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-center gap-1.5 flex-wrap">
     <div class="text-gray">Article Comments:</div>
     <div class="text-nowrap relative !pr-6">
       <span>{{ number_format($stats['comments'] ?? 0) }}</span>
-      <x-tooltip message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip message="Total comments posted on your articles during the selected time period.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
   <div class="flex justify-start items-start gap-1.5 flex-wrap md:!flex-nowrap">
@@ -31,7 +31,7 @@
       @else
         <span class="text-gray">—</span>
       @endif
-      <x-tooltip class="!top-1 !translate-y-[0]" message="tooltip">@include('icons.shield')</x-tooltip>
+      <x-tooltip class="!top-1 !translate-y-[0]" message="Article with the highest engagement (views, likes, comments) during the selected time period.">@include('icons.shield')</x-tooltip>
     </div>
   </div>
 </div>

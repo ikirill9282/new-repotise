@@ -49,6 +49,7 @@ class Subs extends Component
       if ($user) {
         $subs = $user->subscriptions()
           ->whereIn('stripe_status', ['active', 'trialing', 'incomplete'])
+          ->orderByDesc('created_at')
           ->get()
           ->map(function (Subscriptions $subscription) {
             $subscription->productModel = $this->resolveProduct($subscription);

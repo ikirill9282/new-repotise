@@ -2,8 +2,12 @@
 
 @php
   $variables = $page->variables;
-  $hasProducts = auth()->user()->favorite_products->isNotEmpty();
-  $hasAuthors = auth()->user()->favorite_authors->isNotEmpty(); 
+  $favoriteProducts = $favoriteProducts ?? collect();
+  $favoriteAuthors = $favoriteAuthors ?? collect();
+  $hasProducts = $favoriteProducts->isNotEmpty();
+  $hasAuthors = $favoriteAuthors->isNotEmpty();
+  $productsSort = $productsSort ?? request()->get('products_sort', 'rating');
+  $creatorsSort = $creatorsSort ?? request()->get('creators_sort', 'name_asc');
 @endphp
 
 @section('content')
@@ -42,14 +46,17 @@
                           <div class="top_group_fav favorites_second">
                             <div class="right_select {{ !$hasProducts ? '!hidden' : '' }}">
                                 <span>Sort by:</span>
-                                <select>
-                                    <option>Top Rated</option>
-                                    <option>Top Rated1</option>
-                                    <option>Top Rated2</option>
+                                <select id="favorites-products-sort" class="tg-select">
+                                    <option value="price_high" {{ $productsSort === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                                    <option value="price_low" {{ $productsSort === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                    <option value="rating" {{ $productsSort === 'rating' ? 'selected' : '' }}>Top Rated</option>
+                                    <option value="popular" {{ $productsSort === 'popular' ? 'selected' : '' }}>Most Popular</option>
+                                    <option value="newest" {{ $productsSort === 'newest' ? 'selected' : '' }}>Newest First</option>
+                                    <option value="oldest" {{ $productsSort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
                                 </select>
                             </div>
                             <div class="favorite_cards_group">
-                                @foreach (auth()->user()->favorite_products as $product)
+                                @foreach ($favoriteProducts as $product)
                                     @include('site.components.cards.product', [
                                         'model' => $product,
                                         'class' => 'removable',
@@ -73,14 +80,14 @@
                           <div class="top_group_fav favorites_second {{ !$hasAuthors ? '!hidden' : '' }}">
                             <div class="right_select">
                                 <span>Sort by:</span>
-                                <select>
-                                    <option>Newest First</option>
-                                    <option>Newest First1</option>
-                                    <option>Newest First2</option>
+                                <select id="favorites-creators-sort" class="tg-select">
+                                    <option value="name_asc" {{ $creatorsSort === 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
+                                    <option value="name_desc" {{ $creatorsSort === 'name_desc' ? 'selected' : '' }}>Name (Z-A)</option>
+                                    <option value="followers_desc" {{ $creatorsSort === 'followers_desc' ? 'selected' : '' }}>Followers (High to Low)</option>
                                 </select>
                             </div>
                             <div class="cards_why_need">
-                                @foreach (auth()->user()->favorite_authors as $author)
+                                @foreach ($favoriteAuthors as $author)
                                     @include('site.components.favorite.author', [
                                         'author' => $author,
                                         'class' => 'removable',
@@ -109,4 +116,32 @@
 
 @push('js')
     <script src="{{ asset('/assets/js/favorite.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const handleSortChange = (selectId, param, defaultValue) => {
+                const select = document.getElementById(selectId);
+                if (!select) {
+                    return;
+                }
+
+                select.addEventListener('change', (event) => {
+                    const url = new URL(window.location.href);
+                    const params = url.searchParams;
+                    const value = event.target.value;
+
+                    if (value === defaultValue) {
+                        params.delete(param);
+                    } else {
+                        params.set(param, value);
+                    }
+
+                    url.search = params.toString();
+                    window.location.href = url.toString();
+                });
+            };
+
+            handleSortChange('favorites-products-sort', 'products_sort', 'rating');
+            handleSortChange('favorites-creators-sort', 'creators_sort', 'name_asc');
+        });
+    </script>
 @endpush

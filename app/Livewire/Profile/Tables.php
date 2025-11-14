@@ -11,20 +11,32 @@ class Tables extends Component
     public $activeTable;
 
     public $sortable = false;
-    public $sorting = null;
+    public ?string $sorting = null;
     public $args = [];
+    public array $sortingOptions = [];
 
     public function mount(
       array $tables = [], 
       ?string $active = null, 
       ?string $sortable = null,
       ?array $args = [],
+      ?string $defaultSorting = null,
+      array $sortingOptions = [],
     )
     {
       $this->tables = $tables;
       $this->activeTable = $active;
       $this->sortable = $sortable ?? false;
       $this->args = $args;
+      $this->sortingOptions = $sortingOptions;
+
+      if ($this->sortable && !empty($this->sortingOptions)) {
+        if (!is_null($defaultSorting) && array_key_exists($defaultSorting, $this->sortingOptions)) {
+          $this->sorting = $defaultSorting;
+        } else {
+          $this->sorting = array_key_first($this->sortingOptions);
+        }
+      }
     }
 
     public function setActive(string $name)
@@ -56,6 +68,11 @@ class Tables extends Component
           return $table;
         }
       }
+    }
+
+    public function updatedSorting(?string $value): void
+    {
+      $this->dispatch('sortingChanged', $value);
     }
 
     public function render()

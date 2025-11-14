@@ -47,6 +47,7 @@ class SearchClient
           'slug', 
           'title', 
           'rating',
+          'created_at',
           'author',
           'price', 
           'old_price', 
@@ -72,6 +73,7 @@ class SearchClient
             'preview',
             'short',
             'created_at',
+            'views',
             'tags',
           ])
           ->setSort(['created_at:desc'])
@@ -89,6 +91,7 @@ class SearchClient
             'avatar', 
             'description',
             'followers_count',
+            'created_at',
           ])
           ,
       ],

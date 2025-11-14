@@ -354,13 +354,18 @@
                         </div>
                     </div>
                     <div class="right_products_filter">
+                        @php
+                            $currentSort = $sortOption ?? request()->get('sort', 'rating');
+                        @endphp
                         <div class="right_select">
                             <span>Sort by:</span>
-                            <select>
-                                <option>Newest First</option>
-                                <option>Top Rated</option>
-                                <option>Price Ascending</option>
-                                <option>Price Descending</option>
+                            <select id="products-sort" class="tg-select">
+                                <option value="price_high" {{ $currentSort === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                                <option value="price_low" {{ $currentSort === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                <option value="rating" {{ $currentSort === 'rating' ? 'selected' : '' }}>Top Rated</option>
+                                <option value="popular" {{ $currentSort === 'popular' ? 'selected' : '' }}>Most Popular</option>
+                                <option value="newest" {{ $currentSort === 'newest' ? 'selected' : '' }}>Newest First</option>
+                                <option value="oldest" {{ $currentSort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
                             </select>
                         </div>
                         <div class="filter_cards_group !items-stretch">
@@ -399,6 +404,21 @@
     <script>
         // Скрываем блок search_results, если все его элементы скрыты
         document.addEventListener('DOMContentLoaded', function() {
+            const sortSelect = document.getElementById('products-sort');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', (event) => {
+                    const url = new URL(window.location.href);
+                    const params = url.searchParams;
+                    if (event.target.value === 'rating') {
+                        params.delete('sort');
+                    } else {
+                        params.set('sort', event.target.value);
+                    }
+                    url.search = params.toString();
+                    window.location.href = url.toString();
+                });
+            }
+
             const searchResults = document.querySelector('.filter_products .about_block .search_filter .search_results');
             if (searchResults) {
                 const checkVisibility = () => {

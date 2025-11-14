@@ -12,6 +12,8 @@ class DonationAnalytics extends Component
 
     public ?string $active = null;
 
+    public ?string $donationType = null;
+
     public function mount(?string $active = null, ?string $period = null): void
     {
         $this->active = $active;
@@ -52,6 +54,14 @@ class DonationAnalytics extends Component
             ->where('created_at', '>=', $from)
             ->whereNull('refunded_at')
             ->with('user')
+            ->when(
+                $this->donationType === 'recurring',
+                fn($query) => $query->whereNotNull('subscription_id')
+            )
+            ->when(
+                $this->donationType === 'one_time',
+                fn($query) => $query->whereNull('subscription_id')
+            )
             ->orderByDesc('created_at')
             ->limit(25)
             ->get()
@@ -72,6 +82,10 @@ class DonationAnalytics extends Component
 
         return view('livewire.profile.tables.donation-analytics', [
             'rows' => $rows,
+            'donationTypes' => [
+                'one_time' => 'One-time',
+                'recurring' => 'Recurring',
+            ],
         ]);
     }
 }

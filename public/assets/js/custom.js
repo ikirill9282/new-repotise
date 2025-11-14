@@ -410,6 +410,7 @@ const FavoriteButtons = function() {
   this.discover = (container) => {
     $(container).find('.favorite-button').each((k, btn) => {
       const button = $(btn);
+      if (button.data('follow')) return;
       const hash = button.data('item');
       const key = button.data('key');
 
@@ -457,6 +458,41 @@ const FavoriteButtons = function() {
   };
 }
 
+const refreshLivewireCart = () => {
+  if (!window.Livewire || typeof Livewire.all !== 'function') {
+    return false;
+  }
+
+  const components = Livewire.all();
+  if (!Array.isArray(components)) {
+    return false;
+  }
+
+  const cartComponent = components.find((component) => {
+    if (!component) {
+      return false;
+    }
+
+    if (component.name === 'modals.cart' && typeof component.refreshCart === 'function') {
+      component.refreshCart();
+      return true;
+    }
+
+    if (component.name === 'modals.cart' && typeof component.call === 'function') {
+      component.call('refreshCart');
+      return true;
+    }
+
+    return false;
+  });
+
+  if (!cartComponent) {
+    return false;
+  }
+
+  return true;
+};
+
 const CartButtons = function() {
   this.discover = (container) => {
     const buttons = $(container).find('.add-to-cart');
@@ -485,14 +521,45 @@ const CartButtons = function() {
                 $('.cart-counter').html(response.products_count);
                 $('.cart-counter').removeClass('hidden');
                 $('.cart-counter').attr('style', '');
-                $(this).addClass('in-cart');
-                $(this).attr('href', '/payment/checkout');
-                $(this).html($(this).html().replace('Add to cart', 'View Cart'));
-								if (window.Livewire?.dispatch) {
-									Livewire.dispatch('openModal', { modalName: 'cart' });
-								}
+
+                const button = $(this);
+                button.addClass('in-cart');
+
+                if (button.is('a')) {
+                  button.attr('href', '/payment/checkout');
+                  button.html(button.html().replace('Add to cart', 'View Cart'));
+                }
+
+                if (button.data('hide-on-add')) {
+                  button.fadeOut(150, function() {
+                    $(this).remove();
+                  });
+                }
+
+                const isRefreshOnly = button.data('refresh-only');
+
+                if (isRefreshOnly) {
+                  const refreshed = refreshLivewireCart();
+                  if (!refreshed && window.Livewire?.dispatch) {
+                    Livewire.dispatch('openModal', { 
+                      modalName: 'cart', 
+                      args: { forceRefresh: Date.now() },
+                    });
+                  }
+                } else if (window.Livewire?.dispatch) {
+                  Livewire.dispatch('openModal', { modalName: 'cart' });
+                }
 								
               }
+            }).fail((xhr) => {
+              const message = xhr?.responseJSON?.message || 'Unable to add product to cart.';
+              $.toast({
+                text: message,
+                icon: 'error',
+                heading: 'Error',
+                position: 'top-right',
+                hideAfter: 5000,
+              });
             });
         });
       })
@@ -710,31 +777,39 @@ const FollowButtons = function() {
               type: 'article',
             }
           }).then(response => {
-            const btns = document.querySelectorAll(`[data-group="${group}"]`)
-            if (btns.length) {
-              btns.forEach((btn, k) => {
-                if (response.sub) {
-                  btn.innerHTML = 'Unsubscribe';
-                } else {
-                  btn.innerHTML = 'Subscribe';
-                }
-              });
+            const btns = document.querySelectorAll(`[data-group="${group}"]`);
+            const isSubscribed = !!response.sub;
 
-              if (response.sub) {
-                $.toast({
-                  text: 'You’re now following and won’t miss any updates.',
-                  icon: 'success',
-                  heading: 'Success',
-                  position: 'top-right',
-                });
+            btns.forEach((btn) => {
+              const mode = btn.getAttribute('data-mode') || 'text';
+
+              if (mode === 'icon') {
+                if (isSubscribed) {
+                  btn.classList.add('favorite-active');
+                  btn.setAttribute('aria-pressed', 'true');
+                } else {
+                  btn.classList.remove('favorite-active');
+                  btn.setAttribute('aria-pressed', 'false');
+                }
               } else {
-                $.toast({
-                  text: 'You have unfollowed the user\'s updates.',
-                  icon: 'success',
-                  heading: 'Success',
-                  position: 'top-right',
-                });
+                btn.innerHTML = isSubscribed ? 'Unsubscribe' : 'Subscribe';
               }
+            });
+
+            if (isSubscribed) {
+              $.toast({
+                text: 'You’re now following and won’t miss any updates.',
+                icon: 'success',
+                heading: 'Success',
+                position: 'top-right',
+              });
+            } else {
+              $.toast({
+                text: 'You have unfollowed the user\'s updates.',
+                icon: 'success',
+                heading: 'Success',
+                position: 'top-right',
+              });
             }
           });
         });
@@ -1068,6 +1143,7 @@ $(document).ready(function() {
     window.CopyToClipboard.discover();
     window.EmojiButtons.discover();
     window.ReadMoreButtons.discover();
+    window.CartButtons.discover(el || 'body');
 
     $('[data-input="percent"]').on('input', function(evt) {
       $(this).val(evt.target.value.replace(/[^0-9\.]+/is, '') + '%');

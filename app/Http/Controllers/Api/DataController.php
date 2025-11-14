@@ -24,17 +24,20 @@ use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\OptimizeMedia;
 
 class DataController extends Controller
 {
 
   public function uploadImage(Request $request)
   {
-    $request->validate(['image' => 'required|image|max:2048']);
+    $request->validate(['image' => 'required|image|mimes:jpeg,jpg,png,gif,webp']);
     $image = $request->file('image');
     
     try {
       $path = $image->store('images', 'public');
+      OptimizeMedia::dispatch('public', $path);
+
       $gallery = Gallery::create([
         'model_id' => 0,
         'user_id' => $request->user()->id,

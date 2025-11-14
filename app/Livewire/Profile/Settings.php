@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Jobs\OptimizeMedia;
 use Laravel\Cashier\Cashier;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -69,7 +70,6 @@ class Settings extends Component
     public bool $showPaymentForm = false;
     public ?string $paymentSetupSecret = null;
     public string $stripePublishableKey = '';
-
     public array $returnPolicies = [];
     public ?int $selectedReturnPolicy = null;
 
@@ -324,6 +324,33 @@ class Settings extends Component
         }
     }
 
+    public function deletePaymentMethod(string $paymentMethodId): void
+    {
+        try {
+            $this->user->deletePaymentMethod($paymentMethodId);
+            $this->dispatch('toastSuccess', ['message' => 'Payment method removed.']);
+        } catch (\Throwable $e) {
+            Log::error('Failed to delete payment method from settings page.', [
+                'user_id' => $this->user->id ?? null,
+                'payment_method' => $paymentMethodId,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->dispatch('toastError', ['message' => 'Unable to delete payment method. Please try again.']);
+            return;
+        }
+
+        $this->refreshPaymentMethods();
+
+        if ($this->selectedPaymentMethod === $paymentMethodId) {
+            $this->selectedPaymentMethod = $this->paymentMethods[0]['id'] ?? null;
+        }
+
+        if ($this->selectedPayoutMethod === $paymentMethodId) {
+            $this->selectedPayoutMethod = $this->payoutMethods[0]['id'] ?? null;
+        }
+    }
+
     public function refreshPaymentMethods(?string $paymentMethodId = null): void
     {
         $this->loadPaymentData();
@@ -492,7 +519,7 @@ class Settings extends Component
         }
 
         $this->validate([
-            'avatar' => 'required|image|max:2048|mimes:jpeg,jpg,png,gif',
+            'avatar' => 'required|image|mimes:jpeg,jpg,png,gif,webp',
         ]);
 
         try {
@@ -507,6 +534,7 @@ class Settings extends Component
 
             // Сохраняем новую аватарку
             $path = $this->avatar->store('images/avatars', 'public');
+            OptimizeMedia::dispatch('public', $path);
             $avatarPath = "/storage/$path";
 
             // Обновляем аватарку в user_options
