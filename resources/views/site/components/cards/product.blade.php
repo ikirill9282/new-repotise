@@ -54,9 +54,13 @@
 
         @if (! $isOwner)
           @if ($model->subscription)
-            <x-btn href="{{ $model->makeUrl() }}" :disabled="auth()->user()?->subscribed($model->id)" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5 in-cart">
+            @php
+              $isSubscribed = auth()->check() && auth()->user()->subscribed($model->id);
+              $showInCartStyle = $cart->inCart($model->id) || $isSubscribed;
+            @endphp
+            <x-btn href="{{ $model->makeUrl() }}" :disabled="$isSubscribed" class="to_basket absolute bottom-0 !left-[50%] translate-x-[-50%] !w-[90%] !py-2.5 {{ $showInCartStyle ? 'in-cart' : '' }}">
               @if(auth()->check())
-                @if(auth()->user()->subscribed($model->id))
+                @if($isSubscribed)
                   Subscribed
                 @else
                   Add to cart

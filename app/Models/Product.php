@@ -90,7 +90,10 @@ class Product extends Model
 
     $array = $this->toArray();
 
-    $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+    $array['author'] = array_merge(
+      $this->author->only('profile', 'name', 'avatar', 'description'),
+      ['username' => $this->author->username, 'slug' => $this->author->username]
+    );
     $array['categories'] = $this->categories->select(['id', 'parent_id', 'title'])->toArray();
     $array['type'] = $this->types->select(['id', 'title', 'slug'])->toArray();
     $array['location'] = $this->locations->select(['id', 'title', 'slug'])->toArray();
@@ -174,7 +177,17 @@ class Product extends Model
 
   public function prepareRatingImages()
   {
-    return rating_images($this->rating);
+    // Если отзывов нет - показываем 0 звезд (все пустые)
+    if (($this->reviews_count ?? 0) == 0) {
+      return rating_images(0);
+    }
+    
+    // Если отзывы есть - вычисляем средний рейтинг из отзывов
+    $avgRating = $this->reviews()
+      ->whereNull('parent_id')
+      ->avg('rating');
+    
+    return rating_images($avgRating ?? 0);
   }
 
   public function reviewsCount(): Attribute

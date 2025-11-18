@@ -86,6 +86,7 @@ class SearchClient
           ->setAttributesToRetrieve([
             'id', 
             'name', 
+            'username',
             'slug', 
             'profile', 
             'avatar', 

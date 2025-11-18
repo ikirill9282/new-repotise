@@ -239,7 +239,8 @@ class SiteController extends Controller
       'page' => $page,
       'articles' => Article::query()
         ->when(isset($id), fn($q) => $q->where('id', '!=', $id))
-        ->orderByDesc('id')
+        ->whereHas('author.roles', fn($q) => $q->whereIn('name', ['creator', 'customer']))
+        ->inRandomOrder()
         ->limit(3)
         ->get()
         ->all(),
@@ -324,18 +325,35 @@ class SiteController extends Controller
       ->withCount('followers')
       ->get();
 
-    $favoriteAuthors = match ($creatorsSort) {
-      'followers_desc' => $favoriteAuthors
-        ->sortByDesc(fn($author) => (int) ($author->followers_count ?? 0))
+    // Получаем статьи авторов вместо их профилей
+    $favoriteAuthorsIds = $favoriteAuthors->pluck('id')->toArray();
+    $favoriteArticles = collect();
+    
+    if (!empty($favoriteAuthorsIds)) {
+      $favoriteArticles = \App\Models\Article::query()
+        ->whereIn('user_id', $favoriteAuthorsIds)
+        // ->where('status_id', \App\Enums\Status::ACTIVE) // Временно убрано для отображения всех статей
+        ->with(['preview', 'author' => function($query) {
+          $query->withCount('followers');
+        }])
+        ->withCount('likes')
+        ->orderByDesc('published_at')
+        ->orderByDesc('created_at')
+        ->get();
+    }
+
+    $favoriteArticles = match ($creatorsSort) {
+      'followers_desc' => $favoriteArticles
+        ->sortByDesc(fn($article) => (int) ($article->author->followers_count ?? 0))
         ->values(),
-      'name_desc' => $favoriteAuthors
-        ->sortByDesc(fn($author) => strtolower($author->username ?? $author->name ?? ''))
+      'name_desc' => $favoriteArticles
+        ->sortByDesc(fn($article) => strtolower($article->author->username ?? $article->author->name ?? ''))
         ->values(),
-      'name_asc' => $favoriteAuthors
-        ->sortBy(fn($author) => strtolower($author->username ?? $author->name ?? ''))
+      'name_asc' => $favoriteArticles
+        ->sortBy(fn($article) => strtolower($article->author->username ?? $article->author->name ?? ''))
         ->values(),
-      default => $favoriteAuthors
-        ->sortBy(fn($author) => strtolower($author->username ?? $author->name ?? ''))
+      default => $favoriteArticles
+        ->sortByDesc(fn($article) => $article->published_at ?? $article->created_at)
         ->values(),
     };
 
@@ -343,6 +361,7 @@ class SiteController extends Controller
       'page' => $page,
       'favoriteProducts' => $favoriteProducts,
       'favoriteAuthors' => $favoriteAuthors,
+      'favoriteArticles' => $favoriteArticles,
       'productsSort' => $productsSort,
       'creatorsSort' => $creatorsSort,
     ]);
@@ -366,6 +385,33 @@ class SiteController extends Controller
     $sortOption = $valid['sort'] ?? 'relevance';
 
     $search_results = is_null($query) ? [] : SearchClient::full($query);
+
+    // При сортировке по relevance ставим полные совпадения заголовка первыми
+    if (!empty($search_results) && $sortOption === 'relevance' && !is_null($query)) {
+      $queryLower = mb_strtolower(trim($query));
+      $exactMatches = [];
+      $otherResults = [];
+      
+      foreach ($search_results as $item) {
+        // Для разных типов результатов используем разные поля для заголовка
+        $title = match($item['index'] ?? '') {
+          'products' => mb_strtolower(trim($item['title'] ?? $item['name'] ?? '')),
+          'articles' => mb_strtolower(trim($item['title'] ?? '')),
+          'users' => mb_strtolower(trim($item['name'] ?? $item['profile'] ?? '')),
+          default => mb_strtolower(trim($item['title'] ?? $item['name'] ?? '')),
+        };
+        
+        // Проверяем полное совпадение заголовка с поисковым запросом
+        if ($title === $queryLower) {
+          $exactMatches[] = $item;
+        } else {
+          $otherResults[] = $item;
+        }
+      }
+      
+      // Сначала полные совпадения, потом остальные результаты
+      $search_results = array_merge($exactMatches, $otherResults);
+    }
 
     if (!empty($search_results) && $sortOption !== 'relevance') {
       $sortResolver = function(array $item) use ($sortOption) {
@@ -525,9 +571,19 @@ class SiteController extends Controller
       ->withCount([
         'reviews as reviews_count' => fn($q) => $q->whereNull('parent_id'),
       ])
+      ->withAvg([
+        'reviews as avg_rating' => fn($q) => $q->whereNull('parent_id')
+      ], 'rating')
       ->when(
-        isset($valid['rating']),
-        fn($q) => $q->where('rating', '>=', $valid['rating']),
+        isset($valid['rating']) && $valid['rating'] > 0,
+        fn($q) => $q->whereExists(function($sq) use ($valid) {
+          $sq->selectRaw('1')
+             ->from('reviews')
+             ->whereColumn('reviews.product_id', 'products.id')
+             ->whereNull('reviews.parent_id')
+             ->groupBy('reviews.product_id')
+             ->havingRaw('AVG(rating) >= ?', [$valid['rating']]);
+        }),
       )
       ->when(
         isset($valid['price']['min']),
@@ -593,7 +649,7 @@ class SiteController extends Controller
         ->orderBy(DB::raw('COALESCE(published_at, created_at, updated_at)'))
         ->orderByDesc('id'),
       default => $query
-        ->orderByDesc('rating')
+        ->orderByDesc(DB::raw('COALESCE((SELECT AVG(rating) FROM reviews WHERE reviews.product_id = products.id AND reviews.parent_id IS NULL), 0)'))
         ->orderByDesc('reviews_count')
         ->orderByDesc('id'),
     })->paginate(20);
@@ -609,6 +665,11 @@ class SiteController extends Controller
   {
     if (!Auth::check() && $request->has('referal') && is_string($request->get('referal'))) {
       SessionExpire::set('referal', $request->get('referal'), Carbon::now()->addHours(24));
+    }
+
+    // Redirect sellers to dashboard
+    if (Auth::check() && Auth::user()->hasRole('creator')) {
+      return redirect()->route('profile.dashboard');
     }
 
     $page = Page::where('slug', 'sellers')

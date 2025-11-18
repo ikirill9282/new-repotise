@@ -248,6 +248,19 @@ header .about_block .right_group_block .rection_groups span {
 	color: #FFFFFF !important;
 }
 
+.to_basket.in-cart {
+  background: #FFFFFF !important;
+	border: 1px solid #FC7361!important;
+	color: #212121 !important;
+}
+
+.to_basket.in-cart:hover {
+  box-shadow: none !important;
+  cursor: pointer !important;
+	background: #FC7361 !important;	
+	color: #FFFFFF !important;
+}
+
 .cart-drop {
   color: #A4A0A0;
   transition: color 0.3s;
@@ -380,8 +393,12 @@ header .about_block .right_group_block .cart svg:hover {
     width: 100%;
     height: 100%;
     z-index: 10;
-    background-attachment: fixed;
+    /* Убрали background-attachment: fixed для устранения проблем с производительностью при скролле */
+    background-attachment: scroll;
     background-repeat: no-repeat;
+    /* Оптимизация для лучшей производительности */
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .parallax.parallax-custom {
@@ -1929,7 +1946,7 @@ footer .bottom_connecting_group .connecting a {
 }
 
 header .search_group {
-  max-width: 400px;
+  /* max-width: 400px; */
   margin: 0 auto 0 0;
 }
 
@@ -2074,18 +2091,19 @@ header .search_group input[name="q"]::placeholder {
 }
 
 .product_page_home .about_block .img_products {
-  max-width: 50%;
+  max-width: 482px;
 }
 
 .product_page_home .group_left {
-  max-width: 80%;
+  max-width: 78%;
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
+	/* justify-content: space-between; */
 }
 
 .product_page_home .about_block .information_product {
-  max-width: 47%;
+  max-width: 454px;
 }
 
 .product_page_home .about_block .img_products .mySwiper14 .swiper-slide img {
@@ -2106,6 +2124,7 @@ header .search_group input[name="q"]::placeholder {
   top: 80px;
   right: 0;
   max-width: none;
+	width: 100%;
 }
 
 .product_page_home .group_left .group_right {

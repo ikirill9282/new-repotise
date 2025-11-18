@@ -25,7 +25,7 @@
                                       <a class="mb-auto" href="{{ $article->makeFeedUrl() }}">
                                           <h3>{{ $article->title }}</h3>
                                       </a>
-                                      <div class="print-content">{!! $article->short() !!}</div>
+                                      <div class="print-content">{{ strip_tags($article->short()) }}</div>
                                       <div class="name_author">
                                         <a class="group w-full flex items-center justify-start gap-2" href="{{ $article->author->makeProfileUrl() }}" class="author-link">
                                           <img class="rounded-full object-cover" src="{{ $article->author->avatar }}"

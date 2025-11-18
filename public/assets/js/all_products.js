@@ -247,7 +247,15 @@ $(document).ready(function() {
     }
 
     function renderEndMessage() {
+        // Don't show message if no products found at all (empty state is shown)
+        if ($container.find(".not_found_products").length) return;
+        
+        // Don't show message if already shown
         if ($container.find("." + PRODUCTS_END_CLASS).length) return;
+
+        // Only show message if there are products but they've ended (pagination finished)
+        const hasProducts = $container.find(".item").length > 0;
+        if (!hasProducts) return;
 
         $container.append(
             '<div class="' +

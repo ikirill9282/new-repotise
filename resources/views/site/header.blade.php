@@ -5,7 +5,7 @@
                 <a href="{{ route('home') }}"><img class="max-w-18 sm:!max-w-none"
                         src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
             </div>
-            <div x-data="{}" class="right_group_block gap-2">
+            <div x-data="{}" class="right_group_block gap-3">
                 <x-search 
                   placeholder="Search the site..."
                   hits="header_hits"
@@ -85,7 +85,7 @@
                                 <div class="name flex flex-col">
                                     <h3>{{ auth()->user()?->profile }}</h3>
                                 </div>
-                                <img class="hidden" src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
+                                <img class="profile-dropdown__arrow" src="{{ asset('assets/img/arrow_bottom.svg') }}" alt="Arrow">
                             </div>
                         </a>
                         <div class="profile-dropdown__menu">

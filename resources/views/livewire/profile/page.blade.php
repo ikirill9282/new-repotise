@@ -137,13 +137,17 @@
                           @foreach ($user->articles()->latest()->limit(6)->get() as $article)
                             <div class="flex flex-col mb-10 last:mb-0">
                                 <div class="flex justify-start items-center mb-2">
-                                    <div class="w-9 h-9 mr-1 rounded-full overflow-hidden">
+                                    <a href="{{ $article->author->makeProfileUrl() }}" class="w-9 h-9 mr-1 rounded-full overflow-hidden hover:opacity-80 transition">
                                       <img src="{{ $article->author->avatar }}" alt="Avatar"
                                         class="object-cover w-full h-full" />
-                                    </div>
+                                    </a>
                                     <div class="text-gray text-sm !leading-5">
-                                      <p>{{ $article->author->getName() }}</p>
-                                      <p>{{ $article->author->profile }}</p>
+                                      <a href="{{ $article->author->makeProfileUrl() }}" class="hover:!text-black transition !text-inherit">
+                                        <p>{{ $article->author->getName() }}</p>
+                                      </a>
+                                      <a href="{{ $article->author->makeProfileUrl() }}" class="hover:!text-black transition !text-inherit">
+                                        <p>{{ $article->author->profile }}</p>
+                                      </a>
                                     </div>
                                     @if(auth()->user()?->id == $article->author->id)
                                       <x-btn href="{{ $article->makeEditUrl() }}" class="!flex items-center sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3">
@@ -168,10 +172,12 @@
                                     <p class="text-gray bg-light px-2 py-1 rounded-full">{{ $article->views }} Views</p>
                                 </div>
                                 <div class="mb-4">
-                                    <h6 class="!text-2xl mb-4">{{ $article->title }}</h6>
-                                    <div class="text-gray read-more read-more-300">
+                                    <a href="{{ $article->makeFeedUrl() }}" class="block hover:opacity-80 transition !text-inherit hover:!text-black">
+                                        <h6 class="!text-2xl mb-4">{{ $article->title }}</h6>
+                                    </a>
+                                    <a href="{{ $article->makeFeedUrl() }}" class="block text-gray read-more read-more-300 hover:opacity-80 transition !text-inherit hover:!text-black">
                                         {!! $article->getText() !!}
-                                    </div>
+                                    </a>
                                 </div>
                                 <div class="flex items-center justify-start flex-wrap gap-1">
                                     @foreach ($article->tags as $tag)  
@@ -302,6 +308,17 @@
                     @endif
 
                     {{-- SOCIALS --}}
+                    @php
+                      $socials = $options->getSocial() ?? [];
+                      $visibility = $options->getSocialVisibility() ?? [];
+                      $icons = \App\Models\UserOptions::getSocialIcons();
+                      $hasVisibleSocials = collect($socials)
+                        ->filter(fn ($url, $key) => array_key_exists($key, $icons))
+                        ->filter(fn ($url) => !empty($url))
+                        ->filter(fn ($url, $key) => (bool) ($visibility[$key] ?? false))
+                        ->isNotEmpty();
+                    @endphp
+                    @if($hasVisibleSocials)
                     <div class="">
                         <h5 class="mb-3">Connect Online</h5>
 
@@ -314,6 +331,7 @@
                           <x-link wire:click.prevent="$dispatch('openModal', { modalName: 'social', args: { user_id: '{{ $this->user_id }}' } })" class="inline-block !mt-3">Add Social Link</x-link>
                         @endif
                     </div>
+                    @endif
                     
                     
                     @if($collaborationOpen || $isOwner)

@@ -16,14 +16,24 @@
               <a class="author-link !text-md" href="{{ $article->author->makeProfileUrl() }}">{{ $article->author->profile }}</a>
             </p>
         </div>
+        @if(auth()->check() && auth()->user()->id === $article->author->id)
+        <a 
+          href="{{ $article->makeEditUrl() }}" 
+          class="follow edit-btn"
+        >
+          @include('icons.edit')
+          Edit Insights
+        </a>
+        @elseif(!$article->author->hasFollower(auth()->user()?->id))
         <a 
           href="{{ $article->author->makeSubscribeUrl() }}" 
           class="follow follow-btn {{ auth()->check() ? '' : 'open_auth' }}"
           data-resource="{{ $resource }}"
           data-group="{{ $group }}"
         >
-          {{ $article->author->hasFollower(auth()->user()?->id) ? 'Unsubscribe' : 'Subscribe' }}
+          Subscribe
         </a>
+        @endif
       </div>
       <div class="block_date">
           <span>{{ \Illuminate\Support\Carbon::parse($article->created_at)->format('d.m.Y') }}</span>
@@ -49,11 +59,11 @@
 				</h2>
         <a 
           href="{{ $article->author->makeSubscribeUrl() }}"
-          class="follow-btn {{ auth()->check() ? '' : 'open_auth' }}"
+          class="follow-btn {{ auth()->check() ? '' : 'open_auth' }} {{ $article->author->hasFollower(auth()->user()?->id) ? 'following' : '' }}"
           data-resource="{{ $resource }}"
           data-group="{{ $group }}"
         >
-          {{ $article->author->hasFollower(auth()->user()?->id) ? 'Unsubscribe' : 'Subscribe' }}
+          {{ $article->author->hasFollower(auth()->user()?->id) ? 'Following' : 'Subscribe' }}
         </a>
     </div>
     <div class="bottom_group">

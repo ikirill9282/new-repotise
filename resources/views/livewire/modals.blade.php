@@ -52,7 +52,7 @@
 								
         >
         <div class="popUp-wrap flex justify-center items-center h-full min-w-full sm:min-w-lg">
-            <div class="popUp-wrap w-full max-h-full overflow-y-scroll overflow-x-hidden scrollbar-custom">
+            <div class="popUp-wrap w-full max-h-full overflow-y-auto overflow-x-hidden scrollbar-custom">
                 <x-card
                   size="xs"
                   class="popUp__edit-contact popUp mx-auto !gap-0 !rounded-xl md:min-w-xl

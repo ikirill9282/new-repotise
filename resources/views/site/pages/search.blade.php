@@ -71,10 +71,19 @@
                                                 <div class="profile">
                                                     <img class="rounded-full object-cover" src="{{ print_key('avatar', $item['author']) }}"
                                                         alt="Avatar {{ print_key('profile', $item['author']) }}">
-                                                    <a href="{{ url('/profile/' . print_key('profile', $item['author'] ?? [])) }}"
-                                                        class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">
-                                                        {{ print_key('profile', $item['author']) }}
-                                                    </a>
+                                                    @php
+                                                        $authorUsername = print_key('slug', $item['author'] ?? []) ?? print_key('username', $item['author'] ?? []);
+                                                        $authorProfileUrl = $authorUsername ? url('/profile/@' . $authorUsername) : '#';
+                                                        $authorProfile = print_key('profile', $item['author'] ?? []);
+                                                    @endphp
+                                                    @if($authorUsername && $authorProfile)
+                                                        <a href="{{ $authorProfileUrl }}"
+                                                            class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">
+                                                            {{ $authorProfile }}
+                                                        </a>
+                                                    @elseif($authorProfile)
+                                                        <span class="!text-[#A4A0A0]">{{ $authorProfile }}</span>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -111,6 +120,10 @@
                                 @break
 
                                 @case('users')
+                                    @php
+                                        $username = print_key('slug', $item) ?? print_key('username', $item);
+                                        $profileUrl = $username ? url('/profile/@' . $username) : '#';
+                                    @endphp
                                     <div class="card_group">
                                         <div class="left_title">
                                             <img src="{{ asset('assets/img/profile_search.svg') }}" alt="Profile icon">
@@ -118,15 +131,24 @@
                                         </div>
                                         <div class="profile_commendor">
                                             <div class="img-wrap">
-																							<a href="{{ url('/users/profile/' . print_key('profile', $item)) }}">
+																							@if($username)
+                                                <a href="{{ $profileUrl }}">
+                                                    <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile"
+                                                        class="img_profile rounded-full object-cover">
+                                                </a>
+																							@else
                                                 <img src="{{ url(print_key('avatar', $item)) }}" alt="Profile"
                                                     class="img_profile rounded-full object-cover">
-																							</a>
+																							@endif
                                             </div>
 
                                             <div class="right_text">
-                                                <h3 class=""><a class="!text-inherit"
-                                                        href="{{ url('/users/profile/' . print_key('profile', $item)) }}">{{ print_key('name', $item) }}</a>
+                                                <h3 class="">
+                                                    @if($username)
+                                                        <a class="!text-inherit" href="{{ $profileUrl }}">{{ print_key('name', $item) }}</a>
+                                                    @else
+                                                        {{ print_key('name', $item) }}
+                                                    @endif
                                                 </h3>
                                                 <div>
                                                     {!! print_key('description', $item) !!}
@@ -160,23 +182,32 @@
                                         </div>
                                         <div class="profile_commendor">
                                             <div class="img-wrap">
-																							<a href="{{ url('/insights/feed?aid=' . print_key('id', $item)) }}">
+																							<a href="{{ url('/insights/' . print_key('slug', $item) . '?aid=' . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => print_key('id', $item)])) }}">
                                                 <img src="{{ url(print_key('preview', $item)) }}" alt="Insight"
                                                     class="img_profile rounded-full">
 																							</a>
                                             </div>
                                             <div class="right_text">
                                                 <h3><a class="!text-inherit"
-                                                        href="{{ url('/insights/feed?aid=' . print_key('id', $item)) }}">{{ print_key('title', $item) }}</a>
+                                                        href="{{ url('/insights/' . print_key('slug', $item) . '?aid=' . \App\Helpers\CustomEncrypt::generateUrlHash(['id' => print_key('id', $item)])) }}">{{ print_key('title', $item) }}</a>
                                                 </h3>
                                                 <div class="print-content hover:cursor-pointer hover-text-black transition">
-                                                    {!! print_key('short', $item) !!}
+                                                    {{ strip_tags(print_key('short', $item)) }}
                                                 </div>
                                                 <div class="profile">
                                                     <img class="rounded-full object-cover"
                                                         src="{{ url(print_key('avatar', $item['author'] ?? [])) }}" alt="Avatar">
-                                                    <a href="{{ url('/users/profile/' . print_key('profile', $item['author'] ?? [])) }}"
-                                                        class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">{{ print_key('profile', $item['author'] ?? []) }}</a>
+                                                    @php
+                                                        $authorUsername = print_key('slug', $item['author'] ?? []) ?? print_key('username', $item['author'] ?? []);
+                                                        $authorProfileUrl = $authorUsername ? url('/profile/@' . $authorUsername) : '#';
+                                                        $authorProfile = print_key('profile', $item['author'] ?? []);
+                                                    @endphp
+                                                    @if($authorUsername && $authorProfile)
+                                                        <a href="{{ $authorProfileUrl }}"
+                                                            class="!text-[#A4A0A0] hover:cursor-pointer hover:!text-black transition">{{ $authorProfile }}</a>
+                                                    @elseif($authorProfile)
+                                                        <span class="!text-[#A4A0A0]">{{ $authorProfile }}</span>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>

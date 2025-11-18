@@ -26,7 +26,7 @@
               @endphp
                 <div class="about_block">
                     <div class="group_left">
-                        <div class="img_products lg:!max-w-[49%]">
+                        <div class="img_products">
                             <div style="--swiper-navigation-color: #fff; --swiper-pagination-color: #fff"
                                 class="swiper mySwiper14">
                                 <div class="swiper-wrapper">
@@ -395,7 +395,7 @@
                             </a>
                             <div class="creator-description " data-color="#fff">
                                 {!! $product->author->getShortDescription() !!}
-																<div class="read-more-wrap" style="box-shadow: rgb(255, 255, 255) 0px 0px 30px 30px; background-color: rgb(255, 255, 255); position:relative"><a href="{{ $product->author->makeProfileUrl() }}" class="read-more-btn">Read More</a></div>
+																<div ><a href="{{ $product->author->makeProfileUrl() }}" class="read-more-btn mt-4">Read More</a></div>
                             </div>
                             {{-- <span class="read-more">Read More</span> --}}
                         </div>
@@ -497,7 +497,13 @@
             </div>
         </section>
 
-        <x-chat type="review" :model="$product" />
+        @php
+          // Проверяем наличие отзывов (только основных, без ответов)
+          $hasReviews = $product->reviews()->whereNull('parent_id')->exists();
+        @endphp
+        @if($hasReviews)
+          <x-chat type="review" :model="$product" />
+        @endif
 
         <section class="frequently_bought">
             <div class="container">

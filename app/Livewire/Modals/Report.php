@@ -82,24 +82,35 @@ class Report extends Component
             return;
         }
 
-        if (is_string($this->form['message'])) {
-            $this->form['message'] = trim($this->form['message']);
+        // Trim message if it's a string
+        $message = $this->form['message'] ?? null;
+        if (is_string($message)) {
+            $message = trim($message);
+            $this->form['message'] = $message;
+        }
+
+        // Ensure message is set for validation
+        if (empty($message)) {
+            $this->form['message'] = '';
         }
 
         $validator = Validator::make(
             $this->form,
             [
-                'message' => 'required|string|min:10|max:1000',
+                'message' => 'required|string|min:10|max:200',
             ],
             [
-                'message.required' => 'Please describe the issue you spotted.',
-                'message.min' => 'Please provide a bit more detail so we can review it properly.',
-                'message.max' => 'Your report is too long. Please shorten it to 1000 characters.',
+                'message.required' => 'Please describe the error you found. Your message must be at least 10 characters long.',
+                'message.min' => 'Please provide a bit more detail so we can review it properly. Your message must be at least 10 characters long.',
+                'message.max' => 'Your report is too long. Please shorten it to 200 characters.',
             ]
         );
 
         if ($validator->fails()) {
-            throw new ValidationException($validator);
+            $this->submitted = false;
+            $this->failed = true;
+            $this->resetValidation();
+            return;
         }
 
         $data = $validator->validated();
@@ -116,13 +127,11 @@ class Report extends Component
             return;
         }
 
-        $this->reset('form');
-        $this->resetValidation();
-
         $this->submitted = true;
         $this->failed = false;
-
-        $this->dispatch('toastSuccess', ['message' => 'Thanks for your report! We will review it shortly.']);
+        
+        $this->reset('form');
+        $this->resetValidation();
     }
 
     public function render()

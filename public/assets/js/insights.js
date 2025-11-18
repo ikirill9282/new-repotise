@@ -162,12 +162,25 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   };
 
-  const handleScroll = () => {
+  // Throttle функция для оптимизации обработчика скролла
+  function throttle(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  const handleScroll = throttle(() => {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
       loadMoreArticles();
       loadMoreNews();
     }
-  };
+  }, 100); // Проверяем каждые 100ms вместо каждого события скролла
 
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener('scroll', handleScroll, { passive: true });
 });

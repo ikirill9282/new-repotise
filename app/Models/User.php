@@ -125,6 +125,9 @@ class User extends Authenticatable implements HasName, FilamentUser
         unset($array['roles']);
         
         $array['avatar'] = $this->avatar;
+        // Явно добавляем username и slug для корректной работы ссылок в поиске
+        $array['username'] = $this->username;
+        $array['slug'] = $this->username; // slug используется для формирования URL профиля
 
         if ($load_options) {
           $array['options'] = $this->options?->toArray();

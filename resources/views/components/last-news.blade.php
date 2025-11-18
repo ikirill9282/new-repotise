@@ -23,6 +23,5 @@
       </div>
   </div>
   
-  <!-- Вывод счётчика под слайдером -->
-  <p class="text-gray-500 text-sm mt-2">Total news: {{ $totalNews }}</p>
+
 </div>

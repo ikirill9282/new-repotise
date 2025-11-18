@@ -1,6 +1,6 @@
 <div class="cards_group relative flex flex-col justify-start items-start">
-  <div class="img_products item !max-w-none !w-full">
-      <img class="main_img !w-full" src="{{ url($model->avatar) }}" alt="Autho {{ $model->getName() }}">
+  <div class="img_products item !max-w-none">
+      <img class="main_img object-cover" src="{{ url($model->avatar) }}" alt="Autho {{ $model->getName() }}">
       
       @include('site.components.favorite.button', [
         'stroke' => '#FF2C0C',

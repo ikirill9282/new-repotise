@@ -1,8 +1,8 @@
 <div>
   @if($orders->isNotEmpty())
-    <div class="relative overflow-x-scroll max-w-full scrollbar-custom">
+    <div class="relative overflow-x-hidden max-w-full">
 
-        <table class="table !mb-0 ">
+        <table class="table !mb-0 w-full">
           <thead>
             <tr class="">
               <th class="text-nowrap font-normal !border-none !pb-4 !bg-light">Date</th>
@@ -34,14 +34,14 @@
                       </div>
                       <x-link 
                         href="{{ $order_product->product->makeUrl() }}" 
-                        class="!border-0 group-has-[a]:!text-black text-nowrap"
+                        class="!border-0 group-has-[a]:!text-black break-words"
                         >
                           {{ $order_product->product->title }}
                         </x-link>
                     </div>
                   </td>
-                  <td class="bg-clip-content !px-0 text-nowrap !border-light">
-                    <div class="!p-3 flex items-start justify-start gap-4 group ">
+                  <td class="bg-clip-content !px-0 !border-light">
+                    <div class="!p-3 flex items-start justify-start gap-4 group flex-wrap">
                       @if($order->status_id !== \App\Enums\Order::NEW)
                         <div class="flex group">
                           @if(!$order_product->refunded)

@@ -63,27 +63,58 @@ class DataController extends Controller
   
   public function feed(Request $request, $id)
   {
-    $vars = Page::where('slug', 'feed')->with('config')->first()->config->keyBy('name');
-    $news = Article::getLastNews();
-    $aid = null;
+    try {
+      $vars = Page::where('slug', 'feed')->with('config')->first()->config->keyBy('name');
+      $news = Article::getLastNews();
+      $aid = null;
 
-    if (request()->has('aid')) {
-      $rdata = CustomEncrypt::decodeUrlHash(request()->get('aid'));
-      if (isset($rdata['id'])) $aid = $rdata['id'];
-    }
+      if (request()->has('aid')) {
+        $rdata = CustomEncrypt::decodeUrlHash(request()->get('aid'));
+        if (isset($rdata['id'])) $aid = $rdata['id'];
+      }
 
-    $articles = Article::where('id', '<', $id)
-      ->when(!is_null($aid), fn($q) => $q->where('id', '!=', $aid))
-      ->orderByDesc('id')
-      ->limit(2)
-      ->get()
-      ->map(fn($article) => Blade::render('site.components.article_feed', [
-        'variables' => $vars,
-        'last_news' => $news,
-        'article' => $article,
-      ]));
+      // Получаем список уже загруженных статей из параметра запроса
+      $excludeIds = [];
+      if (request()->has('exclude')) {
+        $excludeIds = array_filter(
+          array_map('intval', explode(',', request()->get('exclude'))),
+          fn($id) => $id > 0
+        );
+      }
+      if (!is_null($aid)) {
+        $excludeIds[] = $aid;
+      }
+
+      // Выбираем статьи случайным образом для разнообразия
+      $articles = Article::query()
+        ->when(!empty($excludeIds), fn($q) => $q->whereNotIn('id', $excludeIds))
+        ->whereHas('author.roles', fn($q) => $q->whereIn('name', ['creator', 'customer']))
+        ->inRandomOrder()
+        ->limit(3)
+        ->get();
+      
+      if ($articles->isEmpty()) {
+        return '';
+      }
+      
+      // Собираем все ID статей для исключения при поиске похожих
+      $allExcludeIds = array_merge($excludeIds, $articles->pluck('id')->toArray());
+      
+      $html = $articles->map(function($article) use ($vars, $news, $allExcludeIds) {
+        // Передаем список исключенных ID для getAnalogs
+        $article->getAnalogs($allExcludeIds);
+        return Blade::render('site.components.article_feed', [
+          'variables' => $vars,
+          'last_news' => $news,
+          'article' => $article,
+        ]);
+      })->implode("\n");
     
-    return $articles->implode("\n");
+      return $html;
+    } catch (\Exception $e) {
+      \Log::error('Feed API error: ' . $e->getMessage());
+      return response('', 500);
+    }
   }
 
   public function messages(Request $request)

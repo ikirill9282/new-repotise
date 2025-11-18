@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     if (!$error.length) {
       $error = $('<div>', {
-        class: 'search-error text-sm text-red-500 mt-2',
+        class: 'search-error',
         text: SEARCH_ERROR_TEXT,
       }).addClass('hidden');
 
@@ -42,6 +42,21 @@ window.addEventListener('DOMContentLoaded', function() {
     const $input = $form.find('.search-input').first();
     const value = ($input.val() || '').trim();
     const $error = resolveErrorElement($form);
+
+    // Check if this is a filter input (should not submit)
+    const autoSubmit = $input.data('autosubmit');
+    const isFilter = (
+      autoSubmit === false ||
+      autoSubmit === 'false' ||
+      autoSubmit === 0 ||
+      autoSubmit === '0'
+    );
+
+    if (isFilter) {
+      evt.preventDefault();
+      evt.stopPropagation();
+      return false;
+    }
 
     if (!value.length) {
       evt.preventDefault();
@@ -143,6 +158,52 @@ window.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         $(`#${$(this).data('hits')}`).fadeOut();
       }, 200);
+    });
+
+    // Handle Enter key for filter inputs
+    $(this).on('keydown', function(evt) {
+      if (evt.key === 'Enter' || evt.keyCode === 13) {
+        const $input = $(this);
+        const autoSubmit = $input.data('autosubmit');
+        const isFilter = (
+          autoSubmit === false ||
+          autoSubmit === 'false' ||
+          autoSubmit === 0 ||
+          autoSubmit === '0'
+        );
+
+        if (isFilter) {
+          evt.preventDefault();
+          evt.stopPropagation();
+          evt.stopImmediatePropagation();
+
+          const id = $input.data('hits');
+          if (id) {
+            const hits = $(`#${id}`);
+            const firstResultDiv = hits.find('div').first();
+            const firstResultSpan = firstResultDiv.find('span').first();
+            const inputValue = $input.val().trim();
+
+            if (firstResultSpan.length && firstResultSpan.text() !== 'No Search Results...') {
+              // Select first result if available - trigger click on the span
+              firstResultSpan.trigger('click');
+            } else if (inputValue.length) {
+              // Add entered text as selected item
+              const slug = inputValue.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+              const itemData = {
+                label: inputValue,
+                slug: slug
+              };
+              $input.trigger('searchItemSelected', itemData);
+              $input.val('');
+            }
+
+            hits.fadeOut();
+          }
+          
+          return false;
+        }
+      }
     });
   });
 });

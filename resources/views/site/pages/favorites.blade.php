@@ -4,8 +4,10 @@
   $variables = $page->variables;
   $favoriteProducts = $favoriteProducts ?? collect();
   $favoriteAuthors = $favoriteAuthors ?? collect();
+  $favoriteArticles = $favoriteArticles ?? collect();
   $hasProducts = $favoriteProducts->isNotEmpty();
   $hasAuthors = $favoriteAuthors->isNotEmpty();
+  $hasArticles = $favoriteArticles->isNotEmpty();
   $productsSort = $productsSort ?? request()->get('products_sort', 'rating');
   $creatorsSort = $creatorsSort ?? request()->get('creators_sort', 'name_asc');
 @endphp
@@ -77,7 +79,7 @@
                     </div>
                     <div class="tab-pane fade {{ (!$hasProducts && $hasAuthors) ? 'show active' : '' }}" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
                         <div class="favorites-content">
-                          <div class="top_group_fav favorites_second {{ !$hasAuthors ? '!hidden' : '' }}">
+                          <div class="top_group_fav favorites_second {{ !$hasArticles ? '!hidden' : '' }}">
                             <div class="right_select">
                                 <span>Sort by:</span>
                                 <select id="favorites-creators-sort" class="tg-select">
@@ -87,9 +89,9 @@
                                 </select>
                             </div>
                             <div class="cards_why_need">
-                                @foreach ($favoriteAuthors as $author)
-                                    @include('site.components.favorite.author', [
-                                        'author' => $author,
+                                @foreach ($favoriteArticles as $article)
+                                    @include('site.components.favorite.article', [
+                                        'article' => $article,
                                         'class' => 'removable',
                                     ])
                                 @endforeach
@@ -97,8 +99,8 @@
                         </div>
 
                         <x-empty 
-                          :class="$hasAuthors ? 'hidden' : ''" 
-                          title="You're not following any authors yet. Discover creators and follow your favorites!"
+                          :class="$hasArticles ? 'hidden' : ''" 
+                          title="No articles from followed creators yet. Follow creators to see their articles here!"
                         />
                         </div>
 

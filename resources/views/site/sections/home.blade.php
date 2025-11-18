@@ -11,11 +11,11 @@
                 {!! print_var('page_catalog_button_text', $variables) !!}
               </a>
               @if(auth()->check())
-                <a href="{{ auth()->user()->verified ? url('/profile/article/cleate') : auth()->user()->makeProfileVerificationUrl() }}" class="become_c">
+                <a href="/sellers" class="become_c">
                   {!! print_var('page_catalog_register_text', $variables) !!}
                 </a>
               @else
-                <a href="#" class="become_c open_auth">
+                <a href="/sellers" class="become_c">
                   {!! print_var('page_catalog_register_text', $variables) !!}
                 </a>
               @endif

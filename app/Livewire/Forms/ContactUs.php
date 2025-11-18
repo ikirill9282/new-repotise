@@ -68,6 +68,11 @@ class ContactUs extends Component
       $this->dispatch('resetForm');
     }
 
+    public function removeFile()
+    {
+        $this->fields['file'] = null;
+    }
+
     public function render()
     {
         return view('livewire.forms.contact-us');

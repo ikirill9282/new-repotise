@@ -93,7 +93,7 @@
                 <div class="travel-news-loader text-center py-4 text-[#FC7361] hidden">
                   Loading more news...
                 </div>
-                <p class="text-gray-500 text-sm mt-2">Total news: {{ $newsTotal }}</p>
+                
               </div>
             </div>
         </div>

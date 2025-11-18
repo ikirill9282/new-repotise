@@ -1,7 +1,12 @@
 @php
-$authors = $variables->get('authors_ids')?->value ?? [];
-if (!empty($authors)) {
-  $authors = \App\Models\User::whereIn('id', $authors)->withCount('followers')->get();
+$authors = \App\Models\User::query()
+  ->whereHas('roles', fn($query) => $query->whereIn('name', ['creator', 'seller']))
+  ->withCount('followers')
+  ->orderByDesc('followers_count')
+  ->limit(6)
+  ->get();
+  
+if ($authors->count() < 6) {
   while ($authors->count() < 6) {
     $authors = $authors->collect()->merge($authors)->slice(0, 6);
   }

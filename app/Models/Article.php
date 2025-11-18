@@ -74,7 +74,10 @@ class Article extends Model
 
       $array['tags'] = $this->tags->select(['id', 'title'])->toArray();
       $array['preview'] = $this->preview?->image ?? '';
-      $array['author'] = $this->author->only('profile', 'name', 'avatar', 'description');
+      $array['author'] = array_merge(
+        $this->author->only('profile', 'name', 'avatar', 'description'),
+        ['username' => $this->author->username, 'slug' => $this->author->username]
+      );
       $array['short'] = $this->short();
       $array['keywords'] = $this->getKeywords();
 
@@ -217,30 +220,81 @@ class Article extends Model
     return $count;
   }
 
-  public function getAnalogs()
+  public function getAnalogs(?array $excludeIds = null)
   {
+    $excludeIds = $excludeIds ?? [];
+    $excludeIds[] = $this->id; // Всегда исключаем текущую статью
+    
     $tags = $this->tags->pluck('id')->values()->toArray();
-    if (empty($tags)) {
-      $query = Article::query()
-        ->limit($this->amountAnalogs)
-      ;
-    } else {
+    
+    // Сначала ищем по тегам
+    if (!empty($tags)) {
       $query = Article::query()
         ->whereHas('tags', fn($query) => $query->whereIn('tags.id', $tags))
+        ->whereNotIn('id', $excludeIds)
+        ->whereHas('author.roles', fn($q) => $q->where('name', ['creator', 'customer']))
         ->with('author', 'preview')
-      ;
+        ->orderByDesc('id')
+        ->limit($this->amountAnalogs * 2); // Берем больше, чтобы было из чего выбрать
+      
+      $analogs = $query->get()->collect();
+      
+      // Если нашли достаточно по тегам, возвращаем
+      if ($analogs->count() >= $this->amountAnalogs) {
+        $this->analogs = $analogs->slice(0, $this->amountAnalogs);
+        return $this;
+      }
+    } else {
+      $analogs = collect();
     }
-
-    $analogs = $query->whereHas('author.roles', fn($q) => $q->where('name', ['creator', 'customer']))
-      ->where('id', '!=', $this->id)
-      ->orderByDesc('id')
-      ->get()
-      ->collect();
-
-    while ($analogs->count() < $this->amountAnalogs) {
+    
+    // Если не хватает, ищем по похожим словам в названии
+    $titleWords = array_filter(
+      explode(' ', preg_replace('/[^\w\s]/u', ' ', mb_strtolower($this->title))),
+      fn($word) => mb_strlen($word) > 3
+    );
+    
+    if (!empty($titleWords)) {
+      $titleQuery = Article::query()
+        ->whereNotIn('id', array_merge($excludeIds, $analogs->pluck('id')->toArray()))
+        ->whereHas('author.roles', fn($q) => $q->where('name', ['creator', 'customer']))
+        ->with('author', 'preview');
+      
+      // Ищем статьи, где в названии есть хотя бы одно слово из текущей статьи
+      $titleQuery->where(function($q) use ($titleWords) {
+        foreach (array_slice($titleWords, 0, 3) as $word) { // Берем первые 3 слова
+          $q->orWhere('title', 'LIKE', "%{$word}%");
+        }
+      });
+      
+      $titleAnalogs = $titleQuery
+        ->orderByDesc('id')
+        ->limit($this->amountAnalogs * 2)
+        ->get()
+        ->collect();
+      
+      $analogs = $analogs->merge($titleAnalogs);
+    }
+    
+    // Если все еще не хватает, берем любые статьи (кроме исключенных)
+    if ($analogs->count() < $this->amountAnalogs) {
+      $fallbackQuery = Article::query()
+        ->whereNotIn('id', array_merge($excludeIds, $analogs->pluck('id')->toArray()))
+        ->whereHas('author.roles', fn($q) => $q->where('name', ['creator', 'customer']))
+        ->with('author', 'preview')
+        ->orderByDesc('id')
+        ->limit($this->amountAnalogs - $analogs->count());
+      
+      $fallbackAnalogs = $fallbackQuery->get()->collect();
+      $analogs = $analogs->merge($fallbackAnalogs);
+    }
+    
+    // Если все еще не хватает, дублируем существующие (старый способ)
+    while ($analogs->count() < $this->amountAnalogs && $analogs->count() > 0) {
       $analogs = $analogs->merge($analogs->all());
     }
-    $this->analogs = $analogs->slice(0, $this->amountAnalogs);
+    
+    $this->analogs = $analogs->slice(0, $this->amountAnalogs)->unique('id')->values();
 
     return $this;
   }

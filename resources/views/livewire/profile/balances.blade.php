@@ -31,13 +31,6 @@
         <x-tooltip message="Earnings currently pending clearance (for example, recent sales or refund hold periods)." class="!right-3" />
       </div>
     </div>
-    <div class="group mb-4">
-      <div class="text-gray mb-1 text-sm">Total Balance</div>
-      <div class="px-3 py-2.5 bg-light rounded relative text-gray">
-        ${{ number_format($totalBalance, 2, '.', ' ') }}
-        <x-tooltip message="Combined amount of your available and pending balances." class="!right-3" />
-      </div>
-    </div>
   </div>
 
   <div class="flex flex-col-reverse sm:flex-row justify-center items-center !gap-2 lg:!gap-4">

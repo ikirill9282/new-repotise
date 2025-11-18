@@ -22,18 +22,20 @@
       scrollbar-color: #FC7361 #f1f1f1;
   }
   .cart-modal .item .img_products {
-      height: 120px;
+      width: 153px;
+      height: 160px;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      padding: 0 8px;
+      padding: 0;
+      border-radius: 5px;
   }
   .cart-modal .item .img_products .main_img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 14px;
+      border-radius: 5px;
   }
   .cart-modal .item .img_products > a {
       display: block;
@@ -42,24 +44,38 @@
   }
   .cart-modal .item .img_products .cart-modal-add-btn {
       position: absolute;
-      left: calc(10%);
+      left: calc(5%);
       bottom: 0px;
       /* transform: translateX(-50%); */
-      width: calc(80%);
+      width: calc(88%);
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
   }
   .cart-modal .item .product-title {
-      font-size: 18px !important;
+      font-size: 16px !important;
       font-weight: 500 !important;
       color: #1f1f1f !important;
   }
+  .cart-modal h3 {
+      font-size: 16px !important;
+  }
+  .cart-modal .cart-modal-title {
+      width: 153px;
+      text-align: center;
+      margin: 0;
+  }
+  .cart-modal h4,
+  .cart-modal h5,
+  .cart-modal h6 {
+      font-size: 16px !important;
+  }
   @media (min-width: 768px) {
       .cart-modal .item .img_products {
-          height: 130px;
-          padding: 0 10px;
+          width: 153px;
+          height: 160px;
+          padding: 0;
       }
   }
   .cart-modal .item .cost p,
@@ -73,8 +89,9 @@
 
 <div class="flex flex-col md:flex-row-reverse justify-between items-stretch gap-2 cart-modal md:min-w-3xl rounded-lg select-none h-full md:h-[85vh] max-h-[90vh]">
   <div class="md:basis-1/4 order-2 md:!order-1 relative md:!pr-2 h-full">
-      <div class="md:max-w-[280px] md:rounded-lg h-full">
-          <div class="products_item flex flex-col gap-3 pr-2 md:pr-0 h-full overflow-y-auto recommendations-scroll">
+      <div class="md:max-w-[280px] md:rounded-lg h-full flex flex-col">
+          <h3 class="font-semibold mb-3 cart-modal-title">More to Explore</h3>
+          <div class="products_item flex flex-col gap-3 pr-2 md:pr-0 flex-1 overflow-y-auto recommendations-scroll">
               @foreach ($trending_products as $product)
                   @php
                       $preview = $product->preview?->image
@@ -124,7 +141,7 @@
     </div>
     <div class=" md:basis-3/4 bg-white pt-4 px-2 pb-2 md:p-2 
                 rounded-lg flex flex-col transition overflow-y-auto h-full
-                cart-order
+                cart-order recommendations-scroll
                 "
         >
         <div class="order-view {{ ($this->order?->products && $this->order->products->isNotEmpty()) ? '' : 'hidden' }}">

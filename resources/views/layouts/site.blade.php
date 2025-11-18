@@ -64,7 +64,7 @@
       {{-- @livewire('modal') --}}
       @livewire('modals')
 
-    {{-- @include('site.sections.accept_cookie') --}}
+    @include('site.components.accept_cookie')
     <script src="{{ asset('/assets/js/custom.js') }}"></script>
     <script>
       let parallaxes = new makeParallax();
@@ -82,6 +82,7 @@
     <script src="{{ asset('/assets/js/jquery.emojipicker.js') }}"></script>
 
     <script src="{{ asset('/assets/js/app.js') }}"></script>
+    <script src="{{ asset('/assets/js/cookie-manager.js') }}"></script>
 
     @vite('resources/js/app.js')
 

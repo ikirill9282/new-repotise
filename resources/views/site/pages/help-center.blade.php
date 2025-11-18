@@ -44,7 +44,7 @@
                         }
                       @endphp
                       <div class="!mb-8 last:!mb-0">
-                        <x-title class="!mb-6">{{ $title }}</x-title>
+                        <x-title class="md:!text-2xl !mb-6">{{ $title }}</x-title>
                         <x-accordion parent="#faq" :items="$items"></x-accordion>
                       </div>
                     @endforeach

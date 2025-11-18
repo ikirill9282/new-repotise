@@ -55,14 +55,27 @@ class CabinetController extends Controller
       'street2' => 'sometimes|nullable|string',
       'city' => 'required|string',
       'state' => 'required|string',
-      'zip' => 'required|integer',
+      'zip' => 'required|string',
       'country' => 'required|string',
       'birthday' => 'required|string',
-      'tax_id' => 'sometimes|nullable|integer',
+      'tax_id' => 'sometimes|nullable|string',
       'phone' => 'sometimes|nullable|string',
+      'youtube' => 'sometimes|nullable|boolean',
+      'tiktok' => 'sometimes|nullable|boolean',
+      'google' => 'sometimes|nullable|boolean',
+      'facebook' => 'sometimes|nullable|boolean',
+      'instagram' => 'sometimes|nullable|boolean',
+      'twitter' => 'sometimes|nullable|boolean',
     ]);
 
     if (isset($valid['phone'])) $valid['phone'] = preg_replace('/[^0-9]+/is', '', $valid['phone']);
+
+    // Обработка социальных сетей (чекбоксы отправляются только если отмечены)
+    $socialNetworks = ['youtube', 'tiktok', 'google', 'facebook', 'instagram', 'twitter'];
+    foreach ($socialNetworks as $network) {
+      // Если чекбокс отмечен в запросе, сохраняем true, иначе null
+      $valid[$network] = $request->has($network) ? true : null;
+    }
 
     $user->options()->update($valid);
     $user->updateStripeCustomer([

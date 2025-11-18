@@ -120,15 +120,6 @@
                           </x-slot>
                       @endif
                     @endcomponent
-                    <div class="search_results flex-wrap">
-                        @foreach (\App\Models\Location::whereHas('products')->limit(20)->orderByDesc('id')->get() as $item)
-                            <span>
-                                <a class="px-2" href="{{ url("/products/$item->slug?" . $getQueryString([])) }}">
-                                    {{ $item->title }}
-                                </a>
-                            </span>
-                        @endforeach
-                    </div>
                 </div>
                 <div class="filter_products_group">
                     <div class="filter">
@@ -146,14 +137,13 @@
                                             <div class="accordion accordion-flush" id="accordionFlushExample">
                                                 <div class="accordion-item">
                                                     <h2 class="accordion-header">
-                                                        <button class="accordion-button collapsed" type="button"
+                                                        <button class="accordion-button" type="button"
                                                             data-bs-toggle="collapse" data-bs-target="#flush-collapseOne"
-                                                            aria-expanded="false" aria-controls="flush-collapseOne">
+                                                            aria-expanded="true" aria-controls="flush-collapseOne">
                                                             {{ print_var('filter_rating', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapseOne" class="accordion-collapse collapse show"
-                                                        data-bs-parent="#accordionFlushExample">
+                                                    <div id="flush-collapseOne" class="accordion-collapse collapse show">
                                                         <div class="accordion-body">
                                                             <div class="stars_filter">
                                                                 <span class="numbers">0</span>
@@ -250,14 +240,13 @@
                                                 </div>
                                                 <div class="accordion-item">
                                                     <h2 class="accordion-header">
-                                                        <button class="accordion-button collapsed" type="button"
+                                                        <button class="accordion-button" type="button"
                                                             data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo"
-                                                            aria-expanded="false" aria-controls="flush-collapseTwo">
+                                                            aria-expanded="true" aria-controls="flush-collapseTwo">
                                                             {{ print_var('filter_type', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapseTwo" class="accordion-collapse collapse show"
-                                                        data-bs-parent="#accordionFlushExample">
+                                                    <div id="flush-collapseTwo" class="accordion-collapse collapse show">
                                                         <div class="accordion-body">
                                                             <div class="type_products">
                                                                 @foreach (\App\Models\Type::orderBy('title')->get() as $type)
@@ -272,15 +261,14 @@
                                                 </div>
                                                 <div class="accordion-item">
                                                     <h2 class="accordion-header">
-                                                        <button class="accordion-button collapsed" type="button"
+                                                        <button class="accordion-button" type="button"
                                                             data-bs-toggle="collapse"
-                                                            data-bs-target="#flush-collapseThree" aria-expanded="false"
+                                                            data-bs-target="#flush-collapseThree" aria-expanded="true"
                                                             aria-controls="flush-collapseThree">
                                                             {{ print_var('filter_category', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapseThree" class="accordion-collapse collapse show"
-                                                        data-bs-parent="#accordionFlushExample">
+                                                    <div id="flush-collapseThree" class="accordion-collapse collapse show">
                                                         <div class="accordion-body">
                                                             @include('site.components.search', [
                                                                 'icon' => false,
@@ -291,6 +279,7 @@
                                                                 'hits' => 'filter-category',
                                                                 'attributes' => [
                                                                     'data-source' => 'categories',
+                                                                    'data-autosubmit' => 'false',
                                                                 ],
                                                             ])
                                                             <div class="input-group">
@@ -304,14 +293,13 @@
                                                 </div>
                                                 <div class="accordion-item">
                                                     <h2 class="accordion-header">
-                                                        <button class="accordion-button collapsed" type="button"
+                                                        <button class="accordion-button" type="button"
                                                             data-bs-toggle="collapse" data-bs-target="#flush-collapse1"
-                                                            aria-expanded="false" aria-controls="flush-collapse1">
+                                                            aria-expanded="true" aria-controls="flush-collapse1">
                                                             {{ print_var('filter_location', $variables) }}
                                                         </button>
                                                     </h2>
-                                                    <div id="flush-collapse1" class="accordion-collapse collapse show"
-                                                        data-bs-parent="#accordionFlushExample">
+                                                    <div id="flush-collapse1" class="accordion-collapse collapse show">
                                                         <div class="accordion-body">
                                                             @include('site.components.search', [
                                                                 'icon' => false,
@@ -322,6 +310,7 @@
                                                                 'hits' => 'filter-location',
                                                                 'attributes' => [
                                                                     'data-source' => 'locations',
+                                                                    'data-autosubmit' => 'false',
                                                                 ],
                                                             ])
                                                             <div class="input-group">
@@ -419,24 +408,6 @@
                 });
             }
 
-            const searchResults = document.querySelector('.filter_products .about_block .search_filter .search_results');
-            if (searchResults) {
-                const checkVisibility = () => {
-                    const visibleChildren = Array.from(searchResults.children).filter(child => {
-                        const style = window.getComputedStyle(child);
-                        return style.display !== 'none' && !child.hasAttribute('hidden');
-                    });
-                    if (visibleChildren.length === 0) {
-                        searchResults.style.display = 'none';
-                    } else {
-                        searchResults.style.display = '';
-                    }
-                };
-                checkVisibility();
-                // Проверяем при изменении DOM
-                const observer = new MutationObserver(checkVisibility);
-                observer.observe(searchResults, { childList: true, attributes: true, attributeFilter: ['hidden', 'style'] });
-            }
         });
         
         // Скрываем блоки inf_cards (теги в карточках продуктов), если все теги скрыты

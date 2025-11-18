@@ -10,6 +10,22 @@
             // stripe.verifyIdentity(k);
             // console.log(stripe);
 
+            const phoneInput = document.querySelector('#phone');
+            if (phoneInput) {
+                const iti = window.intlTelInput(phoneInput, {
+                    initialCountry: 'us',
+                    preferredCountries: ['us', 'gb', 'ca'],
+                    utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js'
+                });
+                
+                // Обновляем значение перед отправкой формы
+                const form = phoneInput.closest('form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        phoneInput.value = iti.getNumber();
+                    });
+                }
+            }
         });
     </script>
 @endpush
@@ -88,7 +104,7 @@
                                         </i>
                                     </label>
 
-                                    @error('name')
+                                    @error('full_name')
                                         <span class="text-red-500">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -253,7 +269,7 @@
 
                               @endif
                               <h2>
-                                  Social Media Verification (Reccommended)
+                                  Social Media Verification (Recommended)
                               </h2>
                               <p>
                                   To expedite and strengthen your account verification, we highly recommend linking
@@ -385,7 +401,7 @@
                     </div>
                 </div>
                 <div class="col">
-
+                   
                 </div>
               </div>
         </section>

@@ -85,6 +85,6 @@
         </div>
       @endif
   </form>
-  <div class="search-error text-sm text-red-500 mt-2 hidden"></div>
+  <div class="search-error hidden"></div>
   {{ $slot ?? '' }}
 </div>

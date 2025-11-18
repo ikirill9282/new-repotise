@@ -2,11 +2,11 @@
   <x-card class="lg:!p-12">
     <div class="flex justify-between items-stretch !gap-12 flex-col-reverse lg:flex-row">
       <div class="basis-full lg:basis-1/2">
-        <x-title class="!mb-4">Get in Touch</x-title>
+        <x-title class="!mb-3">Get in Touch</x-title>
         
         <div class="!mb-8">Have a question? We're here to assist. Send us a message.</div>
         
-        <div class="flex flex-col !gap-3">
+        <div class="flex flex-col !gap-4">
 
           @csrf
 
@@ -20,17 +20,38 @@
 
           <x-form.textarea-counter wire:model="fields.text" name="text" class="min-h-24" id="ta" placeholder="Your Message<br> Please provide details about your request" :tooltip="false"></x-form.textarea-counter>
 
-          <x-form.file id="contact-file" wire:model="fields.file" accept="image/*">
-            <div wire:loading class="absolute w-full h-full top-0 left-0 bg-light/50 z-150">
-              <x-loader width="60" height="60" />
+          @if($this->fields['file'])
+            <div class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 file-loaded-preview">
+              <img class="object-cover w-full h-full" src="{{ $this->fields['file']->temporaryUrl() }}" alt="Uploaded image">
+              <span class="absolute inset-0 flex items-center justify-center text-white text-xs font-medium z-20">file loaded</span>
+              <button 
+                type="button"
+                wire:click.prevent="removeFile" 
+                class="absolute top-1 right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors z-20"
+                title="Remove image"
+              >
+                @include('icons.close', ['width' => 12, 'height' => 12, 'class' => 'text-gray-600'])
+              </button>
             </div>
-
-            @if($this->fields['file'])
-              <div class="absolute w-full h-full top-0 left-0 !rounded-lg overflow-hidden z-40 group-hover:cursor-pointer">
-                <img class="object-cover h-full w-full !inline-block opacity-100 transition group-hover:!opacity-50" src="{{ $this->fields['file']->temporaryUrl() }}" alt="Banner">
+            <style>
+              .file-loaded-preview::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 10;
+              }
+            </style>
+          @else
+            <x-form.file id="contact-file" wire:model="fields.file" accept="image/*">
+              <div wire:loading class="absolute w-full h-full top-0 left-0 bg-light/50 z-150">
+                <x-loader width="60" height="60" />
               </div>
-            @endif
-          </x-form.file>
+            </x-form.file>
+          @endif
 					<script>
 						document.addEventListener('DOMContentLoaded', function () {
 								const input = document.getElementById('contact-file');

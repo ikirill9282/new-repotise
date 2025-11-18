@@ -60,10 +60,6 @@
                                         aria-controls="pills-profile"
                                         aria-selected="{{ $this->form['gift'] ? 'true' : 'false' }}">
                                         Send as Gift
-                                        <x-tooltip class="!opacity-100 !absolute -top-2 -right-6"
-                                            message="Select this option to send this product as a gift to someone else. You will be prompted to enter the recipient's email and a gift message.">
-                                            @include('icons.shield')
-                                        </x-tooltip>
                                     </label>
                                 </li>
                             </ul>
@@ -112,7 +108,7 @@
                         </div>
 
                         {{-- PROMOCODE --}}
-                        <div class="promo_cod flex-col !items-start !gap-3" inert>
+                        <div class="promo_cod flex-col !items-start !gap-3">
                             <div class="flex w-full gap-3" >
                                 <div class="input_block">
                                     <input wire:model="promocode" type="text"

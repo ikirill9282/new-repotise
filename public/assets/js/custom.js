@@ -782,6 +782,8 @@ const FollowButtons = function() {
 
             btns.forEach((btn) => {
               const mode = btn.getAttribute('data-mode') || 'text';
+              const isInFollowToCanal = btn.closest('.follow_to_canal') !== null;
+              const isInTalmaev = btn.closest('.talmaev') !== null && !isInFollowToCanal;
 
               if (mode === 'icon') {
                 if (isSubscribed) {
@@ -792,7 +794,27 @@ const FollowButtons = function() {
                   btn.setAttribute('aria-pressed', 'false');
                 }
               } else {
-                btn.innerHTML = isSubscribed ? 'Unsubscribe' : 'Subscribe';
+                // Hide button in talmaev block (next to author) when subscribed
+                if (isInTalmaev) {
+                  if (isSubscribed) {
+                    btn.style.display = 'none';
+                  } else {
+                    btn.style.display = '';
+                    btn.innerHTML = 'Subscribe';
+                  }
+                } else {
+                  const unsubscribeText = isInFollowToCanal ? 'Following' : 'Unsubscribe';
+                  btn.innerHTML = isSubscribed ? unsubscribeText : 'Subscribe';
+                  
+                  // Add/remove 'following' class for buttons in follow_to_canal block
+                  if (isInFollowToCanal) {
+                    if (isSubscribed) {
+                      btn.classList.add('following');
+                    } else {
+                      btn.classList.remove('following');
+                    }
+                  }
+                }
               }
             });
 
@@ -941,9 +963,9 @@ const CartCounter = function() {
 }
 
 const header = $('header');
+// Убрали функционал скрытия/показа header при скролле для устранения проблем со скроллом
 if (header.length) {
-  header.addClass('!sticky top-0 left-0 !translate-y-0');
-  header.removeClass('translate-y-[-100%]');
+  header.addClass('!sticky top-0 left-0');
 }
 
 window.FavoriteButtons = new FavoriteButtons();
@@ -1006,14 +1028,33 @@ function setCosts(data)
 }
 
 
-$(window).on('scroll', function() {
-    const point = $(this).scrollTop();
+// Throttle функция для оптимизации обработчиков скролла
+function throttle(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Оптимизированный обработчик скролла с throttling для предотвращения торможений
+let lastScrollTop = 0;
+const handleHeaderScroll = throttle(function() {
+    const point = window.pageYOffset || document.documentElement.scrollTop;
     if (point > 0) {
         header.addClass('shadow-md');
     } else {
         header.removeClass('shadow-md');
     }
-});
+    lastScrollTop = point;
+}, 16); // ~60fps
+
+// Используем нативный addEventListener с passive для лучшей производительности
+window.addEventListener('scroll', handleHeaderScroll, { passive: true });
 
 $('.hamburger-menu').on('click', function(evt) {
     const menu = $('#mobile_menu');

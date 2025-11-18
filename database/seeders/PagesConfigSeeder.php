@@ -29,7 +29,7 @@ class PagesConfigSeeder extends Seeder
           'page_catalog_button_text' => 'Explore Your Adventure',
           'page_catalog_button_link' => '/products',
           'page_catalog_register_text' => 'Become a Creator',
-          'page_catalog_register_link' => '#',
+          'page_catalog_register_link' => '/sellers',
 
           'main_article_heading' => 'h2',
           'main_article_id' => 1,
@@ -202,7 +202,7 @@ class PagesConfigSeeder extends Seeder
         'page' => Page::where('slug', 'products')->first(),
         'variables' => [
           'page_heading' => 'h2',
-          'page_header' => 'Discover Products',
+          'page_header' => 'Trending Now',
           'trending_heading' => 'h2',
           'trending_header' => 'Trending Now',
           'search_placeholder' => 'Search by products, destinations, and creators',

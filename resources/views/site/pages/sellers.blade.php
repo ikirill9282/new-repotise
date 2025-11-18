@@ -13,9 +13,15 @@
                         global audience. It's simple, profitable, and built for creators
                         like you.
                     </p>
-                    <x-btn x-on:click.prevent="Livewire.dispatch('modal.openReg')">
-                        Get Started
-                    </x-btn>
+                    @if (!auth()->check())
+                        <x-btn x-on:click.prevent="Livewire.dispatch('modal.openReg')">
+                            Get Started
+                        </x-btn>
+                    @else
+                        <x-btn href="{{ route('verify') }}">
+                            Get Started
+                        </x-btn>
+                    @endif
                 </div>
             </div>
         </section>

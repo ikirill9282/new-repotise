@@ -20,7 +20,7 @@
           <div class="rp-top__balance !w-full grow lg:max-w-lg">
             <div class="balance-input">
               <span class="inline-block !mb-2">
-                Referral Balance
+                Available Balance
               </span>
               <div class="balance-input__input">
                 <span>
