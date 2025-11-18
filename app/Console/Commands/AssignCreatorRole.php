@@ -37,11 +37,23 @@ class AssignCreatorRole extends Command
 
         // Find users by email pattern
         if (str_starts_with($emailPattern, '@')) {
-            // Domain pattern
+            // Domain pattern - search for emails ending with the domain
             $users = User::where('email', 'like', '%' . $emailPattern)->get();
         } else {
             // Specific email
             $users = User::where('email', $emailPattern)->get();
+        }
+        
+        // Debug: show all users with trekguider in email
+        if ($users->isEmpty() && str_contains($emailPattern, 'trekguider')) {
+            $this->warn("No users found. Searching for any users with 'trekguider' in email...");
+            $allTrekguiderUsers = User::where('email', 'like', '%trekguider%')->get();
+            if ($allTrekguiderUsers->isNotEmpty()) {
+                $this->info("Found users with 'trekguider' in email:");
+                foreach ($allTrekguiderUsers as $u) {
+                    $this->line("  - {$u->email} (ID: {$u->id})");
+                }
+            }
         }
 
         if ($users->isEmpty()) {
