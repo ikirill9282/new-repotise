@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Helpers\Collapse;
 use App\Helpers\CustomEncrypt;
 use App\Helpers\Slug;
@@ -312,6 +313,7 @@ class Product extends Model
   public function getTogetherProducts(int $limit = 10, array $includes = []): Collection
   {
     $products = $this->query()
+      ->where('status_id', Status::ACTIVE)
       ->where('id', '!=', $this->id)
       ->whereHas('locations', fn($q) => $q->whereIn('locations.id', $this->locations->pluck('id')))
       ->orWhereHas('types', fn($q) => $q->whereIn('types.id', $this->types->pluck('id')))
@@ -328,6 +330,7 @@ class Product extends Model
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
   {
     $products = \App\Models\Product::query()
+      ->where('status_id', Status::ACTIVE)
       ->when(
         !empty($includes),
         fn($query) => $query->whereIn('id', $includes)->orWhere('id', '>', 0),
@@ -356,6 +359,6 @@ class Product extends Model
 
   public static function getAnalogs(int $product_id = null)
   {
-    return static::latest()->limit(10)->get();
+    return static::where('status_id', Status::ACTIVE)->latest()->limit(10)->get();
   }
 }

@@ -177,10 +177,14 @@ class ProductResource extends Resource
                   ->color(Color::Sky)
                   ->url(fn($record) => url("/admin/products/$record->id/edit"))
                   ,
-                TextColumn::make('type.title')
+                TextColumn::make('types.title')
                   ->label('Product Type')
                   ->sortable()
-                  ->searchable()
+                  ->searchable(query: function (Builder $query, string $search): Builder {
+                      return $query->whereHas('types', function ($q) use ($search) {
+                          $q->where('title', 'like', "%{$search}%");
+                      });
+                  })
                   ->toggleable()
                   ,
 

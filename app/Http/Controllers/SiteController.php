@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Order as EnumsOrder;
+use App\Enums\Status;
 use App\Helpers\SessionExpire;
 use App\Search\SearchClient;
 use App\Models\Page;
@@ -568,6 +569,7 @@ class SiteController extends Controller
     $valid = array_filter($valid, fn($item) => !is_null($item));
 
     $query = Product::query()
+      ->where('status_id', Status::ACTIVE)
       ->withCount([
         'reviews as reviews_count' => fn($q) => $q->whereNull('parent_id'),
       ])
