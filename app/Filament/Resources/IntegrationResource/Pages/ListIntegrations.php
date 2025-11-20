@@ -13,7 +13,8 @@ class ListIntegrations extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // Integrations are created via seeders, not manually
+            Actions\CreateAction::make()
+                ->label('Create Integration'),
         ];
     }
 }

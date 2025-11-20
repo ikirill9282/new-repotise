@@ -45,8 +45,10 @@ class IntegrationResource extends Resource
                             ->label('Integration Name')
                             ->required()
                             ->maxLength(255)
-                            ->disabled()
-                            ->dehydrated(),
+                            ->disabled(fn($record) => $record !== null)
+                            ->dehydrated()
+                            ->live()
+                            ->helperText(fn($record) => $record ? 'Integration name cannot be changed after creation' : 'Enter a unique name for this integration (e.g., stripe, ga4, mailgun)'),
                         Select::make('type')
                             ->label('Type')
                             ->required()
@@ -56,8 +58,9 @@ class IntegrationResource extends Resource
                                 Integration::TYPE_ANALYTICS => 'Analytics',
                                 Integration::TYPE_OTHER => 'Other',
                             ])
-                            ->disabled()
-                            ->dehydrated(),
+                            ->disabled(fn($record) => $record !== null)
+                            ->dehydrated()
+                            ->helperText(fn($record) => $record ? 'Integration type cannot be changed after creation' : 'Select the type of integration'),
                         Select::make('status')
                             ->label('Status')
                             ->required()
@@ -70,10 +73,13 @@ class IntegrationResource extends Resource
                     ])
                     ->columns(3),
                 Section::make('Configuration')
-                    ->schema(function ($record) {
+                    ->schema(function ($record, $get) {
                         $schemas = [];
                         
-                        if ($record && $record->name === 'stripe') {
+                        // Get integration name from form or record
+                        $integrationName = $record?->name ?? $get('name');
+                        
+                        if ($integrationName === 'stripe') {
                             $schemas = [
                                 TextInput::make('config.api_key')
                                     ->label('Publishable Key')
@@ -89,7 +95,7 @@ class IntegrationResource extends Resource
                                     ->password()
                                     ->helperText('Stripe webhook signing secret (optional)'),
                             ];
-                        } elseif ($record && $record->name === 'mailgun') {
+                        } elseif ($integrationName === 'mailgun') {
                             $schemas = [
                                 TextInput::make('config.domain')
                                     ->label('Domain')
@@ -105,7 +111,7 @@ class IntegrationResource extends Resource
                                     ->default('api.mailgun.net')
                                     ->helperText('Mailgun API endpoint'),
                             ];
-                        } elseif ($record && $record->name === 'ga4') {
+                        } elseif ($integrationName === 'ga4') {
                             $schemas = [
                                 TextInput::make('config.property_id')
                                     ->label('Property ID')
@@ -135,8 +141,7 @@ class IntegrationResource extends Resource
                         
                         return $schemas;
                     })
-                    ->columns(2)
-                    ->visible(fn($record) => $record !== null),
+                    ->columns(2),
             ]);
     }
 
@@ -342,6 +347,7 @@ class IntegrationResource extends Resource
     {
         return [
             'index' => Pages\ListIntegrations::route('/'),
+            'create' => Pages\CreateIntegration::route('/create'),
             'edit' => Pages\EditIntegration::route('/{record}/edit'),
         ];
     }

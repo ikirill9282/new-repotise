@@ -7,23 +7,14 @@ use App\Models\History;
 use App\Models\Integration;
 use Filament\Actions;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
-class EditIntegration extends EditRecord
+class CreateIntegration extends CreateRecord
 {
     protected static string $resource = IntegrationResource::class;
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\DeleteAction::make()
-                ->disabled(fn() => $this->record->name === 'stripe'), // Prevent deleting Stripe
-            Actions\ViewAction::make(),
-        ];
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Ensure config is properly formatted
         if (isset($data['config']) && is_array($data['config'])) {
@@ -31,10 +22,21 @@ class EditIntegration extends EditRecord
             $data['config'] = array_filter($data['config'], fn($value) => $value !== null && $value !== '');
         }
         
+        // Check if integration with this name already exists
+        if (Integration::where('name', $data['name'])->exists()) {
+            Notification::make()
+                ->title('Integration already exists')
+                ->body("An integration with name '{$data['name']}' already exists. Please use a different name.")
+                ->danger()
+                ->send();
+            
+            $this->halt();
+        }
+        
         return $data;
     }
 
-    protected function afterSave(): void
+    protected function afterCreate(): void
     {
         $integration = $this->record;
         
@@ -55,18 +57,18 @@ class EditIntegration extends EditRecord
             $hasRequiredFields = !empty($config['api_key']);
         }
         
-        // Update status if needed
-        if ($hasRequiredFields && $integration->status === Integration::STATUS_NOT_CONFIGURED) {
+        // Set status based on configuration
+        if ($hasRequiredFields) {
             $integration->update(['status' => Integration::STATUS_INACTIVE]);
-        } elseif (!$hasRequiredFields && $integration->status !== Integration::STATUS_NOT_CONFIGURED) {
+        } else {
             $integration->update(['status' => Integration::STATUS_NOT_CONFIGURED]);
         }
         
         // Log to history
         History::info()
-            ->action('Integration Updated')
+            ->action('Integration Created')
             ->initiator(Auth::id())
-            ->message("Integration {$integration->name} configuration updated")
+            ->message("Integration {$integration->name} was created")
             ->payload(['ip_address' => request()->ip()])
             ->write();
     }
