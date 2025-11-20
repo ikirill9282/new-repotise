@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -121,9 +122,8 @@ class IntegrationResource extends Resource
                                     ->label('Measurement ID')
                                     ->required()
                                     ->helperText('GA4 Measurement ID for frontend tracking (format: G-XXXXXXXXXX). Find it in GA4 Admin > Data Streams > Web Stream Details'),
-                                TextInput::make('config.credentials_json')
+                                Textarea::make('config.credentials_json')
                                     ->label('Credentials JSON')
-                                    ->textarea()
                                     ->rows(5)
                                     ->helperText('Service account credentials JSON (for API access)'),
                             ];
