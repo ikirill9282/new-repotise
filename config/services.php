@@ -61,6 +61,7 @@ return [
     
     'ga4' => [
       'property_id' => env('GA4_PROPERTY_ID'),
+      'measurement_id' => env('GA4_MEASUREMENT_ID'), // G-XXXXXXXXXX format for frontend tracking
       'credentials_path' => env('GA4_CREDENTIALS_PATH', storage_path('app/google-credentials.json')),
     ],
 ];

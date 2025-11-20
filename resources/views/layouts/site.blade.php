@@ -47,7 +47,23 @@
 
     @php
       $cart = new \App\Services\Cart();
+      $ga4MeasurementId = ga4_measurement_id();
     @endphp
+
+    @if($ga4MeasurementId)
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4MeasurementId }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ $ga4MeasurementId }}', {
+        'send_page_view': true,
+        'anonymize_ip': true, // GDPR compliance
+        'cookie_flags': 'SameSite=None;Secure'
+      });
+    </script>
+    @endif
 </head>
 
 <body class="text-dark">

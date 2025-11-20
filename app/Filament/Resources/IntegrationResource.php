@@ -110,12 +110,16 @@ class IntegrationResource extends Resource
                                 TextInput::make('config.property_id')
                                     ->label('Property ID')
                                     ->required()
-                                    ->helperText('Google Analytics 4 Property ID'),
+                                    ->helperText('Google Analytics 4 Property ID (numeric ID for API)'),
+                                TextInput::make('config.measurement_id')
+                                    ->label('Measurement ID')
+                                    ->required()
+                                    ->helperText('GA4 Measurement ID for frontend tracking (format: G-XXXXXXXXXX). Find it in GA4 Admin > Data Streams > Web Stream Details'),
                                 TextInput::make('config.credentials_json')
                                     ->label('Credentials JSON')
                                     ->textarea()
                                     ->rows(5)
-                                    ->helperText('Service account credentials JSON'),
+                                    ->helperText('Service account credentials JSON (for API access)'),
                             ];
                         } else {
                             $schemas = [

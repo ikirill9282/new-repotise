@@ -163,3 +163,30 @@ if (! function_exists('settings')) {
     return \App\Models\SystemSetting::get($key, $default);
   }
 }
+
+if (! function_exists('ga4_measurement_id')) {
+  /**
+   * Get GA4 Measurement ID (G-XXXXXXXXXX) for frontend tracking
+   * First tries to get from Integration model, then from env/config
+   * 
+   * @return string|null
+   */
+  function ga4_measurement_id(): ?string
+  {
+    try {
+      // Try to get from Integration model first
+      $integration = \App\Models\Integration::where('name', 'ga4')
+        ->where('status', \App\Models\Integration::STATUS_ACTIVE)
+        ->first();
+      
+      if ($integration && $integration->getConfig('measurement_id')) {
+        return $integration->getConfig('measurement_id');
+      }
+    } catch (\Exception $e) {
+      // Fallback to config if Integration doesn't exist or error
+    }
+    
+    // Fallback to config/env
+    return config('services.ga4.measurement_id');
+  }
+}
