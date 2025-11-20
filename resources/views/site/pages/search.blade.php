@@ -108,7 +108,11 @@
                                                 <div class="reviews">
                                                     <div class="stars flex">
                                                         {{-- TODO: render stars --}}
-                                                        @foreach (rating_images(print_key('rating', $item) ?? 0) as $star)
+                                                        @php
+                                                            $rating = print_key('rating', $item);
+                                                            $rating = ($rating === 'null' || $rating === null) ? 0 : (float) $rating;
+                                                        @endphp
+                                                        @foreach (rating_images($rating) as $star)
                                                             <span><img src="{{ $star }}" alt=""></span>
                                                         @endforeach
                                                     </div>

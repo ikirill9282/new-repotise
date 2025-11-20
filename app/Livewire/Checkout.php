@@ -19,6 +19,12 @@ use Laravel\Cashier\PaymentMethod;
 use Livewire\Attributes\On;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod as StripePaymentMethod;
+use Stripe\Exception\CardException;
+use Stripe\Exception\RateLimitException;
+use Stripe\Exception\InvalidRequestException;
+use Stripe\Exception\AuthenticationException;
+use Stripe\Exception\ApiConnectionException;
+use Stripe\Exception\ApiErrorException;
 use App\Enums\Order as EnumsOrder;
 use App\Jobs\ProcessOrder;
 
@@ -233,10 +239,58 @@ class Checkout extends Component
           ]);
         }
 
+      } catch (CardException $e) {
+        // Обработка ошибок карты от Stripe
+        $errorCode = $e->getStripeCode();
+        $declineCode = $e->getDeclineCode();
+        
+        Log::warning('Stripe card error during payment', [
+          'order_id' => $order->id ?? null,
+          'error_code' => $errorCode,
+          'decline_code' => $declineCode,
+          'message' => $e->getMessage(),
+        ]);
+        
+        DB::rollBack();
+        
+        // Если есть PaymentIntent, сохраняем его для отображения ошибки
+        if (isset($paymentIntent) && $paymentIntent->id) {
+          return redirect()->route('payment.error', [
+            'payment_intent' => $paymentIntent->id,
+            'reason' => $errorCode,
+            'decline_reason' => $declineCode,
+          ]);
+        }
+        
+        return redirect()->route('payment.error', [
+          'reason' => $errorCode ?? 'card_declined',
+          'decline_reason' => $declineCode,
+        ]);
+      } catch (RateLimitException | InvalidRequestException | AuthenticationException | ApiConnectionException | ApiErrorException $e) {
+        // Обработка других ошибок Stripe API
+        Log::error('Stripe API error during payment', [
+          'order_id' => $order->id ?? null,
+          'error_type' => get_class($e),
+          'message' => $e->getMessage(),
+        ]);
+        
+        DB::rollBack();
+        
+        if (isset($paymentIntent) && $paymentIntent->id) {
+          return redirect()->route('payment.error', [
+            'payment_intent' => $paymentIntent->id,
+            'reason' => 'internal_error',
+          ]);
+        }
+        
+        return redirect()->route('payment.error', ['reason' => 'internal_error']);
       } catch (\Exception $e) {
-        Log::critical('Error while payement creation', [
-          'order' => $order ?? null,
-          'error' => $e,
+        // Обработка всех остальных ошибок
+        Log::critical('Error while payment creation', [
+          'order_id' => $order->id ?? null,
+          'error_type' => get_class($e),
+          'message' => $e->getMessage(),
+          'trace' => $e->getTraceAsString(),
         ]);
         DB::rollBack();
         return redirect()->route('payment.error', ['reason' => 'internal_error']);

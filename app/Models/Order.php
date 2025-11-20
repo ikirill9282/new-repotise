@@ -175,7 +175,7 @@ class Order extends Model
     protected function getVatRate(): float
     {
       try {
-        $setting = \DB::table('tax_settings')
+        $setting = DB::table('tax_settings')
           ->where('key', 'vat_rate')
           ->first();
         

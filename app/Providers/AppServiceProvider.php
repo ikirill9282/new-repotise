@@ -11,6 +11,8 @@ use Laravel\Cashier\Cashier;
 use App\Models\Subscriptions;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\Article;
 use App\Models\Comment;
 use App\Models\Report;
@@ -101,6 +103,12 @@ class AppServiceProvider extends ServiceProvider
     protected function configureStripeFromIntegration(): void
     {
       try {
+        // Проверяем доступность подключения к базе данных
+        if (!$this->isDatabaseAvailable()) {
+          // Если база данных недоступна, используем значения из .env
+          return;
+        }
+        
         $integration = Integration::where('name', 'stripe')
           ->where('status', Integration::STATUS_ACTIVE)
           ->first();
@@ -124,9 +132,27 @@ class AppServiceProvider extends ServiceProvider
             Config::set('cashier.webhook.secret', $webhookSecret);
           }
         }
+      } catch (\PDOException $e) {
+        // Ошибка подключения к базе данных - используем .env значения
+        // Не логируем, так как это нормально при миграциях и консольных командах
       } catch (\Exception $e) {
-        // Silently fail and use .env values if Integration doesn't exist
-        \Log::debug('Could not load Stripe config from Integration: ' . $e->getMessage());
+        // Другие ошибки - логируем только в debug режиме
+        if (config('app.debug')) {
+          Log::debug('Could not load Stripe config from Integration: ' . $e->getMessage());
+        }
+      }
+    }
+    
+    /**
+     * Check if database connection is available
+     */
+    protected function isDatabaseAvailable(): bool
+    {
+      try {
+        DB::connection()->getPdo();
+        return true;
+      } catch (\Exception $e) {
+        return false;
       }
     }
 }
