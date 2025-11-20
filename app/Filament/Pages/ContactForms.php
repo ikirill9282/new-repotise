@@ -9,6 +9,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Infolists\Infolist;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use Illuminate\Support\Carbon;
 
@@ -24,8 +25,12 @@ class ContactForms extends Page
 
     protected static ?int $navigationSort = 4;
 
-    public function table(Table $table): Table
+    public function table(Table|Infolist $table): Table|Infolist
     {
+        if ($table instanceof Infolist) {
+            return $table;
+        }
+        
         return $table
             ->query(Form::query())
             ->columns([

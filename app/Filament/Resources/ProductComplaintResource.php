@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductComplaintResource\Pages;
 use App\Filament\Resources\ProductComplaintResource\RelationManagers;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\ProductResource;
 use App\Models\Report;
 use App\Models\Product;
 use App\Models\User;
@@ -89,7 +90,7 @@ class ProductComplaintResource extends Resource
                     ->label('Product')
                     ->searchable()
                     ->sortable()
-                    ->url(fn ($record) => $record->reportable ? route('filament.admin.resources.products.edit', ['record' => $record->reportable_id]) : null)
+                    ->url(fn ($record) => $record->reportable ? ProductResource::getUrl('edit', ['record' => $record->reportable_id]) : null)
                     ->color(Color::Sky)
                     ->limit(50),
                 
@@ -138,7 +139,7 @@ class ProductComplaintResource extends Resource
                 Action::make('view')
                     ->label('View')
                     ->icon('heroicon-o-eye')
-                    ->url(fn ($record) => route('filament.admin.resources.product-complaints.view', ['record' => $record->id])),
+                    ->url(fn ($record) => ProductComplaintResource::getUrl('view', ['record' => $record->id])),
                 
                 Action::make('unpublish_product')
                     ->label('Unpublish Product')

@@ -48,10 +48,20 @@ class UserResource extends Resource
 
   public static function getEloquentQuery(): Builder
   {
-    return parent::getEloquentQuery()
+    $query = parent::getEloquentQuery()
       ->withoutGlobalScopes([SoftDeletingScope::class])
-      ->with('roles')
-      ->whereDoesntHave('roles', fn($q) => $q->where('name', 'system'));
+      ->with('roles');
+    
+    // Check if system_users filter is active via request
+    // Filament stores toggle filter state in tableFilters parameter
+    $tableFilters = request()->get('tableFilters', []);
+    if (!isset($tableFilters['system_users']) || !$tableFilters['system_users']) {
+      // By default, exclude system users
+      $query->whereDoesntHave('roles', fn($q) => $q->where('name', 'system'));
+    }
+    // If filter is active, don't exclude system users (show all)
+    
+    return $query;
   }
 
   public static function form(Form $form): Form
@@ -168,6 +178,9 @@ class UserResource extends Resource
         Filter::make('deleted')
           ->label('Deleted')
           ->query(fn (Builder $query): Builder => $query->onlyTrashed())
+          ->toggle(),
+        Filter::make('system_users')
+          ->label('Show System Users')
           ->toggle(),
         SelectFilter::make('roles')
           ->label('Role')

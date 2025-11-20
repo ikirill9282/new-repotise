@@ -327,8 +327,12 @@ class SettingsSecurity extends Page implements HasForms, HasTable
             ->send();
     }
 
-    public function table(Table $table): Table
+    public function table(Table|Infolist $table): Table|Infolist
     {
+        if ($table instanceof Infolist) {
+            return $table;
+        }
+        
         return $table
             ->query(LoginHistory::query()->orderByDesc('created_at'))
             ->columns([

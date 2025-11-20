@@ -294,6 +294,54 @@ use App\Filament\Resources\ProductResource;
 
 ---
 
+## 5. Скрытие пользователей в UserResource
+
+### Проблема
+На странице Users не отображаются все аккаунты платформы. Системные пользователи (с ролью `system`) полностью скрыты из списка из-за фильтра в `getEloquentQuery()`.
+
+### Файл, требующий проверки:
+
+#### 5.1. `app/Filament/Resources/UserResource.php`
+**Строка 49-55:**
+```php
+public static function getEloquentQuery(): Builder
+{
+  return parent::getEloquentQuery()
+    ->withoutGlobalScopes([SoftDeletingScope::class])
+    ->with('roles')
+    ->whereDoesntHave('roles', fn($q) => $q->where('name', 'system'));
+}
+```
+
+**Проблема:**
+- Фильтр `->whereDoesntHave('roles', fn($q) => $q->where('name', 'system'))` исключает всех пользователей с ролью `system`
+- Удаленные пользователи (soft deleted) не показываются по умолчанию, требуется включить фильтр "Deleted"
+
+**Варианты решения:**
+
+**Вариант 1: Показывать всех пользователей, включая системных**
+```php
+public static function getEloquentQuery(): Builder
+{
+  return parent::getEloquentQuery()
+    ->withoutGlobalScopes([SoftDeletingScope::class])
+    ->with('roles');
+    // Убрать фильтр ->whereDoesntHave('roles', ...)
+}
+```
+
+**Вариант 2: Добавить фильтр в таблицу для показа системных пользователей (рекомендуется)**
+- Оставить текущий фильтр в `getEloquentQuery()` (скрывать системных по умолчанию)
+- Добавить toggle фильтр "Show System Users" в таблицу для опционального показа
+
+**Вариант 3: Показывать удаленных пользователей по умолчанию**
+- Изменить фильтр "Deleted" с toggle на необязательный или включенный по умолчанию
+
+### Рекомендация:
+Рекомендуется **Вариант 2** - оставить скрытие системных пользователей по умолчанию (так как это технические аккаунты), но добавить возможность их просмотра через фильтр для администраторов, которым это нужно.
+
+---
+
 ## Примечания
 
 После исправления всех проблем рекомендуется:
