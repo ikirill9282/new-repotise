@@ -385,7 +385,36 @@ class Checkout extends Component
     public function render()
     {
       $order = $this->getOrder();
-      $paymentMethods = ($order && $order?->user_id) !== 0 ? $order?->user->paymentMethods() : null;
+      $paymentMethods = collect([]); // По умолчанию пустая коллекция
+      
+      if ($order && $order?->user_id && $order?->user) {
+        try {
+          $paymentMethods = $order->user->paymentMethods();
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+          // Если клиент не найден в Stripe, очищаем stripe_id
+          if (str_contains($e->getMessage(), 'No such customer')) {
+            Log::warning('Stripe customer not found, clearing stripe_id', [
+              'user_id' => $order->user->id,
+              'stripe_id' => $order->user->stripe_id,
+            ]);
+            
+            $order->user->update(['stripe_id' => null]);
+            // $paymentMethods уже пустая коллекция
+          } else {
+            // Другие ошибки Stripe - логируем
+            Log::error('Error fetching payment methods from Stripe', [
+              'user_id' => $order->user->id,
+              'error' => $e->getMessage(),
+            ]);
+          }
+        } catch (\Exception $e) {
+          // Обработка всех остальных ошибок
+          Log::error('Unexpected error fetching payment methods', [
+            'user_id' => $order->user->id ?? null,
+            'error' => $e->getMessage(),
+          ]);
+        }
+      }
 
       return view('livewire.checkout', [
         'order' => $order,
