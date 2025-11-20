@@ -25,7 +25,7 @@ class PaymentMethod extends Component
             abort(403);
         }
 
-        $this->publishableKey = config('cashier.key') ?? env('STRIPE_KEY', '');
+        $this->publishableKey = stripe_key() ?? '';
 
         if ($this->publishableKey === '') {
             Log::error('Stripe publishable key is not configured.');

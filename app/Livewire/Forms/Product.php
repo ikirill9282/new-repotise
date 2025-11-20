@@ -102,7 +102,7 @@ class Product extends Component
     public function draft()
     {
       $this->fields['status_id'] = 6;
-      $this->sumbit();
+      $this->submit();
     }
 
     public function resetTypes(ModelProdct $model): void

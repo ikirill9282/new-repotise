@@ -78,7 +78,7 @@ trait UsesDonationFlow
             abort(403, 'You cannot donate to yourself.');
         }
 
-        $this->publishableKey = config('cashier.key') ?? env('STRIPE_KEY', '');
+        $this->publishableKey = stripe_key() ?? '';
 
         if ($this->publishableKey === '') {
             Log::error('Stripe publishable key missing for donation.');

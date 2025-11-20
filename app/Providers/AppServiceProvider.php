@@ -10,9 +10,11 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use Laravel\Cashier\Cashier;
 use App\Models\Subscriptions;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Config;
 use App\Models\Article;
 use App\Models\Comment;
 use App\Models\Report;
+use App\Models\Integration;
 use App\Observers\ArticleObserver;
 use App\Observers\CommentObserver;
 use App\Observers\ReportObserver;
@@ -35,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
       Model::unguard();
 
       Cashier::useSubscriptionModel(Subscriptions::class);
+      
+      // Configure Stripe from Integration model if available
+      $this->configureStripeFromIntegration();
 
       // Register observers
       Article::observe(ArticleObserver::class);
@@ -88,5 +93,40 @@ class AppServiceProvider extends ServiceProvider
                 ->collapsed(),
         ]);
     });
+    }
+    
+    /**
+     * Configure Stripe keys from Integration model or fallback to env
+     */
+    protected function configureStripeFromIntegration(): void
+    {
+      try {
+        $integration = Integration::where('name', 'stripe')
+          ->where('status', Integration::STATUS_ACTIVE)
+          ->first();
+        
+        if ($integration) {
+          $apiKey = $integration->getConfig('api_key');
+          $secretKey = $integration->getConfig('secret_key');
+          $webhookSecret = $integration->getConfig('webhook_secret');
+          
+          if ($apiKey) {
+            Config::set('cashier.key', $apiKey);
+          }
+          
+          if ($secretKey) {
+            Config::set('cashier.secret', $secretKey);
+            // Also set for Stripe SDK directly
+            \Stripe\Stripe::setApiKey($secretKey);
+          }
+          
+          if ($webhookSecret) {
+            Config::set('cashier.webhook.secret', $webhookSecret);
+          }
+        }
+      } catch (\Exception $e) {
+        // Silently fail and use .env values if Integration doesn't exist
+        \Log::debug('Could not load Stripe config from Integration: ' . $e->getMessage());
+      }
     }
 }

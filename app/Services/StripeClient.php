@@ -13,7 +13,14 @@ class StripeClient
 {
   public function __construct()
   {
-    Stripe::setApiKey(env('STRIPE_SECRET'));
+    // Use helper function to get secret from Integration or env
+    $secret = stripe_secret();
+    if ($secret) {
+      Stripe::setApiKey($secret);
+    } else {
+      // Fallback to env for backwards compatibility
+      Stripe::setApiKey(env('STRIPE_SECRET'));
+    }
   }
 
   public function createPaymentIntent(Order $model)

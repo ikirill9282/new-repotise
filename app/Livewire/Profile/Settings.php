@@ -103,7 +103,7 @@ class Settings extends Component
             $this->dispatch('toastError', ['message' => session()->pull('email_change_error')]);
         }
 
-        $this->stripePublishableKey = config('cashier.key') ?? env('STRIPE_KEY', '');
+        $this->stripePublishableKey = stripe_key() ?? '';
     }
 
     public function updated($propertyName): void

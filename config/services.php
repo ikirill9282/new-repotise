@@ -64,4 +64,10 @@ return [
       'measurement_id' => env('GA4_MEASUREMENT_ID'), // G-XXXXXXXXXX format for frontend tracking
       'credentials_path' => env('GA4_CREDENTIALS_PATH', storage_path('app/google-credentials.json')),
     ],
+    
+    'stripe' => [
+      'key' => env('STRIPE_KEY'),
+      'secret' => env('STRIPE_SECRET'),
+      'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
 ];

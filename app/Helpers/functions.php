@@ -190,3 +190,84 @@ if (! function_exists('ga4_measurement_id')) {
     return config('services.ga4.measurement_id');
   }
 }
+
+if (! function_exists('stripe_key')) {
+  /**
+   * Get Stripe Publishable Key
+   * First tries to get from Integration model, then from env/config
+   * 
+   * @return string|null
+   */
+  function stripe_key(): ?string
+  {
+    try {
+      // Try to get from Integration model first
+      $integration = \App\Models\Integration::where('name', 'stripe')
+        ->where('status', \App\Models\Integration::STATUS_ACTIVE)
+        ->first();
+      
+      if ($integration && $integration->getConfig('api_key')) {
+        return $integration->getConfig('api_key');
+      }
+    } catch (\Exception $e) {
+      // Fallback to config if Integration doesn't exist or error
+    }
+    
+    // Fallback to config/env
+    return config('services.stripe.key') ?? config('cashier.key');
+  }
+}
+
+if (! function_exists('stripe_secret')) {
+  /**
+   * Get Stripe Secret Key
+   * First tries to get from Integration model, then from env/config
+   * 
+   * @return string|null
+   */
+  function stripe_secret(): ?string
+  {
+    try {
+      // Try to get from Integration model first
+      $integration = \App\Models\Integration::where('name', 'stripe')
+        ->where('status', \App\Models\Integration::STATUS_ACTIVE)
+        ->first();
+      
+      if ($integration && $integration->getConfig('secret_key')) {
+        return $integration->getConfig('secret_key');
+      }
+    } catch (\Exception $e) {
+      // Fallback to config if Integration doesn't exist or error
+    }
+    
+    // Fallback to config/env
+    return config('services.stripe.secret') ?? config('cashier.secret');
+  }
+}
+
+if (! function_exists('stripe_webhook_secret')) {
+  /**
+   * Get Stripe Webhook Secret
+   * First tries to get from Integration model, then from env/config
+   * 
+   * @return string|null
+   */
+  function stripe_webhook_secret(): ?string
+  {
+    try {
+      // Try to get from Integration model first
+      $integration = \App\Models\Integration::where('name', 'stripe')
+        ->where('status', \App\Models\Integration::STATUS_ACTIVE)
+        ->first();
+      
+      if ($integration && $integration->getConfig('webhook_secret')) {
+        return $integration->getConfig('webhook_secret');
+      }
+    } catch (\Exception $e) {
+      // Fallback to config if Integration doesn't exist or error
+    }
+    
+    // Fallback to config/env
+    return config('services.stripe.webhook_secret') ?? config('cashier.webhook.secret');
+  }
+}
