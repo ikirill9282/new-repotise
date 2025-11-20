@@ -61,7 +61,7 @@ class History extends Model
 
     public function initer()
     {
-      return $this->belongsTo(User::class, 'initialtor', 'id');
+      return $this->belongsTo(User::class, 'initiator', 'id');
     }
 
     public static function userVerifyInProgress(User $user)
@@ -305,6 +305,19 @@ class History extends Model
 
     public function write(): self
     {
+      // Если ip_address есть в payload, извлекаем его
+      if ($this->payload) {
+        $payload = is_string($this->payload) ? json_decode($this->payload, true) : $this->payload;
+        if (isset($payload['ip_address']) && !$this->ip_address) {
+          $this->ip_address = $payload['ip_address'];
+        }
+      }
+      
+      // Если ip_address не установлен, пытаемся получить из request
+      if (!$this->ip_address && request()) {
+        $this->ip_address = request()->ip();
+      }
+      
       $this->save();
       $this->refresh();
 

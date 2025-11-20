@@ -17,5 +17,6 @@ class RoleSeeder extends Seeder
       Role::firstOrCreate(['name' => 'system'], ['name' => 'system', 'title' => 'System']);
       Role::firstOrCreate(['name' => 'refered-seller'], ['name' => 'refered-seller', 'title' => 'Refered Seller']);
       Role::firstOrCreate(['name' => 'admin'], ['name' => 'admin', 'title' => 'Admin']);
+      Role::firstOrCreate(['name' => 'moderator'], ['name' => 'moderator', 'title' => 'Moderator']);
     }
 }

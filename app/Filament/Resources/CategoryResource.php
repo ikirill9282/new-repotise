@@ -29,21 +29,33 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationGroup = 'Products';
+    protected static ?string $navigationGroup = 'products';
 
-    protected static ?string $navigationIcon = 'heroicon-o-swatch';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationLabel = 'Categories';
+
+    protected static ?int $navigationSort = 3;
     
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('title'),
+                TextInput::make('title')
+                  ->required()
+                  ->maxLength(255),
                 TextInput::make('slug')->disabled(),
+                TextInput::make('position')
+                  ->label('Position / Priority')
+                  ->numeric()
+                  ->default(0)
+                  ->helperText('Lower numbers appear first. Default is 0.')
+                  ,
                 Select::make('parent_id')
                   ->label('Parent Category')
-                  ->options(Category::select('id', 'title')->get()->pluck('title', 'id')->toArray()),
+                  ->options(Category::select('id', 'title')->get()->pluck('title', 'id')->toArray())
+                  ->searchable()
+                  ->nullable(),
             ])
             ->columns(1);
     }
@@ -58,6 +70,11 @@ class CategoryResource extends Resource
                   ->sortable()
                   ->url(fn($record) => url("/admin/categories/$record->id/edit"))
                   ->color(Color::Sky)
+                  ,
+                TextColumn::make('position')
+                  ->label('Position / Priority')
+                  ->sortable()
+                  ->default(0)
                   ,
                 TextColumn::make('slug')
                   ->searchable()

@@ -6,6 +6,7 @@ use App\Filament\Resources\ArticleResource\Pages;
 use App\Filament\Resources\ArticleResource\RelationManagers;
 use App\Models\Article;
 use App\Models\Status;
+use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
@@ -34,7 +35,11 @@ class ArticleResource extends Resource
 {
     protected static ?string $model = Article::class;
 
-    protected static ?string $navigationGroup = 'Articles';
+    protected static ?string $navigationGroup = 'content';
+
+    protected static ?string $navigationLabel = 'Articles & News';
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3-bottom-left';
 
@@ -50,7 +55,8 @@ class ArticleResource extends Resource
     {
         return $table
             ->recordUrl(fn() => null)
-            ->query(static::getEloquentQuery()->orderByDesc('id'))
+            ->query(static::getEloquentQuery()->orderByDesc('published_at')->orderByDesc('created_at'))
+            ->defaultSort('published_at', 'desc')
             ->columns([
                 TextColumn::make('id')
                   ->label('Article ID')
@@ -60,13 +66,33 @@ class ArticleResource extends Resource
                   ->view('filament.tables.columns.image')
                   ,
                 TextColumn::make('title')
+                    ->label('Content Title')
                     ->searchable()
                     ->sortable()
                     ->color(Color::Sky)
-                    // ->url(fn($record) => $record->makeUrl(), true)
                     ->url(fn($record) => url("/admin/articles/$record->id/edit"))
                     ,
+                TextColumn::make('content_type')
+                    ->label('Type')
+                    ->formatStateUsing(function($record) {
+                        return $record->author->hasRole('admin') ? 'News' : 'Article';
+                    })
+                    ->badge()
+                    ->color(fn($record) => $record->author->hasRole('admin') ? 'info' : 'success')
+                    ->sortable(query: function ($query, string $direction): Builder {
+                        return $query->join('users', 'articles.user_id', '=', 'users.id')
+                            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                            ->orderBy('roles.name', $direction)
+                            ->select('articles.*');
+                    }),
+                TextColumn::make('category.title')
+                    ->label('Category')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('user')
+                    ->label('Author')
                     ->view('filament.tables.columns.author')
                     ->searchable(query: function ($query, $search) {
                         $query->orWhereHas('user', function ($q) use ($search) {
@@ -74,6 +100,15 @@ class ArticleResource extends Resource
                               ->orWhere('email', 'like', "%{$search}%");
                         });
                     }),
+                TextColumn::make('published_at')
+                    ->label('Publish Date')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable()
+                    ->dateTime('Y-m-d H:i:s')
+                    ->icon('heroicon-o-check-badge')
+                    ->iconColor(Color::Sky)
+                    ->placeholder('-'),
                 TextColumn::make('status.title')
                   ->label('Status')
                   ->searchable()
@@ -105,15 +140,6 @@ class ArticleResource extends Resource
                   ->sortable()
                   ->searchable()
                   ->toggleable()
-                  ,
-                TextColumn::make('published_at')
-                  ->label('Published At')
-                  ->sortable()
-                  ->searchable()
-                  ->toggleable()
-                  ->dateTime('Y-m-d H:i:s')
-                  ->icon('heroicon-o-check-badge')
-                  ->iconColor(Color::Sky)
                   ,
                 TextColumn::make('created_at')
                   ->icon('heroicon-o-clock')
@@ -160,13 +186,16 @@ class ArticleResource extends Resource
                     }
                   })
                   ,
+                SelectFilter::make('category_id')
+                  ->label('Filter by Category')
+                  ->relationship('category', 'title')
+                  ->searchable(),
                 SelectFilter::make('user_id')
                   ->label('Filter by Author')
                   ->searchable()
                   ->options(User::whereHas('articles')->get()->pluck('name', 'id'))
                   ->query(function($query, $state) {
                     if (!empty($state['value'])) {
-                      // dd($state['value']);
                       $query->where('user_id', $state['value']);
                     }
                   })

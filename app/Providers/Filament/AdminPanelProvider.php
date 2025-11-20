@@ -54,7 +54,21 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                \App\Filament\Pages\Dashboard::class,
+                \App\Filament\Pages\TaxSettings::class,
+                \App\Filament\Pages\ProductsImportExport::class,
+                \App\Filament\Pages\UserFundsHistory::class,
+                \App\Filament\Pages\CommunityComments::class,
+                \App\Filament\Pages\CommunityReviews::class,
+                \App\Filament\Pages\ContactForms::class,
+                \App\Filament\Pages\CommunityModerationQueue::class,
+                \App\Filament\Pages\SystemLogs::class,
+                \App\Filament\Pages\LoginHistory::class,
+                \App\Filament\Pages\EmailTriggers::class,
+                \App\Filament\Pages\EmailCampaigns::class,
+                \App\Filament\Pages\Coupons::class,
+                \App\Filament\Pages\SEOTools::class,
+                \App\Filament\Pages\RolesPermissions::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

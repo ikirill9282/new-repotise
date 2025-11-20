@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Jobs\ProcessOrder;
 use App\Services\StripeClient;
 use App\Traits\HasAuthor;
+use App\Models\RevenueShare;
 use Illuminate\Support\Facades\DB;
 use Stripe\Service\PaymentIntentService;
 
@@ -71,6 +72,11 @@ class Order extends Model
     public function order_products()
     {
       return $this->hasMany(OrderProducts::class);
+    }
+
+    public function revenueShares()
+    {
+      return $this->hasMany(RevenueShare::class);
     }
 
     public function discount()
@@ -154,9 +160,30 @@ class Order extends Model
       return $this->prepare ? $this->products->count() : $this->products()->count();
     }
 
-    public function getTax(): int
+    public function getTax(): float
     {
-      return 0;
+      // База для расчёта налога = cost - discount_amount
+      $base = $this->cost - ($this->discount_amount ?? 0);
+      
+      // Получаем ставку налога из настроек
+      $vatRate = $this->getVatRate();
+      
+      // Налог = base * vat_rate / 100
+      return round($base * ($vatRate / 100), 2);
+    }
+
+    protected function getVatRate(): float
+    {
+      try {
+        $setting = \DB::table('tax_settings')
+          ->where('key', 'vat_rate')
+          ->first();
+        
+        return $setting ? (float) $setting->value : 0.0;
+      } catch (\Exception $e) {
+        // Если таблица не существует, возвращаем 0
+        return 0.0;
+      }
     }
 
     public function getTotal(): int

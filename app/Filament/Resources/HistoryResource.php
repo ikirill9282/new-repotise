@@ -23,6 +23,8 @@ class HistoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
+    protected static ?string $navigationGroup = 'other';
+
     public static function form(Form $form): Form
     {
         return $form

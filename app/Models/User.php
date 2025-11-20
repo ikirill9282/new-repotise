@@ -8,6 +8,7 @@ use App\Helpers\Collapse;
 use App\Helpers\SessionExpire;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -37,7 +38,7 @@ use Illuminate\Support\Facades\DB;
 class User extends Authenticatable implements HasName, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, Searchable, HasCart, Billable, HasGallery;
+    use HasFactory, Notifiable, HasRoles, Searchable, HasCart, Billable, HasGallery, SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -165,6 +166,13 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
+      // Разрешаем доступ к странице логина для всех авторизованных пользователей
+      // Filament сам проверит права после входа
+      $path = request()->path();
+      if (str_starts_with($path, 'admin/login') || $path === 'admin/login') {
+        return true;
+      }
+      
       return $this->hasRole('admin') || $this->hasRole('super-admin');
     }
 
@@ -578,5 +586,188 @@ class User extends Authenticatable implements HasName, FilamentUser
       }
 
       return false;
+    }
+
+    /**
+     * Get display role name based on mapping
+     */
+    public function getDisplayRoleName(): string
+    {
+        $roleMapping = [
+            'customer' => 'User',
+            'creator' => 'Seller',
+            'refered-seller' => 'Seller (Referral)',
+            'admin' => 'Admin',
+            'super-admin' => 'Super Admin',
+            'moderator' => 'Moderator',
+        ];
+
+        // Ensure roles are loaded
+        if (!$this->relationLoaded('roles')) {
+            $this->load('roles');
+        }
+
+        $roles = $this->roles->pluck('name')->toArray();
+        
+        // Приоритет: super-admin > admin > moderator > seller > user
+        if (in_array('super-admin', $roles)) {
+            return $roleMapping['super-admin'];
+        }
+        if (in_array('admin', $roles)) {
+            return $roleMapping['admin'];
+        }
+        if (in_array('moderator', $roles)) {
+            return $roleMapping['moderator'];
+        }
+        if (in_array('refered-seller', $roles)) {
+            return $roleMapping['refered-seller'];
+        }
+        if (in_array('creator', $roles)) {
+            return $roleMapping['creator'];
+        }
+        if (in_array('customer', $roles)) {
+            return $roleMapping['customer'];
+        }
+
+        // If no roles found, return default 'User'
+        return 'User';
+    }
+
+    /**
+     * Check if user is system user (should not be shown in admin)
+     */
+    public function isSystemUser(): bool
+    {
+        return $this->hasRole('system');
+    }
+
+    /**
+     * Get display status
+     */
+    public function getDisplayStatus(): string
+    {
+        if ($this->trashed()) {
+            return 'Deleted';
+        }
+
+        $status = $this->status ?? 'active'; // Default to 'active' if status is null
+
+        return match($status) {
+            'active' => 'Active',
+            'blocked' => 'Blocked',
+            'pending_verification' => 'Pending Verification',
+            'deleted' => 'Deleted',
+            default => 'Unknown',
+        };
+    }
+
+    /**
+     * Check if user is active
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active' && !$this->trashed();
+    }
+
+    /**
+     * Check if user is blocked
+     */
+    public function isBlocked(): bool
+    {
+        return $this->status === 'blocked';
+    }
+
+    /**
+     * Check if user is pending verification
+     */
+    public function isPendingVerification(): bool
+    {
+        return $this->status === 'pending_verification';
+    }
+
+    /**
+     * Block user
+     */
+    public function block(): bool
+    {
+        return $this->update(['status' => 'blocked', 'active' => 0]);
+    }
+
+    /**
+     * Unblock user
+     */
+    public function unblock(): bool
+    {
+        $status = $this->email_verified_at ? 'active' : 'pending_verification';
+        return $this->update(['status' => $status, 'active' => 1]);
+    }
+
+    /**
+     * Get last IP address from sessions
+     */
+    public function getLastIpAddress(): ?string
+    {
+        $session = DB::table('sessions')
+            ->where('user_id', $this->id)
+            ->whereNotNull('ip_address')
+            ->orderBy('last_activity', 'desc')
+            ->first();
+
+        return $session?->ip_address;
+    }
+
+    /**
+     * Get total earnings (sum of author_amount from revenue_shares)
+     */
+    public function getTotalEarnings(): float
+    {
+        return (float) DB::table('revenue_shares')
+            ->where('author_id', $this->id)
+            ->whereNull('refunded_at')
+            ->sum('author_amount');
+    }
+
+    /**
+     * Get platform commission from this seller
+     */
+    public function getPlatformCommission(?string $period = null): float
+    {
+        $query = DB::table('revenue_shares')
+            ->where('author_id', $this->id)
+            ->whereNull('refunded_at');
+
+        if ($period === 'month') {
+            $query->where('created_at', '>=', now()->subMonth());
+        } elseif ($period === 'year') {
+            $query->where('created_at', '>=', now()->subYear());
+        }
+
+        return (float) $query->sum('service_amount');
+    }
+
+    /**
+     * Get Stripe fees from this seller
+     */
+    public function getStripeFees(?string $period = null): float
+    {
+        $query = DB::table('revenue_shares')
+            ->where('author_id', $this->id)
+            ->whereNull('refunded_at');
+
+        if ($period === 'month') {
+            $query->where('created_at', '>=', now()->subMonth());
+        } elseif ($period === 'year') {
+            $query->where('created_at', '>=', now()->subYear());
+        }
+
+        return (float) $query->sum('stripe_fee');
+    }
+
+    /**
+     * Get current commission percentage
+     */
+    public function getCurrentCommission(): float
+    {
+        return $this->options?->getFee() ?? 10.0;
     }
 }

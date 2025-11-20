@@ -13,4 +13,5 @@ enum Status
   const REJECT = 5;
   const SCHEDULED = 6;
   const DELETED = 7;
+  const SPAM = 8;
 }

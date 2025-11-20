@@ -94,6 +94,11 @@ class Article extends Model
     return $this->hasMany(Comment::class)->orderByDesc('id');
   }
   
+  public function category()
+  {
+    return $this->belongsTo(Category::class);
+  }
+
   public function tags()
   {
     return $this->belongsToMany(Tag::class, 'article_tags', 'article_id', 'tag_id', 'id', 'id')->where('status_id', '!=', Status::DELETED);

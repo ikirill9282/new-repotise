@@ -39,4 +39,9 @@ class RevenueShare extends Model
   {
     return $this->belongsTo(RefundRequest::class);
   }
+
+  public function payout()
+  {
+    return $this->belongsTo(Payout::class);
+  }
 }

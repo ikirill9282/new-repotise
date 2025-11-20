@@ -116,3 +116,50 @@ if (! function_exists('currency')) {
     return '$' . number_format($value, $decimals, '.', ',');
   }
 }
+
+if (! function_exists('money')) {
+  /**
+   * Format money amount with currency symbol and proper formatting
+   * Uses platform currency from config
+   * 
+   * @param int|float|null $amount
+   * @param int $decimals
+   * @return string|null
+   */
+  function money(int|float|null $amount, int $decimals = 2): ?string
+  {
+    if (is_null($amount)) {
+      return null;
+    }
+    
+    $currency = config('cashier.currency', 'usd');
+    $formatted = number_format((float) $amount, $decimals, '.', ',');
+    
+    $symbol = match(strtoupper($currency)) {
+      'USD' => '$',
+      'EUR' => '€',
+      'GBP' => '£',
+      default => strtoupper($currency) . ' ',
+    };
+    
+    return $symbol . $formatted;
+  }
+}
+
+if (! function_exists('settings')) {
+  /**
+   * Get or set system settings
+   * 
+   * @param string|null $key
+   * @param mixed $default
+   * @return mixed|array
+   */
+  function settings(?string $key = null, $default = null)
+  {
+    if ($key === null) {
+      return \App\Models\SystemSetting::allAsArray();
+    }
+
+    return \App\Models\SystemSetting::get($key, $default);
+  }
+}

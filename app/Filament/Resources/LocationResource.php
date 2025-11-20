@@ -29,12 +29,13 @@ class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
 
-    protected static ?string $navigationGroup = 'Products';
+    protected static ?string $navigationGroup = 'products';
 
-    // protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationIcon = 'heroicon-o-globe-europe-africa';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationLabel = 'Locations';
+
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

@@ -23,7 +23,7 @@ use Filament\Tables\Grouping\Group;
 
 class FAQResource extends Resource
 {
-    protected static ?string $navigationGroup = 'Content';
+    protected static ?string $navigationGroup = 'other';
 
     protected static ?string $model = FAQ::class;
 
@@ -34,8 +34,6 @@ class FAQResource extends Resource
     protected static ?string $pluralModelLabel = 'FAQ';
 
     protected static ?string $slug = 'faq';
-
-    protected static ?int $navigationSort = 2;
 
 
     public static function form(Form $form): Form

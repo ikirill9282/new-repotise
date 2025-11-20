@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
       $middleware->redirectGuestsTo(function(Request $request) {
+        // Исключаем маршруты Filament из редиректа
+        if ($request->is('admin*')) {
+          return null; // Позволяем Filament обработать неавторизованных пользователей
+        }
         return '/';
       });
       // $middleware->appendToGroup('web', [
@@ -31,7 +35,12 @@ return Application::configure(basePath: dirname(__DIR__))
       __DIR__.'/../app/Listeners',
     ])
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function(\Exception $e) {
+        $exceptions->render(function(\Exception $e, Request $request) {
+          // Исключаем маршруты Filament из редиректа на /undefined
+          if ($request->is('admin*')) {
+            return null; // Позволяем Filament обработать ошибку самостоятельно
+          }
+
           if ($e instanceof AccessDeniedHttpException) {
             return redirect('/undefined');
           }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\History;
+use App\Models\LoginHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +25,68 @@ class AuthController extends Controller
         'remember' => 'sometimes|nullable|accepted',
       ]);
 
+      $email = $valid['email'];
+      $user = User::where('email', $email)->first();
+      
+      // Check if user is locked
+      if ($user && $user->login_locked_until && $user->login_locked_until > now()) {
+        LoginHistory::logFailed($email, 'Account is locked due to multiple failed login attempts', $request->ip(), $request->userAgent());
+        
+        return back()->withErrors([
+          'email' => 'Your account has been temporarily locked due to multiple failed login attempts. Please try again later or contact support.',
+        ])->onlyInput('email');
+      }
+
+      // Reset lock if time has passed
+      if ($user && $user->login_locked_until && $user->login_locked_until <= now()) {
+        $user->login_locked_until = null;
+        $user->failed_login_attempts = 0;
+        $user->last_failed_login_at = null;
+        $user->save();
+      }
+
       if (Auth::attempt(['email' => $valid['email'], 'password' => $valid['password']], $valid['remember'] ?? false)) {
         $request->session()->regenerate();
+        
+        // Log successful login
+        LoginHistory::logSuccess(Auth::user(), $request->ip(), $request->userAgent());
+        
+        // Reset failed attempts on successful login
+        if ($user) {
+          $user->failed_login_attempts = 0;
+          $user->last_failed_login_at = null;
+          $user->login_locked_until = null;
+          $user->save();
+        }
+        
         return redirect()->back();
+      }
+
+      // Log failed login
+      $failureReason = 'Invalid credentials';
+      LoginHistory::logFailed($email, $failureReason, $request->ip(), $request->userAgent());
+
+      // Increment failed attempts
+      if ($user) {
+        $now = now();
+        $lastFailed = $user->last_failed_login_at;
+        $fifteenMinutesAgo = $now->copy()->subMinutes(15);
+        
+        // Reset counter if last failed attempt was more than 15 minutes ago
+        if (!$lastFailed || $lastFailed->lt($fifteenMinutesAgo)) {
+          $user->failed_login_attempts = 1;
+        } else {
+          $user->failed_login_attempts++;
+        }
+        
+        $user->last_failed_login_at = $now;
+        
+        // Lock account if 5 or more failed attempts within 15 minutes
+        if ($user->failed_login_attempts >= 5) {
+          $user->login_locked_until = $now->copy()->addMinutes(15);
+        }
+        
+        $user->save();
       }
 
       return back()->withErrors([

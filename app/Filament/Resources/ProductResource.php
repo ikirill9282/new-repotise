@@ -8,7 +8,15 @@ use App\Models\OrderProducts;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\Type;
+use App\Models\Category;
+use App\Models\Location;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -34,16 +42,112 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
-    protected static ?string $navigationGroup = 'Products';
-    protected static ?string $navigationLabel = 'Product List';
+    protected static ?string $navigationGroup = 'products';
+    protected static ?string $navigationLabel = 'All Products';
 
     protected static ?int $navigationSort = 1;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Section::make('Basic Information')
+                    ->schema([
+                        TextInput::make('title')
+                            ->label('Product Name')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        
+                        RichEditor::make('text')
+                            ->label('Description')
+                            ->required()
+                            ->columnSpanFull()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'link',
+                                'bulletList',
+                                'orderedList',
+                            ]),
+                        
+                        Select::make('user_id')
+                            ->label('Seller')
+                            ->relationship('author', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->disabled(fn ($record) => $record !== null)
+                            ->dehydrated(),
+                        
+                        Select::make('status_id')
+                            ->label('Status')
+                            ->options(Status::all()->pluck('title', 'id'))
+                            ->required()
+                            ->default(3),
+                    ])
+                    ->columns(2),
+                
+                Section::make('Categories & Locations')
+                    ->schema([
+                        Select::make('categories')
+                            ->label('Categories')
+                            ->relationship('categories', 'title')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->helperText('Select at least one category'),
+                        
+                        Select::make('locations')
+                            ->label('Locations')
+                            ->relationship('locations', 'title')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->helperText('Optional: Select product locations'),
+                    ])
+                    ->columns(2),
+                
+                Section::make('Pricing')
+                    ->schema([
+                        TextInput::make('price')
+                            ->label('Price')
+                            ->numeric()
+                            ->required()
+                            ->prefix('$')
+                            ->minValue(0)
+                            ->step(0.01),
+                        
+                        TextInput::make('old_price')
+                            ->label('Old Price (Sale Price)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->minValue(0)
+                            ->step(0.01)
+                            ->helperText('Optional: Original price before discount')
+                            ->dehydrated(false), // Don't save to database if column doesn't exist
+                    ])
+                    ->columns(2),
+                
+                Section::make('Additional Information')
+                    ->schema([
+                        Textarea::make('rejection_reason')
+                            ->label('Rejection Reason')
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->disabled(fn ($record) => $record?->status_id !== 5)
+                            ->helperText('This field is only visible for rejected products')
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 
@@ -103,15 +207,15 @@ class ProductResource extends Resource
                   ->money('usd', true)
                   ,
 
-                TextColumn::make('old_price')
-                  ->label('Old Price')
-                  ->sortable()
-                  ->searchable()
-                  ->toggleable()
-                  ->money('usd', true)
-                  ->color(Color::Gray)
-                  // ->extraAttributes(['class' => 'line-through'])
-                  ,
+                // TextColumn::make('old_price')
+                //   ->label('Old Price')
+                //   ->sortable()
+                //   ->searchable()
+                //   ->toggleable()
+                //   ->money('usd', true)
+                //   ->color(Color::Gray)
+                //   // ->extraAttributes(['class' => 'line-through'])
+                //   ,
                 TextColumn::make('status.title')
                   ->label('Status')
                   ->sortable()
@@ -186,6 +290,20 @@ class ProductResource extends Resource
                   ->multiple()
                   ->options(Type::pluck('title', 'id'))
                   ,
+                SelectFilter::make('categories')
+                  ->label('Filter by Category')
+                  ->searchable()
+                  ->multiple()
+                  ->relationship('categories', 'title', fn (Builder $query) => $query)
+                  ->query(function (Builder $query, array $data): Builder {
+                    if (!empty($data['values']) && is_array($data['values'])) {
+                      return $query->whereHas('categories', function ($q) use ($data) {
+                        $q->whereIn('categories.id', $data['values']);
+                      });
+                    }
+                    return $query;
+                  })
+                  ,
                 SelectFilter::make('user_id')
                   ->label('Filter by Seller')
                   ->searchable()
@@ -237,8 +355,23 @@ class ProductResource extends Resource
                     Tables\Actions\Action::make('Reject')
                       ->icon('heroicon-o-shield-exclamation')
                       ->visible(fn (Product $record): bool => $record->status_id === 3)
-                      ->action(function (Product $record) {
-                          $record->update(['status_id' => 5]);
+                      ->color('danger')
+                      ->requiresConfirmation()
+                      ->modalHeading('Reject Product')
+                      ->modalDescription('Please provide a reason for rejecting this product.')
+                      ->form([
+                          Forms\Components\Textarea::make('rejection_reason')
+                              ->label('Rejection Reason')
+                              ->required()
+                              ->rows(3)
+                              ->maxLength(500)
+                              ->helperText('Please explain why this product is being rejected.')
+                      ])
+                      ->action(function (Product $record, array $data) {
+                          $record->update([
+                              'status_id' => 5,
+                              'rejection_reason' => $data['rejection_reason']
+                          ]);
                       })
                       ,
                     Tables\Actions\Action::make('Duplicate')
@@ -275,7 +408,27 @@ class ProductResource extends Resource
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function ($records) {
+                            $totalOrders = 0;
+                            foreach ($records as $record) {
+                                $totalOrders += $record->getOrdersCount();
+                            }
+                            if ($totalOrders > 0) {
+                                \Filament\Notifications\Notification::make()
+                                    ->warning()
+                                    ->title('Some products have orders')
+                                    ->body("Selected products have {$totalOrders} associated order(s). Products will be hidden (soft deleted) but data will be preserved.")
+                                    ->persistent()
+                                    ->send();
+                            }
+                        })
+                        ->successNotification(
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('Products deleted')
+                                ->body('Selected products have been hidden (soft deleted).')
+                        ),
                     // Tables\Actions\EditBulkAction::make(),
                     // Tables\Actions\ViewAction::make()
                     //   ->url(fn (Product $record): string => url($record->makeUrl()))
@@ -298,9 +451,25 @@ class ProductResource extends Resource
                       ,
                     Tables\Actions\BulkAction::make('Reject')
                       ->icon('heroicon-o-shield-exclamation')
-                      ->action(function (Collection $records) {
+                      ->color('danger')
+                      ->requiresConfirmation()
+                      ->modalHeading('Reject Selected Products')
+                      ->modalDescription('Please provide a reason for rejecting these products.')
+                      ->form([
+                          Forms\Components\Textarea::make('rejection_reason')
+                              ->label('Rejection Reason')
+                              ->required()
+                              ->rows(3)
+                              ->maxLength(500)
+                              ->helperText('This reason will be applied to all selected products.')
+                      ])
+                      ->action(function (Collection $records, array $data) {
                         $items = $records->pluck('id');
-                        Product::whereIn('id', $items)->update(['status_id' => 5, 'published_at' => null]);
+                        Product::whereIn('id', $items)->update([
+                            'status_id' => 5,
+                            'published_at' => null,
+                            'rejection_reason' => $data['rejection_reason']
+                        ]);
                       })
                       ,
                     
@@ -352,6 +521,7 @@ class ProductResource extends Resource
     {
         return [
             'index' => Pages\ListProducts::route('/'),
+            'moderation' => Pages\ListProductsModeration::route('/moderation'),
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];

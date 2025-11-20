@@ -23,7 +23,11 @@ class MailLogResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
 
 
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static ?string $navigationGroup = 'marketing';
+
+    protected static ?string $navigationLabel = 'Email Logs';
+
+    protected static ?int $navigationSort = 5;
     // protected static ?string $navigationLabel = 'Product List';
 
     public static function form(Form $form): Form

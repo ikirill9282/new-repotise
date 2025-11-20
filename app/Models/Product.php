@@ -10,9 +10,11 @@ use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use App\Traits\HasMessages;
 use App\Traits\HasStatus;
+use App\Traits\HasReport;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Laravel\Scout\Searchable;
@@ -21,7 +23,7 @@ use Mews\Purifier\Facades\Purifier;
 
 class Product extends Model
 {
-  use HasAuthor, HasGallery, Searchable, HasFactory, HasStatus, HasMessages;
+  use HasAuthor, HasGallery, Searchable, HasFactory, HasStatus, HasMessages, HasReport, SoftDeletes;
 
   protected static function boot()
   {
@@ -143,9 +145,24 @@ class Product extends Model
     return $this->belongsToMany(Location::class, ProductLocations::class, 'product_id', 'location_id', 'id', 'id');
   }
 
+  public function orderProducts()
+  {
+    return $this->hasMany(OrderProducts::class);
+  }
+
   public function reviews()
   {
     return $this->hasMany(Review::class);
+  }
+
+  public function hasOrders(): bool
+  {
+    return $this->orderProducts()->exists();
+  }
+
+  public function getOrdersCount(): int
+  {
+    return $this->orderProducts()->count();
   }
 
   public function messages()

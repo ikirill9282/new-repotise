@@ -20,7 +20,7 @@ class SearchQueriesResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass';
 
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static ?string $navigationGroup = 'other';
 
     public static function form(Form $form): Form
     {

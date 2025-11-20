@@ -58,4 +58,9 @@ return [
       'client_secret' => env('X_CLIENT_SECRET'),
       'redirect' => env('X_REDIRECT_URI'),
     ],
+    
+    'ga4' => [
+      'property_id' => env('GA4_PROPERTY_ID'),
+      'credentials_path' => env('GA4_CREDENTIALS_PATH', storage_path('app/google-credentials.json')),
+    ],
 ];

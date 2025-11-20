@@ -19,6 +19,7 @@ class UserOptions extends Model
         'show_insights' => 'boolean',
         'notification_settings' => 'array',
         'social_visibility' => 'array',
+        'dashboard_settings' => 'array',
     ];
 
     protected float $default_fee = 10;
