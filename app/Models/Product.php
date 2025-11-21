@@ -348,14 +348,17 @@ class Product extends Model
 
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
   {
+    // Always filter by active status and published date - only show active, published products
     $query = \App\Models\Product::query()
       ->where('status_id', Status::ACTIVE)
-      ->whereNotNull('published_at')
-      ->when(
-        !empty($includes),
-        fn($query) => $query->whereIn('id', $includes)->orWhere('id', '>', 0),
-      )
-      ->with('preview', 'locations', 'categories', 'types')
+      ->whereNotNull('published_at');
+    
+    // If specific product IDs are provided, filter by them (they must still be active and published)
+    if (!empty($includes)) {
+      $query->whereIn('id', $includes);
+    }
+    
+    $query->with('preview', 'locations', 'categories', 'types')
       ->withCount(['reviews' => function($query) {
         $query->whereNull('parent_id');
       }])
