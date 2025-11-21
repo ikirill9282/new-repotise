@@ -1,7 +1,11 @@
 @php
   $trending_products = auth()->check()
       ? auth()->user()->getRecomendProducts(10)
-      : \App\Models\Product::limit(10)->latest()->get();
+      : \App\Models\Product::where('status_id', \App\Enums\Status::ACTIVE)
+          ->whereNotNull('published_at')
+          ->limit(10)
+          ->latest()
+          ->get();
   $cartService = new \App\Services\Cart();
 @endphp
 

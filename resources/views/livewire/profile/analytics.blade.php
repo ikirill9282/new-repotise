@@ -64,6 +64,8 @@
           <x-profile.analytics.article :stats="$articleStats"></x-profile.analytics.article>
         @elseif($table == 'donation-analytics')
           <x-profile.analytics.donation :stats="$donationStats"></x-profile.analytics.donation>
+        @elseif($table == 'payout-analytics')
+          <x-profile.analytics.payout :stats="$payoutStats"></x-profile.analytics.payout>
         @endif
       </div>
     </x-card>
@@ -85,6 +87,10 @@
         [
           'name' => 'donation-analytics',
           'title' => 'Donations',
+        ],
+        [
+          'name' => 'payout-analytics',
+          'title' => 'Payouts',
         ],
       ],
       'active' => $table ?? 'sales-analytics',

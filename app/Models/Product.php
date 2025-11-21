@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Order as OrderEnum;
 use App\Enums\Status;
 use App\Helpers\Collapse;
 use App\Helpers\CustomEncrypt;
@@ -312,11 +313,29 @@ class Product extends Model
 
   public function getTogetherProducts(int $limit = 10, array $includes = []): Collection
   {
-    $products = $this->query()
+    $query = $this->query()
       ->where('status_id', Status::ACTIVE)
+      ->whereNotNull('published_at')
       ->where('id', '!=', $this->id)
       ->whereHas('locations', fn($q) => $q->whereIn('locations.id', $this->locations->pluck('id')))
       ->orWhereHas('types', fn($q) => $q->whereIn('types.id', $this->types->pluck('id')))
+      ->with('preview', 'locations', 'categories', 'types')
+      ->withCount(['reviews' => function($query) {
+        $query->whereNull('parent_id');
+      }])
+      ->withCount(['orderProducts as sales_count' => function($query) {
+        $query->whereHas('order', function($q) {
+          $q->where('status_id', '>=', OrderEnum::PAID);
+        });
+      }]);
+
+    // Сортировка по популярности: продажи, просмотры, отзывы, рейтинг
+    $products = $query
+      ->orderByDesc('sales_count')
+      ->orderByDesc('views')
+      ->orderByDesc('reviews_count')
+      ->orderByDesc('rating')
+      ->orderByDesc('created_at')
       ->limit($limit)
       ->get();
 
@@ -329,8 +348,9 @@ class Product extends Model
 
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
   {
-    $products = \App\Models\Product::query()
+    $query = \App\Models\Product::query()
       ->where('status_id', Status::ACTIVE)
+      ->whereNotNull('published_at')
       ->when(
         !empty($includes),
         fn($query) => $query->whereIn('id', $includes)->orWhere('id', '>', 0),
@@ -339,6 +359,19 @@ class Product extends Model
       ->withCount(['reviews' => function($query) {
         $query->whereNull('parent_id');
       }])
+      ->withCount(['orderProducts as sales_count' => function($query) {
+        $query->whereHas('order', function($q) {
+          $q->where('status_id', '>=', OrderEnum::PAID);
+        });
+      }]);
+
+    // Сортировка по популярности: продажи, просмотры, отзывы, рейтинг
+    $products = $query
+      ->orderByDesc('sales_count')
+      ->orderByDesc('views')
+      ->orderByDesc('reviews_count')
+      ->orderByDesc('rating')
+      ->orderByDesc('created_at')
       ->limit($limit)
       ->get();
 
@@ -359,6 +392,10 @@ class Product extends Model
 
   public static function getAnalogs(int $product_id = null)
   {
-    return static::where('status_id', Status::ACTIVE)->latest()->limit(10)->get();
+    return static::where('status_id', Status::ACTIVE)
+      ->whereNotNull('published_at')
+      ->latest()
+      ->limit(10)
+      ->get();
   }
 }

@@ -12,7 +12,7 @@
               <img src="{{ $article->author->avatar }}" class="!w-10 !h-10 object-cover" alt="Avatar">
             </a>
             <p>
-              <span>{{ $article->author->name }}</span>
+              <span>{{ $article->author->getDisplayName() }}</span>
               <a class="author-link !text-md" href="{{ $article->author->makeProfileUrl() }}">{{ $article->author->profile }}</a>
             </p>
         </div>

@@ -19,7 +19,7 @@ class StripeClient
       Stripe::setApiKey($secret);
     } else {
       // Fallback to env for backwards compatibility
-      Stripe::setApiKey(env('STRIPE_SECRET'));
+    Stripe::setApiKey(env('STRIPE_SECRET'));
     }
   }
 

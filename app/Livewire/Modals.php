@@ -127,6 +127,7 @@ class Modals extends Component
         'file-description',
         'delete-subscription',
         'delete-subscription-accept',
+        'payout-details',
       ];
       return !in_array($this->modal, $arr);
     }    
@@ -165,6 +166,8 @@ class Modals extends Component
       ])) return '!max-w-2xl';
       
       if (in_array($this->modal, ['funds', 'contact'])) return '!max-w-xl';
+
+      if (in_array($this->modal, ['payout-details'])) return '!max-w-3xl';
 
       return '';
     }    

@@ -6,7 +6,7 @@
 ])
 
 @php
-    $baseClasses = 'main-btn !p-2.5 w-full !rounded !text-sm sm:!text-base';
+    $baseClasses = 'main-btn !p-2.5 !w-full !rounded !text-sm sm:!text-base';
     $classes = trim(collect([
         $baseClasses,
         $attributes->get('class'),

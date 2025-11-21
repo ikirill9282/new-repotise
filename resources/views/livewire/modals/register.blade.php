@@ -1,13 +1,13 @@
 <div class="relative">
   <h2 class="text-2xl font-bold text-gray-900 !mb-6 text-center select-none">Sign Up</h2>
   
-  <form wire:submit="submit" class="!space-y-4 !mb-10">
+  <form wire:submit.prevent="attempt" class="!space-y-4 !mb-10">
     @csrf
     
-    <x-form.input wire:model="form.email" name="email" type="email" :tooltipModal="true" />
+    <x-form.input wire:model="form.email" name="email" type="email" autocomplete="email" :tooltipModal="true" />
 
     <div x-data="{ type: 'password' }" class="">
-      <x-form.input wire:model="form.password" name="password" x-bind:type="type" placeholder="Password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
+      <x-form.input wire:model="form.password" name="password" x-bind:type="type" autocomplete="new-password" placeholder="Password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
         <x-slot name="icon">
           <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-9 translate-y-[-50%] hover:cursor-pointer">
             <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
@@ -17,7 +17,7 @@
     </div>
 
     <div x-data="{ type: 'password' }" class="">
-      <x-form.input wire:model="form.repeat_password" name="repeat_password" x-bind:type="type" placeholder="Create a password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
+      <x-form.input wire:model="form.repeat_password" name="repeat_password" x-bind:type="type" autocomplete="new-password" placeholder="Create a password" :tooltipModal="true" tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.">
         <x-slot name="icon">
           <div x-on:click="() => type = (type == 'password') ? 'text' : 'password' " class="absolute top-1/2 right-9 translate-y-[-50%] hover:cursor-pointer">
             <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
@@ -31,8 +31,11 @@
     </div>
 
     <div class="flex justify-between items-center !gap-2">
-      <x-btn wire:click.prevent="$dispatch('closeModal')" class="basis-1/3" gray>Cancel</x-btn>
-      <x-btn wire:click.prevent="attempt" class="basis-2/3" >Sign Up</x-btn>
+      <x-btn type="button" wire:click.prevent="$dispatch('closeModal')" class="basis-1/3" gray>Cancel</x-btn>
+      <x-btn type="submit" class="basis-2/3" wire:loading.attr="disabled">
+        <span wire:loading.remove>Sign Up</span>
+        <span wire:loading>Signing Up...</span>
+      </x-btn>
     </div>
 
     <div class="flex items-center justify-center group text-gray">

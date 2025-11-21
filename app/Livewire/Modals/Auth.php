@@ -130,7 +130,12 @@ class Auth extends Component
 
     public function xAuth()
     {
-      return redirect()->away(Socialite::driver('x')->redirect()->getTargetUrl());
+      return redirect()->away(
+        Socialite::driver('x')
+          ->scopes(['tweet.read', 'users.read', 'offline.access']) // Request necessary scopes
+          ->redirect()
+          ->getTargetUrl()
+      );
     }
     
     public function getUser(): ?User

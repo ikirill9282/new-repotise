@@ -99,7 +99,7 @@
                     @if($user->products()->exists())
                       <div class="">
                         <x-product.slider 
-                          :products="$user->products()->latest()->limit(6)->get()"
+                          :products="$user->products()->where('status_id', \App\Enums\Status::ACTIVE)->whereNotNull('published_at')->latest()->limit(6)->get()"
                           id="profile-product-slider"
                         ></x-product.slider>
                       </div>

@@ -121,9 +121,12 @@ class Product extends Component
     {
       $input = is_array($this->locations) ? $this->locations : $this->locations->toArray();
       foreach ($input as $loc) {
-        if (!Location::where('slug', $loc['key'])->exists()) {
-          Location::create(['title' => $loc['label']]);
-        }
+        // Use firstOrCreate to avoid duplicate entry errors
+        // Check by title first since that's the unique constraint
+        Location::firstOrCreate(
+          ['title' => $loc['label']],
+          ['title' => $loc['label']]
+        );
       }
 
       if (!empty($input)) {
@@ -139,9 +142,12 @@ class Product extends Component
     {
       $input = is_array($this->categories) ? $this->categories : $this->categories->toArray();
       foreach ($input as $cat) {
-        if (!Category::where('slug', $cat['key'])->exists()) {
-          Category::create(['title' => $cat['label']]);
-        }
+        // Use firstOrCreate to avoid duplicate entry errors
+        // Check by title first since that's the unique constraint
+        Category::firstOrCreate(
+          ['title' => $cat['label']],
+          ['title' => $cat['label']]
+        );
       }
 
       if (!empty($input)) {

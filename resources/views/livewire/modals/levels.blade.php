@@ -26,7 +26,7 @@
                     </div>
                     <ol>
                         <li class="!list-disc">Platform Fee: {{ $level->fee == 0 ? 'Exclusive Rate' : ($level->fee . "%") }}</li>
-                        <li class="!list-disc">Storage Limit: {{ $level->space == 0 ? 'Unlimited' : $level->getSpace() }}</li>
+                        <li class="!list-disc">Storage Limit: {{ $level->space == 0 ? ($level->id == 4 ? 'Exclusive Rate' : 'Unlimited') : $level->getSpace() }}</li>
                         @if($level->description)
                           <li class="!list-disc">{{ $level->description }}</li>
                         @endif

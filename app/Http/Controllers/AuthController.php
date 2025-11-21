@@ -148,8 +148,21 @@ class AuthController extends Controller
         Session::regenerate();
         ReferalPromocode::dispatch($user);
 
+        // If seller, redirect to profile (not verification page) - new logic
+        // Seller can use all tools, but payout will be disabled until Full Name is set
+        if (boolval($valid['seller'])) {
+          // Assign creator role if not already assigned (for backwards compatibility)
+          if (!$user->hasRole('creator')) {
+            $creatorRole = \Spatie\Permission\Models\Role::findByName('creator');
+            if ($creatorRole) {
+              $user->assignRole($creatorRole);
+            }
+          }
+        }
+        
+        // Redirect seller to profile, not verification page
         $url = boolval($valid['seller']) 
-          ? $user->makeProfileVerificationUrl()
+          ? $user->makeProfileUrl()
           : $user->makeProfileUrl();
         
         return redirect($url);
@@ -185,6 +198,48 @@ class AuthController extends Controller
 
     public function xCallback(Request $request)
     {
-      
+      try {
+        $x_user = Socialite::driver('x')->user();
+        
+        // X (Twitter) may not provide email, so we need to handle this case
+        // If email is not available, use the X ID as a fallback identifier
+        $email = $x_user->email ?? $x_user->id . '@x.placeholder';
+        
+        // Check if user exists by email or by X ID stored somewhere
+        // For now, we'll search by email
+        $user = User::firstWhere('email', $email);
+        
+        if (!$user) {
+          // Create new user
+          $user = User::create([
+            'email' => $email,
+            // If email is not real, mark it as unverified
+            'email_verified_at' => $x_user->email ? Carbon::now() : null,
+          ]);
+          
+          // Send verification code if email is real
+          if ($x_user->email) {
+            $user->sendVerificationCode();
+          }
+          
+          History::userCreated($user);
+        }
+        
+        Auth::login($user);
+        Session::regenerate();
+        ReferalPromocode::dispatch($user);
+
+        return redirect()->route('home');
+        
+      } catch (\Exception $e) {
+        // Log the error
+        \Illuminate\Support\Facades\Log::error('X OAuth callback error', [
+          'error' => $e->getMessage(),
+          'trace' => $e->getTraceAsString(),
+        ]);
+        
+        // Redirect with error message
+        return redirect()->route('home')->with('error', 'Failed to authenticate with X. Please try again.');
+      }
     }
 }

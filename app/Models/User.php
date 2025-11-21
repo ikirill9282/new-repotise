@@ -73,6 +73,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         }
 
         $model->username = $username;
+        // Always set name to username initially (will be cleared for sellers after creation)
         $model->name = ucfirst($username);
 
         // For Social Auth [validation required in forms.]
@@ -426,7 +427,31 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function getName(): string
     {
-      return $this->name;
+      // For sellers: if full_name is set in options, use it; otherwise use username
+      if ($this->hasRole('creator') || $this->hasRole('seller')) {
+        $fullName = $this->options?->full_name;
+        if (!empty($fullName)) {
+          return $fullName;
+        }
+        // Return username if full_name is not set
+        return ucfirst($this->username ?? '');
+      }
+      
+      // For regular users: return name or username
+      return $this->name ?? ucfirst($this->username ?? '');
+    }
+    
+    /**
+     * Get display name for products/articles/comments
+     * Returns full_name if set, otherwise username
+     */
+    public function getDisplayName(): string
+    {
+      $fullName = $this->options?->full_name;
+      if (!empty($fullName)) {
+        return $fullName;
+      }
+      return ucfirst($this->username ?? '');
     }
 
     public function getShortDescription(int $length = 250): string
@@ -447,7 +472,11 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function getRecomendProducts(int $limit = 6): Collection
     {
-      return Product::limit($limit)->orderByDesc('id')->get();
+      return Product::where('status_id', \App\Enums\Status::ACTIVE)
+        ->whereNotNull('published_at')
+        ->limit($limit)
+        ->orderByDesc('id')
+        ->get();
     }
 
     public function getRecomendAuthors(): Collection

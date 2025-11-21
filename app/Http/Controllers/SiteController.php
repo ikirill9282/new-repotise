@@ -570,6 +570,7 @@ class SiteController extends Controller
 
     $query = Product::query()
       ->where('status_id', Status::ACTIVE)
+      ->whereNotNull('published_at')
       ->withCount([
         'reviews as reviews_count' => fn($q) => $q->whereNull('parent_id'),
       ])

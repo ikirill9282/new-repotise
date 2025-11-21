@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Illuminate\Support\Facades\Session;
 
 class Withdraw extends Component
 {
@@ -38,6 +39,14 @@ class Withdraw extends Component
     public function mount(): void
     {
         $user = Auth::user();
+        
+        // Check if user has full name filled (required for payouts)
+        $fullName = $user?->options?->full_name ?? '';
+        if (empty($fullName)) {
+            // Redirect to settings if full name is not set
+            session()->flash('error', 'Please complete your profile by adding your Full Name in Settings before requesting payouts.');
+            return redirect()->route('profile.settings');
+        }
 
         $this->available = (float) ($user?->funds()
             ->where('group', 'referal')

@@ -1,4 +1,8 @@
 <div>
+    @if($isSeller)
+        <x-profile.creator-plus-banner class="mb-6" />
+    @endif
+    
     <div class="flex justify-start items-start flex-col-reverse lg:flex-row !gap-10">
 
         <div class="w-full">

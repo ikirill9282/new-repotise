@@ -280,19 +280,48 @@ class Analytics extends Component
         ];
     }
 
+    protected function buildPayoutStats(User $user, Carbon $from): array
+    {
+        // Lifetime stats - only count successful payouts (PAID status)
+        $payoutQuery = \App\Models\Payout::query()
+            ->where('user_id', $user->id)
+            ->where('status', \App\Models\Payout::STATUS_PAID);
+
+        $totalWithdrawn = (float) (clone $payoutQuery)->sum('amount');
+        $totalPayoutsCount = (clone $payoutQuery)->count();
+        $averagePayoutAmount = $totalPayoutsCount > 0 ? $totalWithdrawn / $totalPayoutsCount : 0.0;
+
+        // Check for next scheduled payout (would need to be implemented based on automatic payout settings)
+        $nextScheduledPayout = null;
+        // TODO: Calculate next scheduled payout date and amount from user's automatic payout settings
+
+        return [
+            'total_withdrawn' => round($totalWithdrawn, 2),
+            'total_payouts_count' => $totalPayoutsCount,
+            'average_payout_amount' => round($averagePayoutAmount, 2),
+            'next_scheduled_payout' => $nextScheduledPayout,
+        ];
+    }
+
     public function render()
     {
         $user = Auth::user();
 
         if (!$user) {
-            return view('livewire.profile.analytics', [
-                'table' => $this->activeTable,
-                'summary' => $this->emptySummary(),
-                'salesStats' => $this->emptySalesStats(),
-                'productStats' => $this->emptyProductStats(),
-                'articleStats' => $this->emptyArticleStats(),
-                'donationStats' => $this->emptyDonationStats(),
-            ]);
+        return view('livewire.profile.analytics', [
+            'table' => $this->activeTable,
+            'summary' => $this->emptySummary(),
+            'salesStats' => $this->emptySalesStats(),
+            'productStats' => $this->emptyProductStats(),
+            'articleStats' => $this->emptyArticleStats(),
+            'donationStats' => $this->emptyDonationStats(),
+            'payoutStats' => [
+                'total_withdrawn' => 0.0,
+                'total_payouts_count' => 0,
+                'average_payout_amount' => 0.0,
+                'next_scheduled_payout' => null,
+            ],
+        ]);
         }
 
         $from = $this->dateFrom();
@@ -302,6 +331,7 @@ class Analytics extends Component
         $productStats = $this->buildProductStats($user, $from, $salesStats);
         $articleStats = $this->buildArticleStats($user);
         $donationStats = $this->buildDonationStats($user, $from);
+        $payoutStats = $this->buildPayoutStats($user, $from);
 
         return view('livewire.profile.analytics', [
             'table' => $this->activeTable,
@@ -310,6 +340,7 @@ class Analytics extends Component
             'productStats' => $productStats,
             'articleStats' => $articleStats,
             'donationStats' => $donationStats,
+            'payoutStats' => $payoutStats,
         ]);
     }
 }
