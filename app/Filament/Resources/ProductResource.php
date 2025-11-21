@@ -82,11 +82,23 @@ class ProductResource extends Resource
                         
                         Select::make('user_id')
                             ->label('Seller')
-                            ->relationship('author', 'name')
+                            ->options(fn () => User::query()->limit(50)->get()->mapWithKeys(fn ($user) => [$user->id => $user->username]))
                             ->searchable()
-                            ->preload()
+                            ->getSearchResultsUsing(fn (string $search): array => 
+                                User::query()
+                                    ->where(function($q) use ($search) {
+                                        $q->where('username', 'like', "%{$search}%")
+                                          ->orWhere('name', 'like', "%{$search}%");
+                                    })
+                                    ->limit(50)
+                                    ->get()
+                                    ->mapWithKeys(fn ($user) => [$user->getKey() => $user->username])
+                                    ->all()
+                            )
+                            ->getOptionLabelUsing(fn ($value): ?string => User::find($value)?->username ?? null)
                             ->required()
                             ->disabled(fn ($record) => $record !== null)
+                            ->helperText('Search by username or name')
                             ->dehydrated(),
                         
                         Select::make('status_id')
@@ -188,6 +200,24 @@ class ProductResource extends Resource
                     ])
                     ->collapsible()
                     ->collapsed(fn ($record) => $record !== null),
+                
+                Section::make('SEO Settings')
+                    ->schema([
+                        TextInput::make('seo_title')
+                            ->label('Meta Title')
+                            ->maxLength(255)
+                            ->helperText('Optional: SEO title for search engines')
+                            ->columnSpanFull(),
+                        
+                        Textarea::make('seo_text')
+                            ->label('Meta Description')
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->helperText('Optional: SEO description for search engines')
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
                 
                 Section::make('Additional Information')
                     ->schema([
