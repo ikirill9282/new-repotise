@@ -114,7 +114,16 @@ class ProductResource extends Resource
                             ->multiple()
                             ->searchable()
                             ->preload()
-                            ->helperText('Optional: Select product locations'),
+                            ->helperText('Optional: Select product locations. Only existing locations can be selected.')
+                            ->createOptionForm([]) // Disable creating new locations
+                            ->createOptionUsing(function () {
+                                \Filament\Notifications\Notification::make()
+                                    ->danger()
+                                    ->title('Cannot create location')
+                                    ->body('Please select an existing location. To create a new location, use the Locations section in the admin panel.')
+                                    ->send();
+                                return null;
+                            }),
                     ])
                     ->columns(2),
                 
