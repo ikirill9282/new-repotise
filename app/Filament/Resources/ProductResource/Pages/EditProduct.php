@@ -23,21 +23,32 @@ class EditProduct extends EditRecord
         // Load relationships for image display
         $this->record->load(['preview', 'gallery']);
         
-        // Load existing preview image - FileUpload expects array with path
-        // Use full path with /storage/ prefix as stored in database (same as default() in form)
+        // Helper function to convert database path (/storage/images/...) to Filament format (images/...)
+        $convertPathForFilament = function($path) {
+            if (empty($path)) return null;
+            // Remove /storage/ prefix and return relative path from disk root
+            $path = str_replace('/storage/', '', $path);
+            $path = ltrim($path, '/');
+            return $path ?: null;
+        };
+        
+        // Load existing preview image - FileUpload expects relative path from disk root (images/...)
         if ($this->record->preview && $this->record->preview->image) {
-            $data['preview_image'] = [$this->record->preview->image];
+            $convertedPath = $convertPathForFilament($this->record->preview->image);
+            $data['preview_image'] = $convertedPath ? [$convertedPath] : [];
         } else {
             $data['preview_image'] = [];
         }
         
-        // Load existing gallery images - FileUpload expects array of paths with /storage/ prefix
+        // Load existing gallery images - FileUpload expects relative paths from disk root (images/...)
         $galleryImages = $this->record->gallery()
             ->where('preview', 0)
             ->where('placement', 'gallery')
             ->whereNull('expires_at')
             ->get()
             ->pluck('image')
+            ->filter()
+            ->map($convertPathForFilament)
             ->filter()
             ->values()
             ->toArray();
@@ -139,11 +150,18 @@ class EditProduct extends EditRecord
                 
                 OptimizeMedia::dispatch('public', $path);
                 
-                // Update form with saved path (full path with /storage/)
+                // Update form with saved path (will be converted to Filament format later)
                 $newPreviewPath = $savedImagePath;
             } elseif (is_string($newPreview)) {
-                // Existing path - keep it as is (with /storage/ prefix)
-                $newPreviewPath = $newPreview;
+                // Existing path - could be Filament format (images/...) or DB format (/storage/images/...)
+                // If it's Filament format, convert to DB format for comparison
+                if (!str_starts_with($newPreview, '/storage/')) {
+                    // Filament format - convert to DB format
+                    $newPreviewPath = "/storage/$newPreview";
+                } else {
+                    // Already DB format
+                    $newPreviewPath = $newPreview;
+                }
             }
         }
         
@@ -151,13 +169,20 @@ class EditProduct extends EditRecord
         $galleryArray = is_array($this->galleryImages) ? $this->galleryImages : [];
         
         // Normalize current gallery paths (existing images as strings)
+        // Filament may return paths in format images/... or /storage/images/...
         $currentGalleryPaths = [];
         $newGalleryPaths = []; // Initialize array for gallery paths
         foreach ($galleryArray as $image) {
             if (is_string($image)) {
-                $normalized = $normalizePath($image);
+                // Normalize path - convert to DB format if needed
+                $dbFormatPath = $image;
+                if (!str_starts_with($image, '/storage/')) {
+                    // Filament format (images/...) - convert to DB format (/storage/images/...)
+                    $dbFormatPath = "/storage/$image";
+                }
+                $normalized = $normalizePath($dbFormatPath);
                 $currentGalleryPaths[] = $normalized;
-                $newGalleryPaths[] = $normalized; // Keep existing paths
+                $newGalleryPaths[] = $dbFormatPath; // Keep in DB format for saving
             }
         }
         
@@ -199,37 +224,56 @@ class EditProduct extends EditRecord
                 
                 OptimizeMedia::dispatch('public', $path);
                 
-                // Add saved path to gallery paths for form update (full path with /storage/)
+                // Add saved path to gallery paths for form update (will be converted to Filament format later)
                 $newGalleryPaths[] = $savedImagePath;
             } elseif (is_string($image)) {
-                // Existing path - keep it as is (with /storage/ prefix)
-                $newGalleryPaths[] = $image;
+                // Existing path - could be Filament format (images/...) or DB format (/storage/images/...)
+                // Convert to DB format if needed
+                if (!str_starts_with($image, '/storage/')) {
+                    // Filament format - convert to DB format
+                    $newGalleryPaths[] = "/storage/$image";
+                } else {
+                    // Already DB format
+                    $newGalleryPaths[] = $image;
+                }
             }
         }
         
         // After saving, reload record with fresh relationships
         $this->record = $this->record->fresh(['preview', 'gallery']);
         
+        // Helper function to convert database path (/storage/images/...) to Filament format (images/...)
+        $convertPathForFilament = function($path) {
+            if (empty($path)) return null;
+            // Remove /storage/ prefix and return relative path from disk root
+            $path = str_replace('/storage/', '', $path);
+            $path = ltrim($path, '/');
+            return $path ?: null;
+        };
+        
         // Update form state with saved image paths to prevent "Waiting for size" issue
-        // Use full paths with /storage/ prefix (same format as default() in form)
+        // Use relative paths from disk root (images/...) as Filament FileUpload expects
         $currentState = $this->form->getState();
         
         // Update preview image path if new file was saved
         if ($newPreviewPath !== null && is_string($newPreviewPath)) {
-            // New file was saved - update form with saved path
-            $currentState['preview_image'] = [$newPreviewPath];
+            // New file was saved - convert to Filament format (images/...)
+            $convertedPath = $convertPathForFilament($newPreviewPath);
+            $currentState['preview_image'] = $convertedPath ? [$convertedPath] : [];
         } elseif ($newPreviewPath === null) {
             // Preview was removed
             $currentState['preview_image'] = [];
         }
         // If existing path (string), form already has it, no update needed
         
-        // Update gallery images paths - include all saved and existing paths
+        // Update gallery images paths - convert to Filament format (images/...)
         if (!empty($newGalleryPaths)) {
-            $currentState['gallery_images'] = array_values(array_unique($newGalleryPaths));
+            $convertedGalleryPaths = array_map($convertPathForFilament, $newGalleryPaths);
+            $convertedGalleryPaths = array_filter($convertedGalleryPaths);
+            $currentState['gallery_images'] = array_values(array_unique($convertedGalleryPaths));
         }
         
-        // Fill form with updated image paths (full paths with /storage/ prefix)
+        // Fill form with updated image paths (relative paths from disk root: images/...)
         $this->form->fill($currentState);
         
         // Show success notification

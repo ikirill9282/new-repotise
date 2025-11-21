@@ -176,7 +176,14 @@ class ProductResource extends Resource
                                 '1:1',
                             ])
                             ->helperText('Main product image that will be displayed as preview')
-                            ->default(fn ($record) => $record?->preview?->image)
+                            ->default(function ($record) {
+                                if (!$record || !$record->preview || !$record->preview->image) {
+                                    return null;
+                                }
+                                // Convert /storage/images/... to images/... for Filament
+                                $path = str_replace('/storage/', '', $record->preview->image);
+                                return ltrim($path, '/');
+                            })
                             ->columnSpanFull(),
                         
                         FileUpload::make('gallery_images')
@@ -195,7 +202,22 @@ class ProductResource extends Resource
                                 '1:1',
                             ])
                             ->helperText('Additional product images (up to 8 images)')
-                            ->default(fn ($record) => $record?->gallery->where('preview', 0)->pluck('image')->toArray() ?? [])
+                            ->default(function ($record) {
+                                if (!$record || !$record->gallery) {
+                                    return [];
+                                }
+                                // Convert /storage/images/... to images/... for Filament
+                                return $record->gallery
+                                    ->where('preview', 0)
+                                    ->where('placement', 'gallery')
+                                    ->whereNull('expires_at')
+                                    ->pluck('image')
+                                    ->filter()
+                                    ->map(fn($path) => ltrim(str_replace('/storage/', '', $path), '/'))
+                                    ->filter()
+                                    ->values()
+                                    ->toArray();
+                            })
                             ->columnSpanFull(),
                     ])
                     ->collapsible()
