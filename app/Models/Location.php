@@ -28,20 +28,20 @@ class Location extends Model
       // Check if location with same title already exists
       $existingByTitle = static::where('title', $model->title)->first();
       if ($existingByTitle) {
-        throw new \Illuminate\Database\QueryException(
-          '', 
-          [], 
-          new \PDOException("Location with title '{$model->title}' already exists. Please select the existing location or choose a different name.")
+        $validator = \Illuminate\Support\Facades\Validator::make([], []);
+        throw new \Illuminate\Validation\ValidationException(
+          $validator,
+          ['title' => ["Location with title '{$model->title}' already exists. Please select the existing location or choose a different name."]]
         );
       }
       
       // Check if location with same slug already exists
       $existingBySlug = static::where('slug', $model->slug)->first();
       if ($existingBySlug) {
-        throw new \Illuminate\Database\QueryException(
-          '', 
-          [], 
-          new \PDOException("Location with slug '{$model->slug}' already exists. Please select the existing location or choose a different name.")
+        $validator = \Illuminate\Support\Facades\Validator::make([], []);
+        throw new \Illuminate\Validation\ValidationException(
+          $validator,
+          ['slug' => ["Location with slug '{$model->slug}' already exists. Please select the existing location or choose a different name."]]
         );
       }
     });
