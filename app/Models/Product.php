@@ -313,12 +313,35 @@ class Product extends Model
 
   public function getTogetherProducts(int $limit = 10, array $includes = []): Collection
   {
+    // Ensure locations and types are loaded
+    $this->load(['locations', 'types']);
+    
+    $locationIds = $this->locations->pluck('id')->toArray();
+    $typeIds = $this->types->pluck('id')->toArray();
+    
+    // If no locations and no types, return empty collection to avoid returning all products
+    if (empty($locationIds) && empty($typeIds)) {
+      return collect();
+    }
+    
+    // Build query with proper grouping for OR condition
     $query = $this->query()
       ->where('status_id', Status::ACTIVE)
       ->whereNotNull('published_at')
       ->where('id', '!=', $this->id)
-      ->whereHas('locations', fn($q) => $q->whereIn('locations.id', $this->locations->pluck('id')))
-      ->orWhereHas('types', fn($q) => $q->whereIn('types.id', $this->types->pluck('id')))
+      ->where(function($q) use ($locationIds, $typeIds) {
+        if (!empty($locationIds)) {
+          $q->whereHas('locations', fn($sq) => $sq->whereIn('locations.id', $locationIds));
+        }
+        if (!empty($typeIds)) {
+          // Use orWhereHas only if locationIds is not empty, otherwise use whereHas
+          if (!empty($locationIds)) {
+            $q->orWhereHas('types', fn($sq) => $sq->whereIn('types.id', $typeIds));
+          } else {
+            $q->whereHas('types', fn($sq) => $sq->whereIn('types.id', $typeIds));
+          }
+        }
+      })
       ->with('preview', 'locations', 'categories', 'types')
       ->withCount(['reviews' => function($query) {
         $query->whereNull('parent_id');
@@ -339,11 +362,18 @@ class Product extends Model
       ->limit($limit)
       ->get();
 
-    while($products->count() < $limit) {
-      $products = $products->collect()->merge($products)->slice(0, $limit);
+    // Fix infinite loop: only duplicate if we have at least one product and need more
+    // Don't create infinite loop - just duplicate once if needed
+    if ($products->count() > 0 && $products->count() < $limit) {
+      $originalCount = $products->count();
+      $needed = $limit - $originalCount;
+      
+      // Take as many as needed from the original products (duplicate them)
+      $duplicates = $products->take($needed);
+      $products = $products->merge($duplicates);
     }
 
-    return $products;
+    return $products->take($limit);
   }
 
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
@@ -398,7 +428,19 @@ class Product extends Model
     $rdata = CustomEncrypt::decodeUrlHash($pid);
     $id = isset($rdata['id']) ? $rdata['id'] : null;
 
-    return static::where('id', $id)->with('author.options')->withCount('reviews')->first();
+    return static::where('id', $id)
+      ->with([
+        'author.options',
+        'preview',
+        'gallery',
+        'locations',
+        'types',
+        'categories'
+      ])
+      ->withCount(['reviews' => function($query) {
+        $query->whereNull('parent_id');
+      }])
+      ->first();
   }
 
   public static function getAnalogs(int $product_id = null)
