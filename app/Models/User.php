@@ -456,7 +456,11 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function getShortDescription(int $length = 250): string
     {
-      return (strlen($this->description) > $length) ? substr($this->description, 0, $length) . '...' : $this->description;
+      $description = $this->description ?? '';
+      if (empty($description)) {
+        return '';
+      }
+      return (strlen($description) > $length) ? substr($description, 0, $length) . '...' : $description;
     }
 
     public function hasFavorite(int $id, string $type)
