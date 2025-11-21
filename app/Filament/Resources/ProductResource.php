@@ -10,6 +10,9 @@ use App\Models\Status;
 use App\Models\Type;
 use App\Models\Category;
 use App\Models\Location;
+use App\Models\Gallery;
+use App\Helpers\Collapse;
+use App\Jobs\OptimizeMedia;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -135,6 +138,47 @@ class ProductResource extends Resource
                             ->dehydrated(false), // Don't save to database if column doesn't exist
                     ])
                     ->columns(2),
+                
+                Section::make('Images')
+                    ->schema([
+                        FileUpload::make('preview_image')
+                            ->label('Preview Image (Main Image)')
+                            ->image()
+                            ->directory('images')
+                            ->disk('public')
+                            ->maxSize(10240) // 10MB
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->helperText('Main product image that will be displayed as preview')
+                            ->default(fn ($record) => $record?->preview?->image)
+                            ->columnSpanFull(),
+                        
+                        FileUpload::make('gallery_images')
+                            ->label('Gallery Images')
+                            ->image()
+                            ->directory('images')
+                            ->disk('public')
+                            ->multiple()
+                            ->maxFiles(8)
+                            ->maxSize(10240) // 10MB per file
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->helperText('Additional product images (up to 8 images)')
+                            ->default(fn ($record) => $record?->gallery->where('preview', 0)->pluck('image')->toArray() ?? [])
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(fn ($record) => $record !== null),
                 
                 Section::make('Additional Information')
                     ->schema([

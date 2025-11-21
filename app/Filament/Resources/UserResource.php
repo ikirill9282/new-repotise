@@ -57,7 +57,11 @@ class UserResource extends Resource
     $tableFilters = request()->get('tableFilters', []);
     if (!isset($tableFilters['system_users']) || !$tableFilters['system_users']) {
       // By default, exclude system users
-      $query->whereDoesntHave('roles', fn($q) => $q->where('name', 'system'));
+      // Also include users with ID 0 (if they exist) even if they have system role
+      $query->where(function($q) {
+        $q->whereDoesntHave('roles', fn($subq) => $subq->where('name', 'system'))
+          ->orWhere('id', 0);
+      });
     }
     // If filter is active, don't exclude system users (show all)
     
