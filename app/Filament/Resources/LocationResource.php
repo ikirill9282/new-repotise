@@ -41,8 +41,15 @@ class LocationResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')->maxLength(250),
-                TextInput::make('slug')->disabled(),
+                TextInput::make('title')
+                    ->required()
+                    ->maxLength(250)
+                    ->unique(ignoreRecord: true)
+                    ->validationMessages([
+                        'unique' => 'Location with this title already exists. Please choose a different name or select the existing location.',
+                    ]),
+                TextInput::make('slug')
+                    ->disabled(),
             ])
             ->columns(1);
     }
