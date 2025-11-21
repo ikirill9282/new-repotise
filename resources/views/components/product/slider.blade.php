@@ -49,7 +49,7 @@
             <div class="relative h-60 rounded overflow-hidden">
                 <img 
                   class="max-w-full w-full h-full object-cover" 
-                  src="{{ url($product->preview->image) }}" 
+                  src="{{ url($product->preview?->image ?? '/storage/images/default_product.png') }}" 
                   alt="product {{ $product->id }} image"
                 >
 

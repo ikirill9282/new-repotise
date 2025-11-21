@@ -23,7 +23,7 @@
                 />
               </div>
               <div class="rounded-lg overflow-hidden h-24 md:h-30">
-                <img class="w-full h-full object-cover" src="{{ $product->preview->image }}" alt="Preview">
+                <img class="w-full h-full object-cover" src="{{ $product->preview?->image ?? '/storage/images/default_product.png' }}" alt="Preview">
               </div>
               <div class="flex justify-start items-start md:items-center flex-col md:flex-row w-full !gap-16 overflow-hidden">
                 <div class="w-full md:w-auto md:overflow-hidden">

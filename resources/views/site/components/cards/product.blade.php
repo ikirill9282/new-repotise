@@ -6,7 +6,7 @@
 
 @if(isset($template) && $template == 'cart')
   <div class="item">
-    <img src="{{ url($model->preview->image) }}" alt="Product Preview"
+    <img src="{{ url($model->preview?->image ?? '/storage/images/default_product.png') }}" alt="Product Preview"
         class="order_img">
     <div class="description_orders">
         <div class="title_description">
@@ -43,7 +43,7 @@
   <div class="item flex flex-col {{ isset($class) ? $class : '' }}">
     <div class="img_products relative" x-data="{}">
 				<a href="{{ $model->makeUrl() }}" class="block">
-        <img class="main_img object-cover" src="{{ url($model->preview->image) }}" alt="model {{ $model->id }} image">
+        <img class="main_img object-cover" src="{{ url($model->preview?->image ?? '/storage/images/default_product.png') }}" alt="model {{ $model->id }} image">
 				</a>
 
         @include('site.components.favorite.button', [
