@@ -24,28 +24,20 @@ class EditProduct extends EditRecord
         $this->record->load(['preview', 'gallery']);
         
         // Load existing preview image - FileUpload expects array with path
-        // For existing files, we pass the path as stored in database
+        // Use full path with /storage/ prefix as stored in database (same as default() in form)
         if ($this->record->preview && $this->record->preview->image) {
-            // FileUpload stores paths relative to disk root or with /storage/ prefix
-            // Use the path as stored in database
-            $previewPath = $this->record->preview->image;
-            // Convert to relative path (without /storage/) for Filament
-            $previewPath = str_replace('/storage/', '', $previewPath);
-            $data['preview_image'] = $previewPath ? [$previewPath] : [];
+            $data['preview_image'] = [$this->record->preview->image];
         } else {
             $data['preview_image'] = [];
         }
         
-        // Load existing gallery images - FileUpload expects array of paths
+        // Load existing gallery images - FileUpload expects array of paths with /storage/ prefix
         $galleryImages = $this->record->gallery()
             ->where('preview', 0)
             ->where('placement', 'gallery')
             ->whereNull('expires_at')
             ->get()
-            ->map(function($item) {
-                // Convert to relative path (without /storage/) for Filament
-                return str_replace('/storage/', '', $item->image);
-            })
+            ->pluck('image')
             ->filter()
             ->values()
             ->toArray();
@@ -62,14 +54,14 @@ class EditProduct extends EditRecord
         $previewImageData = $data['preview_image'] ?? [];
         $this->previewImage = is_array($previewImageData) && !empty($previewImageData) 
             ? $previewImageData 
-            : null;
+            : [];
         
         $galleryImagesData = $data['gallery_images'] ?? [];
         $this->galleryImages = is_array($galleryImagesData) && !empty($galleryImagesData)
             ? $galleryImagesData
             : [];
         
-        // Remove images from data as they will be processed separately
+        // Remove images from data as they will be processed separately in afterSave
         unset($data['preview_image'], $data['gallery_images']);
         
         return $data;
@@ -78,6 +70,8 @@ class EditProduct extends EditRecord
     protected function afterSave(): void
     {
         $record = $this->record->fresh(['preview', 'gallery']);
+        $newPreviewPath = null;
+        $newGalleryPaths = [];
         
         // Helper function to normalize image paths for comparison
         $normalizePath = function($path) {
@@ -114,6 +108,7 @@ class EditProduct extends EditRecord
                     ->whereNull('expires_at')
                     ->update(['preview' => 0, 'expires_at' => Carbon::now()]);
             }
+            $newPreviewPath = null;
         } else {
             $newPreview = $previewArray[0];
             
@@ -130,32 +125,41 @@ class EditProduct extends EditRecord
                 }
                 
                 $path = $newPreview->store('images', 'public');
+                $savedImagePath = "/storage/$path"; // Full path for database
                 
                 Gallery::create([
                     'user_id' => $record->user_id,
                     'model_id' => $record->id,
                     'type' => 'products',
-                    'image' => "/storage/$path",
+                    'image' => $savedImagePath,
                     'preview' => 1,
                     'placement' => 'site',
                     'size' => Collapse::bytesToMegabytes($newPreview->getSize()),
                 ]);
                 
                 OptimizeMedia::dispatch('public', $path);
+                
+                // Update form with saved path (full path with /storage/)
+                $newPreviewPath = $savedImagePath;
+            } elseif (is_string($newPreview)) {
+                // Existing path - keep it as is (with /storage/ prefix)
+                $newPreviewPath = $newPreview;
             }
-            // If it's a string (existing path), do nothing (image unchanged)
         }
         
         // Handle gallery images
         $galleryArray = is_array($this->galleryImages) ? $this->galleryImages : [];
         
         // Normalize current gallery paths (existing images as strings)
-        $currentGalleryPaths = array_filter(array_map(function($img) use ($normalizePath) {
-            if (is_string($img)) {
-                return $normalizePath($img);
+        $currentGalleryPaths = [];
+        $newGalleryPaths = []; // Initialize array for gallery paths
+        foreach ($galleryArray as $image) {
+            if (is_string($image)) {
+                $normalized = $normalizePath($image);
+                $currentGalleryPaths[] = $normalized;
+                $newGalleryPaths[] = $normalized; // Keep existing paths
             }
-            return null; // New files (objects) will be processed separately
-        }, $galleryArray));
+        }
         
         // Find images that were removed (exist in DB but not in form)
         $removedImages = array_diff($existingGallery, $currentGalleryPaths);
@@ -181,21 +185,59 @@ class EditProduct extends EditRecord
             // Check if it's a new file (UploadedFile instance)
             if (is_object($image) && method_exists($image, 'store')) {
                 $path = $image->store('images', 'public');
+                $savedImagePath = "/storage/$path"; // Full path for database
                 
                 Gallery::create([
                     'user_id' => $record->user_id,
                     'model_id' => $record->id,
                     'type' => 'products',
-                    'image' => "/storage/$path",
+                    'image' => $savedImagePath,
                     'preview' => 0,
                     'placement' => 'gallery',
                     'size' => Collapse::bytesToMegabytes($image->getSize()),
                 ]);
                 
                 OptimizeMedia::dispatch('public', $path);
+                
+                // Add saved path to gallery paths for form update (full path with /storage/)
+                $newGalleryPaths[] = $savedImagePath;
+            } elseif (is_string($image)) {
+                // Existing path - keep it as is (with /storage/ prefix)
+                $newGalleryPaths[] = $image;
             }
-            // If it's a string (existing path), do nothing (image unchanged)
         }
+        
+        // After saving, reload record with fresh relationships
+        $this->record = $this->record->fresh(['preview', 'gallery']);
+        
+        // Update form state with saved image paths to prevent "Waiting for size" issue
+        // Use full paths with /storage/ prefix (same format as default() in form)
+        $currentState = $this->form->getState();
+        
+        // Update preview image path if new file was saved
+        if ($newPreviewPath !== null && is_string($newPreviewPath)) {
+            // New file was saved - update form with saved path
+            $currentState['preview_image'] = [$newPreviewPath];
+        } elseif ($newPreviewPath === null) {
+            // Preview was removed
+            $currentState['preview_image'] = [];
+        }
+        // If existing path (string), form already has it, no update needed
+        
+        // Update gallery images paths - include all saved and existing paths
+        if (!empty($newGalleryPaths)) {
+            $currentState['gallery_images'] = array_values(array_unique($newGalleryPaths));
+        }
+        
+        // Fill form with updated image paths (full paths with /storage/ prefix)
+        $this->form->fill($currentState);
+        
+        // Show success notification
+        Notification::make()
+            ->success()
+            ->title('Product updated')
+            ->body('The product and images have been saved successfully.')
+            ->send();
     }
 
     protected function getHeaderActions(): array
