@@ -375,11 +375,19 @@ class Product extends Model
       ->limit($limit)
       ->get();
 
-    while($products->count() < $limit) {
-      $products = $products->collect()->merge($products)->slice(0, $limit);
+    // If we have fewer products than requested and have at least one product,
+    // duplicate them once (but don't create an infinite loop)
+    if ($products->count() > 0 && $products->count() < $limit) {
+      $originalCount = $products->count();
+      $needed = $limit - $originalCount;
+      
+      // Take as many as needed from the original products (duplicate them)
+      $duplicates = $products->take($needed);
+      $products = $products->merge($duplicates);
     }
 
-    return $products;
+    // Return only the requested limit to prevent any edge cases
+    return $products->take($limit);
   }
 
   public static function findByPid(string $pid): ?Product
