@@ -519,7 +519,7 @@ class Settings extends Component
         }
 
         $this->validate([
-            'avatar' => 'required|image|mimes:jpeg,jpg,png,gif,webp',
+            'avatar' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:102400',
         ]);
 
         try {
@@ -549,7 +549,7 @@ class Settings extends Component
 
             $this->dispatch('toastSuccess', ['message' => 'Avatar updated successfully.']);
         } catch (ValidationException $e) {
-            $this->dispatch('toastError', ['message' => 'Please select a valid image file (max 2MB, jpeg/jpg/png/gif).']);
+            $this->dispatch('toastError', ['message' => 'Please select a valid image file (max 100MB, jpeg/jpg/png/gif).']);
             $this->avatar = null;
         } catch (\Throwable $e) {
             Log::error('Failed to upload avatar.', [

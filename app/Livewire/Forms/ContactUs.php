@@ -31,7 +31,7 @@ class ContactUs extends Component
         'email' => 'required|email',
         'subject' => 'required|string',
         'text' => 'required|string',
-        'file' => 'sometimes|nullable|file',
+        'file' => 'sometimes|nullable|file|max:102400',
       ]);
 
       if ($validator->fails()) {

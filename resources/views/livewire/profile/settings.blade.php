@@ -256,7 +256,7 @@
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <span class="text-white text-xs font-medium">Change</span>
             </div>
-            <x-tooltip class="!absolute -top-3 right-0" message="Visible to other users. Upload JPG, PNG, or JPEG (max 5MB)."></x-tooltip>
+            <x-tooltip class="!absolute -top-3 right-0" message="Visible to other users. Upload JPG, PNG, or JPEG (max 100MB)."></x-tooltip>
             <input 
                 type="file" 
                 id="avatar-upload" 

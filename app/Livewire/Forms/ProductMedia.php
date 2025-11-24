@@ -259,6 +259,43 @@ class ProductMedia extends Component
         throw new ValidationException($validator);
       }
 
+      // Validate file sizes
+      if (!empty($valid['banner']['uploaded'])) {
+        $bannerValidator = Validator::make(['banner' => $valid['banner']['uploaded']], [
+          'banner' => 'image|mimes:jpeg,jpg,png,gif,webp|max:102400',
+        ]);
+        if ($bannerValidator->fails()) {
+          $validator->errors()->merge($bannerValidator->errors());
+          throw new ValidationException($validator);
+        }
+      }
+
+      // Validate gallery images
+      foreach ($valid['gallery'] as $key => $item) {
+        if (!empty($item['uploaded'])) {
+          $galleryValidator = Validator::make(['image' => $item['uploaded']], [
+            'image' => 'image|mimes:jpeg,jpg,png,gif,webp|max:102400',
+          ]);
+          if ($galleryValidator->fails()) {
+            $validator->errors()->add("gallery.$key", 'Image size must be less than 100MB.');
+            throw new ValidationException($validator);
+          }
+        }
+      }
+
+      // Validate product files
+      foreach ($valid['files'] as $key => $file) {
+        if (!empty($file['uploaded'])) {
+          $fileValidator = Validator::make(['file' => $file['uploaded']], [
+            'file' => 'file|max:102400',
+          ]);
+          if ($fileValidator->fails()) {
+            $validator->errors()->add("files.$key", 'File size must be less than 100MB.');
+            throw new ValidationException($validator);
+          }
+        }
+      }
+
       return $valid;
     }
 

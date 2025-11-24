@@ -167,7 +167,7 @@ class ProductResource extends Resource
                             ->image()
                             ->directory('images')
                             ->disk('public')
-                            ->maxSize(10240) // 10MB
+                            ->maxSize(102400) // 100MB
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -193,7 +193,7 @@ class ProductResource extends Resource
                             ->disk('public')
                             ->multiple()
                             ->maxFiles(8)
-                            ->maxSize(10240) // 10MB per file
+                            ->maxSize(102400) // 100MB per file
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,

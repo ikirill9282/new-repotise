@@ -31,7 +31,7 @@ class DataController extends Controller
 
   public function uploadImage(Request $request)
   {
-    $request->validate(['image' => 'required|image|mimes:jpeg,jpg,png,gif,webp']);
+    $request->validate(['image' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:102400']);
     $image = $request->file('image');
     
     try {

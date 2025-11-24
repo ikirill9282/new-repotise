@@ -123,6 +123,17 @@ class Article extends Component
         throw new ValidationException($validator);
       }
 
+      // Validate banner size if uploaded
+      if ($this->banner) {
+        $bannerValidator = Validator::make(['banner' => $this->banner], [
+          'banner' => 'image|mimes:jpeg,jpg,png,gif,webp|max:102400',
+        ]);
+        if ($bannerValidator->fails()) {
+          $validator->errors()->merge($bannerValidator->errors());
+          throw new ValidationException($validator);
+        }
+      }
+
       $valid = $validator->validated();
       $valid['text'] = $this->processText($valid['text']);
 

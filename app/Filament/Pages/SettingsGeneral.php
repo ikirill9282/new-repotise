@@ -84,9 +84,9 @@ class SettingsGeneral extends Page implements HasForms
                             ->directory('logos')
                             ->disk('public')
                             ->visibility('public')
-                            ->maxSize(2048)
+                            ->maxSize(102400)
                             ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'])
-                            ->helperText('Upload platform logo (PNG, JPG, SVG, max 2MB)')
+                            ->helperText('Upload platform logo (PNG, JPG, SVG, max 100MB)')
                             ->imagePreviewHeight('100')
                             ->downloadable()
                             ->openable(),

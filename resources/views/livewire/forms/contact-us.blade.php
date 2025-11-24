@@ -58,8 +58,8 @@
 								if (input) {
 										input.addEventListener('change', function(event) {
 												const file = event.target.files[0];
-												if (file && file.size > 25 * 1024 * 1024) {
-														alert('Файл слишком большой. Максимальный размер — 25 МБ.');
+												if (file && file.size > 100 * 1024 * 1024) {
+														alert('Файл слишком большой. Максимальный размер — 100 МБ.');
 														event.target.value = ''; // Очистить input
 												}
 										});
