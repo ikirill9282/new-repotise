@@ -64,6 +64,8 @@
         <div x-data="{}" class="">
             <x-link x-on:click.prevent="() => Livewire.dispatch('openModal', { modalName: 'levels' })">Learn More</x-link>
         </div>
+
+				<x-profile.creator-plus-banner class="mt-4" />
     @endif
 </x-card>
 

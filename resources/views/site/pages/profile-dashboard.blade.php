@@ -14,9 +14,7 @@
             @endif
             {{-- <x-profile.resend-verify class="mb-4" /> --}}
             
-            @if($user && $user->hasRole('creator'))
-                <x-profile.creator-plus-banner class="mb-4" />
-            @endif
+           
 
             <div class="flex flex-col lg:flex-row justify-start items-stretch gap-3 mb-4">
                 <div class="basis-1/2">
@@ -24,6 +22,7 @@
                 </div>
                 <div class="basis-1/2">
                     @livewire('profile.level-benefits', ['class' => 'h-full'])
+										
                 </div>
             </div>
 
