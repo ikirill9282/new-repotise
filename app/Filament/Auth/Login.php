@@ -8,6 +8,7 @@ use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Auth\Login as BaseLogin;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -19,20 +20,26 @@ class Login extends BaseLogin
     $user = $email ? User::where('email', $email)->first() : null;
     
     // Check if user is locked
-    if ($user && $user->login_locked_until && $user->login_locked_until > now()) {
-      LoginHistory::logFailed($email, 'Account is locked due to multiple failed login attempts', request()->ip(), request()->userAgent());
-      
-      throw ValidationException::withMessages([
-        'data.email' => __('Your account has been temporarily locked due to multiple failed login attempts. Please try again later or contact support.'),
-      ]);
+    if ($user && $user->login_locked_until) {
+      $lockedUntil = $user->login_locked_until instanceof Carbon ? $user->login_locked_until : Carbon::parse($user->login_locked_until);
+      if ($lockedUntil > now()) {
+        LoginHistory::logFailed($email, 'Account is locked due to multiple failed login attempts', request()->ip(), request()->userAgent());
+        
+        throw ValidationException::withMessages([
+          'data.email' => __('Your account has been temporarily locked due to multiple failed login attempts. Please try again later or contact support.'),
+        ]);
+      }
     }
 
     // Reset lock if time has passed
-    if ($user && $user->login_locked_until && $user->login_locked_until <= now()) {
-      $user->login_locked_until = null;
-      $user->failed_login_attempts = 0;
-      $user->last_failed_login_at = null;
-      $user->save();
+    if ($user && $user->login_locked_until) {
+      $lockedUntil = $user->login_locked_until instanceof Carbon ? $user->login_locked_until : Carbon::parse($user->login_locked_until);
+      if ($lockedUntil <= now()) {
+        $user->login_locked_until = null;
+        $user->failed_login_attempts = 0;
+        $user->last_failed_login_at = null;
+        $user->save();
+      }
     }
 
     // Log failed login
@@ -41,7 +48,9 @@ class Login extends BaseLogin
     // Increment failed attempts
     if ($user) {
       $now = now();
-      $lastFailed = $user->last_failed_login_at;
+      $lastFailed = $user->last_failed_login_at ? 
+        ($user->last_failed_login_at instanceof Carbon ? $user->last_failed_login_at : Carbon::parse($user->last_failed_login_at)) 
+        : null;
       $fifteenMinutesAgo = $now->copy()->subMinutes(15);
       
       // Reset counter if last failed attempt was more than 15 minutes ago

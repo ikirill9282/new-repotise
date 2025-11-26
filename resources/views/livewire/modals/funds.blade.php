@@ -45,11 +45,24 @@
             class="bg-transparent group-has-[input]:!px-0"
           />
         @endforeach
+        <x-btn 
+          second 
+          class="!inline-block !text-sm !px-3 !py-1.5 w-auto mt-1"
+          x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'payment-method' })"
+        >
+          + Add Payment Method
+        </x-btn>
       </div>
     @else
       <div class="bg-light rounded !p-4 text-gray flex flex-col gap-2">
         <span>No payment methods saved yet.</span>
-        <x-btn second class="!inline-block !text-sm !px-3 !py-1 w-auto">+ Add Payment Method</x-btn>
+        <x-btn 
+          second 
+          class="!inline-block !text-sm !px-3 !py-1 w-auto"
+          x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'payment-method' })"
+        >
+          + Add Payment Method
+        </x-btn>
       </div>
     @endif
   </form>
@@ -79,7 +92,20 @@
 
   {{-- BUTTONS --}}
   <div class="flex justify-center items-center gap-3 max-w-xl mx-auto">
-    <x-btn class="!text-sm sm:!text-base !w-auto !px-6" wire:click.prevent="$dispatch('closeModal')" outlined>Cancel</x-btn>
-    <x-btn class="!text-sm sm:!text-base !grow">Add Funds</x-btn>
+    <x-btn 
+      class="!text-sm sm:!text-base !w-auto !px-6" 
+      wire:click.prevent="$dispatch('closeModal')" 
+      outlined
+    >
+      Cancel
+    </x-btn>
+    <x-btn 
+      class="!text-sm sm:!text-base !grow"
+      wire:click="submit"
+      wire:loading.attr="disabled"
+    >
+      <span wire:loading.remove wire:target="submit">Add Funds</span>
+      <span wire:loading wire:target="submit">Processing...</span>
+    </x-btn>
   </div>
 </div>

@@ -331,13 +331,20 @@ class ProductResource extends Resource
                   ->searchable()
                   ->toggleable()
                   ->badge()
-                  ->color(fn($record) => match($record->status_id) {
-                    1 => Color::Emerald,
-                    2 => Color::Indigo,
-                    3 => Color::Amber,
-                    4 => Color::Sky,
-                    5 => Color::Red,
-                    6 => Color::Orange,
+                  ->color(function($record) {
+                    if (!$record || !$record->status_id) {
+                        return Color::Gray;
+                    }
+                    return match($record->status_id) {
+                        1 => Color::Emerald,
+                        2 => Color::Indigo,
+                        3 => Color::Amber,
+                        4 => Color::Sky,
+                        5 => Color::Red,
+                        6 => Color::Orange,
+                        7 => Color::Gray,
+                        default => Color::Gray,
+                    };
                   })
                   ,
 

@@ -162,8 +162,13 @@ class Order extends Model
 
     public function getTax(): float
     {
-      // База для расчёта налога = cost - discount_amount
-      $base = $this->cost - ($this->discount_amount ?? 0);
+      // Для подготовленного заказа или когда cost не установлен (null), считаем от суммы заказа
+      if ($this->prepare || is_null($this->cost)) {
+        $base = $this->getAmount() - $this->getDiscount();
+      } else {
+        // Для сохраненного заказа используем cost - discount_amount
+        $base = $this->cost - ($this->discount_amount ?? 0);
+      }
       
       // Получаем ставку налога из настроек
       $vatRate = $this->getVatRate();
@@ -201,6 +206,7 @@ class Order extends Model
       $order = new static();
       $order->prepare = true;
       $order->promocode = $cart->hasPromocode() ? $cart->getCartPromocode() : null;
+      $order->discount_id = $cart->hasPromocode() ? $cart->getCartPromocode() : null;
       $order->products = static::preparingCartProducts($cart);
       $order->status_id = EnumsOrder::NEW;
 
@@ -302,9 +308,17 @@ class Order extends Model
     public function getDiscount(): int
     {
       $sum = 0;
-      if (!$this->discount()->exists()) return $sum;
+      
+      // Для подготовленного заказа проверяем discount_id напрямую
+      if ($this->prepare) {
+        if (empty($this->discount_id)) return $sum;
+        $discount = Discount::find($this->discount_id);
+      } else {
+        if (!$this->discount()->exists()) return $sum;
+        $discount = $this->discount;
+      }
 
-      $discount = $this->discount;
+      if (!$discount) return $sum;
 
       if ($discount->type == 'promocode') {
         if ($discount->target == 'cart') {
@@ -317,8 +331,9 @@ class Order extends Model
         }
       }
 
-      if ($this->discount->type == 'freeproduct') {
+      if ($discount->type == 'freeproduct') {
           $op = $this->findReferalFreeProduct();
+          if (!$op) return 0;
           $max_discount = $op->product->author->id > 0 ? 25 : 50;
 
           return $max_discount > $op->price ? $op->price : $max_discount;

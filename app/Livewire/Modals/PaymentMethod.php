@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Cashier;
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 class PaymentMethod extends Component
 {
@@ -44,7 +45,61 @@ class PaymentMethod extends Component
 
         $this->clientSecret = $intent->client_secret;
 
+        // Dispatch event after a small delay to ensure DOM is ready
         $this->dispatch('payment-method-open');
+        
+        // Also dispatch via JavaScript for immediate execution
+        $this->dispatch('payment-method-open-js');
+    }
+
+    #[On('modal-opened')]
+    public function refreshSetupIntent($data = null): void
+    {
+        // Handle different event formats
+        $modal = null;
+        if (is_array($data)) {
+            $modal = $data['modal'] ?? $data[0]['modal'] ?? null;
+        } elseif (is_string($data)) {
+            $modal = $data;
+        }
+        
+        // Only refresh if this is the payment-method modal
+        if ($modal !== 'payment-method' && $modal !== null) {
+            return;
+        }
+
+        $this->createNewSetupIntent();
+    }
+
+    public function getClientSecret(): string
+    {
+        $this->createNewSetupIntent();
+        return $this->clientSecret;
+    }
+
+    protected function createNewSetupIntent(): void
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return;
+        }
+
+        if (empty($user->stripe_id)) {
+            $user->createOrGetStripeCustomer();
+        }
+
+        // Create a new SetupIntent for each modal opening
+        $intent = Cashier::stripe()->setupIntents->create([
+            'customer' => $user->stripe_id,
+            'payment_method_types' => ['card'],
+            'usage' => 'off_session',
+        ]);
+
+        $this->clientSecret = $intent->client_secret;
+        
+        // Dispatch event with new client secret
+        $this->dispatch('payment-method-client-secret-updated', ['clientSecret' => $this->clientSecret]);
     }
 
     public function attachPaymentMethod(string $paymentMethodId): void
@@ -60,7 +115,12 @@ class PaymentMethod extends Component
 
             $user->updateDefaultPaymentMethod($paymentMethod->id);
 
+            // Dispatch to SettingsComponent (for settings page)
             $this->dispatch('payment-method-added', $paymentMethod->id)->to(SettingsComponent::class);
+            
+            // Dispatch globally (for other components like Funds, Withdraw, etc.)
+            $this->dispatch('payment-method-added', $paymentMethod->id);
+            
             $this->dispatch('toastSuccess', ['message' => 'Payment method added successfully.']);
             $this->dispatch('payment-method-close');
             $this->dispatch('closeModal');

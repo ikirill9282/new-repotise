@@ -31,7 +31,21 @@ class Comment extends Model
 
   public function children()
   {
-    return $this->hasMany(Comment::class, 'parent_id')->orderByDesc('created_at');
+    $query = $this->hasMany(Comment::class, 'parent_id');
+    
+    // Показываем активные комментарии для всех
+    // И PENDING комментарии только для их автора
+    $query->where(function($q) {
+      $q->where('status_id', \App\Enums\Status::ACTIVE);
+      if (auth()->check()) {
+        $q->orWhere(function($subQ) {
+          $subQ->where('status_id', \App\Enums\Status::PENDING)
+            ->where('user_id', auth()->id());
+        });
+      }
+    });
+    
+    return $query->orderByDesc('created_at');
   }
 
   public function likes()

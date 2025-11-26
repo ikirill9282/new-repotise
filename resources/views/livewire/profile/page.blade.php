@@ -60,10 +60,12 @@
                     <span class="text-gray">Open for Collaboration:</span>
                                   <span>{{ $collaborationOpen ? 'Yes' : 'No' }}</span>
                               </p>
+                              @if($user->country)
                               <p class="">
                                   <span class="text-gray">Country:</span>
                                   <span>{{ $user->country }}</span>
                               </p>
+                              @endif
                           </div>
                       </div>
                       <div class="creatorPage__content-infoBlok-list">

@@ -114,8 +114,12 @@ class ResetPasswordConfirm extends Component
       $valid = $validator->validated();
 
       if (!User::validatePassword($valid['password'])) {
-        $validator->errors()->add('password', 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.');
-        return ;
+        $strength = User::getPasswordStrength($valid['password']);
+        $message = $strength === 'weak' 
+          ? 'The password is too weak. Please use a medium or strong password with at least 8 characters, including uppercase and lowercase letters, numbers, and symbols.'
+          : 'The password does not meet the security requirements. Please use a medium or strong password.';
+        $validator->errors()->add('password', $message);
+        throw new ValidationException($validator);
       }
 
       if ($valid['password'] !== $valid['password_confirmation']) {

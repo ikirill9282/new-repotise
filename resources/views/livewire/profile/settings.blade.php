@@ -49,13 +49,42 @@
                   <div class="text-xs text-gray mt-1 pl-1">Click to change your email address.</div>
                 </div>
 
-                <x-form.input 
-                  label="New Password"
-                  type="password"
-                  name="security.password"
-                  wire:model.defer="security.password"
-                  tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols."
-                />
+                <div class="w-full">
+                  <div x-data="{ type: 'password' }" class="">
+                    <x-form.input 
+                      label="New Password"
+                      name="security.password"
+                      wire:model.defer="security.password"
+                      x-bind:type="type"
+                      tooltipText="Password must be at least 8 characters long and include a mix of letters, numbers, and symbols."
+                    >
+                      <x-slot name="icon">
+                        <div x-on:click="() => type = (type == 'password') ? 'text' : 'password'" class="absolute top-1/2 right-9 translate-y-[-50%] hover:cursor-pointer">
+                          <img src="{{ asset('assets/img/icons/eye.svg') }}" alt="Eye" />
+                        </div>
+                      </x-slot>
+                    </x-form.input>
+                  </div>
+                  <div x-data="passwordStrength('security.password')" class="mt-2">
+                    <div x-show="password.length > 0" x-transition>
+                      <div class="flex items-center gap-2 mb-1">
+                        <div class="flex-1 h-1.5 bg-gray/20 rounded-full overflow-hidden">
+                          <div x-bind:class="{
+                            'bg-red-500': strength === 'weak',
+                            'bg-yellow-500': strength === 'medium',
+                            'bg-green-500': strength === 'strong'
+                          }" x-bind:style="'width: ' + (strength === 'weak' ? '33%' : strength === 'medium' ? '66%' : '100%')" class="h-full transition-all duration-300"></div>
+                        </div>
+                        <span x-bind:class="{
+                          'text-red-500': strength === 'weak',
+                          'text-yellow-500': strength === 'medium',
+                          'text-green-500': strength === 'strong'
+                        }" x-text="strengthText" class="text-xs font-medium"></span>
+                      </div>
+                      <p x-show="strength === 'weak'" class="text-xs text-red-500 mt-1">This password is too weak. Please use a medium or strong password with uppercase and lowercase letters, numbers, and symbols.</p>
+                    </div>
+                  </div>
+                </div>
 
                 <x-form.input 
                   label="Confirm Password"
@@ -440,5 +469,70 @@
           reset();
         });
       })();
+
+      function passwordStrength(wireModel) {
+        return {
+          password: '',
+          strength: 'weak',
+          strengthText: 'Weak',
+          
+          init() {
+            const input = document.querySelector('input[name="security.password"]');
+            if (input) {
+              // Check initial value
+              if (input.value) {
+                this.checkStrength(input.value);
+              }
+              // Listen to input events
+              input.addEventListener('input', (e) => {
+                this.checkStrength(e.target.value);
+              });
+            }
+          },
+          
+          checkStrength(value) {
+            this.password = value || '';
+            if (!this.password) {
+              this.strength = 'weak';
+              this.strengthText = 'Weak';
+              return;
+            }
+            
+            let score = 0;
+            const length = this.password.length;
+            
+            // Length checks
+            if (length >= 8) score++;
+            if (length >= 12) score++;
+            if (length >= 16) score++;
+            
+            // Character variety
+            if (/[a-z]/.test(this.password)) score++; // lowercase
+            if (/[A-Z]/.test(this.password)) score++; // uppercase
+            if (/\d/.test(this.password)) score++; // numbers
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.password)) score++; // special chars
+            
+            // Additional checks
+            if (length >= 8 && /[a-z]/.test(this.password) && /[A-Z]/.test(this.password) && /\d/.test(this.password)) {
+              score++; // has lowercase, uppercase, and number
+            }
+            if (length >= 8 && /[a-z]/.test(this.password) && /[A-Z]/.test(this.password) && /\d/.test(this.password) && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.password)) {
+              score++; // has all character types
+            }
+            
+            // Determine strength
+            if (score <= 3) {
+              this.strength = 'weak';
+              this.strengthText = 'Weak';
+            } else if (score <= 6) {
+              this.strength = 'medium';
+              this.strengthText = 'Medium';
+            } else {
+              this.strength = 'strong';
+              this.strengthText = 'Strong';
+            }
+          }
+        }
+      }
     </script>
   @endscript

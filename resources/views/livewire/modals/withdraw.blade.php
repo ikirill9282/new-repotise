@@ -6,6 +6,14 @@
     <form class="pb-6 mb-4 border-b-1 border-gray/30">
         {{-- INPUTS --}}
         <div class="mb-5">
+          {{-- Available Balance --}}
+          <div class="mb-3">
+            <div class="text-gray mb-1 text-sm">Available Balance</div>
+            <div class="px-3 py-2.5 bg-light rounded relative text-gray">
+              {{ currency($available) }}
+            </div>
+          </div>
+          
           <x-form.input 
             type="number"
             step="0.01"
@@ -42,11 +50,24 @@
                   class="bg-transparent group-has-[input]:!px-0"
                 />
               @endforeach
+              <x-btn 
+                second 
+                class="!inline-block !text-sm !px-3 !py-1.5 w-auto mt-1"
+                x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'payment-method' })"
+              >
+                + Add New Payout Method
+              </x-btn>
             </div>
           @else
             <div class="bg-light rounded !p-4 text-gray flex flex-col gap-2">
               <span>No payout methods connected yet.</span>
-              <x-btn second class="!inline-block !text-sm !px-3 !py-1 w-auto">+ Add New Payout Method</x-btn>
+              <x-btn 
+                second 
+                class="!inline-block !text-sm !px-3 !py-1 w-auto"
+                x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'payment-method' })"
+              >
+                + Add New Payout Method
+              </x-btn>
             </div>
           @endif
         </div>
@@ -119,14 +140,21 @@
     </div>
 
     {{-- TWO FACTOR --}}
-    <div class="mb-4">
-      <x-form.input 
-        label="Two-Factor Authentication Code" 
-        placeholder="Enter 6-digit code" 
-        :tooltip="false" 
-        inputClass="!text-base" 
-      />
-    </div>
+    @if($requiresTwofa ?? false)
+      <div class="mb-4">
+        <x-form.input 
+          label="Two-Factor Authentication Code" 
+          placeholder="Enter 6-digit code" 
+          :tooltip="false" 
+          inputClass="!text-base"
+          wire:model="twofaCode"
+          maxlength="6"
+        />
+        @error('twofaCode')
+          <div class="!mt-3 text-red-500">{!! $message !!}</div>
+        @enderror
+      </div>
+    @endif
 
     {{-- BUTTONS --}}
     <div class="flex justify-center items-center gap-3 max-w-xl mx-auto">
@@ -137,8 +165,13 @@
         >
           Cancel
         </x-btn>
-        <x-btn class="!text-sm sm:!text-base !grow">
-          Request Withdrawal
+        <x-btn 
+          class="!text-sm sm:!text-base !grow"
+          wire:click="submit"
+          wire:loading.attr="disabled"
+        >
+          <span wire:loading.remove wire:target="submit">Request Withdrawal</span>
+          <span wire:loading wire:target="submit">Processing...</span>
         </x-btn>
     </div>
 </div>

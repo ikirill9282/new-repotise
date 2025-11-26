@@ -109,6 +109,12 @@ class Product extends Model
     return $array;
   }
 
+  public function shouldBeSearchable(): bool
+  {
+    // Не индексируем удаленные товары
+    return $this->status_id !== Status::DELETED;
+  }
+
   private function generateSlug(bool $salt = false)
   {
     $this->slug = Slug::makeEn($this->title) . ($salt ? random_int(0, 10000) : '');

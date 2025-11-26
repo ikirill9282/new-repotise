@@ -66,6 +66,15 @@ class CabinetController extends Controller
       'facebook' => 'sometimes|nullable|boolean',
       'instagram' => 'sometimes|nullable|boolean',
       'twitter' => 'sometimes|nullable|boolean',
+    ], [
+      'full_name.required' => 'Please enter your Full Name.',
+      'street.required' => 'Please enter a valid Address.',
+      'city.required' => 'Please enter a valid Address.',
+      'state.required' => 'Please enter a valid Address.',
+      'zip.required' => 'Please enter a valid Address.',
+      'country.required' => 'Please enter a valid Address.',
+      'birthday.required' => 'Please enter a valid Date of Birth.',
+      'tax_id.required' => 'Please enter a valid Tax ID or Passport/ID Number.',
     ]);
 
     if (isset($valid['phone'])) $valid['phone'] = preg_replace('/[^0-9]+/is', '', $valid['phone']);
@@ -124,8 +133,13 @@ class CabinetController extends Controller
       ]);
     } catch (\Exception $e) {
       DB::rollBack();
+      Log::error('Verification error', [
+        'user_id' => $user->id,
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString(),
+      ]);
       return redirect()->back()->withErrors([
-        'form' => $e->getMessage(),
+        'form' => 'We encountered an error during verification. Please review the form and try again, or contact support if the issue persists.',
       ]);
     }
     DB::commit();

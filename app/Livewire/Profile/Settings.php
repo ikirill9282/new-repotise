@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use App\Jobs\OptimizeMedia;
@@ -151,6 +152,15 @@ class Settings extends Component
             }
 
             if (!empty($this->security['password'])) {
+                // Validate password strength
+                if (!User::validatePassword($this->security['password'])) {
+                    $strength = User::getPasswordStrength($this->security['password']);
+                    $message = $strength === 'weak' 
+                        ? 'The password is too weak. Please use a medium or strong password with at least 8 characters, including uppercase and lowercase letters, numbers, and symbols.'
+                        : 'The password does not meet the security requirements. Please use a medium or strong password.';
+                    $this->addError('security.password', $message);
+                    throw new ValidationException(Validator::make([], []));
+                }
                 $this->user->password = Hash::make($this->security['password']);
             }
 

@@ -16,6 +16,8 @@ class ProfileProduct extends Component
 
   public string $sorting = 'newest';
 
+  protected $listeners = ['products-refresh' => '$refresh'];
+
   public function mount($active, ?string $sorting = null)
   {
     $this->status_id = match($active) {
@@ -37,6 +39,7 @@ class ProfileProduct extends Component
       'products' => Auth::user()->products()
         ->withCount('favorite')
         ->whereIn('status_id', $satuses)
+        ->where('status_id', '!=', Status::DELETED)
         ->when(
           $this->sorting === 'price_low',
           fn($query) => $query

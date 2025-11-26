@@ -34,7 +34,7 @@
   </div>
 
   <div class="flex flex-col-reverse sm:flex-row justify-center items-center !gap-2 lg:!gap-4">
-    <x-btn class="grow">Withdraw Funds</x-btn>
-    <x-btn outlined class="lg:!w-auto text-nowrap px-4">Top Up Balance</x-btn>
+    <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'withdraw' })" class="grow">Withdraw Funds</x-btn>
+    <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'funds' })" outlined class="lg:!w-auto text-nowrap px-4">Top Up Balance</x-btn>
   </div>
 </x-card>

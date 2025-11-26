@@ -91,7 +91,21 @@ class Article extends Model
 
   public function messages()
   {
-    return $this->hasMany(Comment::class)->orderByDesc('id');
+    $query = $this->hasMany(Comment::class);
+    
+    // Показываем активные комментарии для всех
+    // И PENDING комментарии только для их автора
+    $query->where(function($q) {
+      $q->where('status_id', Status::ACTIVE);
+      if (auth()->check()) {
+        $q->orWhere(function($subQ) {
+          $subQ->where('status_id', Status::PENDING)
+            ->where('user_id', auth()->id());
+        });
+      }
+    });
+    
+    return $query->orderByDesc('id');
   }
   
   public function category()
@@ -147,6 +161,17 @@ class Article extends Model
     $this->comments = Comment::query()
       ->where('article_id', $this->id)
       ->whereNull('parent_id')
+      ->where(function($query) {
+        // Показываем активные комментарии для всех
+        $query->where('status_id', Status::ACTIVE);
+        // И PENDING комментарии только для их автора
+        if (auth()->check()) {
+          $query->orWhere(function($q) {
+            $q->where('status_id', Status::PENDING)
+              ->where('user_id', auth()->id());
+          });
+        }
+      })
       ->with('likes', function($query) {
         $query->with('author.options')->orderByDesc('id')->limit(4);
       })

@@ -1,0 +1,23 @@
+<div>
+  <div class="text-center">
+    {{-- HEADER --}}
+    <div class="text-2xl font-semibold mb-6">Product Deleted</div>
+
+    {{-- LOGO --}}
+    <div class="!mb-6 flex justify-center items-center">
+      @include('icons.check')
+    </div>
+
+    {{-- TEXT --}}
+    <div class="mb-6 flex flex-col gap-2">
+      <p>The product has been successfully deleted from the marketplace.</p>
+      <p>Customers who have already purchased this product will continue to have access to it.</p>
+    </div>
+
+    {{-- BUTTONS --}}
+    <div class="flex justify-center items-center gap-2 flex-col sm:flex-row">
+      <x-btn class="!text-sm sm:!text-base" wire:click.prevent="$dispatch('closeModal')">Close</x-btn>
+    </div>
+  </div>
+</div>
+

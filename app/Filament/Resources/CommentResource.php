@@ -7,6 +7,7 @@ use App\Filament\Resources\CommentResource\RelationManagers;
 use App\Models\Comment;
 use App\Models\Status;
 use App\Models\Article;
+use App\Models\Report;
 use App\Enums\Status as StatusEnum;
 use App\Filament\Resources\UserResource;
 use Filament\Forms;
@@ -44,6 +45,13 @@ class CommentResource extends Resource
     protected static ?string $navigationLabel = 'Comments';
 
     protected static ?int $navigationSort = 2;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['status', 'author', 'article'])
+            ->withCount('reports');
+    }
 
     public static function form(Form $form): Form
     {
@@ -94,9 +102,12 @@ class CommentResource extends Resource
                     })
                     ->badge()
                     ->color('gray'),
-                TextColumn::make('display_status')
+                TextColumn::make('status.title')
                     ->label('Status')
                     ->formatStateUsing(function($record) {
+                        if (!$record || !$record->status_id) {
+                            return 'Unknown';
+                        }
                         return match($record->status_id) {
                             StatusEnum::ACTIVE => 'Published',
                             StatusEnum::PENDING => 'Pending Approval',
@@ -106,13 +117,26 @@ class CommentResource extends Resource
                         };
                     })
                     ->badge()
-                    ->color(fn($record) => match($record->status_id) {
-                        StatusEnum::ACTIVE => 'success',
-                        StatusEnum::PENDING => 'warning',
-                        StatusEnum::REJECT => 'danger',
-                        StatusEnum::SPAM => 'gray',
-                        default => 'gray',
-                    }),
+                    ->color(function($record) {
+                        if (!$record || !$record->status_id) {
+                            return 'gray';
+                        }
+                        return match($record->status_id) {
+                            StatusEnum::ACTIVE => 'success',
+                            StatusEnum::PENDING => 'warning',
+                            StatusEnum::REJECT => 'danger',
+                            StatusEnum::SPAM => 'gray',
+                            default => 'gray',
+                        };
+                    })
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('reports_count')
+                    ->label('Reports')
+                    ->counts('reports')
+                    ->badge()
+                    ->color(fn($record) => $record->reports_count > 0 ? 'danger' : 'gray')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Date Created')
                     ->dateTime()
@@ -135,6 +159,22 @@ class CommentResource extends Resource
                         return $query->where('status_id', $data['value']);
                     })
                     ->default(StatusEnum::PENDING),
+                SelectFilter::make('has_reports')
+                    ->label('Has Reports')
+                    ->options([
+                        'all' => 'All',
+                        'yes' => 'Has Reports',
+                        'no' => 'No Reports',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!isset($data['value']) || $data['value'] === null || $data['value'] === 'all') {
+                            return $query;
+                        }
+                        if ($data['value'] === 'yes') {
+                            return $query->has('reports');
+                        }
+                        return $query->doesntHave('reports');
+                    }),
                 SelectFilter::make('content_type')
                     ->label('Filter by Content Type')
                     ->options([
@@ -163,7 +203,46 @@ class CommentResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->modalHeading('Comment Details')
-                        ->infolist(fn($record) => static::getCommentInfolist($record)),
+                        ->infolist(function($record) {
+                            if (!$record) {
+                                return Infolist::make();
+                            }
+                            return static::getCommentInfolist($record)->record($record);
+                        }),
+                    Action::make('view_reports')
+                        ->label('View Reports')
+                        ->icon('heroicon-o-flag')
+                        ->color('danger')
+                        ->visible(fn($record) => $record && $record->reports()->count() > 0)
+                        ->modalHeading('Reports on Comment')
+                        ->modalContent(function ($record) {
+                            if (!$record) {
+                                return '<p>No reports found.</p>';
+                            }
+                            
+                            $reports = $record->reports()->with('author')->orderByDesc('created_at')->get();
+                            
+                            if ($reports->isEmpty()) {
+                                return '<p>No reports found.</p>';
+                            }
+                            
+                            $html = '<div class="space-y-4">';
+                            foreach ($reports as $report) {
+                                $html .= '<div class="border-b pb-3 mb-3">';
+                                $html .= '<div class="flex justify-between items-start mb-2">';
+                                $html .= '<div>';
+                                $html .= '<strong>' . ($report->author->name ?? 'Unknown User') . '</strong>';
+                                $html .= '<span class="text-gray-500 text-sm ml-2">' . ($report->created_at ? $report->created_at->format('Y-m-d H:i') : '') . '</span>';
+                                $html .= '</div>';
+                                $html .= '</div>';
+                                $html .= '<p class="text-sm text-gray-700 mt-2">' . nl2br(e($report->message ?? 'No message')) . '</p>';
+                                $html .= '</div>';
+                            }
+                            $html .= '</div>';
+                            return $html;
+                        })
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Close'),
                     EditAction::make(),
                     Action::make('approve')
                         ->label('Approve')
@@ -275,6 +354,7 @@ class CommentResource extends Resource
     public static function getCommentInfolist(Comment $record): Infolist
     {
         return Infolist::make()
+            ->record($record)
             ->schema([
                 Section::make('Comment Information')
                     ->schema([
@@ -282,23 +362,29 @@ class CommentResource extends Resource
                             ->label('Comment ID'),
                         TextEntry::make('author.name')
                             ->label('Author')
-                            ->url(fn($record) => $record->author ? UserResource::getUrl('view', ['record' => $record->author]) : null),
+                            ->url(fn($record) => $record && $record->author ? UserResource::getUrl('view', ['record' => $record->author]) : null),
                         TextEntry::make('text')
                             ->label('Comment Text')
                             ->html(),
                         TextEntry::make('article.title')
                             ->label('Content Title')
-                            ->url(fn($record) => $record->article ? url("/admin/articles/{$record->article->id}/edit") : null),
+                            ->url(fn($record) => $record && $record->article ? url("/admin/articles/{$record->article->id}/edit") : null),
                         TextEntry::make('content_type')
                             ->label('Content Type')
-                            ->formatStateUsing(fn($record) => $record->article && $record->article->author->hasRole('admin') ? 'News' : 'Article'),
+                            ->formatStateUsing(fn($record) => $record && $record->article && $record->article->author ? ($record->article->author->hasRole('admin') ? 'News' : 'Article') : 'N/A'),
                         TextEntry::make('parent.text')
                             ->label('Parent Comment')
-                            ->visible(fn($record) => $record->parent_id !== null)
+                            ->visible(fn($record) => $record && $record->parent_id !== null)
                             ->html(),
+                        TextEntry::make('reports_count')
+                            ->label('Reports Count')
+                            ->formatStateUsing(fn($record) => $record ? $record->reports()->count() : 0)
+                            ->badge()
+                            ->color(fn($record) => ($record && $record->reports()->count() > 0) ? 'danger' : 'gray'),
                         TextEntry::make('display_status')
                             ->label('Status')
                             ->formatStateUsing(function($record) {
+                                if (!$record) return 'Unknown';
                                 return match($record->status_id) {
                                     StatusEnum::ACTIVE => 'Published',
                                     StatusEnum::PENDING => 'Pending Approval',
@@ -308,18 +394,54 @@ class CommentResource extends Resource
                                 };
                             })
                             ->badge()
-                            ->color(fn($record) => match($record->status_id) {
-                                StatusEnum::ACTIVE => 'success',
-                                StatusEnum::PENDING => 'warning',
-                                StatusEnum::REJECT => 'danger',
-                                StatusEnum::SPAM => 'gray',
-                                default => 'gray',
+                            ->color(function($record) {
+                                if (!$record) return 'gray';
+                                return match($record->status_id) {
+                                    StatusEnum::ACTIVE => 'success',
+                                    StatusEnum::PENDING => 'warning',
+                                    StatusEnum::REJECT => 'danger',
+                                    StatusEnum::SPAM => 'gray',
+                                    default => 'gray',
+                                };
                             }),
                         TextEntry::make('created_at')
                             ->label('Date Created')
                             ->dateTime(),
                     ])
                     ->columns(2),
+                Section::make('Reports')
+                    ->visible(fn($record) => $record && $record->reports()->count() > 0)
+                    ->schema([
+                        TextEntry::make('reports')
+                            ->label('')
+                            ->formatStateUsing(function($record) {
+                                if (!$record) {
+                                    return 'No reports';
+                                }
+                                
+                                $reports = $record->reports()->with('author')->orderByDesc('created_at')->get();
+                                
+                                if ($reports->isEmpty()) {
+                                    return 'No reports';
+                                }
+                                
+                                $html = '<div class="space-y-4">';
+                                foreach ($reports as $report) {
+                                    $html .= '<div class="border-b pb-3">';
+                                    $html .= '<div class="flex justify-between items-start mb-2">';
+                                    $html .= '<div>';
+                                    $html .= '<strong>' . ($report->author->name ?? 'Unknown') . '</strong>';
+                                    $html .= '<span class="text-gray-500 text-sm ml-2">' . ($report->created_at ? $report->created_at->format('Y-m-d H:i') : '') . '</span>';
+                                    $html .= '</div>';
+                                    $html .= '</div>';
+                                    $html .= '<p class="text-sm text-gray-700">' . nl2br(e($report->message ?? '')) . '</p>';
+                                    $html .= '</div>';
+                                }
+                                $html .= '</div>';
+                                return $html;
+                            })
+                            ->html(),
+                    ]),
             ]);
     }
 

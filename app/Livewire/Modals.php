@@ -27,6 +27,8 @@ class Modals extends Component
       'cancelsub',
       'delete-subscription',
       'delete-subscription-accept',
+      'delete-product',
+      'delete-product-accept',
     ];
 
     public function mount()
@@ -127,6 +129,8 @@ class Modals extends Component
         'file-description',
         'delete-subscription',
         'delete-subscription-accept',
+        'delete-product',
+        'delete-product-accept',
         'payout-details',
       ];
       return !in_array($this->modal, $arr);
@@ -163,9 +167,11 @@ class Modals extends Component
         'social',
         'donate',
         'delete-subscription',
+        'delete-product',
+        'delete-product-accept',
       ])) return '!max-w-2xl';
       
-      if (in_array($this->modal, ['funds', 'contact'])) return '!max-w-xl';
+      if (in_array($this->modal, ['funds', 'contact', 'payment-method'])) return '!max-w-xl';
 
       if (in_array($this->modal, ['payout-details'])) return '!max-w-3xl';
 

@@ -18,7 +18,7 @@
               {{ $inputWrapClass }}
             ">
     <input 
-      type="{{ $type }}" 
+      type="{{ $type }}"
       name="{{ $name }}"
       id="{{ $name }}"
       class="w-full outline-0 

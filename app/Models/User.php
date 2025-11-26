@@ -247,6 +247,11 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->funds()->where(['group' => 'referal']);
     }
 
+    public function withdrawals()
+    {
+      return $this->hasMany(Withdrawal::class);
+    }
+
     public function favorite_products()
     {
       return $this->hasManyThrough(Product::class, UserFavorite::class, 'user_id', 'id', 'id', 'item_id')
@@ -326,7 +331,59 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public static function validatePassword(string $password): bool
     {
-      return preg_match( '/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_\-+=]{8,}$/is', $password);
+      // Basic format check
+      if (!preg_match( '/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_\-+=]{8,}$/is', $password)) {
+        return false;
+      }
+      
+      // Must be medium or strong (not weak)
+      return static::isPasswordAcceptable($password);
+    }
+
+    /**
+     * Determine password strength: 'weak', 'medium', 'strong'
+     */
+    public static function getPasswordStrength(string $password): string
+    {
+      $score = 0;
+      $length = strlen($password);
+
+      // Length check
+      if ($length >= 8) $score++;
+      if ($length >= 12) $score++;
+      if ($length >= 16) $score++;
+
+      // Character variety
+      if (preg_match('/[a-z]/', $password)) $score++; // lowercase
+      if (preg_match('/[A-Z]/', $password)) $score++; // uppercase
+      if (preg_match('/\d/', $password)) $score++; // numbers
+      if (preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) $score++; // special chars
+
+      // Additional checks
+      if ($length >= 8 && preg_match('/[a-z]/', $password) && preg_match('/[A-Z]/', $password) && preg_match('/\d/', $password)) {
+        $score++; // has lowercase, uppercase, and number
+      }
+      if ($length >= 8 && preg_match('/[a-z]/', $password) && preg_match('/[A-Z]/', $password) && preg_match('/\d/', $password) && preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
+        $score++; // has all character types
+      }
+
+      // Determine strength
+      if ($score <= 3) {
+        return 'weak';
+      } elseif ($score <= 6) {
+        return 'medium';
+      } else {
+        return 'strong';
+      }
+    }
+
+    /**
+     * Check if password meets minimum requirements (medium or strong only)
+     */
+    public static function isPasswordAcceptable(string $password): bool
+    {
+      $strength = static::getPasswordStrength($password);
+      return $strength === 'medium' || $strength === 'strong';
     }
 
     public function makeProfileUrl(): string

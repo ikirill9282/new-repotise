@@ -8,7 +8,22 @@
 @php
   $can_write = ($type == 'review') ? auth()->user()?->canWriteReview($model) : auth()->user()?->canWriteComment($model);
   $message_exists = ($type == 'review' ) ? auth()->user()?->reviews()->where('product_id', $model->id)->exists() : true;
-  $count = ($type == 'review') ? $model->reviews_count : $model->messages()->whereNull('parent_id')->count();
+  // Считаем активные комментарии + PENDING комментарии автора
+  $count = ($type == 'review') 
+    ? $model->reviews_count 
+    : $model->messages()
+        ->whereNull('parent_id')
+        ->where(function($query) {
+          $query->where('status_id', \App\Enums\Status::ACTIVE)
+            ->orWhere(function($q) {
+              // Показываем PENDING комментарии только если они принадлежат текущему пользователю
+              if (auth()->check()) {
+                $q->where('status_id', \App\Enums\Status::PENDING)
+                  ->where('user_id', auth()->id());
+              }
+            });
+        })
+        ->count();
 @endphp
 
 <div class="bg-light" id="review">

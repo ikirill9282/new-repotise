@@ -31,6 +31,17 @@ trait HasMessages
         'author.options',
       ])
         ->withCount('likes', 'messages')
+        ->where(function($q) {
+          // Показываем активные комментарии для всех
+          $q->where('status_id', \App\Enums\Status::ACTIVE);
+          // И PENDING комментарии только для их автора
+          if (auth()->check()) {
+            $q->orWhere(function($subQ) {
+              $subQ->where('status_id', \App\Enums\Status::PENDING)
+                ->where('user_id', auth()->id());
+            });
+          }
+        })
         ->when(
           $this->messages_type == 'parent',
           fn($query) => $query->whereNull('parent_id')
@@ -86,7 +97,19 @@ trait HasMessages
     }
 
     if ($this->messages_type == 'parent') {
-      return $this->messages()->whereNull('parent_id')->count() - $this->getLoadedMessagesCount() - $this->messages_offset;
+      // Считаем активные комментарии + PENDING комментарии автора
+      return $this->messages()
+        ->whereNull('parent_id')
+        ->where(function($query) {
+          $query->where('status_id', \App\Enums\Status::ACTIVE)
+            ->orWhere(function($q) {
+              if (auth()->check()) {
+                $q->where('status_id', \App\Enums\Status::PENDING)
+                  ->where('user_id', auth()->id());
+              }
+            });
+        })
+        ->count() - $this->getLoadedMessagesCount() - $this->messages_offset;
     }
     return $this->messages_count - $this->getLoadedMessagesCount() - $this->messages_offset;
   }

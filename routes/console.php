@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\News;
 use App\Models\OrderProducts;
 use App\Models\Subscriptions;
+use App\Models\UserFunds;
 use App\Services\StripeClient;
 use Database\Factories\ProductFactory;
 use Illuminate\Support\Facades\Crypt;
@@ -112,5 +113,55 @@ Artisan::command('flush_stripe_customers', function() {
   $users = Cashier::stripe()->customers->all(['limit' => 100]);
   foreach ($users as $user) {
     Cashier::stripe()->customers->delete($user->id);
+  }
+});
+
+Artisan::command('add-test-balance {user_id} {amount=1000}', function($user_id, $amount) {
+  try {
+    // Check database connection
+    \Illuminate\Support\Facades\DB::connection()->getPdo();
+  } catch (\Exception $e) {
+    $this->error("Database connection failed: " . $e->getMessage());
+    $this->warn("Make sure Docker is running or database is accessible.");
+    $this->warn("If using Docker, run: docker-compose exec php php artisan add-test-balance {$user_id} {$amount}");
+    return 1;
+  }
+  
+  $user = User::find($user_id);
+  
+  if (!$user) {
+    $this->error("User with ID {$user_id} not found.");
+    return 1;
+  }
+  
+  $amount = (float) $amount;
+  
+  if ($amount <= 0) {
+    $this->error("Amount must be greater than 0.");
+    return 1;
+  }
+  
+  try {
+    UserFunds::create([
+      'user_id' => $user->id,
+      'group' => 'referal',
+      'type' => 'credit',
+      'sum' => $amount,
+      'message' => 'Test balance for withdrawal testing',
+      'model' => null,
+      'model_id' => null,
+    ]);
+    
+    $totalBalance = $user->funds()->where('group', 'referal')->sum('sum');
+    
+    $this->info("✓ Successfully added test balance!");
+    $this->info("  User: {$user->email} (ID: {$user->id})");
+    $this->info("  Amount added: $" . number_format($amount, 2));
+    $this->info("  Total referral balance: $" . number_format($totalBalance, 2));
+    
+    return 0;
+  } catch (\Exception $e) {
+    $this->error("Failed to add test balance: " . $e->getMessage());
+    return 1;
   }
 });
