@@ -4,13 +4,22 @@ namespace App\Filament\Widgets;
 
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Filament\Widgets\Concerns\HasDashboardDateRange;
 use App\Models\User;
+use App\Filament\Resources\UserResource;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class UsersWidget extends BaseWidget
 {
+    use HasDashboardDateRange;
+
     protected static ?int $sort = 1;
+
+    public function mount(): void
+    {
+        $this->mountHasDashboardDateRange();
+    }
 
     protected function getColumns(): int
     {
@@ -19,9 +28,11 @@ class UsersWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $period = $this->getPeriod();
-        $startDate = $period['start'];
-        $endDate = $period['end'];
+        // Используем trigger для принудительного обновления
+        $trigger = $this->dateRangeUpdateTrigger ?? 0;
+        
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
 
         // Активные пользователи (с активностью за период)
         $activeUsers = User::query()
@@ -45,28 +56,28 @@ class UsersWidget extends BaseWidget
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
+        // Расчет % изменения для новых пользователей
+        $prevStart = $this->getPreviousPeriodStartDate();
+        $prevEnd = $this->getPreviousPeriodEndDate();
+        $prevNewUsers = User::query()
+            ->whereBetween('created_at', [$prevStart, $prevEnd])
+            ->count();
+        $newUsersChange = $this->calculateChange($newUsers, $prevNewUsers);
+
         return [
             Stat::make('Active Users', number_format($activeUsers))
                 ->description('Active in period')
                 ->color('success')
                 ->icon('heroicon-o-user-group'),
             Stat::make('New Users', number_format($newUsers))
-                ->description('New in period')
-                ->color('primary')
-                ->icon('heroicon-o-user-plus'),
-        ];
-    }
-
-    protected function getPeriod(): array
-    {
-        // По умолчанию последние 30 дней
-        $endDate = Carbon::now();
-        $startDate = $endDate->copy()->subDays(30);
-
-        // TODO: Получать из фильтров дашборда
-        return [
-            'start' => $startDate,
-            'end' => $endDate,
+                ->description($newUsersChange !== null 
+                    ? ($newUsersChange >= 0 ? '+' : '') . number_format($newUsersChange, 1) . '% vs previous period'
+                    : 'New in period'
+                )
+                ->descriptionIcon($newUsersChange !== null && $newUsersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($newUsersChange !== null && $newUsersChange >= 0 ? 'success' : 'danger')
+                ->icon('heroicon-o-user-plus')
+                ->url(UserResource::getUrl('index')),
         ];
     }
 }

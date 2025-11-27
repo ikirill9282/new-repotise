@@ -70,7 +70,7 @@ class ArticleResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->color(Color::Sky)
-                    ->url(fn($record) => url("/admin/articles/$record->id/edit"))
+                    ->url(fn($record) => static::getUrl('edit', ['record' => $record->id]))
                     ,
                 TextColumn::make('content_type')
                     ->label('Type')

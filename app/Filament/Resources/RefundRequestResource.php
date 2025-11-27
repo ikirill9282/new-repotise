@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RefundRequestResource\Pages;
 use App\Models\RefundRequest;
 use App\Services\StripeRefundProcessor;
+use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\UserResource;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -31,6 +33,12 @@ class RefundRequestResource extends Resource
     protected static ?string $navigationLabel = 'Refund Requests';
 
     protected static ?int $navigationSort = 3;
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['order', 'buyer', 'seller']);
+    }
 
     public static function form(Form $form): Form
     {

@@ -15,7 +15,7 @@ class CommunityModerationQueue extends Page
 
     protected static ?string $navigationLabel = 'Moderation Queue';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1;
 
     public static function getUrl(array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null): string
     {

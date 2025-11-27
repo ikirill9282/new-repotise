@@ -75,9 +75,22 @@ class ProductResource extends Resource
                             ->toolbarButtons([
                                 'bold',
                                 'italic',
+                                'underline',
+                                'strike',
                                 'link',
                                 'bulletList',
                                 'orderedList',
+                                'h1',
+                                'h2',
+                                'h3',
+                                'blockquote',
+                                'codeBlock',
+                                'alignLeft',
+                                'alignCenter',
+                                'alignRight',
+                            ])
+                            ->disableToolbarButtons([
+                                // Отключаем только те, которые не нужны
                             ]),
                         
                         Select::make('user_id')
@@ -280,7 +293,7 @@ class ProductResource extends Resource
                   ->toggleable()
                   // ->url(fn($record) => $record->makeUrl(), true)
                   ->color(Color::Sky)
-                  ->url(fn($record) => url("/admin/products/$record->id/edit"))
+                  ->url(fn($record) => static::getUrl('edit', ['record' => $record->id]))
                   ,
                 TextColumn::make('types.title')
                   ->label('Product Type')

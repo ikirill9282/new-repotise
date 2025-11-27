@@ -11,6 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -26,7 +27,6 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Contracts\View\View;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\Checkbox;
 use Filament\Tables\Filters\SelectFilter;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use Illuminate\Support\Carbon;
@@ -84,6 +84,22 @@ class UserResource extends Resource
           ->required()
           ->maxLength(255)
           ->unique(ignoreRecord: true),
+        TextInput::make('password')
+          ->label('Password')
+          ->password()
+          ->required(fn($context) => $context === 'create')
+          ->minLength(8)
+          ->maxLength(255)
+          ->dehydrated(fn($context) => $context === 'create')
+          ->helperText('Minimum 8 characters. Required only when creating new user.')
+          ->visible(fn($context) => $context === 'create'),
+        TextInput::make('password_confirmation')
+          ->label('Confirm Password')
+          ->password()
+          ->required(fn($context) => $context === 'create')
+          ->same('password')
+          ->dehydrated(false)
+          ->visible(fn($context) => $context === 'create'),
         Select::make('roles')
           ->multiple()
           ->options(Role::where('name', '!=', 'system')->pluck('title', 'id'))
@@ -97,6 +113,11 @@ class UserResource extends Resource
             'pending_verification' => 'Pending Verification',
           ])
           ->default('active'),
+        Checkbox::make('send_welcome_email')
+          ->label('Send welcome email to user')
+          ->default(false)
+          ->helperText('If enabled, a welcome email will be sent to the user\'s email address.')
+          ->visible(fn($context) => $context === 'create'),
       ])
       ->columns(1);
   }
@@ -111,7 +132,14 @@ class UserResource extends Resource
           ->searchable(),
         TextColumn::make('username')
           ->label('Name / Username')
-          ->searchable(['name', 'username', 'email'])
+          ->searchable(query: function (Builder $query, string $search): Builder {
+            return $query->where(function($q) use ($search) {
+              $q->where('name', 'like', "%{$search}%")
+                ->orWhere('username', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('stripe_account_id', 'like', "%{$search}%");
+            });
+          })
           ->formatStateUsing(fn($record) => $record->name . ' / @' . $record->username)
           ->sortable(),
         TextColumn::make('email')
@@ -160,6 +188,51 @@ class UserResource extends Resource
           ->label('Registration Date')
           ->dateTime()
           ->sortable(),
+        TextColumn::make('stripe_account_id')
+          ->label('Stripe Account ID')
+          ->getStateUsing(function($record) {
+            // For Stripe Connect, check if user has connected account
+            // stripe_id in users table is Customer ID, not Account ID
+            // If there's a separate field for Connect Account, use it
+            return $record->stripe_id ? 'cus_' . substr($record->stripe_id, 0, 14) . '...' : 'N/A';
+          })
+          ->searchable(query: function (Builder $query, string $search): Builder {
+            return $query->where('stripe_id', 'like', "%{$search}%");
+          })
+          ->placeholder('N/A')
+          ->copyable(),
+        TextColumn::make('twofa_status')
+          ->label('2FA Status')
+          ->getStateUsing(fn($record) => $record->twofa ? 'Enabled' : 'Disabled')
+          ->badge()
+          ->color(fn($record) => $record->twofa ? 'success' : 'gray')
+          ->sortable(),
+        TextColumn::make('referral_status')
+          ->label('Referral Status')
+          ->getStateUsing(function($record) {
+            $isReferrer = $record->referals()->exists();
+            $isReferral = $record->referrer()->exists();
+            if ($isReferrer) return 'Referrer';
+            if ($isReferral) return 'Referral';
+            return '-';
+          })
+          ->badge()
+          ->color(function($record) {
+            $isReferrer = $record->referals()->exists();
+            $isReferral = $record->referrer()->exists();
+            if ($isReferrer || $isReferral) return 'info';
+            return 'gray';
+          }),
+        TextColumn::make('lifetime_revenue')
+          ->label('Lifetime Revenue')
+          ->getStateUsing(function($record) {
+            if (!$record->hasRole('creator', 'refered-seller')) {
+              return 'N/A';
+            }
+            return '$' . number_format($record->getPlatformCommission(), 2);
+          })
+          ->sortable()
+          ->placeholder('N/A'),
       ])
       ->filters([
         SelectFilter::make('status')
@@ -200,6 +273,52 @@ class UserResource extends Resource
               return $query->whereBetween('created_at', ["$arr[0] 00:00:00", "$arr[1] 23:59:59"]);
             }
           }),
+        SelectFilter::make('twofa')
+          ->label('2FA Status')
+          ->options([
+            1 => 'Enabled',
+            0 => 'Disabled',
+          ])
+          ->query(function (Builder $query, array $data): Builder {
+            if (!isset($data['value']) || $data['value'] === null) {
+              return $query;
+            }
+            return $query->where('twofa', $data['value']);
+          }),
+        Filter::make('is_referrer')
+          ->label('Is Referrer')
+          ->query(fn (Builder $query): Builder => $query->whereHas('referals'))
+          ->toggle(),
+        Filter::make('is_referral')
+          ->label('Is Referral')
+          ->query(fn (Builder $query): Builder => $query->whereHas('referrer'))
+          ->toggle(),
+        Filter::make('has_active_subscription')
+          ->label('Has Active Subscription')
+          ->query(function (Builder $query): Builder {
+            return $query->whereHas('subscriptions', function($q) {
+              $q->where('stripe_status', 'active');
+            });
+          })
+          ->toggle(),
+        Filter::make('has_made_purchase')
+          ->label('Has Made Purchase')
+          ->query(function (Builder $query): Builder {
+            return $query->whereHas('orders', function($q) {
+              $q->where('status_id', '>=', 2); // PAID or higher
+            });
+          })
+          ->toggle(),
+        Filter::make('pending_deletion')
+          ->label('Pending Deletion')
+          ->query(fn (Builder $query): Builder => $query->whereNotNull('deletion_requested_at'))
+          ->toggle(),
+        Filter::make('has_stripe_account')
+          ->label('Has Stripe Account')
+          ->query(function (Builder $query): Builder {
+            return $query->whereNotNull('stripe_account_id');
+          })
+          ->toggle(),
       ])
       ->actions([
         Tables\Actions\ViewAction::make(),
@@ -437,6 +556,7 @@ class UserResource extends Resource
   {
     return [
       'index' => Pages\ListUsers::route('/'),
+      'create' => Pages\CreateUser::route('/create'),
       'view' => Pages\ViewUser::route('/{record}'),
     ];
   }

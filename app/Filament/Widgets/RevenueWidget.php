@@ -3,14 +3,21 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
+use App\Filament\Widgets\Concerns\HasDashboardDateRange;
 use App\Models\Order;
 use App\Models\Category;
 use App\Enums\Order as EnumsOrder;
-use Illuminate\Support\Carbon;
 
 class RevenueWidget extends ChartWidget
 {
+    use HasDashboardDateRange;
+
     protected static ?string $heading = 'Revenue by Category';
+
+    public function mount(): void
+    {
+        $this->mountHasDashboardDateRange();
+    }
 
     protected static ?int $sort = 7;
 
@@ -23,15 +30,17 @@ class RevenueWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $period = $this->getPeriod();
-        $startDate = $period['start'];
-        $endDate = $period['end'];
+        // Используем trigger для принудительного обновления
+        $trigger = $this->dateRangeUpdateTrigger ?? 0;
+        
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
 
         // Общий доход платформы (platform_reward)
-        $totalRevenue = Order::query()
+        $totalRevenue = (float) (Order::query()
             ->where('status_id', '>=', EnumsOrder::PAID)
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('platform_reward') ?? 0;
+            ->sum('platform_reward') ?? 0);
 
         // Доход по категориям
         $revenueByCategory = Order::query()
@@ -54,7 +63,7 @@ class RevenueWidget extends ChartWidget
                     }
                     
                     // Распределяем platform_reward пропорционально
-                    $productRevenue = $productCount > 0 ? $platformReward / $productCount : 0;
+                    $productRevenue = $productCount > 0 ? ((float) $platformReward) / $productCount : 0;
                     
                     return $product->categories->map(function($category) use ($productRevenue) {
                         return [
@@ -111,16 +120,6 @@ class RevenueWidget extends ChartWidget
     protected function getType(): string
     {
         return 'pie';
-    }
-
-    protected function getPeriod(): array
-    {
-        $endDate = Carbon::now();
-        $startDate = $endDate->copy()->subDays(30);
-        return [
-            'start' => $startDate,
-            'end' => $endDate,
-        ];
     }
 }
 

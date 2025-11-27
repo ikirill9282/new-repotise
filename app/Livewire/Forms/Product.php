@@ -190,9 +190,24 @@ class Product extends Component
       $data = $this->fields ?? [];
       $data['status_id'] = isset($data['status_id']) ? $data['status_id'] : 3;
 
+      // Логируем исходный текст для отладки
+      $originalText = $data['text'] ?? '';
+      Log::info('Product text before processing', [
+        'length' => strlen($originalText),
+        'preview' => substr($originalText, 0, 500),
+        'full_text' => $originalText
+      ]);
+
       $data['text'] = ($data['text'] == '<h3><br></h3>' || $data['text'] == '<p><br></p>') 
         ? '' : 
         $this->processText($data['text'] ?? '');
+      
+      // Логируем текст после processText
+      Log::info('Product text after processText', [
+        'length' => strlen($data['text']),
+        'preview' => substr($data['text'], 0, 500),
+        'full_text' => $data['text']
+      ]);
 
       $data['user_id'] = $this->attrs['user_id']
         ? Crypt::decrypt($this->attrs['user_id'])

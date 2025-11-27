@@ -15,7 +15,7 @@ class CommunityReviews extends Page
 
     protected static ?string $navigationLabel = 'Reviews';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function getUrl(array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null): string
     {

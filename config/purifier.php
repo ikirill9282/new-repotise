@@ -28,7 +28,7 @@ return [
             'HTML.Allowed'             => 'div,b,strong[class],i,em,u,h1[class],h2[class],h3[class],h4[class],h5[class],a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
             'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align',
             'AutoFormat.AutoParagraph' => false,
-            'AutoFormat.RemoveEmpty'   => true,
+            'AutoFormat.RemoveEmpty'   => false, // Отключаем удаление пустых элементов, чтобы сохранить структуру
         ],
         'test'    => [
             'Attr.EnableID' => 'true',

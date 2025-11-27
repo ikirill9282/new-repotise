@@ -23,7 +23,7 @@ class ContactForms extends Page
 
     protected static ?string $navigationLabel = 'Contact Forms';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 6;
 
     public function table(Table|Infolist $table): Table|Infolist
     {

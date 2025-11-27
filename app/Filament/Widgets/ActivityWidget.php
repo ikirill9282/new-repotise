@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
+use App\Filament\Widgets\Concerns\HasDashboardDateRange;
 use App\Models\User;
 use App\Models\Order;
 use Illuminate\Support\Carbon;
@@ -10,7 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class ActivityWidget extends ChartWidget
 {
+    use HasDashboardDateRange;
+
     protected static ?string $heading = 'User Activity';
+
+    public function mount(): void
+    {
+        $this->mountHasDashboardDateRange();
+    }
 
     protected static ?int $sort = 6;
 
@@ -23,9 +31,11 @@ class ActivityWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $period = $this->getPeriod();
-        $startDate = $period['start'];
-        $endDate = $period['end'];
+        // Используем trigger для принудительного обновления
+        $trigger = $this->dateRangeUpdateTrigger ?? 0;
+        
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
 
         // Агрегируем активность по дням
         // Логины - используем updated_at как приблизительный индикатор активности
@@ -91,10 +101,10 @@ class ActivityWidget extends ChartWidget
             $dateKey = $currentDate->format('Y-m-d');
             $labels[] = $currentDate->format('M d');
             
-            $loginData[] = $logins->has($dateKey) ? (int)$logins[$dateKey]->count : 0;
-            $orderData[] = $orders->has($dateKey) ? (int)$orders[$dateKey]->count : 0;
-            $articleData[] = $articles->has($dateKey) ? (int)$articles[$dateKey]->count : 0;
-            $commentData[] = $comments->has($dateKey) ? (int)$comments[$dateKey]->count : 0;
+            $loginData[] = $logins->has($dateKey) && isset($logins[$dateKey]->count) ? (int)$logins[$dateKey]->count : 0;
+            $orderData[] = $orders->has($dateKey) && isset($orders[$dateKey]->count) ? (int)$orders[$dateKey]->count : 0;
+            $articleData[] = $articles->has($dateKey) && isset($articles[$dateKey]->count) ? (int)$articles[$dateKey]->count : 0;
+            $commentData[] = $comments->has($dateKey) && isset($comments[$dateKey]->count) ? (int)$comments[$dateKey]->count : 0;
             
             $currentDate->addDay();
         }
@@ -129,16 +139,6 @@ class ActivityWidget extends ChartWidget
     protected function getType(): string
     {
         return 'line';
-    }
-
-    protected function getPeriod(): array
-    {
-        $endDate = Carbon::now();
-        $startDate = $endDate->copy()->subDays(30);
-        return [
-            'start' => $startDate,
-            'end' => $endDate,
-        ];
     }
 }
 

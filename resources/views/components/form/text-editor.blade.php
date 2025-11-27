@@ -30,3 +30,35 @@
     @enderror
   @endif
 </div>
+<style>
+  /* Стили для списков в Quill редакторе */
+  .quill-editor .ql-editor ul,
+  .quill-editor .ql-editor ol {
+    list-style-position: outside !important;
+    padding-left: 30px !important;
+    margin: 15px 0 !important;
+  }
+  .quill-editor .ql-editor ul {
+    list-style-type: disc !important;
+    list-style: disc outside !important;
+  }
+  .quill-editor .ql-editor ol {
+    list-style-type: decimal !important;
+    list-style: decimal outside !important;
+  }
+  .quill-editor .ql-editor li {
+    display: list-item !important;
+    list-style-position: outside !important;
+    margin: 8px 0 !important;
+    padding-left: 5px !important;
+    line-height: 1.6 !important;
+  }
+  .quill-editor .ql-editor ul ul {
+    list-style-type: circle !important;
+    list-style: circle outside !important;
+  }
+  .quill-editor .ql-editor ul ul ul {
+    list-style-type: square !important;
+    list-style: square outside !important;
+  }
+</style>

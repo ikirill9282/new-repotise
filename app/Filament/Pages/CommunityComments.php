@@ -15,7 +15,7 @@ class CommunityComments extends Page
 
     protected static ?string $navigationLabel = 'Comments';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function getUrl(array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null): string
     {

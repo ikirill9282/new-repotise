@@ -175,6 +175,34 @@
                             <h3 class="mb-3">Product Description</h3>
                             <div class="read-more" data-text="Read More" data-color="#f9f9f9">{!! $product->getText() !!}</div>
                         </div>
+                        <style>
+                            /* Принудительное отображение маркеров списков */
+                            .product_description .read-more .user-custom-text ul,
+                            .product_description .read-more .user-custom-text ol,
+                            .product_description .user-custom-text ul,
+                            .product_description .user-custom-text ol {
+                                list-style-position: outside !important;
+                                padding-left: 30px !important;
+                                margin: 15px 0 !important;
+                            }
+                            .product_description .read-more .user-custom-text ul,
+                            .product_description .user-custom-text ul {
+                                list-style-type: disc !important;
+                                list-style: disc outside !important;
+                            }
+                            .product_description .read-more .user-custom-text ol,
+                            .product_description .user-custom-text ol {
+                                list-style-type: decimal !important;
+                                list-style: decimal outside !important;
+                            }
+                            .product_description .read-more .user-custom-text li,
+                            .product_description .user-custom-text li {
+                                display: list-item !important;
+                                list-style-position: outside !important;
+                                margin: 8px 0 !important;
+                                padding-left: 5px !important;
+                            }
+                        </style>
 
                         <div class="group_middle">
                           <div class="information_product">

@@ -8,6 +8,8 @@ use App\Models\RefundRequest;
 use App\Services\StripeRefundProcessor;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\UserResource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -31,6 +33,12 @@ class DisputeResource extends Resource
     protected static ?string $navigationGroup = 'financials';
 
     protected static ?int $navigationSort = 4;
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['buyer', 'seller', 'order']);
+    }
 
     public static function form(Form $form): Form
     {

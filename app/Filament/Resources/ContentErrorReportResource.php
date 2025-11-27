@@ -6,6 +6,7 @@ use App\Filament\Resources\ContentErrorReportResource\Pages;
 use App\Models\Report;
 use App\Models\Article;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\ArticleResource;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -31,7 +32,7 @@ class ContentErrorReportResource extends Resource
 {
     protected static ?string $model = Report::class;
 
-    protected static ?string $navigationGroup = 'content';
+    protected static ?string $navigationGroup = 'community';
 
     protected static ?string $navigationLabel = 'Error Reports';
 
@@ -42,7 +43,8 @@ class ContentErrorReportResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('type', Report::TYPE_CONTENT_ERROR);
+            ->where('type', Report::TYPE_CONTENT_ERROR)
+            ->with(['author', 'reportable']);
     }
 
     public static function form(Form $form): Form
@@ -69,8 +71,9 @@ class ContentErrorReportResource extends Resource
                 TextColumn::make('author.name')
                     ->label('Reporter')
                     ->searchable(['author.username', 'author.email', 'author.name'])
-                    ->url(fn($record) => $record->author ? UserResource::getUrl('view', ['record' => $record->author]) : null)
-                    ->color(Color::Sky),
+                    ->url(fn($record) => $record->author ? UserResource::getUrl('view', ['record' => $record->author->id ?? $record->author_id]) : null)
+                    ->color(Color::Sky)
+                    ->placeholder('N/A'),
                 TextColumn::make('reported_content')
                     ->label('Reported Content')
                     ->formatStateUsing(function($record) {
@@ -89,8 +92,8 @@ class ContentErrorReportResource extends Resource
                     })
                     ->url(function($record) {
                         $content = $record->reportable;
-                        if (!$content || !($content instanceof Article)) return null;
-                        return $content->author ? UserResource::getUrl('view', ['record' => $content->author]) : null;
+                        if (!$content || !($content instanceof Article) || !$content->author) return null;
+                        return UserResource::getUrl('view', ['record' => $content->author->id ?? $content->user_id]);
                     })
                     ->color(Color::Sky),
                 TextColumn::make('user_message')
@@ -309,7 +312,7 @@ class ContentErrorReportResource extends Resource
                             }),
                         TextEntry::make('author.name')
                             ->label('Reporter')
-                            ->url(fn($record) => $record->author ? UserResource::getUrl('view', ['record' => $record->author]) : null),
+                            ->url(fn($record) => $record->author ? UserResource::getUrl('view', ['record' => $record->author->id ?? $record->author_id]) : null),
                         TextEntry::make('message')
                             ->label('User Message')
                             ->formatStateUsing(fn($record) => strip_tags($record->message ?? ''))
@@ -325,8 +328,8 @@ class ContentErrorReportResource extends Resource
                                 return $content->author->name ?? 'N/A';
                             })
                             ->url(function() use ($content) {
-                                if (!$content || !($content instanceof Article)) return null;
-                                return $content->author ? UserResource::getUrl('view', ['record' => $content->author]) : null;
+                                if (!$content || !($content instanceof Article) || !$content->author) return null;
+                                return UserResource::getUrl('view', ['record' => $content->author->id ?? $content->user_id]);
                             }),
                         TextEntry::make('content_type')
                             ->label('Content Type')
@@ -345,7 +348,7 @@ class ContentErrorReportResource extends Resource
                             ->formatStateUsing(fn() => 'Edit Article')
                             ->url(function() use ($content) {
                                 if (!$content || !($content instanceof Article)) return null;
-                                return url("/admin/articles/{$content->id}/edit");
+                                return \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $content->id]);
                             })
                             ->color(Color::Sky),
                     ])
@@ -383,7 +386,7 @@ class ContentErrorReportResource extends Resource
                                 ->url(function($record) {
                                     $content = $record->reportable;
                                     if (!$content || !($content instanceof Article)) return null;
-                                    return url("/admin/articles/{$content->id}/edit");
+                                    return \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $content->id]);
                                 })
                                 ->openUrlInNewTab(),
                         ]),

@@ -1825,6 +1825,97 @@ footer .bottom_connecting_group .connecting a {
   border-color: var(--black, #000);
 }
 
+/* Стили для списков в описании продукта */
+.user-custom-text ul,
+.user-custom-text ol,
+.read-more .user-custom-text ul,
+.read-more .user-custom-text ol,
+.product_description .user-custom-text ul,
+.product_description .user-custom-text ol {
+  margin: 15px 0;
+  padding-left: 30px;
+  list-style-position: outside !important;
+  /* Не используем display: block, чтобы маркеры отображались */
+}
+
+.user-custom-text ul,
+.read-more .user-custom-text ul,
+.product_description .user-custom-text ul {
+  list-style-type: disc !important;
+  list-style: disc outside !important;
+}
+
+.user-custom-text ol,
+.read-more .user-custom-text ol,
+.product_description .user-custom-text ol {
+  list-style-type: decimal !important;
+  list-style: decimal outside !important;
+}
+
+.user-custom-text li,
+.read-more .user-custom-text li,
+.product_description .user-custom-text li {
+  margin: 8px 0;
+  padding-left: 5px;
+  line-height: 1.6;
+  color: var(--black, #212121);
+  display: list-item !important;
+  list-style-position: outside !important;
+  list-style: inherit !important;
+}
+
+.user-custom-text ul ul,
+.user-custom-text ol ol,
+.user-custom-text ul ol,
+.user-custom-text ol ul,
+.read-more .user-custom-text ul ul,
+.read-more .user-custom-text ol ol,
+.read-more .user-custom-text ul ol,
+.read-more .user-custom-text ol ul,
+.product_description .user-custom-text ul ul,
+.product_description .user-custom-text ol ol,
+.product_description .user-custom-text ul ol,
+.product_description .user-custom-text ol ul {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.user-custom-text ul ul,
+.read-more .user-custom-text ul ul,
+.product_description .user-custom-text ul ul {
+  list-style-type: circle !important;
+  list-style: circle outside !important;
+}
+
+.user-custom-text ul ul ul,
+.read-more .user-custom-text ul ul ul,
+.product_description .user-custom-text ul ul ul {
+  list-style-type: square !important;
+  list-style: square outside !important;
+}
+
+/* Дополнительные правила для гарантированного отображения маркеров */
+.product_description .read-more .user-custom-text ul,
+.product_description .read-more .user-custom-text ol {
+  list-style-position: outside !important;
+  padding-left: 30px !important;
+}
+
+.product_description .read-more .user-custom-text ul {
+  list-style-type: disc !important;
+  list-style: disc outside !important;
+}
+
+.product_description .read-more .user-custom-text ol {
+  list-style-type: decimal !important;
+  list-style: decimal outside !important;
+}
+
+.product_description .read-more .user-custom-text li {
+  display: list-item !important;
+  list-style-position: outside !important;
+}
+
 .search_group {
   width: 100%;
   max-width: 900px;
@@ -3375,4 +3466,98 @@ header .search_group input[name="q"]::placeholder {
     .profile-referal-page .referal-btn {
       padding: 11.5px 10px;
     }
+}
+
+/* Стили для списков в Quill редакторе (страница редактирования) */
+.quill-editor .ql-editor ul,
+.quill-editor .ql-editor ol,
+.text-editor .quill-editor .ql-editor ul,
+.text-editor .quill-editor .ql-editor ol {
+  list-style-position: outside !important;
+  padding-left: 30px !important;
+  margin: 15px 0 !important;
+}
+
+.quill-editor .ql-editor ul,
+.text-editor .quill-editor .ql-editor ul {
+  list-style-type: disc !important;
+  list-style: disc outside !important;
+}
+
+.quill-editor .ql-editor ol,
+.text-editor .quill-editor .ql-editor ol {
+  list-style-type: decimal !important;
+  list-style: decimal outside !important;
+}
+
+.quill-editor .ql-editor li,
+.text-editor .quill-editor .ql-editor li {
+  display: list-item !important;
+  list-style-position: outside !important;
+  margin: 8px 0 !important;
+  padding-left: 5px !important;
+  line-height: 1.6 !important;
+}
+
+.quill-editor .ql-editor ul ul,
+.quill-editor .ql-editor ol ol,
+.text-editor .quill-editor .ql-editor ul ul,
+.text-editor .quill-editor .ql-editor ol ol {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.quill-editor .ql-editor ul ul,
+.text-editor .quill-editor .ql-editor ul ul {
+  list-style-type: circle !important;
+  list-style: circle outside !important;
+}
+
+.quill-editor .ql-editor ul ul ul,
+.text-editor .quill-editor .ql-editor ul ul ul {
+  list-style-type: square !important;
+  list-style: square outside !important;
+}
+
+/* КРИТИЧЕСКИ ВАЖНЫЕ СТИЛИ ДЛЯ СПИСКОВ - ДОЛЖНЫ БЫТЬ В КОНЦЕ ФАЙЛА */
+/* Принудительное отображение маркеров списков в описании продукта */
+.product_description .read-more .user-custom-text ul,
+.product_description .read-more .user-custom-text ol,
+.product_description .user-custom-text ul,
+.product_description .user-custom-text ol,
+.read-more .user-custom-text ul,
+.read-more .user-custom-text ol,
+.user-custom-text ul,
+.user-custom-text ol {
+  list-style-position: outside !important;
+  padding-left: 30px !important;
+  margin: 15px 0 !important;
+}
+
+.product_description .read-more .user-custom-text ul,
+.product_description .user-custom-text ul,
+.read-more .user-custom-text ul,
+.user-custom-text ul {
+  list-style-type: disc !important;
+  list-style: disc outside !important;
+}
+
+.product_description .read-more .user-custom-text ol,
+.product_description .user-custom-text ol,
+.read-more .user-custom-text ol,
+.user-custom-text ol {
+  list-style-type: decimal !important;
+  list-style: decimal outside !important;
+}
+
+.product_description .read-more .user-custom-text li,
+.product_description .user-custom-text li,
+.read-more .user-custom-text li,
+.user-custom-text li {
+  display: list-item !important;
+  list-style-position: outside !important;
+  margin: 8px 0 !important;
+  padding-left: 5px !important;
+  line-height: 1.6 !important;
+  color: var(--black, #212121) !important;
 }

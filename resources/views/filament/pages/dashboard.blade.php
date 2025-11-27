@@ -2,12 +2,89 @@
     <div class="space-y-2">
         <div class="flex items-center justify-between mb-1">
             <h2 class="text-lg font-semibold">Dashboard</h2>
-            <div class="flex gap-2">
-                <!-- Фильтры будут добавлены позже -->
+        </div>
+
+        {{-- Date Range Selector --}}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4" wire:key="date-range-selector">
+            <form wire:submit.prevent>
+                {{ $this->form }}
+            </form>
+        </div>
+
+        @script
+        <script>
+            $wire.on('refresh-dashboard-widgets', () => {
+                // Принудительно обновляем все виджеты
+                Livewire.all().forEach(component => {
+                    if (component.$wire.hasOwnProperty('refreshDateRange')) {
+                        component.$wire.call('refreshDateRange');
+                    }
+                });
+            });
+        </script>
+        @endscript
+
+
+
+        {{-- Key Metrics Overview --}}
+        <div class="mb-4" wire:key="key-metrics-{{ $this->startDate ?? 'default' }}-{{ $this->endDate ?? 'default' }}">
+            <x-filament-widgets::widgets
+                :widgets="[\App\Filament\Widgets\KeyMetricsWidget::class]"
+                :columns="['default' => 1]"
+                class="gap-2"
+            />
+        </div>
+
+        {{-- Quick Actions --}}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4">
+            <h3 class="text-lg font-semibold mb-3">Quick Actions</h3>
+            <div class="flex flex-wrap gap-2">
+                <x-filament::button 
+                   href="{{ \App\Filament\Resources\ProductResource::getUrl('create') }}"
+                   color="primary"
+                   size="md">
+                    <x-heroicon-o-plus class="w-4 h-4 mr-1" />
+                    Add Product
+                </x-filament::button>
+                <x-filament::button 
+                   href="{{ \App\Filament\Resources\ArticleResource::getUrl('create') }}"
+                   color="primary"
+                   size="md">
+                    <x-heroicon-o-plus class="w-4 h-4 mr-1" />
+                    Add Article
+                </x-filament::button>
+                <x-filament::button 
+                   href="{{ \App\Filament\Resources\UserResource::getUrl('create') }}"
+                   color="primary"
+                   size="md">
+                    <x-heroicon-o-plus class="w-4 h-4 mr-1" />
+                    Add User
+                </x-filament::button>
+                <x-filament::button 
+                   href="{{ \App\Filament\Resources\ModerationQueueResource::getUrl('index') }}"
+                   color="warning"
+                   size="md">
+                    <x-heroicon-o-check-circle class="w-4 h-4 mr-1" />
+                    Moderation Queue
+                </x-filament::button>
+                <x-filament::button 
+                   href="{{ \App\Filament\Resources\TransactionResource::getUrl('index') }}"
+                   color="success"
+                   size="md">
+                    <x-heroicon-o-credit-card class="w-4 h-4 mr-1" />
+                    View Transactions
+                </x-filament::button>
+                <x-filament::button 
+                   href="{{ \App\Filament\Pages\SettingsGeneral::getUrl() }}"
+                   color="gray"
+                   size="md">
+                    <x-heroicon-o-cog-6-tooth class="w-4 h-4 mr-1" />
+                    General Settings
+                </x-filament::button>
             </div>
         </div>
 
-        <div class="dashboard-grid grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="dashboard-grid grid grid-cols-1 md:grid-cols-3 gap-3" wire:key="dashboard-widgets-{{ $this->startDate ?? 'default' }}-{{ $this->endDate ?? 'default' }}">
             <!-- Левая колонка: Пользователи -->
             <div class="dashboard-column space-y-2">
                 <div class="flex items-center gap-2 pb-1 border-b border-gray-200">
@@ -48,8 +125,17 @@
             </div>
         </div>
 
+        {{-- Recent Activity Feeds --}}
+        <div class="mb-4" wire:key="recent-activity-{{ $startDate ?? 'default' }}-{{ $endDate ?? 'default' }}">
+            <x-filament-widgets::widgets
+                :widgets="[\App\Filament\Widgets\RecentActivityWidget::class]"
+                :columns="['default' => 1]"
+                class="gap-2"
+            />
+        </div>
+
         <!-- Revenue by Category - отдельный блок на половину ширины -->
-        <div class="mt-3 revenue-widget-container">
+        <div class="mt-3 revenue-widget-container" wire:key="revenue-widget-{{ $startDate ?? 'default' }}-{{ $endDate ?? 'default' }}">
             <div class="w-full md:w-1/2">
                 <x-filament-widgets::widgets
                     :widgets="[\App\Filament\Widgets\RevenueWidget::class]"

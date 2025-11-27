@@ -4,14 +4,14 @@
 namespace App\Enums;
 
 
-enum Status
+class Status
 {
-  const ACTIVE = 1;
-  const DRAFT = 2;
-  const PENDING = 3;
-  const REVISION = 4;
-  const REJECT = 5;
-  const SCHEDULED = 6;
-  const DELETED = 7;
-  const SPAM = 8;
+  public const ACTIVE = 1;
+  public const DRAFT = 2;
+  public const PENDING = 3;
+  public const REVISION = 4;
+  public const REJECT = 5;
+  public const SCHEDULED = 6;
+  public const DELETED = 7;
+  public const SPAM = 8;
 }

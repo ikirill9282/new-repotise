@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Modals;
 
+use App\Mail\DonationReceived;
+use App\Mail\DonationSent;
 use App\Models\Payments;
 use App\Models\RevenueShare;
 use App\Models\User;
@@ -9,11 +11,13 @@ use App\Models\UserFunds;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\CardException;
 use Stripe\PaymentIntent;
 
 class Donate extends Component
@@ -99,6 +103,9 @@ class Donate extends Component
         }
 
         $this->prepareSetupIntent();
+        if ($this->setupIntentSecret) {
+            $this->dispatch('setup-intent-updated', $this->setupIntentSecret);
+        }
     }
 
     protected function resolvePaymentMethods(): array
@@ -139,6 +146,17 @@ class Donate extends Component
         $this->amount = round(max(0, $numeric), 2);
     }
 
+    public function updatedSelectedPaymentMethod($value): void
+    {
+        if ($value === 'new') {
+            $this->prepareSetupIntent();
+            if ($this->setupIntentSecret) {
+                $this->dispatch('setup-intent-updated', $this->setupIntentSecret);
+            }
+        }
+        $this->dispatch('refreshPaymentMethods');
+    }
+
     public function setAmount(float $value): void
     {
         $this->amount = round(max(0, $value), 2);
@@ -158,6 +176,10 @@ class Donate extends Component
         }
 
         $this->prepareSetupIntent();
+        $this->dispatch('refreshPaymentMethods');
+        if ($this->setupIntentSecret) {
+            $this->dispatch('setup-intent-updated', $this->setupIntentSecret);
+        }
     }
 
     protected function paymentMethodExists(?string $paymentMethodId): bool
@@ -227,37 +249,43 @@ class Donate extends Component
         return round(($chargeAmount * ($this->processingPercent / 100)) + $this->processingFlat, 2);
     }
 
-    public function checkDonation(): array
+    public function checkDonation(): void
     {
-        Log::info('Donation check triggered', [
-            'seller_id' => $this->seller->id ?? null,
-            'donor_id' => $this->donor?->id,
-            'authenticated' => (bool) $this->donor,
-            'selected_method' => $this->selectedPaymentMethod,
-        ]);
-        $this->validate($this->rules());
+        try {
+            $this->validate($this->rules());
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dispatch('toastError', ['message' => 'Please fill in all required fields correctly.']);
+            $this->dispatch('donation-check-result', ['error' => true]);
+            return;
+        }
 
         $selected = $this->selectedPaymentMethod;
 
-            if ($this->shouldUseNewPaymentMethod($selected)) {
+        if ($this->shouldUseNewPaymentMethod($selected)) {
             if (!$this->setupIntentSecret) {
-                $this->dispatch('toastError', ['message' => 'Adding a new payment method is temporarily unavailable. Please try again later.']);
-                return ['error' => true];
+                $this->prepareSetupIntent();
+                if (!$this->setupIntentSecret) {
+                    $this->dispatch('toastError', ['message' => 'Adding a new payment method is temporarily unavailable. Please try again later.']);
+                    $this->dispatch('donation-check-result', ['error' => true]);
+                    return;
+                }
             }
 
-            return [
+            $this->dispatch('donation-check-result', [
                 'action' => 'create',
-            ];
+            ]);
+            return;
         }
 
         if (!$this->paymentMethodExists($selected)) {
             $this->dispatch('toastError', ['message' => 'Selected payment method is no longer available.']);
-            return ['error' => true];
+            $this->dispatch('donation-check-result', ['error' => true]);
+            return;
         }
 
-        return [
+        $this->dispatch('donation-check-result', [
             'action' => $selected,
-        ];
+        ]);
     }
 
     #[On('makeDonation')]
@@ -278,7 +306,7 @@ class Donate extends Component
             $donor = $this->ensureDonorAccount();
 
             if (!$donor) {
-                $this->dispatch('toastError', ['message' => 'Please provide valid donor details.']);
+                $this->showDonationError('Please provide valid donor details.', 'validation_error');
                 return;
             }
 
@@ -290,7 +318,7 @@ class Donate extends Component
             $chargeAmount = $this->calculateChargeAmount($this->amount, $this->coverFees);
 
             if ($chargeAmount <= 0) {
-                $this->dispatch('toastError', ['message' => 'Please enter a valid donation amount.']);
+                $this->showDonationError('Please enter a valid donation amount.', 'validation_error');
                 return;
             }
 
@@ -335,23 +363,43 @@ class Donate extends Component
             }
 
             if (!in_array($intent->status, [PaymentIntent::STATUS_SUCCEEDED, PaymentIntent::STATUS_PROCESSING])) {
-                $this->dispatch('toastError', ['message' => 'Unable to process donation. Please try another payment method.']);
+                $errorMessage = $this->getStripeErrorMessage($intent);
+                $this->showDonationError($errorMessage['message'], $errorMessage['code']);
                 return;
             }
 
             $this->finalizeDonation($intent);
+        } catch (CardException $exception) {
+            $errorMessage = $this->getStripeErrorMessageFromException($exception);
+            Log::error('Donation processing failed - Card error.', [
+                'seller_id' => $this->seller->id ?? null,
+                'donor_id' => $this->donor?->id,
+                'error' => $exception->getMessage(),
+                'code' => $exception->getStripeCode(),
+                'decline_code' => $exception->getDeclineCode(),
+            ]);
+            $this->showDonationError($errorMessage['message'], $errorMessage['code']);
+        } catch (ApiErrorException $exception) {
+            $errorMessage = $this->getStripeErrorMessageFromException($exception);
+            Log::error('Donation processing failed - Stripe API error.', [
+                'seller_id' => $this->seller->id ?? null,
+                'donor_id' => $this->donor?->id,
+                'error' => $exception->getMessage(),
+            ]);
+            $this->showDonationError($errorMessage['message'], $errorMessage['code']);
         } catch (\Throwable $exception) {
             Log::error('Donation processing failed.', [
                 'seller_id' => $this->seller->id ?? null,
                 'donor_id' => $this->donor?->id,
                 'error' => $exception->getMessage(),
             ]);
-            $this->dispatch('toastError', ['message' => 'Unable to process donation. Please try again later.']);
+            $this->showDonationError('Unable to process donation. Please try again later.', 'processing_error');
         } finally {
-            if (!$needsFurtherAction) {
-                $this->dispatch('donation-processing-ended', [
-                    'componentId' => $this->getId(),
-                ]);
+            // Don't dispatch donation-processing-ended here - it will be dispatched
+            // by showDonationError or finalizeDonation if needed
+            if (!$needsFurtherAction && !$this->unavailable) {
+                // Only dispatch if we're not showing an error or success modal
+                // The error/success modals will handle their own cleanup
             }
         }
     }
@@ -359,24 +407,45 @@ class Donate extends Component
     public function donationResult(string $result, string $paymentIntentId): void
     {
         if ($this->unavailable || !$this->seller) {
-            $this->dispatch('toastError', ['message' => 'Donations are currently unavailable for this creator.']);
+            $this->showDonationError('Donations are currently unavailable for this creator.', 'unavailable');
             return;
         }
 
         try {
             if ($result !== 'success') {
-                $this->dispatch('toastError', ['message' => 'Donation authorization was cancelled or failed.']);
+                $this->showDonationError('Donation authorization was cancelled or failed.', 'authorization_failed');
                 return;
             }
 
             $intent = Cashier::stripe()->paymentIntents->retrieve($paymentIntentId);
 
             if (!in_array($intent->status, [PaymentIntent::STATUS_SUCCEEDED, PaymentIntent::STATUS_PROCESSING])) {
-                $this->dispatch('toastError', ['message' => 'Unable to confirm donation payment.']);
+                $errorMessage = $this->getStripeErrorMessage($intent);
+                $this->showDonationError($errorMessage['message'], $errorMessage['code']);
                 return;
             }
 
             $this->finalizeDonation($intent);
+        } catch (CardException $exception) {
+            $errorMessage = $this->getStripeErrorMessageFromException($exception);
+            Log::error('Donation confirmation failed - Card error.', [
+                'seller_id' => $this->seller->id ?? null,
+                'donor_id' => $this->donor?->id,
+                'payment_intent' => $paymentIntentId,
+                'error' => $exception->getMessage(),
+                'code' => $exception->getStripeCode(),
+                'decline_code' => $exception->getDeclineCode(),
+            ]);
+            $this->showDonationError($errorMessage['message'], $errorMessage['code']);
+        } catch (ApiErrorException $exception) {
+            $errorMessage = $this->getStripeErrorMessageFromException($exception);
+            Log::error('Donation confirmation failed - Stripe API error.', [
+                'seller_id' => $this->seller->id ?? null,
+                'donor_id' => $this->donor?->id,
+                'payment_intent' => $paymentIntentId,
+                'error' => $exception->getMessage(),
+            ]);
+            $this->showDonationError($errorMessage['message'], $errorMessage['code']);
         } catch (\Throwable $exception) {
             Log::error('Donation confirmation failed.', [
                 'seller_id' => $this->seller->id ?? null,
@@ -384,18 +453,15 @@ class Donate extends Component
                 'payment_intent' => $paymentIntentId,
                 'error' => $exception->getMessage(),
             ]);
-            $this->dispatch('toastError', ['message' => 'Unable to confirm donation payment. Please contact support if the issue persists.']);
-        } finally {
-            $this->dispatch('donation-processing-ended', [
-                'componentId' => $this->getId(),
-            ]);
+            $this->showDonationError('Unable to confirm donation payment. Please contact support if the issue persists.', 'confirmation_failed');
         }
+        // Note: donation-processing-ended is dispatched by showDonationError or finalizeDonation
     }
 
     protected function finalizeDonation(PaymentIntent $paymentIntent): void
     {
         if ($this->unavailable || !$this->seller) {
-            $this->dispatch('toastError', ['message' => 'Donations are currently unavailable for this creator.']);
+            $this->showDonationError('Donations are currently unavailable for this creator.', 'unavailable');
             return;
         }
 
@@ -421,7 +487,7 @@ class Donate extends Component
                 'expected_donor' => $this->donor?->id,
                 'metadata_donor' => $donorId,
             ]);
-            $this->dispatch('toastError', ['message' => 'Donation could not be verified.']);
+            $this->showDonationError('Donation could not be verified. Please contact support if the issue persists.', 'verification_failed');
             return;
         }
 
@@ -486,7 +552,49 @@ class Donate extends Component
             'service_amount' => $platformFee,
         ]);
 
+        // Send email notification to seller
+        try {
+            $donorName = $anonymous ? null : ($this->donor?->getName() ?? Arr::get($metadata, 'donor_name'));
+            Mail::to($this->seller->email)->send(
+                new DonationReceived(
+                    seller: $this->seller,
+                    amount: $donationAmount,
+                    donorName: $donorName,
+                    anonymous: $anonymous,
+                    message: $sanitizedMessage,
+                )
+            );
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to send donation received email.', [
+                'seller_id' => $this->seller->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        // Send email confirmation to donor
+        if ($this->donor) {
+            try {
+                $monthlySupport = Arr::get($metadata, 'monthly_support') === '1';
+                Mail::to($this->donor->email)->send(
+                    new DonationSent(
+                        donor: $this->donor,
+                        seller: $this->seller,
+                        amount: $donationAmount,
+                        monthlySupport: $monthlySupport,
+                    )
+                );
+            } catch (\Throwable $exception) {
+                Log::warning('Failed to send donation sent email.', [
+                    'donor_id' => $this->donor->id,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+        }
+
         $this->dispatch('toastSuccess', ['message' => 'Thank you for supporting this creator!']);
+        $this->dispatch('donation-processing-ended', [
+            'componentId' => $this->getId(),
+        ]);
         $this->dispatch('closeModal');
         $this->dispatch('openModal', 'donate-accept', [
             'amount' => $donationAmount,
@@ -555,6 +663,7 @@ class Donate extends Component
 
             $intent = Cashier::stripe()->setupIntents->create($params);
             $this->setupIntentSecret = $intent->client_secret;
+            $this->dispatch('setup-intent-updated', $this->setupIntentSecret);
         } catch (\Throwable $exception) {
             Log::warning('Unable to prepare setup intent for donation.', [
                 'seller_id' => $this->seller->id ?? null,
@@ -647,6 +756,95 @@ class Donate extends Component
                 'error' => $exception->getMessage(),
             ]);
         }
+    }
+
+    public function showDonationError(string $message, ?string $errorCode = null): void
+    {
+        $this->dispatch('closeModal');
+        $this->dispatch('openModal', 'donate-error', [
+            'message' => $message,
+            'errorCode' => $errorCode,
+            'seller_id' => $this->seller->id ?? null,
+        ]);
+        $this->dispatch('donation-processing-ended', [
+            'componentId' => $this->getId(),
+        ]);
+    }
+
+    protected function getStripeErrorMessage(?PaymentIntent $intent): array
+    {
+        if (!$intent) {
+            return [
+                'message' => 'Unable to process donation. Please try another payment method.',
+                'code' => 'processing_error',
+            ];
+        }
+
+        $lastError = $intent->last_payment_error ?? null;
+
+        if ($lastError) {
+            return $this->mapStripeError(
+                $lastError->code ?? null,
+                $lastError->decline_code ?? null,
+                $intent->currency ?? null
+            );
+        }
+
+        return [
+            'message' => 'Unable to process donation. Please try another payment method.',
+            'code' => 'processing_error',
+        ];
+    }
+
+    protected function getStripeErrorMessageFromException(\Throwable $exception): array
+    {
+        $code = null;
+        $declineCode = null;
+
+        if ($exception instanceof CardException) {
+            $code = $exception->getStripeCode();
+            $declineCode = $exception->getDeclineCode();
+        } elseif ($exception instanceof ApiErrorException) {
+            $code = $exception->getStripeCode();
+        }
+
+        return $this->mapStripeError($code, $declineCode);
+    }
+
+    protected function mapStripeError(?string $code, ?string $declineCode, ?string $currency = null): array
+    {
+        $errorMessages = [
+            'card_declined' => 'Your card was declined. Please try a different card or contact your bank for details.',
+            'insufficient_funds' => 'Insufficient funds. Your bank declined the charge — please use another card or payment method.',
+            'expired_card' => 'This card has expired. Please use a different card or update the expiration date.',
+            'incorrect_number' => 'Invalid card number. Please check the card number and try again.',
+            'invalid_number' => 'The card number looks incorrect. Please re-enter it carefully or try another card.',
+            'incorrect_cvc' => 'Incorrect security code (CVC). Re-enter the 3- or 4-digit code from your card.',
+            'invalid_cvc' => 'Security code looks invalid. Check the CVC and try again.',
+            'invalid_expiry_month' => 'Invalid expiration month. Please check the card\'s expiration date and try again.',
+            'invalid_expiry_year' => 'Invalid expiration year. Please check the card\'s expiration date and try again.',
+            'payment_intent_authentication_failure' => 'Authentication failed. Your bank didn\'t complete verification — try again or use a different payment method.',
+            'setup_intent_authentication_failure' => 'Authentication failed. Your bank didn\'t complete verification — try again or use a different payment method.',
+            'payment_method_not_available' => 'This payment method is temporarily unavailable. Please try again later or use another payment method.',
+            'processing_error' => 'A processing error occurred. Please try again or use a different payment method.',
+        ];
+
+        $keys = array_filter([$code, $declineCode]);
+        $keys[] = 'default';
+
+        foreach ($keys as $key) {
+            if ($key && isset($errorMessages[$key])) {
+                return [
+                    'message' => $errorMessages[$key],
+                    'code' => $code ?? $declineCode ?? $key,
+                ];
+            }
+        }
+
+        return [
+            'message' => 'Unable to process donation. Please try again later or use a different payment method.',
+            'code' => $code ?? $declineCode ?? 'unknown_error',
+        ];
     }
 
     public function render()

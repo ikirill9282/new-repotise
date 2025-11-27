@@ -32,6 +32,12 @@ class PayoutResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['user']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form

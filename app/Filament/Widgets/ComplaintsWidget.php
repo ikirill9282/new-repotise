@@ -55,11 +55,12 @@ class ComplaintsWidget extends BaseWidget
         // Проверяем существование маршрута для жалоб
         $reportsUrl = null;
         try {
-            $reportsUrl = route('filament.admin.resources.reports.index');
-        } catch (\Illuminate\Routing\Exceptions\RouteNotFoundException $e) {
-            // Маршрут не существует, оставляем null
+            // Используем UserComplaintResource если он существует
+            if (class_exists(\App\Filament\Resources\UserComplaintResource::class)) {
+                $reportsUrl = \App\Filament\Resources\UserComplaintResource::getUrl('index');
+            }
         } catch (\Exception $e) {
-            // Другие ошибки - также оставляем null
+            // Маршрут не существует, оставляем null
         }
 
         $newComplaintsStat = Stat::make('New Complaints', number_format($newComplaints))

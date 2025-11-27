@@ -38,7 +38,7 @@ class CommentResource extends Resource
 {
     protected static ?string $model = Comment::class;
 
-    protected static ?string $navigationGroup = 'content';
+    protected static ?string $navigationGroup = 'community';
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
@@ -74,7 +74,7 @@ class CommentResource extends Resource
                     ->label('Content Title')
                     ->searchable()
                     ->sortable()
-                    ->url(fn($record) => $record->article ? url("/admin/articles/{$record->article->id}/edit") : null)
+                    ->url(fn($record) => $record->article ? \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $record->article->id]) : null)
                     ->color(Color::Sky),
                 TextColumn::make('content_type')
                     ->label('Content Type')
@@ -92,7 +92,8 @@ class CommentResource extends Resource
                 TextColumn::make('author.name')
                     ->label('Author')
                     ->searchable(['author.username', 'author.email', 'author.name'])
-                    ->url(fn($record) => $record->author ? UserResource::getUrl('view', ['record' => $record->author]) : null)
+                    ->url(fn($record) => $record->author ? UserResource::getUrl('view', ['record' => $record->author->id ?? $record->user_id]) : null)
+                    ->placeholder('N/A')
                     ->color(Color::Sky),
                 TextColumn::make('parent_info')
                     ->label('Parent / Reply')
@@ -368,7 +369,7 @@ class CommentResource extends Resource
                             ->html(),
                         TextEntry::make('article.title')
                             ->label('Content Title')
-                            ->url(fn($record) => $record && $record->article ? url("/admin/articles/{$record->article->id}/edit") : null),
+                            ->url(fn($record) => $record && $record->article ? \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $record->article->id]) : null),
                         TextEntry::make('content_type')
                             ->label('Content Type')
                             ->formatStateUsing(fn($record) => $record && $record->article && $record->article->author ? ($record->article->author->hasRole('admin') ? 'News' : 'Article') : 'N/A'),

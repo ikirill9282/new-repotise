@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 use Laravel\Scout\Searchable;
 use Mews\Purifier\Facades\Purifier;
 
@@ -32,9 +33,26 @@ class Product extends Model
     parent::boot();
 
     self::creating(function ($model) {
+      // Логируем текст до очистки Purifier
+      Log::info('Product text before Purifier (creating)', [
+        'length' => strlen($model->text ?? ''),
+        'preview' => substr($model->text ?? '', 0, 500),
+        'full_text' => $model->text ?? ''
+      ]);
+      
       // PURIFY
       $model->title = Purifier::clean($model->title);
+      $textBeforePurifier = $model->text;
       $model->text = Purifier::clean($model->text);
+      
+      // Логируем текст после очистки Purifier
+      Log::info('Product text after Purifier (creating)', [
+        'length_before' => strlen($textBeforePurifier ?? ''),
+        'length_after' => strlen($model->text ?? ''),
+        'preview' => substr($model->text ?? '', 0, 500),
+        'full_text' => $model->text ?? ''
+      ]);
+      
       $model->seo_title = Purifier::clean($model->seo_title);
       $model->seo_text = Purifier::clean($model->seo_text);
       $model->title = str_replace('&amp;', '&', $model->title);
@@ -59,9 +77,35 @@ class Product extends Model
     });
 
     self::updating(function ($model) {
+      // Логируем текст до очистки Purifier
+      if ($model->isDirty('text')) {
+        Log::info('Product text before Purifier (updating)', [
+          'id' => $model->id,
+          'length' => strlen($model->text),
+          'preview' => substr($model->text, 0, 500),
+          'full_text' => $model->text
+        ]);
+      }
+      
       // PURIFY
       $model->title = Purifier::clean($model->title);
-      $model->text = Purifier::clean($model->text);
+      
+      if ($model->isDirty('text')) {
+        $textBeforePurifier = $model->text;
+        $model->text = Purifier::clean($model->text);
+        
+        // Логируем текст после очистки Purifier
+        Log::info('Product text after Purifier (updating)', [
+          'id' => $model->id,
+          'length_before' => strlen($textBeforePurifier),
+          'length_after' => strlen($model->text),
+          'preview' => substr($model->text, 0, 500),
+          'full_text' => $model->text
+        ]);
+      } else {
+        $model->text = Purifier::clean($model->text);
+      }
+      
       $model->seo_title = Purifier::clean($model->seo_title);
       $model->seo_text = Purifier::clean($model->seo_text);
       $model->title = str_replace('&amp;', '&', $model->title);

@@ -7,6 +7,8 @@ use App\Models\Report;
 use App\Models\Comment;
 use App\Models\Review;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\ArticleResource;
+use App\Filament\Resources\ProductResource;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -39,12 +41,13 @@ class UserComplaintResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('type', Report::TYPE_COMPLAINT);
+            ->where('type', Report::TYPE_COMPLAINT)
+            ->with(['author', 'reportable']);
     }
 
     public static function form(Form $form): Form
@@ -101,8 +104,9 @@ class UserComplaintResource extends Resource
                     })
                     ->url(function($record) {
                         $content = $record->reportable;
-                        if (!$content || !method_exists($content, 'author')) return null;
-                        return $content->author ? UserResource::getUrl('view', ['record' => $content->author]) : null;
+                        if (!$content || !method_exists($content, 'author') || !$content->author) return null;
+                        $authorId = is_object($content->author) ? ($content->author->id ?? null) : $content->author;
+                        return $authorId ? UserResource::getUrl('view', ['record' => $authorId]) : null;
                     })
                     ->color(Color::Sky),
                 TextColumn::make('content_location')
@@ -122,10 +126,10 @@ class UserComplaintResource extends Resource
                     ->url(function($record) {
                         $content = $record->reportable;
                         if ($content instanceof Comment && $content->article) {
-                            return url("/admin/articles/{$content->article->id}/edit");
+                            return \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $content->article->id]);
                         }
                         if ($content instanceof Review && $content->product) {
-                            return url("/admin/products/{$content->product->id}/edit");
+                            return \App\Filament\Resources\ProductResource::getUrl('edit', ['record' => $content->product->id]);
                         }
                         return null;
                     })
@@ -353,10 +357,10 @@ class UserComplaintResource extends Resource
                             })
                             ->url(function() use ($content) {
                                 if ($content instanceof Comment && $content->article) {
-                                    return url("/admin/articles/{$content->article->id}/edit");
+                                    return \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $content->article->id]);
                                 }
                                 if ($content instanceof Review && $content->product) {
-                                    return url("/admin/products/{$content->product->id}/edit");
+                                    return \App\Filament\Resources\ProductResource::getUrl('edit', ['record' => $content->product->id]);
                                 }
                                 return null;
                             }),

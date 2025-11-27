@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Models\Order;
+use App\Filament\Resources\UserResource;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -33,6 +34,12 @@ class TransactionResource extends Resource
     protected static ?string $modelLabel = 'Transaction';
 
     protected static ?string $pluralModelLabel = 'Transactions';
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['user', 'payments']);
+    }
 
     public static function form(Form $form): Form
     {

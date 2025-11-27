@@ -24,7 +24,7 @@ class CommissionsSettings extends Page implements HasForms
 
     protected static ?string $navigationGroup = 'financials';
 
-    protected static ?string $navigationLabel = 'Commissions & Fees';
+    protected static ?string $navigationLabel = 'Commissions & Platform Fees';
 
     protected static ?int $navigationSort = 5;
 

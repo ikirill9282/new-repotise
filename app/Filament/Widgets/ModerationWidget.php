@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Article;
 use App\Models\Review;
 use App\Enums\Status;
+use App\Filament\Resources\ProductResource;
 
 class ModerationWidget extends BaseWidget
 {
@@ -46,7 +47,7 @@ class ModerationWidget extends BaseWidget
                 ->description('Products queue')
                 ->color('warning')
                 ->icon('heroicon-o-shopping-bag')
-                ->url(route('filament.admin.resources.products.index', ['tableFilters' => ['status_id' => ['value' => Status::PENDING]]])),
+                ->url(ProductResource::getUrl('index', ['tableFilters' => ['status_id' => ['value' => Status::PENDING]]])),
         ];
     }
 }

@@ -399,6 +399,18 @@ $faqEarnings = [
         'text' => 'Your earning potential on TrekGuider is unlimited! Your income depends entirely on you and the quality of your content. There are no caps on how much you can earn. For example, with average monthly sales of $2,000, your annual income (after platform and payment processing fees) could be over $22,000. To maximize your earnings, take advantage of all TrekGuider offers: sell more products, offer subscriptions, accept tips, publish articles to attract a wider audience, and in the future, offer travel services and tours.',
     ],
     [
+        'title' => 'What commission is charged on donations?',
+        'text' => 'The platform commission is 5% of the donation amount. There is also a commission from the Stripe payment system for payment processing, which is paid by the donation recipient (seller).',
+    ],
+    [
+        'title' => 'Are there limits on the amount of donations?',
+        'text' => 'The minimum donation amount is $1. The maximum one-time donation amount may be limited by the Stripe payment system. For monthly subscriptions, limits may vary, please check Stripe\'s rules for details. <a href="https://stripe.com/docs/currencies" target="_blank" rel="noopener noreferrer" class="text-active hover:underline">Learn more about Stripe\'s rules</a>.',
+    ],
+    [
+        'title' => 'How can I view messages left with my donations?',
+        'text' => 'All donation messages are available in the "Donations" section of your seller account.',
+    ],
+    [
         'title' => 'In which countries can I sell and accept payments on TrekGuider?',
         'text' => "You can sell your products to travelers worldwide! TrekGuider supports international sales in virtually every country where Stripe is available. Buyers can pay for your products in any currency and using local payment methods supported by Stripe. All your earnings are automatically converted to U.S. Dollars and credited to your balance. For more details on Stripe's supported payment methods, please see Stripe's Payment Methods page.",
     ],

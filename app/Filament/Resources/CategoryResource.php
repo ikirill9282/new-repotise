@@ -68,7 +68,7 @@ class CategoryResource extends Resource
                 TextColumn::make('title')
                   ->searchable()
                   ->sortable()
-                  ->url(fn($record) => url("/admin/categories/$record->id/edit"))
+                  ->url(fn($record) => static::getUrl('edit', ['record' => $record->id]))
                   ->color(Color::Sky)
                   ,
                 TextColumn::make('position')

@@ -9,6 +9,7 @@ use App\Models\Comment;
 use App\Models\Review;
 use App\Models\Report;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\ArticleResource;
 use App\Filament\Resources\CommentResource;
 use App\Filament\Resources\ReviewResource;
 use App\Filament\Resources\UserComplaintResource;
@@ -30,13 +31,18 @@ class ModerationQueueResource extends Resource
 {
     protected static ?string $model = ModerationQueue::class;
 
-    protected static ?string $navigationGroup = 'content';
+    protected static ?string $navigationGroup = 'community';
 
     protected static ?string $navigationLabel = 'Moderation Queue';
 
     protected static ?string $navigationIcon = 'heroicon-o-queue-list';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 1;
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery();
+    }
 
     public static function form(Form $form): Form
     {
@@ -113,13 +119,13 @@ class ModerationQueueResource extends Resource
                         if (!$instance) return null;
                         
                         if ($instance instanceof Article) {
-                            return url("/admin/articles/{$instance->id}/edit");
+                            return \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $instance->id]);
                         }
                         if ($instance instanceof Comment) {
-                            return url("/admin/comments");
+                            return CommentResource::getUrl('index');
                         }
                         if ($instance instanceof Review) {
-                            return url("/admin/reviews");
+                            return ReviewResource::getUrl('index');
                         }
                         if ($instance instanceof Report) {
                             if ($instance->type === Report::TYPE_COMPLAINT) {
@@ -178,7 +184,7 @@ class ModerationQueueResource extends Resource
                         if (!$instance) return null;
                         
                         if ($instance instanceof Article) {
-                            return url("/admin/articles/{$instance->id}/edit");
+                            return \App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $instance->id]);
                         }
                         if ($instance instanceof Comment) {
                             return CommentResource::getUrl('index');
@@ -198,7 +204,6 @@ class ModerationQueueResource extends Resource
                     })
                     ->openUrlInNewTab(),
             ])
-            ->defaultSort('priority', 'desc')
             ->defaultSort('created_at', 'desc');
     }
 

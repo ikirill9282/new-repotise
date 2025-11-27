@@ -5,6 +5,11 @@ namespace App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource;
 use App\Models\History;
 use App\Models\RevenueShare;
+use App\Models\Payout;
+use App\Models\Withdrawal;
+use App\Models\Order;
+use App\Models\Subscriptions;
+use App\Models\UserReferal;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Forms;
@@ -15,11 +20,13 @@ use Filament\Infolists;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
 
 class ViewUser extends ViewRecord
 {
@@ -300,6 +307,63 @@ class ViewUser extends ViewRecord
                   ])
                   ->columns(2),
               ]),
+            Infolists\Components\Tabs\Tab::make('Verification')
+              ->visible(fn($record) => $record->hasRole('creator', 'refered-seller'))
+              ->schema([
+                Section::make('Stripe Connect Status')
+                  ->schema([
+                    TextEntry::make('stripe_account_status')
+                      ->label('Stripe Account Status')
+                      ->formatStateUsing(function($record) {
+                        // TODO: Get from Stripe Connect API
+                        if ($record->stripe_id) {
+                          return 'Connected';
+                        }
+                        return 'Not Connected';
+                      })
+                      ->badge()
+                      ->color(function($record) {
+                        return $record->stripe_id ? 'success' : 'gray';
+                      }),
+                    TextEntry::make('stripe_id')
+                      ->label('Stripe Customer ID')
+                      ->formatStateUsing(fn($record) => $record->stripe_id ?? 'N/A')
+                      ->copyable(),
+                    TextEntry::make('stripe_verified_at')
+                      ->label('Stripe Verified At')
+                      ->formatStateUsing(fn($record) => $record->stripe_verified_at 
+                        ? $record->stripe_verified_at->format('Y-m-d H:i:s') 
+                        : 'Not verified')
+                      ->dateTime(),
+                  ])
+                  ->columns(3),
+                Section::make('Verification History')
+                  ->schema([
+                    TextEntry::make('verification_history')
+                      ->label('')
+                      ->formatStateUsing(function($record) {
+                        $verifications = $record->verify()->orderByDesc('created_at')->limit(10)->get();
+                        
+                        if ($verifications->isEmpty()) {
+                          return 'No verification history found.';
+                        }
+                        
+                        $html = '<div class="space-y-2">';
+                        foreach ($verifications as $verify) {
+                          $html .= '<div class="p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm">';
+                          $html .= '<div class="font-medium">' . ($verify->type ?? 'N/A') . '</div>';
+                          $html .= '<div class="text-xs text-gray-600 dark:text-gray-400">';
+                          $html .= 'Status: ' . ($verify->status ?? 'N/A') . ' | ';
+                          $html .= 'Date: ' . $verify->created_at->format('Y-m-d H:i:s');
+                          $html .= '</div></div>';
+                        }
+                        $html .= '</div>';
+                        
+                        return $html;
+                      })
+                      ->html(),
+                  ]),
+              ]),
             Infolists\Components\Tabs\Tab::make('Financial Information')
               ->visible(fn($record) => $record->hasRole('creator', 'refered-seller'))
               ->schema([
@@ -336,6 +400,201 @@ class ViewUser extends ViewRecord
                       ->formatStateUsing(fn($record) => '$' . number_format($record->getStripeFees(), 2)),
                   ])
                   ->columns(2),
+              ]),
+            Infolists\Components\Tabs\Tab::make('Buyer Activity')
+              ->visible(fn($record) => $record->hasRole('buyer') || $record->orders()->exists())
+              ->schema([
+                Section::make('Purchase Summary')
+                  ->schema([
+                    TextEntry::make('total_spent')
+                      ->label('Total Spent')
+                      ->formatStateUsing(function($record) {
+                        $total = Order::where('user_id', $record->id)
+                          ->where('status_id', '>=', 2) // PAID or higher
+                          ->sum('cost');
+                        return '$' . number_format($total, 2);
+                      }),
+                    TextEntry::make('total_orders')
+                      ->label('Total Orders')
+                      ->formatStateUsing(fn($record) => 
+                        Order::where('user_id', $record->id)
+                          ->where('status_id', '>=', 2)
+                          ->count()
+                      ),
+                    TextEntry::make('active_subscriptions')
+                      ->label('Active Subscriptions')
+                      ->formatStateUsing(function($record) {
+                        return $record->subscriptions()
+                          ->where('stripe_status', 'active')
+                          ->count();
+                      }),
+                  ])
+                  ->columns(3),
+                Section::make('Recent Orders')
+                  ->schema([
+                    TextEntry::make('recent_orders')
+                      ->label('')
+                      ->formatStateUsing(function($record) {
+                        $orders = Order::where('user_id', $record->id)
+                          ->with(['order_products.product'])
+                          ->orderByDesc('created_at')
+                          ->limit(10)
+                          ->get();
+                        
+                        if ($orders->isEmpty()) {
+                          return 'No orders found.';
+                        }
+                        
+                        return view('filament.infolists.components.recent-orders', [
+                          'orders' => $orders
+                        ])->render();
+                      })
+                      ->html(),
+                  ]),
+              ]),
+            Infolists\Components\Tabs\Tab::make('Financials & Payouts')
+              ->visible(fn($record) => $record->hasRole('creator', 'refered-seller'))
+              ->schema([
+                Section::make('Stripe Balance')
+                  ->schema([
+                    TextEntry::make('stripe_balance_available')
+                      ->label('Available Balance')
+                      ->formatStateUsing(function($record) {
+                        // TODO: Get from Stripe API
+                        return '$' . number_format($record->balance, 2);
+                      }),
+                    TextEntry::make('stripe_balance_pending')
+                      ->label('Pending Balance')
+                      ->formatStateUsing(function($record) {
+                        // TODO: Get from Stripe API
+                        return '$0.00';
+                      }),
+                  ])
+                  ->columns(2),
+                Section::make('Recent Payouts')
+                  ->schema([
+                    TextEntry::make('recent_payouts')
+                      ->label('')
+                      ->formatStateUsing(function($record) {
+                        $payouts = Payout::where('user_id', $record->id)
+                          ->orderByDesc('created_at')
+                          ->limit(10)
+                          ->get();
+                        
+                        if ($payouts->isEmpty()) {
+                          return 'No payouts found.';
+                        }
+                        
+                        return view('filament.infolists.components.recent-payouts', [
+                          'payouts' => $payouts
+                        ])->render();
+                      })
+                      ->html(),
+                  ]),
+              ]),
+            Infolists\Components\Tabs\Tab::make('Tiers & Commissions')
+              ->visible(fn($record) => $record->hasRole('creator', 'refered-seller'))
+              ->schema([
+                Section::make('Current Level & Commission')
+                  ->schema([
+                    TextEntry::make('current_level')
+                      ->label('Current Level')
+                      ->formatStateUsing(function($record) {
+                        return $record->options?->level?->title ?? 'Default';
+                      }),
+                    TextEntry::make('current_commission_rate')
+                      ->label('Commission Rate')
+                      ->formatStateUsing(fn($record) => number_format($record->getCurrentCommission(), 2) . '%'),
+                    TextEntry::make('commission_source')
+                      ->label('Commission Source')
+                      ->formatStateUsing(function($record) {
+                        // Check if user has individual commission rate
+                        if ($record->options?->fee) {
+                          return 'Admin Override';
+                        }
+                        // Check if referral bonus
+                        if ($record->hasRole('refered-seller')) {
+                          return 'Referral Bonus';
+                        }
+                        return 'Standard Tier';
+                      })
+                      ->badge()
+                      ->color(function($record) {
+                        if ($record->options?->fee) return 'warning';
+                        if ($record->hasRole('refered-seller')) return 'info';
+                        return 'success';
+                      }),
+                    TextEntry::make('storage_allocation')
+                      ->label('Storage Allocation')
+                      ->formatStateUsing(function($record) {
+                        // TODO: Get from level or user options
+                        return '10 GB'; // Placeholder
+                      }),
+                    TextEntry::make('storage_usage')
+                      ->label('Current Storage Usage')
+                      ->formatStateUsing(function($record) {
+                        // TODO: Calculate actual usage
+                        return '2.5 GB / 10 GB (25%)';
+                      }),
+                  ])
+                  ->columns(2),
+              ]),
+            Infolists\Components\Tabs\Tab::make('Referral Program')
+              ->schema([
+                Section::make('Referral Status')
+                  ->schema([
+                    TextEntry::make('referral_type')
+                      ->label('Type')
+                      ->formatStateUsing(function($record) {
+                        $isReferrer = $record->referals()->exists();
+                        $isReferral = $record->referrer()->exists();
+                        if ($isReferrer) return 'Referrer';
+                        if ($isReferral) return 'Referral';
+                        return 'None';
+                      })
+                      ->badge()
+                      ->color(function($record) {
+                        $isReferrer = $record->referals()->exists();
+                        $isReferral = $record->referrer()->exists();
+                        if ($isReferrer || $isReferral) return 'info';
+                        return 'gray';
+                      }),
+                    TextEntry::make('referrer_name')
+                      ->label('Invited By')
+                      ->formatStateUsing(function($record) {
+                        $referrer = $record->referrer;
+                        return $referrer ? $referrer->username : 'N/A';
+                      })
+                      ->visible(fn($record) => $record->referrer()->exists()),
+                    TextEntry::make('referral_date')
+                      ->label('Referral Date')
+                      ->formatStateUsing(function($record) {
+                        $referral = UserReferal::where('referal_id', $record->id)->first();
+                        return $referral ? $referral->created_at->format('Y-m-d H:i:s') : 'N/A';
+                      })
+                      ->visible(fn($record) => $record->referrer()->exists()),
+                  ])
+                  ->columns(3),
+                Section::make('Referral Statistics')
+                  ->visible(fn($record) => $record->referals()->exists())
+                  ->schema([
+                    TextEntry::make('total_referrals')
+                      ->label('Total Referrals')
+                      ->formatStateUsing(fn($record) => $record->referals()->count()),
+                    TextEntry::make('referral_buyers')
+                      ->label('Referred Buyers')
+                      ->formatStateUsing(fn($record) => $record->referal_buyers()->count()),
+                    TextEntry::make('referral_sellers')
+                      ->label('Referred Sellers')
+                      ->formatStateUsing(fn($record) => $record->referals()->whereHas('roles', fn($q) => $q->whereIn('name', ['creator', 'refered-seller']))->count()),
+                    TextEntry::make('referral_earnings')
+                      ->label('Referral Earnings')
+                      ->formatStateUsing(function($record) {
+                        $total = $record->referal_income()->sum('sum');
+                        return '$' . number_format($total, 2);
+                      }),
+                  ])
+                  ->columns(4),
               ]),
             Infolists\Components\Tabs\Tab::make('Activity Log')
               ->schema([
