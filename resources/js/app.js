@@ -150,6 +150,9 @@ function makeQuill(editor) {
             },
             placeholder: editor.getAttribute("data-placeholder") ?? "",
         });
+        
+        // Сохраняем ссылку на Quill экземпляр для доступа из других мест
+        editor.__quill = quill;
 
         // Обработчик вставки из Word с сохранением форматирования
         // Используем более простой подход - обрабатываем только элементы, сохраняя весь текст
@@ -269,185 +272,54 @@ function makeQuill(editor) {
             }
         };
 
-        setTimeout(() => {
+        // Простая функция для загрузки контента в Quill
+        const loadContentIntoQuill = () => {
           let content = input?.value || '';
           
           if (!content) {
+            // Если контента нет, проверяем еще раз через некоторое время (для Livewire)
+            setTimeout(() => loadContentIntoQuill(), 500);
             return;
           }
           
-          // ВАЖНО: Преобразуем правильные HTML теги <ul> и <ol> обратно в формат Quill с data-list
-          // Quill использует <ol> для всех списков, но различает их через data-list атрибут на <li>
-          
-          // Создаем временный контейнер для работы с DOM
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = content;
-          
-          // Преобразуем <ul> в <ol> с data-list="bullet" на элементах <li>
-          const ulLists = Array.from(tempDiv.querySelectorAll('ul'));
-          ulLists.forEach(ul => {
-              const ol = document.createElement('ol');
-              // Копируем атрибуты (кроме data-list)
-              Array.from(ul.attributes).forEach(attr => {
-                  if (attr.name !== 'data-list') {
-                      ol.setAttribute(attr.name, attr.value);
-                  }
-              });
-              
-              // Обрабатываем только прямые дочерние <li> элементы
-              Array.from(ul.children).forEach(li => {
-                  if (li.tagName === 'LI') {
-                      const newLi = li.cloneNode(true);
-                      // Удаляем старый data-list, если есть
-                      newLi.removeAttribute('data-list');
-                      newLi.setAttribute('data-list', 'bullet');
-                      
-                      // Обрабатываем вложенные списки внутри <li>
-                      const nestedUls = newLi.querySelectorAll('ul');
-                      nestedUls.forEach(nestedUl => {
-                          const nestedOl = document.createElement('ol');
-                          Array.from(nestedUl.children).forEach(nestedLi => {
-                              if (nestedLi.tagName === 'LI') {
-                                  const newNestedLi = nestedLi.cloneNode(true);
-                                  newNestedLi.removeAttribute('data-list');
-                                  newNestedLi.setAttribute('data-list', 'bullet');
-                                  nestedOl.appendChild(newNestedLi);
-                              }
-                          });
-                          nestedUl.parentNode.replaceChild(nestedOl, nestedUl);
-                      });
-                      
-                      const nestedOls = newLi.querySelectorAll('ol');
-                      nestedOls.forEach(nestedOl => {
-                          Array.from(nestedOl.children).forEach(nestedLi => {
-                              if (nestedLi.tagName === 'LI' && !nestedLi.hasAttribute('data-list')) {
-                                  nestedLi.setAttribute('data-list', 'ordered');
-                              }
-                          });
-                      });
-                      
-                      ol.appendChild(newLi);
-                  }
-              });
-              
-              ul.parentNode.replaceChild(ol, ul);
-          });
-          
-          // Для <ol> без data-list на элементах <li> добавляем data-list="ordered"
-          const olLists = Array.from(tempDiv.querySelectorAll('ol'));
-          olLists.forEach(ol => {
-              // Проверяем, есть ли data-list на прямых дочерних элементах
-              const directListItems = Array.from(ol.children).filter(child => child.tagName === 'LI');
-              let hasDataList = false;
-              
-              directListItems.forEach(li => {
-                  if (li.hasAttribute('data-list')) {
-                      hasDataList = true;
-                  }
-              });
-              
-              // Если нет data-list на элементах, добавляем data-list="ordered"
-              if (!hasDataList) {
-                  directListItems.forEach(li => {
-                      li.setAttribute('data-list', 'ordered');
-                  });
-              }
-              
-              // Обрабатываем вложенные списки внутри <ol>
-              const nestedUls = ol.querySelectorAll('ul');
-              nestedUls.forEach(nestedUl => {
-                  const nestedOl = document.createElement('ol');
-                  Array.from(nestedUl.children).forEach(nestedLi => {
-                      if (nestedLi.tagName === 'LI') {
-                          const newNestedLi = nestedLi.cloneNode(true);
-                          newNestedLi.removeAttribute('data-list');
-                          newNestedLi.setAttribute('data-list', 'bullet');
-                          nestedOl.appendChild(newNestedLi);
-                      }
-                  });
-                  nestedUl.parentNode.replaceChild(nestedOl, nestedUl);
-              });
-          });
-          
-          // Получаем преобразованный контент
-          content = tempDiv.innerHTML;
-          
-          // Загружаем контент напрямую в Quill через innerHTML
-          // Это сохраняет структуру списков
+          // Просто загружаем контент напрямую через innerHTML
           quill.root.innerHTML = content;
           
-          // После загрузки принудительно восстанавливаем списки в формате Quill
+          // Применяем стили к спискам
           setTimeout(() => {
               const editorElement = quill.root;
+              const allLists = editorElement.querySelectorAll('ul, ol');
               
-              // Обрабатываем все <ol> списки - убеждаемся, что у них есть data-list на <li>
-              const allOlLists = editorElement.querySelectorAll('ol');
-              allOlLists.forEach(ol => {
-                  const listItems = Array.from(ol.children).filter(child => child.tagName === 'LI');
-                  let hasDataList = false;
-                  
-                  listItems.forEach(li => {
-                      if (li.hasAttribute('data-list')) {
-                          hasDataList = true;
-                      }
-                  });
-                  
-                  // Если нет data-list, определяем тип по контексту
-                  // Если это был <ul> (преобразованный выше), должен быть data-list="bullet"
-                  // Иначе data-list="ordered"
-                  if (!hasDataList) {
-                      // Проверяем, был ли это <ul> - если в БД был <ul>, мы его преобразовали в <ol>
-                      // Но мы не можем точно определить, поэтому используем эвристику:
-                      // Если список не имеет data-list, значит это был <ol> из БД, добавляем "ordered"
-                      listItems.forEach(li => {
-                          li.setAttribute('data-list', 'ordered');
-                      });
-                  }
-              });
-              
-              // Принудительно применяем стили для списков
-              const lists = editorElement.querySelectorAll('ul, ol');
-              lists.forEach(list => {
-                if (list.tagName === 'UL') {
-                  list.style.listStyleType = 'disc';
-                  list.style.listStyle = 'disc outside';
-                } else if (list.tagName === 'OL') {
-                  // Определяем тип списка по data-list на первом элементе
-                  const firstLi = list.querySelector('li[data-list]');
-                  if (firstLi) {
-                      const listType = firstLi.getAttribute('data-list');
-                      if (listType === 'bullet') {
-                          list.style.listStyleType = 'disc';
-                          list.style.listStyle = 'disc outside';
-                      } else {
-                          list.style.listStyleType = 'decimal';
-                          list.style.listStyle = 'decimal outside';
-                      }
-                  } else {
-                      // Если нет data-list, по умолчанию ordered
+              allLists.forEach(list => {
+                  if (list.tagName === 'UL') {
+                      list.style.listStyleType = 'disc';
+                      list.style.listStyle = 'disc outside';
+                  } else if (list.tagName === 'OL') {
                       list.style.listStyleType = 'decimal';
                       list.style.listStyle = 'decimal outside';
                   }
-                }
-                list.style.listStylePosition = 'outside';
-                list.style.paddingLeft = '30px';
-                list.style.margin = '15px 0';
+                  list.style.listStylePosition = 'outside';
+                  list.style.paddingLeft = '30px';
+                  list.style.margin = '15px 0';
               });
               
               const listItems = editorElement.querySelectorAll('li');
               listItems.forEach(li => {
-                li.style.display = 'list-item';
-                li.style.listStylePosition = 'outside';
-                li.style.margin = '8px 0';
-                li.style.paddingLeft = '5px';
+                  li.style.display = 'list-item';
+                  li.style.listStylePosition = 'outside';
+                  li.style.margin = '8px 0';
+                  li.style.paddingLeft = '5px';
               });
               
-              // Обновляем input с преобразованным контентом (в формате Quill)
+              // Обновляем input
               if (input) {
                   input.value = editorElement.innerHTML;
               }
           }, 100);
-        }, 300);
+        };
+        
+        // Загружаем контент после инициализации Quill
+        setTimeout(loadContentIntoQuill, 300);
 
         // Обработчик изменений текста
         quill.on("text-change", updateInput);
@@ -501,6 +373,44 @@ window.addEventListener("DOMContentLoaded", function () {
           if (!builded_editors.includes(editor)) {
             makeQuill(editor);
             builded_editors.push(editor);
+          } else {
+            // Если редактор уже создан, просто перезагружаем контент
+            const quillInstance = editor.__quill;
+            if (quillInstance) {
+              const id = editor.getAttribute("data-model");
+              const wrap = editor.closest(".text-editor");
+              const input = wrap?.querySelector(`#${id}`);
+              if (input && input.value) {
+                setTimeout(() => {
+                  quillInstance.root.innerHTML = input.value;
+                  
+                  // Применяем стили к спискам
+                  setTimeout(() => {
+                    const allLists = quillInstance.root.querySelectorAll('ul, ol');
+                    allLists.forEach(list => {
+                      if (list.tagName === 'UL') {
+                        list.style.listStyleType = 'disc';
+                        list.style.listStyle = 'disc outside';
+                      } else if (list.tagName === 'OL') {
+                        list.style.listStyleType = 'decimal';
+                        list.style.listStyle = 'decimal outside';
+                      }
+                      list.style.listStylePosition = 'outside';
+                      list.style.paddingLeft = '30px';
+                      list.style.margin = '15px 0';
+                    });
+                    
+                    const listItems = quillInstance.root.querySelectorAll('li');
+                    listItems.forEach(li => {
+                      li.style.display = 'list-item';
+                      li.style.listStylePosition = 'outside';
+                      li.style.margin = '8px 0';
+                      li.style.paddingLeft = '5px';
+                    });
+                  }, 100);
+                }, 200);
+              }
+            }
           }
         });
     });

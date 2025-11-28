@@ -31,9 +31,14 @@ class KeyMetricsWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        // Используем trigger для принудительного обновления
+        // ВАЖНО: Используем trigger для принудительного обновления - это заставляет Livewire пересчитать метод
+        // Читаем свойство явно чтобы создать зависимость
         $trigger = $this->dateRangeUpdateTrigger ?? 0;
+        // Принудительно читаем из session чтобы получить актуальные данные
+        $this->dashboardStartDate = session('dashboard_start_date');
+        $this->dashboardEndDate = session('dashboard_end_date');
         
+        // Читаем даты из session каждый раз при вызове метода
         $startDate = $this->getStartDate();
         $endDate = $this->getEndDate();
 

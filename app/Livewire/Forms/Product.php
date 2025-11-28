@@ -189,6 +189,11 @@ class Product extends Component
     {
       $data = $this->fields ?? [];
       $data['status_id'] = isset($data['status_id']) ? $data['status_id'] : 3;
+      
+      // Set default refund_policy if not provided
+      if (!isset($data['refund_policy']) || $data['refund_policy'] === '' || $data['refund_policy'] === null) {
+        $data['refund_policy'] = $this->default['refund_policy'] ?? 90;
+      }
 
       // Логируем исходный текст для отладки
       $originalText = $data['text'] ?? '';
@@ -219,16 +224,46 @@ class Product extends Component
 
       $subprice = array_map(function($elem) {
         /** @var string $elem */
-        return str_ireplace('%', '', $elem);
+        $cleaned = str_ireplace('%', '', $elem);
+        return $cleaned === '' ? null : $cleaned;
       }, $this->subprice);
       
       $data = array_merge($data, $subprice);
 
-      $data['price'] = str_ireplace('$', '', $data['price']);
-      $data['sale_price'] = str_ireplace('$', '', $data['sale_price']);
+      // Map old_price to sale_price if it exists
+      if (isset($data['old_price'])) {
+        $data['sale_price'] = $data['old_price'];
+        unset($data['old_price']);
+      }
 
+      $data['price'] = str_ireplace('$', '', $data['price'] ?? '');
+      $data['sale_price'] = str_ireplace('$', '', $data['sale_price'] ?? '');
+
+      // Convert empty strings to null for numeric fields
+      if ($data['price'] === '' || $data['price'] === null) {
+        $data['price'] = null;
+      }
+      
       if ($data['sale_price'] === '' || $data['sale_price'] === null) {
         $data['sale_price'] = null;
+      }
+
+      // Convert empty strings to null for subscription prices when subscription is false
+      if (!($data['subscription'] ?? false)) {
+        $data['month'] = null;
+        $data['quarter'] = null;
+        $data['year'] = null;
+      } else {
+        // For subscription products, convert empty strings to null
+        if (isset($data['month']) && $data['month'] === '') {
+          $data['month'] = null;
+        }
+        if (isset($data['quarter']) && $data['quarter'] === '') {
+          $data['quarter'] = null;
+        }
+        if (isset($data['year']) && $data['year'] === '') {
+          $data['year'] = null;
+        }
       }
 
       return $data;
@@ -242,7 +277,7 @@ class Product extends Component
         'user_id' => 'required|integer',
         'title' => 'required|string',
         'text' => 'required|string',
-        'refund_policy' => 'required|integer',
+        'refund_policy' => 'nullable|integer',
         'subscription' => 'required|boolean',
         'price' => 'required|numeric',
         'sale_price' => 'sometimes|nullable|numeric',
@@ -251,9 +286,9 @@ class Product extends Component
         'types' => 'sometimes|nullable|array',
         'locations' => 'sometimes|nullable|array',
         'categories' => 'sometimes|nullable|array',
-        'month' => 'required_if:subscription,true|numeric',
-        'quarter' => 'required_if:subscription,true|numeric',
-        'year' => 'required_if:subscription,true|numeric',
+        'month' => 'required_if:subscription,true|nullable|numeric',
+        'quarter' => 'required_if:subscription,true|nullable|numeric',
+        'year' => 'required_if:subscription,true|nullable|numeric',
       ], [
         'month' => [
           'required_if' => 'The month field is required when product is subscription.'
@@ -267,7 +302,6 @@ class Product extends Component
       ]);
 
       if ($validator->fails()) {
-        dd($validator->errors(), $data);
         throw new ValidationException($validator);
       }
 

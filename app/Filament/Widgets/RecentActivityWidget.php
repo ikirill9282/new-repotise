@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\Widget;
+use App\Filament\Widgets\Concerns\HasDashboardDateRange;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Article;
@@ -18,16 +19,27 @@ use Illuminate\Support\Carbon;
 
 class RecentActivityWidget extends Widget
 {
+    use HasDashboardDateRange;
+    
     protected static string $view = 'filament.widgets.recent-activity-widget';
 
     protected static ?int $sort = 9;
 
     protected int | string | array $columnSpan = 'full';
 
+    public function mount(): void
+    {
+        $this->mountHasDashboardDateRange();
+    }
+
     public function getRecentOrders()
     {
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
+        
         return Order::query()
             ->where('status_id', '>=', EnumsOrder::PAID)
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->with(['user', 'order_products.product'])
             ->orderByDesc('created_at')
             ->limit(5)
@@ -46,7 +58,11 @@ class RecentActivityWidget extends Widget
 
     public function getRecentRegistrations()
     {
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
+        
         return User::query()
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->with('roles')
             ->orderByDesc('created_at')
             ->limit(5)
@@ -62,8 +78,12 @@ class RecentActivityWidget extends Widget
 
     public function getRecentModerationItems()
     {
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
+        
         return ModerationQueue::query()
             ->whereIn('priority', [ModerationQueue::PRIORITY_HIGH, ModerationQueue::PRIORITY_NORMAL])
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->orderByDesc('created_at')
             ->limit(5)
             ->get()
@@ -80,8 +100,12 @@ class RecentActivityWidget extends Widget
 
     public function getRecentPayouts()
     {
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
+        
         return Payout::query()
             ->whereIn('status', [Payout::STATUS_COMPLETED, Payout::STATUS_FAILED, Payout::STATUS_PAID])
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->with('user')
             ->orderByDesc('updated_at')
             ->limit(5)
@@ -99,8 +123,12 @@ class RecentActivityWidget extends Widget
 
     public function getRecentContent()
     {
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
+        
         return Article::query()
             ->where('status_id', 1) // Published
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->with('author')
             ->orderByDesc('created_at')
             ->limit(5)

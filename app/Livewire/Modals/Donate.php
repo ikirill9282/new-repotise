@@ -251,9 +251,22 @@ class Donate extends Component
 
     public function checkDonation(): void
     {
+        Log::info('Donation: checkDonation called', [
+            'seller_id' => $this->seller->id ?? null,
+            'donor_id' => $this->donor?->id,
+            'amount' => $this->amount,
+            'selected_payment_method' => $this->selectedPaymentMethod,
+            'monthly_support' => $this->monthlySupport,
+        ]);
+
         try {
             $this->validate($this->rules());
         } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Donation: Validation failed', [
+                'seller_id' => $this->seller->id ?? null,
+                'donor_id' => $this->donor?->id,
+                'errors' => $e->errors(),
+            ]);
             $this->dispatch('toastError', ['message' => 'Please fill in all required fields correctly.']);
             $this->dispatch('donation-check-result', ['error' => true]);
             return;
@@ -262,15 +275,18 @@ class Donate extends Component
         $selected = $this->selectedPaymentMethod;
 
         if ($this->shouldUseNewPaymentMethod($selected)) {
+            Log::info('Donation: Using new payment method');
             if (!$this->setupIntentSecret) {
                 $this->prepareSetupIntent();
                 if (!$this->setupIntentSecret) {
+                    Log::error('Donation: Failed to prepare setup intent');
                     $this->dispatch('toastError', ['message' => 'Adding a new payment method is temporarily unavailable. Please try again later.']);
                     $this->dispatch('donation-check-result', ['error' => true]);
                     return;
                 }
             }
 
+            Log::info('Donation: Dispatching donation-check-result with action=create');
             $this->dispatch('donation-check-result', [
                 'action' => 'create',
             ]);
@@ -278,30 +294,69 @@ class Donate extends Component
         }
 
         if (!$this->paymentMethodExists($selected)) {
+            Log::warning('Donation: Selected payment method does not exist', [
+                'selected' => $selected,
+            ]);
             $this->dispatch('toastError', ['message' => 'Selected payment method is no longer available.']);
             $this->dispatch('donation-check-result', ['error' => true]);
             return;
         }
 
-        $this->dispatch('donation-check-result', [
-            'action' => $selected,
+        // For existing payment methods, call handleMakeDonation directly
+        Log::info('Donation: Calling handleMakeDonation directly for existing payment method', [
+            'payment_method_id' => $selected,
         ]);
+        $this->handleMakeDonation(['pm_id' => $selected]);
     }
 
     #[On('makeDonation')]
-    public function handleMakeDonation(array $payload): void
+    public function handleMakeDonation($payload = null): void
     {
+        Log::info('Donation: handleMakeDonation called', [
+            'seller_id' => $this->seller->id ?? null,
+            'donor_id' => $this->donor?->id,
+            'payload' => $payload,
+            'component_id' => $this->getId(),
+        ]);
+
         $needsFurtherAction = false;
 
         if ($this->unavailable || !$this->seller) {
+            Log::warning('Donation: Unavailable or seller missing', [
+                'unavailable' => $this->unavailable,
+                'seller_id' => $this->seller->id ?? null,
+            ]);
             $this->dispatch('toastError', ['message' => 'Donations are currently unavailable for this creator.']);
+            $this->dispatch('donation-processing-ended', [
+                'componentId' => $this->getId(),
+            ]);
             return;
         }
 
+        // Handle different payload formats
+        if (is_string($payload)) {
+            $paymentMethodId = $payload;
+        } elseif (is_array($payload)) {
+            $paymentMethodId = $payload['pm_id'] ?? $payload[0] ?? null;
+        } else {
+            $paymentMethodId = null;
+        }
+
+        // Check if this event is for this component
+        if (is_array($payload) && isset($payload['componentId']) && $payload['componentId'] !== $this->getId()) {
+            Log::info('Donation: Event is for different component, ignoring', [
+                'event_component_id' => $payload['componentId'],
+                'this_component_id' => $this->getId(),
+            ]);
+            return;
+        }
+
+        Log::info('Donation: Processing with payment method', [
+            'payment_method_id' => $paymentMethodId,
+        ]);
+
         try {
             $this->validate($this->rules());
-
-            $paymentMethodId = $payload['pm_id'] ?? null;
 
             $donor = $this->ensureDonorAccount();
 
@@ -350,9 +405,24 @@ class Donate extends Component
                 'description' => sprintf('Donation to %s', $this->seller->username ?? $this->seller->name ?? 'creator'),
             ];
 
+            Log::info('Donation: Creating payment intent', [
+                'amount' => $intentData['amount'],
+                'currency' => $intentData['currency'],
+                'payment_method' => $paymentMethodId,
+            ]);
+
             $intent = Cashier::stripe()->paymentIntents->create($intentData);
 
+            Log::info('Donation: Payment intent created', [
+                'payment_intent_id' => $intent->id,
+                'status' => $intent->status,
+            ]);
+
             if (in_array($intent->status, ['requires_action', 'requires_confirmation'])) {
+                Log::info('Donation: Payment requires action', [
+                    'payment_intent_id' => $intent->id,
+                    'status' => $intent->status,
+                ]);
                 $needsFurtherAction = true;
                 $this->dispatch('donation-requires-action', [
                     'componentId' => $this->getId(),
@@ -363,11 +433,18 @@ class Donate extends Component
             }
 
             if (!in_array($intent->status, [PaymentIntent::STATUS_SUCCEEDED, PaymentIntent::STATUS_PROCESSING])) {
+                Log::error('Donation: Payment intent failed', [
+                    'payment_intent_id' => $intent->id,
+                    'status' => $intent->status,
+                ]);
                 $errorMessage = $this->getStripeErrorMessage($intent);
                 $this->showDonationError($errorMessage['message'], $errorMessage['code']);
                 return;
             }
 
+            Log::info('Donation: Payment intent succeeded, finalizing donation', [
+                'payment_intent_id' => $intent->id,
+            ]);
             $this->finalizeDonation($intent);
         } catch (CardException $exception) {
             $errorMessage = $this->getStripeErrorMessageFromException($exception);
@@ -460,13 +537,20 @@ class Donate extends Component
 
     protected function finalizeDonation(PaymentIntent $paymentIntent): void
     {
+        Log::info('Donation: finalizeDonation called', [
+            'payment_intent_id' => $paymentIntent->id,
+            'seller_id' => $this->seller->id ?? null,
+            'donor_id' => $this->donor?->id,
+        ]);
+
         if ($this->unavailable || !$this->seller) {
+            Log::warning('Donation: Cannot finalize - unavailable or seller missing');
             $this->showDonationError('Donations are currently unavailable for this creator.', 'unavailable');
             return;
         }
 
         if (Payments::where('stripe_id', $paymentIntent->id)->exists()) {
-            $this->dispatch('closeModal');
+            Log::info('Donation: Payment already exists, opening success modal');
             $this->dispatch('openModal', 'donate-accept', [
                 'amount' => ($paymentIntent->amount_received ?? $paymentIntent->amount) / 100,
                 'seller_name' => $this->seller->name ?? $this->seller->username ?? 'Creator',
@@ -591,11 +675,27 @@ class Donate extends Component
             }
         }
 
+        Log::info('Donation: Successfully finalized', [
+            'payment_intent_id' => $paymentIntent->id,
+            'donation_amount' => $donationAmount,
+            'seller_id' => $this->seller->id,
+            'donor_id' => $this->donor?->id,
+            'user_fund_id' => $userFund->id,
+        ]);
+
         $this->dispatch('toastSuccess', ['message' => 'Thank you for supporting this creator!']);
         $this->dispatch('donation-processing-ended', [
             'componentId' => $this->getId(),
         ]);
-        $this->dispatch('closeModal');
+        
+        // Open success modal
+        Log::info('Donation: Opening success modal', [
+            'modal' => 'donate-accept',
+            'amount' => $donationAmount,
+        ]);
+        
+        // Open new modal first, then close current one
+        // The openModal method will set the new modal and keep isVisible = true
         $this->dispatch('openModal', 'donate-accept', [
             'amount' => $donationAmount,
             'charged_amount' => $gross,
@@ -608,6 +708,9 @@ class Donate extends Component
             'monthly_support' => Arr::get($metadata, 'monthly_support') === '1',
             'message' => $sanitizedMessage,
         ]);
+        
+        // Note: We don't need to close the current modal explicitly
+        // because openModal will replace it with the new one
         $this->resetDonationForm();
     }
 
@@ -760,6 +863,14 @@ class Donate extends Component
 
     public function showDonationError(string $message, ?string $errorCode = null): void
     {
+        Log::error('Donation: Error occurred', [
+            'message' => $message,
+            'error_code' => $errorCode,
+            'seller_id' => $this->seller->id ?? null,
+            'donor_id' => $this->donor?->id,
+            'component_id' => $this->getId(),
+        ]);
+
         $this->dispatch('closeModal');
         $this->dispatch('openModal', 'donate-error', [
             'message' => $message,

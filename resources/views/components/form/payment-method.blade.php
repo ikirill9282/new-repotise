@@ -13,6 +13,7 @@
 @php
   $wireModel = $attributes->get('wire:model') ?? $attributes->get('wireModel');
   $inputAttributes = $attributes->except(['class', 'wire:model', 'wireModel']);
+  // If wire:model is provided, merge it back into attributes so Livewire can process it
   if ($wireModel) {
     $inputAttributes = $inputAttributes->merge(['wire:model' => $wireModel]);
   }

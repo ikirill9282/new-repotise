@@ -31,8 +31,11 @@ class TransactionsWidget extends ChartWidget
 
     protected function getData(): array
     {
-        // Используем trigger для принудительного обновления
+        // ВАЖНО: Используем trigger для принудительного обновления
         $trigger = $this->dateRangeUpdateTrigger ?? 0;
+        // Принудительно читаем из session чтобы получить актуальные данные
+        $this->dashboardStartDate = session('dashboard_start_date');
+        $this->dashboardEndDate = session('dashboard_end_date');
         
         $startDate = $this->getStartDate();
         $endDate = $this->getEndDate();

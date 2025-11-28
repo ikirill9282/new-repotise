@@ -1,5 +1,5 @@
 <x-filament-panels::page>
-    <div class="space-y-2">
+    <div class="space-y-2" wire:key="dashboard-container-{{ $this->widgetsUpdateKey ?? 0 }}">
         <div class="flex items-center justify-between mb-1">
             <h2 class="text-lg font-semibold">Dashboard</h2>
         </div>
@@ -11,23 +11,12 @@
             </form>
         </div>
 
-        @script
-        <script>
-            $wire.on('refresh-dashboard-widgets', () => {
-                // Принудительно обновляем все виджеты
-                Livewire.all().forEach(component => {
-                    if (component.$wire.hasOwnProperty('refreshDateRange')) {
-                        component.$wire.call('refreshDateRange');
-                    }
-                });
-            });
-        </script>
-        @endscript
+
 
 
 
         {{-- Key Metrics Overview --}}
-        <div class="mb-4" wire:key="key-metrics-{{ $this->startDate ?? 'default' }}-{{ $this->endDate ?? 'default' }}">
+        <div class="mb-4" wire:key="key-metrics-{{ $this->widgetsUpdateKey ?? 0 }}-{{ $this->startDate ?? '' }}-{{ $this->endDate ?? '' }}">
             <x-filament-widgets::widgets
                 :widgets="[\App\Filament\Widgets\KeyMetricsWidget::class]"
                 :columns="['default' => 1]"
@@ -84,7 +73,7 @@
             </div>
         </div>
 
-        <div class="dashboard-grid grid grid-cols-1 md:grid-cols-3 gap-3" wire:key="dashboard-widgets-{{ $this->startDate ?? 'default' }}-{{ $this->endDate ?? 'default' }}">
+        <div class="dashboard-grid grid grid-cols-1 md:grid-cols-3 gap-3" wire:key="dashboard-widgets-{{ $this->widgetsUpdateKey ?? 0 }}">
             <!-- Левая колонка: Пользователи -->
             <div class="dashboard-column space-y-2">
                 <div class="flex items-center gap-2 pb-1 border-b border-gray-200">
@@ -126,7 +115,7 @@
         </div>
 
         {{-- Recent Activity Feeds --}}
-        <div class="mb-4" wire:key="recent-activity-{{ $startDate ?? 'default' }}-{{ $endDate ?? 'default' }}">
+        <div class="mb-4" wire:key="recent-activity-{{ $this->widgetsUpdateKey ?? 0 }}">
             <x-filament-widgets::widgets
                 :widgets="[\App\Filament\Widgets\RecentActivityWidget::class]"
                 :columns="['default' => 1]"
@@ -135,7 +124,7 @@
         </div>
 
         <!-- Revenue by Category - отдельный блок на половину ширины -->
-        <div class="mt-3 revenue-widget-container" wire:key="revenue-widget-{{ $startDate ?? 'default' }}-{{ $endDate ?? 'default' }}">
+        <div class="mt-3 revenue-widget-container" wire:key="revenue-widget-{{ $this->widgetsUpdateKey ?? 0 }}">
             <div class="w-full md:w-1/2">
                 <x-filament-widgets::widgets
                     :widgets="[\App\Filament\Widgets\RevenueWidget::class]"

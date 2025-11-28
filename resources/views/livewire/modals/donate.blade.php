@@ -109,17 +109,6 @@
               class="bg-transparent group-has-[input]:!px-0"
             />
           @endforeach
-          <x-form.payment-method
-            wire:model="selectedPaymentMethod"
-            name="donate_payment_method" 
-            value="new"
-            :tooltip="false"
-            :editor="false"
-            :icons="false"
-            brand="New Card"
-            last4=""
-            class="bg-transparent group-has-[input]:!px-0"
-          />
           <x-btn 
             second 
             class="!inline-block !text-sm !px-3 !py-1.5 w-auto mt-1"
@@ -237,6 +226,19 @@
         let paymentElement = null;
         let initialized = false;
         let isProcessing = false;
+
+        // Log button click
+        document.addEventListener('DOMContentLoaded', () => {
+          const submitBtn = document.getElementById('donate-submit-btn');
+          if (submitBtn) {
+            submitBtn.addEventListener('click', (e) => {
+              console.log('Donation: Send Donation button clicked', {
+                componentId: componentId,
+                timestamp: new Date().toISOString(),
+              });
+            });
+          }
+        });
 
         if (!stripeKey) {
           console.error('Stripe publishable key is missing');
@@ -370,13 +372,18 @@
           Livewire.on('donation-check-result', async (event) => {
             const result = Array.isArray(event) ? (event[0] || event) : event;
             
+            console.log('Donation: donation-check-result event received', result);
+            
             if (result.error) {
+              console.error('Donation: Error in check result', result);
               setButtonProcessing(false);
               return;
             }
 
-            // Keep button in processing state
+            // Keep button in processing state - it will be reset by donation-processing-ended
+            // or when modal closes
             setButtonProcessing(true);
+            console.log('Donation: Processing donation with action', result.action);
 
             if (result.action === 'create') {
               // New payment method - confirm setup intent
@@ -419,14 +426,18 @@
                 }
 
                 // Call makeDonation with the new payment method
+                console.log('Donation: Calling makeDonation with new payment method', setupIntent.payment_method);
                 const component = Livewire.find(componentId);
-                if (component) {
-                  component.dispatch('makeDonation', {
+                if (component && component.$wire) {
+                  // Use $wire.dispatch to send event to this component
+                  console.log('Donation: Using component.$wire.dispatch');
+                  component.$wire.dispatch('makeDonation', {
                     pm_id: setupIntent.payment_method,
                   });
                 } else {
-                  // Fallback to global dispatch
+                  console.warn('Donation: Component not found or $wire not available, using global dispatch');
                   Livewire.dispatch('makeDonation', {
+                    componentId: componentId,
                     pm_id: setupIntent.payment_method,
                   });
                 }
@@ -435,16 +446,19 @@
                 showError('An error occurred. Please try again.');
                 setButtonProcessing(false);
               }
-            } else if (result.action && result.action !== 'create') {
-              // Existing payment method - call makeDonation directly
+            // Note: For existing payment methods, handleMakeDonation is called directly from PHP
+            // This branch should not be reached for existing payment methods anymore
+            else if (result.action && result.action !== 'create') {
+              console.warn('Donation: Unexpected action in donation-check-result', result.action);
+              // This should not happen, but keep as fallback
               const component = Livewire.find(componentId);
-              if (component) {
-                component.dispatch('makeDonation', {
+              if (component && component.$wire) {
+                component.$wire.dispatch('makeDonation', {
                   pm_id: result.action,
                 });
               } else {
-                // Fallback to global dispatch
                 Livewire.dispatch('makeDonation', {
+                  componentId: componentId,
                   pm_id: result.action,
                 });
               }
@@ -458,6 +472,9 @@
             const data = Array.isArray(event) ? (event[0] || event) : event;
             const clientSecret = data.clientSecret;
             
+            // Keep button in processing state
+            setButtonProcessing(true);
+            
             if (!clientSecret || !stripeInstance) {
               showError('Payment authorization is required but could not be processed.');
               setButtonProcessing(false);
@@ -470,7 +487,7 @@
               if (error) {
                 const component = Livewire.find(componentId);
                 if (component) {
-                  // Pass error message to component
+                  // Pass error message to component - it will dispatch donation-processing-ended
                   const errorMessage = error.message || 'Payment authorization failed.';
                   const errorCode = error.code || error.decline_code || 'authorization_failed';
                   component.call('showDonationError', errorMessage, errorCode);
@@ -482,6 +499,7 @@
               }
 
               // Payment confirmed, call donationResult
+              // donationResult will call finalizeDonation which dispatches donation-processing-ended
               if (paymentIntent) {
                 const component = Livewire.find(componentId);
                 if (component) {
@@ -492,6 +510,7 @@
               console.error('Error confirming payment:', error);
               const component = Livewire.find(componentId);
               if (component) {
+                // Component will dispatch donation-processing-ended
                 const errorMessage = error.message || 'An error occurred during payment authorization.';
                 const errorCode = error.code || 'authorization_error';
                 component.call('showDonationError', errorMessage, errorCode);

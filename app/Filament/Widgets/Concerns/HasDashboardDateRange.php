@@ -23,9 +23,9 @@ trait HasDashboardDateRange
     #[On('dashboard-date-range-updated')]
     public function refreshDateRange(?string $start = null, ?string $end = null): void
     {
-        // Обновляем даты из параметров события или из request/session
-        $newStartDate = $start ?? request()->get('dashboard_start_date') ?? session('dashboard_start_date');
-        $newEndDate = $end ?? request()->get('dashboard_end_date') ?? session('dashboard_end_date');
+        // Обновляем даты из параметров события или из session
+        $newStartDate = $start ?? session('dashboard_start_date');
+        $newEndDate = $end ?? session('dashboard_end_date');
         
         // Всегда обновляем даты и триггер для принудительного обновления
         $this->dashboardStartDate = $newStartDate;
@@ -41,27 +41,25 @@ trait HasDashboardDateRange
         if (property_exists($this, 'cachedData')) {
             unset($this->cachedData);
         }
+        
+        // Принудительно обновляем виджет
+        $this->dispatch('$refresh');
     }
 
     protected function getStartDate(): Carbon
     {
-        // Сначала пытаемся получить из свойства виджета
-        if ($this->dashboardStartDate) {
-            return Carbon::parse($this->dashboardStartDate)->startOfDay();
-        }
-        
-        // Затем из session (устанавливаются Dashboard)
+        // ВАЖНО: Всегда читаем из session первым делом (самый актуальный источник)
         $startDate = session('dashboard_start_date');
         
         if ($startDate) {
+            // Обновляем свойство виджета для синхронизации
+            $this->dashboardStartDate = $startDate;
             return Carbon::parse($startDate)->startOfDay();
         }
         
-        // Затем из request параметров
-        $startDate = request()->get('dashboard_start_date');
-        
-        if ($startDate) {
-            return Carbon::parse($startDate)->startOfDay();
+        // Затем из свойства виджета
+        if ($this->dashboardStartDate) {
+            return Carbon::parse($this->dashboardStartDate)->startOfDay();
         }
         
         // Fallback на последние 30 дней
@@ -70,23 +68,18 @@ trait HasDashboardDateRange
 
     protected function getEndDate(): Carbon
     {
-        // Сначала пытаемся получить из свойства виджета
-        if ($this->dashboardEndDate) {
-            return Carbon::parse($this->dashboardEndDate)->endOfDay();
-        }
-        
-        // Затем из session (устанавливаются Dashboard)
+        // ВАЖНО: Всегда читаем из session первым делом (самый актуальный источник)
         $endDate = session('dashboard_end_date');
         
         if ($endDate) {
+            // Обновляем свойство виджета для синхронизации
+            $this->dashboardEndDate = $endDate;
             return Carbon::parse($endDate)->endOfDay();
         }
         
-        // Затем из request параметров
-        $endDate = request()->get('dashboard_end_date');
-        
-        if ($endDate) {
-            return Carbon::parse($endDate)->endOfDay();
+        // Затем из свойства виджета
+        if ($this->dashboardEndDate) {
+            return Carbon::parse($this->dashboardEndDate)->endOfDay();
         }
         
         // Fallback на сегодня

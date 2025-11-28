@@ -42,6 +42,9 @@ class Dashboard extends Page implements HasForms
 
     public function mount(): void
     {
+        // Инициализируем widgetsUpdateKey
+        $this->widgetsUpdateKey = 0;
+        
         // Инициализируем форму
         $this->form->fill([
             'date_preset' => session('dashboard_date_preset', 'last_30_days'),
@@ -106,18 +109,18 @@ class Dashboard extends Page implements HasForms
                 'dashboard_end_date' => $this->endDate,
             ]);
             
-            // Обновляем request параметры
-            request()->merge([
-                'dashboard_start_date' => $this->startDate,
-                'dashboard_end_date' => $this->endDate,
-            ]);
+            // Сохраняем session сразу
+            session()->save();
             
-            // Отправляем Livewire событие для обновления виджетов
-            // Используем broadcast чтобы событие дошло до всех виджетов на странице
+            // Инкрементируем ключ для принудительного обновления виджетов через wire:key
+            // Это заставит Livewire пересоздать всю страницу с новыми датами
+            $this->widgetsUpdateKey++;
+            
+            // Отправляем Livewire событие для обновления виджетов ПОСЛЕ сохранения session
             $this->dispatch('dashboard-date-range-updated', 
                 start: $this->startDate,
                 end: $this->endDate
-            )->toOthers();
+            );
         } catch (\Exception $e) {
             \Log::error('Error updating dashboard dates', [
                 'error' => $e->getMessage(),
