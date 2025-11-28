@@ -93,8 +93,9 @@ window.addEventListener('DOMContentLoaded', function() {
               });
   
               span.on('click', (evt) => {
-                $(this).val($(span).text());
                 $(this).trigger('searchItemSelected', item);
+                // Очищаем поле ввода после выбора элемента
+                $(this).val('');
 
                 const autoSubmit = $(this).data('autosubmit');
                 const searchForm = $(this).closest('form');

@@ -133,11 +133,15 @@ class ProductMedia extends Component
     public array $attrs = [];
 
     public bool $editMode = false;
+    
+    public array $galleryOrder = [];
 
     public function mount(string $product_id, array $default = [])
     {
       $this->attrs['id'] = $product_id;
       $this->prepareFormFields();
+      // Инициализируем порядок галереи
+      $this->galleryOrder = array_keys($this->fields['gallery']);
     }
     
     public function draft()
@@ -447,10 +451,65 @@ class ProductMedia extends Component
       $this->fields['gallery'][$key]['preview'] = null;
     }
 
+    public function dropBanner()
+    {
+      $this->fields['banner']['uploaded'] = null;
+      $this->fields['banner']['preview'] = null;
+    }
+
     public function dropFile(string $key)
     {
       $this->fields['files'][$key]['uploeded'] = null;
       $this->fields['files'][$key]['current'] = null;
+    }
+
+    public function reorderGallery($order)
+    {
+      // Убеждаемся, что это массив
+      if (!is_array($order)) {
+        Log::error('reorderGallery: order is not an array', ['order' => $order]);
+        return;
+      }
+      
+      // Логируем входящий порядок
+      Log::info('reorderGallery called', [
+        'order' => $order,
+        'order_count' => count($order),
+        'current_order' => $this->galleryOrder,
+        'current_keys' => array_keys($this->fields['gallery']),
+      ]);
+      
+      // Сохраняем порядок
+      $this->galleryOrder = $order;
+      
+      // Сохраняем текущие данные галереи
+      $currentGallery = $this->fields['gallery'];
+      
+      // Создаем новый массив в правильном порядке
+      $reordered = [];
+      
+      // Сначала добавляем элементы в новом порядке
+      foreach ($order as $key) {
+        if (isset($currentGallery[$key])) {
+          $reordered[$key] = $currentGallery[$key];
+        }
+      }
+      
+      // Затем добавляем элементы, которых нет в новом порядке (пустые слоты)
+      foreach ($currentGallery as $key => $item) {
+        if (!isset($reordered[$key])) {
+          $reordered[$key] = $item;
+        }
+      }
+      
+      // Присваиваем новый массив - PHP сохранит порядок вставки
+      $this->fields['gallery'] = $reordered;
+      
+      // Логируем результат
+      Log::info('reorderGallery completed', [
+        'new_order' => $this->galleryOrder,
+        'new_keys' => array_keys($this->fields['gallery']),
+      ]);
     }
     
     public function render()

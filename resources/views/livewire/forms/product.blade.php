@@ -35,6 +35,7 @@
                     source="types" 
                     label="Product Type" 
                     placeholder="Select product types... (Up to 5)" 
+                    :max="5"
                   />
                 </div>
 

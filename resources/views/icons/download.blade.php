@@ -1,4 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+@props([
+  'width' => 24,
+  'height' => 25,
+])
+
+<svg xmlns="http://www.w3.org/2000/svg" width="{{ $width }}" height="{{ $height }}" viewBox="0 0 24 25" fill="none">
     <path d="M12.1211 15.936L12.1211 3.89502" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     <path d="M15.0371 13.0083L12.1211 15.9363L9.20511 13.0083" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"

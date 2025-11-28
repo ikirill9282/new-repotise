@@ -17,14 +17,29 @@
     value: null,
     label: {{ $label ? "'$label'" : 'null' }},
     placeholder: {{ $label ? "'$label'" : 'null' }},
+    close() {
+      const dropdown = this.$refs.dropdown;
+      dropdown.classList.remove('opened');
+      dropdown.removeAttribute('style');
+    },
+    closeAllOtherSelects() {
+      // Закрываем все другие открытые селекты
+      document.querySelectorAll('.select-dropdown.opened').forEach(el => {
+        if (el !== this.$refs.dropdown) {
+          el.classList.remove('opened');
+          el.removeAttribute('style');
+        }
+      });
+    },
     toggle() {
       const dropdown = this.$refs.dropdown;
       const height = this.$refs.dropdownContent?.offsetHeight ?? 0;
       
       if (dropdown.classList.contains('opened')) {
-        dropdown.classList.remove('opened');
-        dropdown.removeAttribute('style');
+        this.close();
       } else {
+        // Закрываем все другие селекты перед открытием этого
+        this.closeAllOtherSelects();
         dropdown.classList.add('opened');
         dropdown.style.height = `${height}px`;
       }
@@ -57,6 +72,7 @@
       });
     });
   }"
+  @click.outside="close()"
   class="w-full group text-sm sm:text-base"
 >
   <input x-ref="input" type="hidden" name="{{ $name }}" {{ $attributes }}>
@@ -90,7 +106,7 @@
   <div class="w-full relative">
     <div 
       x-ref="dropdown" 
-      class="absolute w-full h-0 bottom-0 left-0 translate-y-full overflow-hidden
+      class="select-dropdown absolute w-full h-0 bottom-0 left-0 translate-y-full overflow-hidden
           bg-light rounded-bl rounded-br z-120 shadow
           "
         >

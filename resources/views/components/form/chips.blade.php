@@ -8,12 +8,15 @@
   'create' => true,
   'tooltip' => true,
   'tooltipText' => null,
+  'single' => false,
+  'maxLength' => 50,
 ])
 
 <div class="relative dropdown text-sm sm:text-base"
   x-data="{
     selected: @if($entangle) @entangle($entangle) @else [] @endif,
     create: {{ $create }},
+    single: {{ $single ? 'true' : 'false' }},
     options: [],
     error: null,
     load(query = '') {
@@ -26,41 +29,141 @@
         .catch(error => console.log(error));
     },
     pushVal(val) {
-      if (this.selected.length >= {{ $max }}) {
-        this.error = 'Maximum tags';
-        return ;
+      // Обрабатываем вставку нескольких тегов через запятую
+      const tags = val.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+      
+      if (tags.length === 0) {
+        return;
       }
 
+      // Если несколько тегов через запятую, добавляем их все
+      if (tags.length > 1) {
+        let hasError = false;
+        tags.forEach(tag => {
+          if (hasError) return;
+          
+          if (this.selected.length >= {{ $max }}) {
+            this.error = 'Maximum tags';
+            hasError = true;
+            return;
+          }
+          
+          // Проверяем длину тега
+          if (tag.length > {{ $maxLength }}) {
+            this.error = `Tag length must not exceed {{ $maxLength }} characters`;
+            hasError = true;
+            return;
+          }
+
+          // Нормализуем ключ для сравнения с существующими тегами
+          const normalizeKey = (text) => {
+            return String(text).toLowerCase().trim().replace(/\s+/g, '-');
+          };
+          
+          const formatted = {
+            key: normalizeKey(tag),
+            label: tag.trim(),
+          };
+
+          if (!this.hasVal(formatted)) {
+            this.selected.push(formatted);
+          }
+        });
+        if (!hasError) {
+          this.error = null;
+        }
+        return;
+      }
+
+      // Один тег
+      const tag = tags[0];
+      
+      if (this.selected.length >= {{ $max }}) {
+        this.error = 'Maximum tags';
+        return;
+      }
+
+      // Проверяем длину тега
+      if (tag.length > {{ $maxLength }}) {
+        this.error = `Tag length must not exceed {{ $maxLength }} characters`;
+        return;
+      }
+
+      // Нормализуем ключ для сравнения с существующими тегами
+      const normalizeKey = (text) => {
+        return String(text).toLowerCase().trim().replace(/\s+/g, '-');
+      };
+      
       const formatted = {
-        key: val,
-        label: val,
+        key: normalizeKey(tag),
+        label: tag.trim(),
       };
 
       if (!this.hasVal(formatted)) {
         this.selected.push(formatted);
         this.error = null;
+      } else {
+        // Если тег уже существует, просто очищаем поле без ошибки
+        this.error = null;
       }
     },
     addVal(val) {
-      if (!this.hasVal(val)) {
-        if (val.key !== 'empty') {
+      if (val.key === 'empty') {
+        return;
+      }
+      
+      if (this.single) {
+        // В режиме выбора одного элемента - заменяем текущий выбор
+        if (this.hasVal(val)) {
+          // Если уже выбран, удаляем
+          this.dropVal(val);
+          this.$refs.input.value = '';
+          this.hideList();
+        } else {
+          // Заменяем текущий выбор на новый
+          this.selected = [val];
+          this.error = null;
+          this.$refs.input.value = '';
+          this.hideList();
+        }
+      } else {
+        // Обычный режим множественного выбора
+        if (!this.hasVal(val)) {
           if (this.selected.length >= {{ $max }}) {
             this.error = 'Maximum tags';
             return ;
           }
+          this.selected.push(val);
+          this.error = null;
+          // Очищаем поле ввода после выбора
+          this.$refs.input.value = '';
+          // Закрываем список после выбора
+          this.hideList();
+        } else {
+          this.dropVal(val); 
         }
-        this.selected.push(val);
-        this.error = null;
-      } else {
-        this.dropVal(val); 
       }
     },
     dropVal(val) {
-      this.selected = this.selected.filter(elem => elem.key !== val.key);
+      // Нормализуем ключи для сравнения
+      const normalizeKey = (key) => {
+        if (!key) return '';
+        return String(key).toLowerCase().trim().replace(/\s+/g, '-');
+      };
+      
+      const valKey = normalizeKey(val.key);
+      this.selected = this.selected.filter(elem => normalizeKey(elem.key) !== valKey);
       this.error = null;
     },
     hasVal(val) {
-      return this.selected.find(item => item.key == val.key) !== undefined;
+      // Нормализуем ключи для сравнения (приводим к lowercase и убираем пробелы)
+      const normalizeKey = (key) => {
+        if (!key) return '';
+        return String(key).toLowerCase().trim().replace(/\s+/g, '-');
+      };
+      
+      const valKey = normalizeKey(val.key);
+      return this.selected.find(item => normalizeKey(item.key) === valKey) !== undefined;
     },
     showList() {
       this.$refs.dropdown.classList.remove('!h-0');
@@ -120,8 +223,31 @@
         x-ref="input"
         x-on:focus="showList()"
         x-on:input="(evt) => {
-          evt.target.value = evt.target.value.replace(',', '');
-          load(evt.target.value);
+          const value = evt.target.value;
+          // Если введена запятая, добавляем тег до запятой
+          if (value.includes(',')) {
+            const beforeComma = value.substring(0, value.indexOf(',')).trim();
+            if (beforeComma.length > 0) {
+              pushVal(beforeComma);
+              evt.target.value = value.substring(value.indexOf(',') + 1).trim();
+              load(evt.target.value);
+            } else {
+              evt.target.value = value.substring(value.indexOf(',') + 1).trim();
+            }
+          } else {
+            load(value);
+          }
+        }"
+        x-on:paste="(evt) => {
+          // Обрабатываем вставку через запятую
+          setTimeout(() => {
+            const value = evt.target.value;
+            if (value.includes(',')) {
+              pushVal(value);
+              $refs.input.value = '';
+              if (isEmptyOptions()) load();
+            }
+          }, 0);
         }"
         x-on:keydown.enter.prevent="(evt) => {
           if (create) {
