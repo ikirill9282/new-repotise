@@ -414,10 +414,12 @@
                       <div style="min-width: 150px;">
                         <x-form.select 
                           name="creators-sort"
-                          :label="$currentSort === 'name_asc' ? 'Name (A-Z)' : ($currentSort === 'name_desc' ? 'Name (Z-A)' : 'Followers (High to Low)')"
+                          :label="$currentSort === 'name_asc' ? 'Name (A-Z)' : ($currentSort === 'name_desc' ? 'Name (Z-A)' : ($currentSort === 'channel_asc' ? 'Channel (A-Z)' : ($currentSort === 'channel_desc' ? 'Channel (Z-A)' : 'Followers (High to Low)')))"
                           :options="[
                             'name_asc' => 'Name (A-Z)',
                             'name_desc' => 'Name (Z-A)',
+                            'channel_asc' => 'Channel (A-Z)',
+                            'channel_desc' => 'Channel (Z-A)',
                             'followers_desc' => 'Followers (High to Low)',
                           ]"
                           :tooltip="false"

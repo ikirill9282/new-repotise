@@ -74,6 +74,8 @@ class SiteController extends Controller
     $sort = match($sortValue) {
       'name_asc' => ['username', 'asc'],
       'name_desc' => ['username', 'desc'],
+      'channel_asc' => ['profile', 'asc'],
+      'channel_desc' => ['profile', 'desc'],
       'followers_desc' => ['followers_count', 'desc'],
       default => ['username', 'asc'],
     };
