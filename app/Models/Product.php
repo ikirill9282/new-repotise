@@ -499,8 +499,9 @@ class Product extends Model
       $products = $products->merge($duplicates);
     }
 
-    // Return only the requested limit to prevent any edge cases
-    return $products->take($limit);
+      // Return only the requested limit to prevent any edge cases
+      return $products->take($limit);
+    });
   }
 
   public static function findByPid(string $pid): ?Product
