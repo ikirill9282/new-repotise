@@ -66,6 +66,10 @@ class ProductResource extends Resource
                             ->label('Product Name')
                             ->required()
                             ->maxLength(255)
+                            ->regex('/^[a-zA-Z0-9\s\-'.,!?():;]+$/')
+                            ->validationMessages([
+                                'regex' => 'The title must contain only Latin letters, numbers, spaces, and basic punctuation marks.',
+                            ])
                             ->columnSpanFull(),
                         
                         RichEditor::make('text')

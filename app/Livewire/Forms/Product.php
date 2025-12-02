@@ -275,7 +275,7 @@ class Product extends Component
       
       $validator = Validator::make($data, [
         'user_id' => 'required|integer',
-        'title' => 'required|string',
+        'title' => ['required', 'string', 'regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/'],
         'text' => 'required|string',
         'refund_policy' => 'nullable|integer',
         'subscription' => 'required|boolean',
@@ -290,6 +290,7 @@ class Product extends Component
         'quarter' => 'required_if:subscription,true|nullable|numeric',
         'year' => 'required_if:subscription,true|nullable|numeric',
       ], [
+        'title.regex' => 'The title must contain only Latin letters, numbers, spaces, and basic punctuation marks (no Cyrillic or other characters).',
         'month' => [
           'required_if' => 'The month field is required when product is subscription.'
         ],
