@@ -406,26 +406,25 @@
 										</div>
 
                   @else
-                    <div x-data="{}" class="flex justify-end items-center !mb-6">
-                      <label class="text-gray" for="sorting-table">Sort By:</label>
+                    <div x-data="{}" class="flex justify-end items-center !mb-6 gap-2">
+                      <label class="text-gray" for="sorting-table">Sort By: </label>
                       @php
                         $currentSort = $sortOption ?? request()->get('sort', 'name_asc');
                       @endphp
-                      <select
-                        class="tg-select"
-                        id="sorting-table"
-                        x-on:change="(evt) => {
-                          const url = new URL(window.location.href);
-                          const params = new URLSearchParams(url.search);
-                          params.set('sort', evt.target.value);
-                          url.search = params.toString();
-                          window.location.href = url.toString();
-                        }"
-                        >
-                          <option value="name_asc" {{ $currentSort === 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
-                          <option value="name_desc" {{ $currentSort === 'name_desc' ? 'selected' : '' }}>Name (Z-A)</option>
-                          <option value="followers_desc" {{ $currentSort === 'followers_desc' ? 'selected' : '' }}>Followers (High to Low)</option>
-                      </select>
+                      <div style="min-width: 150px;">
+                        <x-form.select 
+                          name="creators-sort"
+                          :label="$currentSort === 'name_asc' ? 'Name (A-Z)' : ($currentSort === 'name_desc' ? 'Name (Z-A)' : 'Followers (High to Low)')"
+                          :options="[
+                            'name_asc' => 'Name (A-Z)',
+                            'name_desc' => 'Name (Z-A)',
+                            'followers_desc' => 'Followers (High to Low)',
+                          ]"
+                          :tooltip="false"
+                          labelClass="!text-black"
+                          value="{{ $currentSort }}"
+                        />
+                      </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 !gap-3 lg:!gap-6 !mb-6">
                         
@@ -663,6 +662,31 @@
         if (Object.keys(params).includes('platforms')) {
           const selected_langs = params.platforms.map(platform => {
             document.querySelector(`div[data-value="${platform}"]`).classList.add('bg-active', 'text-white', 'active');
+          });
+        }
+
+        // Обработчик сортировки для creators
+        const creatorsSortInput = document.querySelector('input[name="creators-sort"]');
+        if (creatorsSortInput) {
+          const currentSort = '{{ $currentSort ?? "name_asc" }}';
+          creatorsSortInput.value = currentSort;
+          
+          setTimeout(() => {
+            const event = new Event('input', { bubbles: true });
+            creatorsSortInput.dispatchEvent(event);
+          }, 100);
+
+          let timeoutId;
+          creatorsSortInput.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+              const url = new URL(window.location.href);
+              const params = url.searchParams;
+              const value = this.value;
+              params.set('sort', value);
+              url.search = params.toString();
+              window.location.href = url.toString();
+            }, 100);
           });
         }
   </script>

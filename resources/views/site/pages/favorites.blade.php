@@ -47,15 +47,24 @@
                         <div class="favorites-content">
                           <div class="top_group_fav favorites_second">
                             <div class="right_select {{ !$hasProducts ? '!hidden' : '' }}">
-                                <span>Sort by:</span>
-                                <select id="favorites-products-sort" class="tg-select">
-                                    <option value="price_high" {{ $productsSort === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                                    <option value="price_low" {{ $productsSort === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                                    <option value="rating" {{ $productsSort === 'rating' ? 'selected' : '' }}>Top Rated</option>
-                                    <option value="popular" {{ $productsSort === 'popular' ? 'selected' : '' }}>Most Popular</option>
-                                    <option value="newest" {{ $productsSort === 'newest' ? 'selected' : '' }}>Newest First</option>
-                                    <option value="oldest" {{ $productsSort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                                </select>
+                                <span>Sort by: </span>
+                                <div style="min-width: 150px;">
+                                    <x-form.select 
+                                        name="favorites-products-sort"
+                                        :label="$productsSort === 'price_high' ? 'Price: High to Low' : ($productsSort === 'price_low' ? 'Price: Low to High' : ($productsSort === 'rating' ? 'Top Rated' : ($productsSort === 'popular' ? 'Most Popular' : ($productsSort === 'newest' ? 'Newest First' : 'Oldest First'))))"
+                                        :options="[
+                                            'price_high' => 'Price: High to Low',
+                                            'price_low' => 'Price: Low to High',
+                                            'rating' => 'Top Rated',
+                                            'popular' => 'Most Popular',
+                                            'newest' => 'Newest First',
+                                            'oldest' => 'Oldest First',
+                                        ]"
+                                        :tooltip="false"
+                                        labelClass="!text-black"
+                                        value="{{ $productsSort }}"
+                                    />
+                                </div>
                             </div>
                             <div class="favorite_cards_group">
                                 @foreach ($favoriteProducts as $product)
@@ -81,12 +90,21 @@
                         <div class="favorites-content">
                           <div class="top_group_fav favorites_second {{ !$hasArticles ? '!hidden' : '' }}">
                             <div class="right_select">
-                                <span>Sort by:</span>
-                                <select id="favorites-creators-sort" class="tg-select">
-                                    <option value="name_asc" {{ $creatorsSort === 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
-                                    <option value="name_desc" {{ $creatorsSort === 'name_desc' ? 'selected' : '' }}>Name (Z-A)</option>
-                                    <option value="followers_desc" {{ $creatorsSort === 'followers_desc' ? 'selected' : '' }}>Followers (High to Low)</option>
-                                </select>
+                                <span>Sort by: </span>
+                                <div style="min-width: 150px;">
+                                    <x-form.select 
+                                        name="favorites-creators-sort"
+                                        :label="$creatorsSort === 'name_asc' ? 'Name (A-Z)' : ($creatorsSort === 'name_desc' ? 'Name (Z-A)' : 'Followers (High to Low)')"
+                                        :options="[
+                                            'name_asc' => 'Name (A-Z)',
+                                            'name_desc' => 'Name (Z-A)',
+                                            'followers_desc' => 'Followers (High to Low)',
+                                        ]"
+                                        :tooltip="false"
+                                        labelClass="!text-black"
+                                        value="{{ $creatorsSort }}"
+                                    />
+                                </div>
                             </div>
                             <div class="cards_why_need">
                                 @foreach ($favoriteArticles as $article)
@@ -120,25 +138,40 @@
     <script src="{{ asset('/assets/js/favorite.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const handleSortChange = (selectId, param, defaultValue) => {
-                const select = document.getElementById(selectId);
-                if (!select) {
+            const handleSortChange = (inputName, param, defaultValue) => {
+                const input = document.querySelector(`input[name="${inputName}"]`);
+                if (!input) {
                     return;
                 }
 
-                select.addEventListener('change', (event) => {
-                    const url = new URL(window.location.href);
-                    const params = url.searchParams;
-                    const value = event.target.value;
+                // Устанавливаем начальное значение
+                const currentValue = input.value || defaultValue;
+                input.value = currentValue;
+                
+                // Ждем инициализации Alpine.js компонента
+                setTimeout(() => {
+                    const event = new Event('input', { bubbles: true });
+                    input.dispatchEvent(event);
+                }, 100);
 
-                    if (value === defaultValue) {
-                        params.delete(param);
-                    } else {
-                        params.set(param, value);
-                    }
+                // Обработчик изменения значения
+                let timeoutId;
+                input.addEventListener('input', function() {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        const params = url.searchParams;
+                        const value = this.value;
 
-                    url.search = params.toString();
-                    window.location.href = url.toString();
+                        if (value === defaultValue) {
+                            params.delete(param);
+                        } else {
+                            params.set(param, value);
+                        }
+
+                        url.search = params.toString();
+                        window.location.href = url.toString();
+                    }, 100);
                 });
             };
 

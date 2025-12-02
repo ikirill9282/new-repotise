@@ -347,15 +347,24 @@
                             $currentSort = $sortOption ?? request()->get('sort', 'rating');
                         @endphp
                         <div class="right_select">
-                            <span>Sort by:</span>
-                            <select id="products-sort" class="tg-select">
-                                <option value="price_high" {{ $currentSort === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                                <option value="price_low" {{ $currentSort === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                                <option value="rating" {{ $currentSort === 'rating' ? 'selected' : '' }}>Top Rated</option>
-                                <option value="popular" {{ $currentSort === 'popular' ? 'selected' : '' }}>Most Popular</option>
-                                <option value="newest" {{ $currentSort === 'newest' ? 'selected' : '' }}>Newest First</option>
-                                <option value="oldest" {{ $currentSort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                            </select>
+                            <span>Sort by: </span>
+                            <div style="min-width: 150px;">
+                                <x-form.select 
+                                    name="products-sort"
+                                    :label="$currentSort === 'price_high' ? 'Price: High to Low' : ($currentSort === 'price_low' ? 'Price: Low to High' : ($currentSort === 'rating' ? 'Top Rated' : ($currentSort === 'popular' ? 'Most Popular' : ($currentSort === 'newest' ? 'Newest First' : 'Oldest First'))))"
+                                    :options="[
+                                        'price_high' => 'Price: High to Low',
+                                        'price_low' => 'Price: Low to High',
+                                        'rating' => 'Top Rated',
+                                        'popular' => 'Most Popular',
+                                        'newest' => 'Newest First',
+                                        'oldest' => 'Oldest First',
+                                    ]"
+                                    :tooltip="false"
+                                    labelClass="!text-black"
+                                    value="{{ $currentSort }}"
+                                />
+                            </div>
                         </div>
                         <div class="filter_cards_group !items-stretch">
                             @if (!empty($paginator->all()))
@@ -393,18 +402,34 @@
     <script>
         // Скрываем блок search_results, если все его элементы скрыты
         document.addEventListener('DOMContentLoaded', function() {
-            const sortSelect = document.getElementById('products-sort');
-            if (sortSelect) {
-                sortSelect.addEventListener('change', (event) => {
-                    const url = new URL(window.location.href);
-                    const params = url.searchParams;
-                    if (event.target.value === 'rating') {
-                        params.delete('sort');
-                    } else {
-                        params.set('sort', event.target.value);
-                    }
-                    url.search = params.toString();
-                    window.location.href = url.toString();
+            const sortSelectInput = document.querySelector('input[name="products-sort"]');
+            if (sortSelectInput) {
+                // Устанавливаем начальное значение
+                const currentSort = '{{ $currentSort ?? "rating" }}';
+                sortSelectInput.value = currentSort;
+                
+                // Ждем инициализации Alpine.js компонента
+                setTimeout(() => {
+                    const event = new Event('input', { bubbles: true });
+                    sortSelectInput.dispatchEvent(event);
+                }, 100);
+
+                // Обработчик изменения значения
+                let timeoutId;
+                sortSelectInput.addEventListener('input', function() {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        const params = url.searchParams;
+                        const value = this.value;
+                        if (value === 'rating') {
+                            params.delete('sort');
+                        } else {
+                            params.set('sort', value);
+                        }
+                        url.search = params.toString();
+                        window.location.href = url.toString();
+                    }, 100);
                 });
             }
 
