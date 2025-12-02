@@ -34,8 +34,8 @@
                                         <div class="swiper-slide">
                                             <x-optimized-image 
                                                 src="{{ $image->image }}" 
-                                                alt="Product thumbnail {{ $image->id }}"
-                                                class="swiper-slide-thumb"
+                                                alt="Product image {{ $image->id }}"
+                                                :lazy="false"
                                             />
                                         </div>
                                     @endforeach
