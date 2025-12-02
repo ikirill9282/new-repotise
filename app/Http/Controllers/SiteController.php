@@ -207,6 +207,7 @@ class SiteController extends Controller
 
     $news = Article::query()
       ->whereHas('author', fn($query) => $query->where('id', 0))
+      ->with('preview', 'author')
       ->orderByDesc('id')
       ->paginate($perPage, ['*'], 'page', $page);
 

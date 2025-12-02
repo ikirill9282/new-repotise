@@ -384,18 +384,22 @@ class Article extends Model
 
   public static function getLastNews(int|string $maximum_models = 4)
   {
-    $last_news = static::query()
-      ->whereHas('author', fn($query) => $query->where('id', 0))
-      ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
-      ->orderByDesc('id')
-      // ->ddRawSql()
-      ->get();
+    // Кэшируем новости на 30 минут для улучшения производительности
+    $cacheKey = 'last_news_' . $maximum_models;
     
-    
-    while ($last_news->count() > 0 && $last_news->count() < $maximum_models) {
-      $last_news = $last_news->collect()->merge($last_news)->slice(0, $maximum_models);
-    }
+    return \Illuminate\Support\Facades\Cache::remember($cacheKey, 1800, function() use ($maximum_models) {
+      $last_news = static::query()
+        ->whereHas('author', fn($query) => $query->where('id', 0))
+        ->with('preview', 'author')
+        ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
+        ->orderByDesc('id')
+        ->get();
+      
+      while ($last_news->count() > 0 && $last_news->count() < $maximum_models) {
+        $last_news = $last_news->collect()->merge($last_news)->slice(0, $maximum_models);
+      }
 
-    return $last_news;
+      return $last_news;
+    });
   }
 }
