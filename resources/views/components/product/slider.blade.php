@@ -41,7 +41,7 @@
   }"
   class=""
 >
-  <div class="swiper" x-ref="container" id="{{ $id }}">
+  <div class="swiper product-slider" x-ref="container" id="{{ $id }}">
     <div class="swiper-wrapper !items-stretch">
       @foreach ($products as $product)
         <div class="swiper-slide">

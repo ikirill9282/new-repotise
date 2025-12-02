@@ -7053,11 +7053,22 @@ footer .bottom_by_des .by_to {
 	top: 27%;
 }
 
+.product-slider .swiper-button-next,
+.product-slider .swiper-button-prev {
+	top: 50% !important;
+	transform: translateY(-50%) !important;
+	margin-top: 0 !important;
+}
+
 .swiper-button-prev, .swiper-rtl .swiper-button-next {
   width: 40px;
   height: 40px;
   rotate: 180deg;
   left: 0;
+}
+
+.product-slider .swiper-button-prev {
+  transform: translateY(-50%) rotate(180deg) !important;
 }
 .swiper-button-prev:hover svg, .swiper-rtl .swiper-button-next:hover svg {
   fill: #212121;
