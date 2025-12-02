@@ -307,7 +307,36 @@ class CheckoutSubscription extends Component
     public function render()
     {
       $product = $this->getProduct();
-      $paymentMethods = Auth::check() ? Auth::user()->paymentMethods() : null;
+      $paymentMethods = collect([]); // По умолчанию пустая коллекция
+      
+      if (Auth::check()) {
+        try {
+          $paymentMethods = Auth::user()->paymentMethods();
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+          // Если клиент не найден в Stripe, очищаем stripe_id
+          if (str_contains($e->getMessage(), 'No such customer')) {
+            Log::warning('Stripe customer not found, clearing stripe_id', [
+              'user_id' => Auth::id(),
+              'stripe_id' => Auth::user()->stripe_id,
+            ]);
+            
+            Auth::user()->update(['stripe_id' => null]);
+            // $paymentMethods уже пустая коллекция
+          } else {
+            // Другие ошибки Stripe - логируем
+            Log::error('Error fetching payment methods from Stripe', [
+              'user_id' => Auth::id(),
+              'error' => $e->getMessage(),
+            ]);
+          }
+        } catch (\Exception $e) {
+          // Обработка всех остальных ошибок
+          Log::error('Unexpected error fetching payment methods', [
+            'user_id' => Auth::id(),
+            'error' => $e->getMessage(),
+          ]);
+        }
+      }
 
       return view('livewire.checkout-subscription', [
         'intent' => Cashier::stripe()->setupIntents->create([
