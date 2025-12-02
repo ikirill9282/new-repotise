@@ -30,13 +30,6 @@ class CartController extends Controller
           ], 404);
         }
 
-        if (Auth::check() && $product->user_id === Auth::id()) {
-          return response()->json([
-            'status' => 'error',
-            'message' => 'You cannot purchase your own product.',
-          ], 422);
-        }
-
         $cart->addProduct($product_id, 1);
 
       } catch (\Exception $e) {
@@ -62,13 +55,6 @@ class CartController extends Controller
           'status' => 'error',
           'message' => 'Selected product is unavailable.',
         ], 404);
-      }
-
-      if (Auth::check() && $product->user_id === Auth::id()) {
-        return response()->json([
-          'status' => 'error',
-          'message' => 'You cannot purchase your own product.',
-        ], 422);
       }
 
       $cart->addProduct($product_id, $valid['count']);

@@ -53,10 +53,6 @@
                   alt="product {{ $product->id }} image"
                 >
 
-                @php
-                  $isOwner = auth()->check() && (int) auth()->id() === (int) $product->user_id;
-                @endphp
-
                 @include('site.components.favorite.button', [
                   'stroke' => '#FF2C0C',
                   'type' => 'product',
@@ -66,16 +62,14 @@
                   'height' => 20,
                 ])
 
-                @if (! $isOwner)
-                  <x-btn
-                    href="{{ url('/cart') }}" 
-                    class="absolute !w-9/10 bottom-0 left-[50%] translate-x-[-50%] !rounded add-to-cart {{ $cart->inCart($product->id) ? 'in-cart' : '' }}" 
-                    data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}"
-                    data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $product->id]) }}"
-                  >
-                    {{ $cart->inCart($product?->id) ? 'View Cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
-                  </x-btn>
-                @endif
+                <x-btn
+                  href="{{ url('/cart') }}" 
+                  class="absolute !w-9/10 bottom-0 left-[50%] translate-x-[-50%] !rounded add-to-cart {{ $cart->inCart($product->id) ? 'in-cart' : '' }}" 
+                  data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}"
+                  data-key="{{ \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $product->id]) }}"
+                >
+                  {{ $cart->inCart($product?->id) ? 'View Cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
+                </x-btn>
             </div>
             <div class="text-gray text-nowrap overflow-hidden text-ellipsis">
               <a 
