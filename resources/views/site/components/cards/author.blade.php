@@ -4,12 +4,12 @@
           <img class="main_img object-cover w-full h-full" src="{{ url($model->avatar) }}" alt="Autho {{ $model->getName() }}">
       </a>
       
-      @include('site.components.favorite.button', [
-        'stroke' => '#FF2C0C',
-        'type' => 'author',
-        'item_id' => $model->id,
-        'class' => 'transition absolute top-3 right-3 p-2 rounded bg-[rgba(249,_249,_249,_0.5)] lg:hover:bg-white fill-red z-10',
-      ])
+        @include('site.components.favorite.button', [
+          'stroke' => '#FF2C0C',
+          'type' => 'author',
+          'item_id' => $model->id,
+          'class' => 'transition absolute top-3 right-3 p-2 rounded bg-[rgba(249,_249,_249,_0.5)] lg:hover:bg-white fill-red z-10',
+        ])
   </div>
   <div class="name flex gap-2 my-1">
       <p>{{ $model->name }}</p>
