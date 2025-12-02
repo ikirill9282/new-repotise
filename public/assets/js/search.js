@@ -1,5 +1,6 @@
 window.addEventListener('DOMContentLoaded', function() {
   const SEARCH_ERROR_TEXT = 'Please enter a search term.';
+  const MIN_SEARCH_LENGTH = 2;
 
   const resolveErrorElement = ($form) => {
     if (!$form || !$form.length) {
@@ -58,11 +59,12 @@ window.addEventListener('DOMContentLoaded', function() {
       return false;
     }
 
-    if (!value.length) {
+    // Minimum search length is 2 characters
+    if (value.length < MIN_SEARCH_LENGTH) {
       evt.preventDefault();
       evt.stopPropagation();
-      $error.text(SEARCH_ERROR_TEXT).removeClass('hidden');
-      $input.focus();
+      // Don't show error message, just prevent submission
+      $error.addClass('hidden');
       return false;
     }
 
@@ -74,6 +76,21 @@ window.addEventListener('DOMContentLoaded', function() {
     const searchForm = $(this).closest('.search-form');
     const error = resolveErrorElement(searchForm);
     error.addClass('hidden');
+    
+    // Only search if query is 2+ characters
+    const value = ($(this).val() || '').trim();
+    if (value.length < MIN_SEARCH_LENGTH) {
+      const id = $(this).data('hits');
+      if (id) {
+        $(`#${id}`).fadeOut();
+      }
+      return;
+    }
+
+    // Only make AJAX request if query is 2+ characters
+    if (value.length < MIN_SEARCH_LENGTH) {
+      return;
+    }
 
     $.ajax({
         method: 'GET',

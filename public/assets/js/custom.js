@@ -1092,7 +1092,12 @@ $('.search-button').on('click', function(evt) {
   evt.preventDefault();
   const form = $(this).closest('.search-form');
   if (form.length) {
-    form.trigger('submit');
+    const input = form.find('.search-input').first();
+    const value = (input.val() || '').trim();
+    // Minimum search length is 2 characters
+    if (value.length >= 2) {
+      form.trigger('submit');
+    }
   }
 });
 
