@@ -4,7 +4,9 @@
                 {{ $isVisible ? 'modal-fade-in' : ($this->inited ? 'modal-fade-out' : 'hidden') }} 
                 @if ($this->inited && $this->modal == false) hidden @endif
                 "
-        wire:keydown.escape="closeModal" tabindex="0" x-data="{}" 
+        wire:keydown.escape="closeModal" 
+        wire:click.self="closeModal"
+        tabindex="0" x-data="{}" 
         x-init="
 								if (@js($isVisible)) {
 										document.body.classList.add('overflow-hidden');
