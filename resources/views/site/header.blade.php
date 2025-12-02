@@ -30,8 +30,8 @@
                 <nav class="menu">
                     <ul class="justify-end">
                         <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
-                        <li><a class="text-nowrap" href="{{ route('creators') }}">Creators</a></li>
                         <li><a class="text-nowrap" href="{{ route('insights') }}">Travel Insights</a></li>
+                        <li><a class="text-nowrap" href="{{ route('creators') }}">Creators</a></li>
                     </ul>
                 </nav>
                 @if (!auth()->check())
@@ -147,9 +147,9 @@
             <ul class="mob_menu">
                 <li><a class="text-nowrap" href="{{ route('home') }}">Home</a></li>
                 <li><a class="text-nowrap" href="{{ route('products') }}">All Products</a></li>
-                <li><a class="text-nowrap" href="{{ route('creators') }}">Creators</a></li>
+                <li><a class="text-nowrap" href="{{ route('insights') }}">Travel Insights</a></li>
                 <li class="last_menu">
-                    <a class="text-nowrap" href="{{ route('insights') }}">Travel Insights</a>
+                    <a class="text-nowrap" href="{{ route('creators') }}">Creators</a>
                 </li>
             </ul>
             @if (auth()->check())

@@ -9,8 +9,8 @@
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ route('products') }}">All Products</a></li>
                         <li><a href="{{ route('favorites') }}" class="{{ auth()->check() ? '' : 'open_auth' }}">Favorite</a></li>
-                        <li><a href="{{ route('creators') }}">Creators</a></li>
                         <li><a href="{{ route('insights') }}">Travel Insights</a></li>
+                        <li><a href="{{ route('creators') }}">Creators</a></li>
                     </ul>
                 </div>
                 <div class="group mb-4 md:mb-0">
