@@ -1,12 +1,14 @@
 <div class="cards_group relative flex flex-col justify-start items-start">
-  <div class="img_products item !max-w-none !w-full" style="height: 273px; overflow: hidden;">
-      <img class="main_img object-cover w-full h-full" src="{{ url($model->avatar) }}" alt="Autho {{ $model->getName() }}">
+  <div class="img_products item !max-w-none !w-full relative" style="height: 273px; overflow: hidden;">
+      <a href="{{ $model->makeProfileUrl() }}" class="block w-full h-full">
+          <img class="main_img object-cover w-full h-full" src="{{ url($model->avatar) }}" alt="Autho {{ $model->getName() }}">
+      </a>
       
       @include('site.components.favorite.button', [
         'stroke' => '#FF2C0C',
         'type' => 'author',
         'item_id' => $model->id,
-        'class' => 'transition absolute top-3 right-3 p-2 rounded bg-[rgba(249,_249,_249,_0.5)] lg:hover:bg-white fill-red',
+        'class' => 'transition absolute top-3 right-3 p-2 rounded bg-[rgba(249,_249,_249,_0.5)] lg:hover:bg-white fill-red z-10',
       ])
   </div>
   <div class="name flex gap-2 my-1">
