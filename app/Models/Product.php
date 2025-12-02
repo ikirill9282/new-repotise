@@ -429,21 +429,55 @@ class Product extends Model
 
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
   {
-    // Кэшируем популярные продукты на 1 час для улучшения производительности
-    $cacheKey = 'trending_products_' . $limit . '_' . md5(serialize($includes));
+    // Always filter by active status and published date - only show active, published products
+    $query = \App\Models\Product::query()
+      ->where('status_id', Status::ACTIVE)
+      ->whereNotNull('published_at');
     
-    return \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function() use ($limit, $includes) {
-      // Always filter by active status and published date - only show active, published products
-      $query = \App\Models\Product::query()
+    // If specific product IDs are provided, filter by them (they must still be active and published)
+    if (!empty($includes)) {
+      $query->whereIn('id', $includes);
+    }
+    
+    // Оптимизированный eager loading - загружаем только необходимые поля
+    $query->with([
+      'preview:id,product_id,image',
+      'locations:id,slug,name',
+      'categories:id,slug,name',
+      'types:id,slug,name',
+      'author:id,username,name,avatar'
+    ])
+      ->withCount(['reviews' => function($query) {
+        $query->whereNull('parent_id');
+      }])
+      ->withCount(['orderProducts as sales_count' => function($query) {
+        $query->whereHas('order', function($q) {
+          $q->where('status_id', '>=', OrderEnum::PAID);
+        });
+      }]);
+
+    // Сортировка по популярности: продажи, просмотры, отзывы, рейтинг
+    $products = $query
+      ->orderByDesc('sales_count')
+      ->orderByDesc('views')
+      ->orderByDesc('reviews_count')
+      ->orderByDesc('rating')
+      ->orderByDesc('created_at')
+      ->limit($limit)
+      ->get();
+
+    // Если указаны конкретные ID, но продукты не найдены - показываем все популярные (fallback)
+    if ($products->isEmpty() && !empty($includes)) {
+      $fallbackQuery = \App\Models\Product::query()
         ->where('status_id', Status::ACTIVE)
-        ->whereNotNull('published_at');
-      
-      // If specific product IDs are provided, filter by them (they must still be active and published)
-      if (!empty($includes)) {
-        $query->whereIn('id', $includes);
-      }
-      
-      $query->with('preview', 'locations', 'categories', 'types', 'author')
+        ->whereNotNull('published_at')
+        ->with([
+          'preview:id,product_id,image',
+          'locations:id,slug,name',
+          'categories:id,slug,name',
+          'types:id,slug,name',
+          'author:id,username,name,avatar'
+        ])
         ->withCount(['reviews' => function($query) {
           $query->whereNull('parent_id');
         }])
@@ -453,33 +487,8 @@ class Product extends Model
           });
         }]);
 
-      // Сортировка по популярности: продажи, просмотры, отзывы, рейтинг
-      $products = $query
+      $products = $fallbackQuery
         ->orderByDesc('sales_count')
-        ->orderByDesc('views')
-        ->orderByDesc('reviews_count')
-        ->orderByDesc('rating')
-        ->orderByDesc('created_at')
-        ->limit($limit)
-        ->get();
-
-      // Если указаны конкретные ID, но продукты не найдены - показываем все популярные (fallback)
-      if ($products->isEmpty() && !empty($includes)) {
-        $fallbackQuery = \App\Models\Product::query()
-          ->where('status_id', Status::ACTIVE)
-          ->whereNotNull('published_at')
-          ->with('preview', 'locations', 'categories', 'types', 'author')
-          ->withCount(['reviews' => function($query) {
-            $query->whereNull('parent_id');
-          }])
-          ->withCount(['orderProducts as sales_count' => function($query) {
-            $query->whereHas('order', function($q) {
-              $q->where('status_id', '>=', OrderEnum::PAID);
-            });
-          }]);
-
-        $products = $fallbackQuery
-          ->orderByDesc('sales_count')
         ->orderByDesc('views')
         ->orderByDesc('reviews_count')
         ->orderByDesc('rating')
@@ -499,9 +508,7 @@ class Product extends Model
       $products = $products->merge($duplicates);
     }
 
-      // Return only the requested limit to prevent any edge cases
-      return $products->take($limit);
-    });
+    return $products->take($limit);
   }
 
   public static function findByPid(string $pid): ?Product

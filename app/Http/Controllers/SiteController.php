@@ -207,7 +207,11 @@ class SiteController extends Controller
 
     $news = Article::query()
       ->whereHas('author', fn($query) => $query->where('id', 0))
-      ->with('preview', 'author')
+      ->with([
+        'preview:id,article_id,image',
+        'author:id,username,name,avatar'
+      ])
+      ->select('id', 'title', 'slug', 'created_at', 'author_id', 'preview_id')
       ->orderByDesc('id')
       ->paginate($perPage, ['*'], 'page', $page);
 
@@ -591,7 +595,13 @@ class SiteController extends Controller
     $query = Product::query()
       ->where('status_id', Status::ACTIVE)
       ->whereNotNull('published_at')
-      ->with(['preview', 'author', 'categories', 'types', 'locations'])
+      ->with([
+        'preview:id,product_id,image',
+        'author:id,username,name,avatar',
+        'categories:id,slug,name',
+        'types:id,slug,name',
+        'locations:id,slug,name'
+      ])
       ->withCount([
         'reviews as reviews_count' => fn($q) => $q->whereNull('parent_id'),
       ])
