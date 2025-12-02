@@ -1,5 +1,5 @@
 <div class="cards_group relative flex flex-col justify-start items-start">
-  <div class="img_products item !max-w-none !w-full" style="height: 238px; overflow: hidden;">
+  <div class="img_products item !max-w-none !w-full" style="height: 273px; overflow: hidden;">
       <img class="main_img object-cover w-full h-full" src="{{ url($model->avatar) }}" alt="Autho {{ $model->getName() }}">
       
       @include('site.components.favorite.button', [
