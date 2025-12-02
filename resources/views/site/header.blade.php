@@ -2,8 +2,15 @@
     <div class="container !mx-auto">
         <div class="about_block">
             <div class="logo">
-                <a href="{{ route('home') }}"><img class="max-w-18 sm:!max-w-none"
-                        src="{{ asset('/assets/img/logo.svg') }}" alt=""></a>
+                <a href="{{ route('home') }}">
+                    <x-optimized-image 
+                        class="max-w-18 sm:!max-w-none"
+                        src="{{ asset('/assets/img/logo.svg') }}" 
+                        alt="Logo"
+                        :lazy="false"
+                        fetchpriority="high"
+                    />
+                </a>
             </div>
             <div x-data="{}" class="right_group_block gap-3">
                 <x-search 

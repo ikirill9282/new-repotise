@@ -42,7 +42,11 @@
   <div class="item flex flex-col {{ isset($class) ? $class : '' }}">
     <div class="img_products relative" x-data="{}">
 				<a href="{{ $model->makeUrl() }}" class="block">
-        <img class="main_img object-cover" src="{{ url($model->preview?->image ?? '/storage/images/default_product.png') }}" alt="model {{ $model->id }} image">
+        <x-optimized-image 
+            src="{{ $model->preview?->image ?? '/storage/images/default_product.png' }}" 
+            alt="model {{ $model->id }} image"
+            class="main_img object-cover"
+        />
 				</a>
 
         @include('site.components.favorite.button', [

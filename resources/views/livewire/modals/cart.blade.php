@@ -111,7 +111,11 @@
                   <div class="item flex flex-col gap-2">
                       <div class="img_products relative rounded-lg overflow-hidden">
                           <a href="{{ $product->makeUrl() }}" class="block">
-                              <img src="{{ $preview }}" alt="Preview of {{ $title }}" class="main_img object-cover w-full h-full">
+                              <x-optimized-image 
+                                  src="{{ $preview }}" 
+                                  alt="Preview of {{ $title }}" 
+                                  class="main_img object-cover w-full h-full"
+                              />
                           </a>
                           @if (! $inCart)
                               <x-btn

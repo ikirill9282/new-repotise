@@ -47,11 +47,11 @@
         <div class="swiper-slide">
           <div class="h-full flex flex-col gap-2">
             <div class="relative h-60 rounded overflow-hidden">
-                <img 
+                <x-optimized-image 
                   class="max-w-full w-full h-full object-cover" 
-                  src="{{ url($product->preview?->image ?? '/storage/images/default_product.png') }}" 
+                  src="{{ $product->preview?->image ?? '/storage/images/default_product.png' }}" 
                   alt="product {{ $product->id }} image"
-                >
+                />
 
                 @include('site.components.favorite.button', [
                   'stroke' => '#FF2C0C',
