@@ -240,7 +240,7 @@
                 <div class="about_block">
                     @include('site.components.heading', [
                         'variables' => $variables->filter(fn($var) => str_contains($var->name, 'notfound')),
-                        'append' => '"<span>' . request()->get('q') . '</span>"',
+                        'append' => '<span>' . e(request()->get('q')) . '</span>',
                     ])
                     <p>{{ print_var('subtitle', $variables) }}</p>
                     <div class="block_cards">
