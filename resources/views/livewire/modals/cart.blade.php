@@ -107,14 +107,13 @@
                       $productHash = \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]);
                       $productKey = \App\Helpers\CustomEncrypt::generateStaticUrlHas(['id' => $product->id]);
                       $inCart = $cartService->inCart($product->id);
-                      $isOwner = auth()->check() && (int) $product->user_id === auth()->id();
                   @endphp
                   <div class="item flex flex-col gap-2">
                       <div class="img_products relative rounded-lg overflow-hidden">
                           <a href="{{ $product->makeUrl() }}" class="block">
                               <img src="{{ $preview }}" alt="Preview of {{ $title }}" class="main_img object-cover w-full h-full">
                           </a>
-                          @if (! $inCart && ! $isOwner)
+                          @if (! $inCart)
                               <x-btn
                                   type="button"
                                   class="add-to-cart cart-modal-add-btn to_basket"
