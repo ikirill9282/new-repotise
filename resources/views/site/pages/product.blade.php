@@ -123,14 +123,14 @@
                               $isOwner = auth()->check() && (int) auth()->id() === (int) $product->user_id;
                             @endphp
                             @if($product->subscription)
-                              @if(!$isOwner && !auth()->user()?->subscribed($product->id))
+                              @if(!$isOwner && (!auth()->check() || !auth()->user()->subscribed($product->id)))
                                 @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
                               @endif
                             @else
                               @if(!$isOwner)
                                 <div class="add_to_card_block">
                                     <a href="#"
-                                        class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
+                                        class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->check() && auth()->user()->inCart($product->id) ? 'in-cart' : '' }}"
                                         data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
                                             viewBox="0 0 20 21" fill="none">
@@ -144,7 +144,7 @@
                                                 stroke="white" stroke-width="1.5" stroke-linecap="round"
                                                 stroke-linejoin="round" />
                                         </svg>
-                                        {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                        {{ auth()->check() && auth()->user()->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
                                     </a>
                                     <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
                                         checkout</span>
@@ -227,14 +227,14 @@
                               $isOwner = auth()->check() && (int) auth()->id() === (int) $product->user_id;
                             @endphp
                             @if($product->subscription)
-                              @if(!$isOwner && !auth()->user()?->subscribed($product->id))
+                              @if(!$isOwner && (!auth()->check() || !auth()->user()->subscribed($product->id)))
                                 @livewire('product-subscribe', ['product_id' => \Illuminate\Support\Facades\Crypt::encrypt($product->id)])
                               @endif
                             @else
                               @if(!$isOwner)
                                 <div class="add_to_card_block">
                                     <a href="#"
-                                        class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->user()?->inCart($product->id) ? 'in-cart' : '' }}"
+                                        class="to_card add-to-cart {{ auth()->check() ? '' : 'open_auth' }} {{ auth()->check() && auth()->user()->inCart($product->id) ? 'in-cart' : '' }}"
                                         data-value="{{ \App\Helpers\CustomEncrypt::generateUrlHash(['id' => $product->id]) }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21"
                                             viewBox="0 0 20 21" fill="none">
@@ -248,7 +248,7 @@
                                                 stroke="white" stroke-width="1.5" stroke-linecap="round"
                                                 stroke-linejoin="round" />
                                         </svg>
-                                        {{ auth()->user()?->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
+                                        {{ auth()->check() && auth()->user()->inCart($product->id) ? 'View Cart' : print_var('cart_button_text', $variables) ?? 'Add to cart' }}
                                     </a>
                                     <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
                                         checkout</span>
