@@ -142,83 +142,106 @@ $(document).ready(function() {
     }
 
     let scrollTimeout;
-    $(window)
-        .off("scroll.products")
-        .on("scroll.products", function() {
-            // Debounce scroll events to prevent rapid firing
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(function() {
-                if (finished || loading) return;
+    let lastScrollTop = 0;
+    let lastDocumentHeight = 0;
+    
+    // Throttle function to limit scroll event frequency
+    function throttle(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    const handleScroll = throttle(function() {
+        if (finished || loading) return;
 
-                const windowHeight = $(window).height();
-                const scrollTop = $(window).scrollTop();
-                const documentHeight = $(document).height();
-                
-                const scrolledToBottom = scrollTop + windowHeight >= documentHeight - PRODUCTS_SCROLL_OFFSET;
-                if (!scrolledToBottom) return;
+        const windowHeight = $(window).height();
+        const scrollTop = $(window).scrollTop();
+        const documentHeight = $(document).height();
+        
+        // Prevent triggering if document height hasn't changed significantly
+        // (this prevents infinite loops when images load and change document height)
+        if (Math.abs(documentHeight - lastDocumentHeight) < 50 && scrollTop === lastScrollTop) {
+            return;
+        }
+        
+        lastScrollTop = scrollTop;
+        lastDocumentHeight = documentHeight;
+        
+        const scrolledToBottom = scrollTop + windowHeight >= documentHeight - PRODUCTS_SCROLL_OFFSET;
+        if (!scrolledToBottom) return;
 
-                const nextPage = currentPage + 1;
-                if (nextPage > lastPage) {
+        const nextPage = currentPage + 1;
+        if (nextPage > lastPage) {
+            finished = true;
+            renderEndMessage();
+            return;
+        }
+
+        loading = true;
+        renderSpinner();
+
+        const params = getUrlParams();
+        params.page = nextPage;
+
+        $.ajax({
+            url: window.location.pathname,
+            type: "GET",
+            data: params,
+            success: function(response) {
+                removeSpinner();
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(response, "text/html");
+
+                updatePaginationFromDoc(doc);
+
+                const newItems = doc.querySelectorAll(".filter_cards_group .item");
+
+                if (newItems.length === 0) {
                     finished = true;
                     renderEndMessage();
+                    loading = false;
                     return;
                 }
 
-                loading = true;
-                renderSpinner();
-
-                const params = getUrlParams();
-                params.page = nextPage;
-
-                $.ajax({
-                    url: window.location.pathname,
-                    type: "GET",
-                    data: params,
-                    success: function(response) {
-                        removeSpinner();
-
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(response, "text/html");
-
-                        updatePaginationFromDoc(doc);
-
-                        const newItems = doc.querySelectorAll(".filter_cards_group .item");
-
-                        if (newItems.length === 0) {
-                            finished = true;
-                            renderEndMessage();
-                            loading = false;
-                            return;
-                        }
-
-                        // Store current scroll position before adding items
-                        const currentScrollTop = $(window).scrollTop();
-                        const currentDocumentHeight = $(document).height();
-
-                        newItems.forEach(function(item) {
-                            $container.append(item.cloneNode(true));
-                        });
-
-                        currentPage = nextPage;
-                        syncMetaCurrentPage();
-
-                        if (currentPage >= lastPage) {
-                            finished = true;
-                            renderEndMessage();
-                        }
-
-                        // Wait a bit for images to load before allowing next scroll trigger
-                        setTimeout(function() {
-                            loading = false;
-                        }, 300);
-                    },
-                    error: function() {
-                        removeSpinner();
-                        loading = false;
-                    },
+                newItems.forEach(function(item) {
+                    $container.append(item.cloneNode(true));
                 });
-            }, 100);
+
+                currentPage = nextPage;
+                syncMetaCurrentPage();
+
+                if (currentPage >= lastPage) {
+                    finished = true;
+                    renderEndMessage();
+                }
+
+                // Wait longer for images to load and stabilize document height
+                setTimeout(function() {
+                    lastDocumentHeight = $(document).height();
+                    loading = false;
+                }, 500);
+            },
+            error: function() {
+                removeSpinner();
+                loading = false;
+            },
         });
+    }, 200);
+    
+    $(window)
+        .off("scroll.products")
+        .on("scroll.products", handleScroll);
+    
+    // Initialize document height
+    lastDocumentHeight = $(document).height();
 
     function syncPaginationState() {
         const $meta = $(".js-products-pagination").first();

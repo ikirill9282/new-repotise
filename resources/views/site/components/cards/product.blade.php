@@ -46,6 +46,7 @@
             src="{{ $model->preview?->image ?? '/storage/images/default_product.png' }}" 
             alt="model {{ $model->id }} image"
             class="main_img object-cover"
+            :lazy="false"
         />
 				</a>
 
