@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Laravel\Scout\Searchable;
@@ -428,42 +429,21 @@ class Product extends Model
 
   public static function getTrendingProducts(int $limit = 10, array $includes = []): Collection
   {
-    // Always filter by active status and published date - only show active, published products
-    $query = \App\Models\Product::query()
-      ->where('status_id', Status::ACTIVE)
-      ->whereNotNull('published_at');
+    // Кэшируем популярные продукты на 1 час для улучшения производительности
+    $cacheKey = 'trending_products_' . $limit . '_' . md5(serialize($includes));
     
-    // If specific product IDs are provided, filter by them (they must still be active and published)
-    if (!empty($includes)) {
-      $query->whereIn('id', $includes);
-    }
-    
-    $query->with('preview', 'locations', 'categories', 'types')
-      ->withCount(['reviews' => function($query) {
-        $query->whereNull('parent_id');
-      }])
-      ->withCount(['orderProducts as sales_count' => function($query) {
-        $query->whereHas('order', function($q) {
-          $q->where('status_id', '>=', OrderEnum::PAID);
-        });
-      }]);
-
-    // Сортировка по популярности: продажи, просмотры, отзывы, рейтинг
-    $products = $query
-      ->orderByDesc('sales_count')
-      ->orderByDesc('views')
-      ->orderByDesc('reviews_count')
-      ->orderByDesc('rating')
-      ->orderByDesc('created_at')
-      ->limit($limit)
-      ->get();
-
-    // Если указаны конкретные ID, но продукты не найдены - показываем все популярные (fallback)
-    if ($products->isEmpty() && !empty($includes)) {
-      $fallbackQuery = \App\Models\Product::query()
+    return \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function() use ($limit, $includes) {
+      // Always filter by active status and published date - only show active, published products
+      $query = \App\Models\Product::query()
         ->where('status_id', Status::ACTIVE)
-        ->whereNotNull('published_at')
-        ->with('preview', 'locations', 'categories', 'types')
+        ->whereNotNull('published_at');
+      
+      // If specific product IDs are provided, filter by them (they must still be active and published)
+      if (!empty($includes)) {
+        $query->whereIn('id', $includes);
+      }
+      
+      $query->with('preview', 'locations', 'categories', 'types', 'author')
         ->withCount(['reviews' => function($query) {
           $query->whereNull('parent_id');
         }])
@@ -473,8 +453,33 @@ class Product extends Model
           });
         }]);
 
-      $products = $fallbackQuery
+      // Сортировка по популярности: продажи, просмотры, отзывы, рейтинг
+      $products = $query
         ->orderByDesc('sales_count')
+        ->orderByDesc('views')
+        ->orderByDesc('reviews_count')
+        ->orderByDesc('rating')
+        ->orderByDesc('created_at')
+        ->limit($limit)
+        ->get();
+
+      // Если указаны конкретные ID, но продукты не найдены - показываем все популярные (fallback)
+      if ($products->isEmpty() && !empty($includes)) {
+        $fallbackQuery = \App\Models\Product::query()
+          ->where('status_id', Status::ACTIVE)
+          ->whereNotNull('published_at')
+          ->with('preview', 'locations', 'categories', 'types', 'author')
+          ->withCount(['reviews' => function($query) {
+            $query->whereNull('parent_id');
+          }])
+          ->withCount(['orderProducts as sales_count' => function($query) {
+            $query->whereHas('order', function($q) {
+              $q->where('status_id', '>=', OrderEnum::PAID);
+            });
+          }]);
+
+        $products = $fallbackQuery
+          ->orderByDesc('sales_count')
         ->orderByDesc('views')
         ->orderByDesc('reviews_count')
         ->orderByDesc('rating')
