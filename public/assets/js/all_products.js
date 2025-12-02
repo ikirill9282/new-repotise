@@ -141,67 +141,83 @@ $(document).ready(function() {
         renderEndMessage();
     }
 
+    let scrollTimeout;
     $(window)
         .off("scroll.products")
         .on("scroll.products", function() {
-            if (finished || loading) return;
+            // Debounce scroll events to prevent rapid firing
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(function() {
+                if (finished || loading) return;
 
-            const scrolledToBottom = $(window).scrollTop() + $(window).height() >= $(document).height() - PRODUCTS_SCROLL_OFFSET;
-            if (!scrolledToBottom) return;
+                const windowHeight = $(window).height();
+                const scrollTop = $(window).scrollTop();
+                const documentHeight = $(document).height();
+                
+                const scrolledToBottom = scrollTop + windowHeight >= documentHeight - PRODUCTS_SCROLL_OFFSET;
+                if (!scrolledToBottom) return;
 
-            const nextPage = currentPage + 1;
-            if (nextPage > lastPage) {
-                finished = true;
-                renderEndMessage();
-                return;
-            }
+                const nextPage = currentPage + 1;
+                if (nextPage > lastPage) {
+                    finished = true;
+                    renderEndMessage();
+                    return;
+                }
 
-            loading = true;
-            renderSpinner();
+                loading = true;
+                renderSpinner();
 
-            const params = getUrlParams();
-            params.page = nextPage;
+                const params = getUrlParams();
+                params.page = nextPage;
 
-            $.ajax({
-                url: window.location.pathname,
-                type: "GET",
-                data: params,
-                success: function(response) {
-                    removeSpinner();
+                $.ajax({
+                    url: window.location.pathname,
+                    type: "GET",
+                    data: params,
+                    success: function(response) {
+                        removeSpinner();
 
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(response, "text/html");
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(response, "text/html");
 
-                    updatePaginationFromDoc(doc);
+                        updatePaginationFromDoc(doc);
 
-                    const newItems = doc.querySelectorAll(".filter_cards_group .item");
+                        const newItems = doc.querySelectorAll(".filter_cards_group .item");
 
-                    if (newItems.length === 0) {
-                        finished = true;
-                        renderEndMessage();
+                        if (newItems.length === 0) {
+                            finished = true;
+                            renderEndMessage();
+                            loading = false;
+                            return;
+                        }
+
+                        // Store current scroll position before adding items
+                        const currentScrollTop = $(window).scrollTop();
+                        const currentDocumentHeight = $(document).height();
+
+                        newItems.forEach(function(item) {
+                            $container.append(item.cloneNode(true));
+                        });
+
+                        currentPage = nextPage;
+                        syncMetaCurrentPage();
+
+                        if (currentPage >= lastPage) {
+                            finished = true;
+                            renderEndMessage();
+                        }
+
+                        // Wait a bit for images to load before allowing next scroll trigger
+                        setTimeout(function() {
+                            loading = false;
+                        }, 300);
+                    },
+                    error: function() {
+                        removeSpinner();
                         loading = false;
-                        return;
-                    }
-
-                    newItems.forEach(function(item) {
-                        $container.append(item.cloneNode(true));
-                    });
-
-                    currentPage = nextPage;
-                    syncMetaCurrentPage();
-
-                    if (currentPage >= lastPage) {
-                        finished = true;
-                        renderEndMessage();
-                    }
-
-                    loading = false;
-                },
-                error: function() {
-                    removeSpinner();
-                    loading = false;
-                },
-            });
+                    },
+                });
+            }, 100);
         });
 
     function syncPaginationState() {
