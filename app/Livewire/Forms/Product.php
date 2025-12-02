@@ -275,7 +275,7 @@ class Product extends Component
       
       $validator = Validator::make($data, [
         'user_id' => 'required|integer',
-        'title' => ['required', 'string', 'regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/'],
+        'title' => ['required', 'string', "regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/"],
         'text' => 'required|string',
         'refund_policy' => 'nullable|integer',
         'subscription' => 'required|boolean',

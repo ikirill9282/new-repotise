@@ -105,7 +105,7 @@ class Article extends Component
       $validator = Validator::make($data, [
         'user_id' => 'required|integer',
         'status_id' => 'sometimes|nullable|integer',
-        'title' => ['required', 'string', 'regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/'],
+        'title' => ['required', 'string', "regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/"],
         'text' => 'required|string',
         'seo_title' => 'sometimes|nullable|string',
         'seo_text' => 'sometimes|nullable|string',
