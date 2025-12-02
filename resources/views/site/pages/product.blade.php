@@ -150,7 +150,10 @@
                                         checkout</span>
                                 </div>
                               @else
-                                <div class="add_to_card_block" style="visibility: hidden; height: 0; margin: 0; padding: 0;"></div>
+                                <div class="add_to_card_block" style="opacity: 0; pointer-events: none; min-height: 60px;">
+                                    <div style="width: 207px;"></div>
+                                    <span></span>
+                                </div>
                               @endif
                             @endif
 
@@ -253,7 +256,10 @@
                                         checkout</span>
                                 </div>
                               @else
-                                <div class="add_to_card_block" style="visibility: hidden; height: 0; margin: 0; padding: 0;"></div>
+                                <div class="add_to_card_block" style="opacity: 0; pointer-events: none; min-height: 60px;">
+                                    <div style="width: 207px;"></div>
+                                    <span></span>
+                                </div>
                               @endif
                             @endif
                             <div class="bottom_informations">
