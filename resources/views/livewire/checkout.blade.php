@@ -213,10 +213,15 @@
 
                         <p class="text-sm group !mb-6">By confirm your payment, you agree to our <x-link
                               class="!border-none group-has-[a]:!text-active"  
-                              href="{{ url('/all-policies') }}"
+                              href="{{ url('/policies/terms-and-conditions') }}"
                             >
-                              Terms of Service & Privacy Policy.
-                            </x-link>
+                              Terms of Service
+                            </x-link> & <x-link
+                              class="!border-none group-has-[a]:!text-active"  
+                              href="{{ url('/policies/privacy-policy') }}"
+                            >
+                              Privacy Policy
+                            </x-link>.
                         </p>
                         <div class="bottom_back_block">
                             <x-link href="#" class="!border-none">

@@ -184,8 +184,7 @@
                 </div>
             </div>
             <a wire:click.prevent="moveCheckout" href="#" class="place_button inline-block">Place Order</a>
-            <p class="terms_service !m-0 !p-0">By placing your order, you agree to our <a href="{{ url('/policies/privacy-policy') }}">Terms of
-                    Service & Privacy Policy.</a>
+            <p class="terms_service !m-0 !p-0">By placing your order, you agree to our <a href="{{ url('/policies/terms-and-conditions') }}">Terms of Service</a> & <a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a>.
             </p>
         </div>
           

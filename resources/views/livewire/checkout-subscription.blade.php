@@ -103,10 +103,15 @@
                         <div class="text-sm w-full !mb-6 text-gray group">By confirm your payment, you agree to our 
                           <x-link
                             class="!border-none group-has-[a]:!text-active"
-                            href="{{ url('/all-policies') }}"
+                            href="{{ url('/policies/terms-and-conditions') }}"
                           >
-                            Terms of Service & Privacy Policy.
-                          </x-link>
+                            Terms of Service
+                          </x-link> & <x-link
+                            class="!border-none group-has-[a]:!text-active"
+                            href="{{ url('/policies/privacy-policy') }}"
+                          >
+                            Privacy Policy
+                          </x-link>.
                         </div>
                         <div class="text-sm flex justify-between items-center">
                             <x-link class="!border-none" href="{{ $product->makeUrl() }}">Back</x-link>
