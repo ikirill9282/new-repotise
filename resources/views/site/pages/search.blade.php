@@ -35,13 +35,22 @@
                         $currentSort = $sortOption ?? request()->get('sort', 'relevance');
                     @endphp
                     <div class="right_select">
-                        <span>Sort by:</span>
-                        <select id="search-sort" class="tg-select">
-                            <option value="relevance" {{ $currentSort === 'relevance' ? 'selected' : '' }}>Relevance</option>
-                            <option value="popular" {{ $currentSort === 'popular' ? 'selected' : '' }}>Most Popular</option>
-                            <option value="newest" {{ $currentSort === 'newest' ? 'selected' : '' }}>Newest First</option>
-                            <option value="oldest" {{ $currentSort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                        </select>
+                        <span>Sort by: </span>
+                        <div style="min-width: 150px;">
+                            <x-form.select 
+                                name="search-sort"
+                                :label="$currentSort === 'relevance' ? 'Relevance' : ($currentSort === 'popular' ? 'Most Popular' : ($currentSort === 'newest' ? 'Newest First' : 'Oldest First'))"
+                                :options="[
+                                    'relevance' => 'Relevance',
+                                    'popular' => 'Most Popular',
+                                    'newest' => 'Newest First',
+                                    'oldest' => 'Oldest First',
+                                ]"
+                                :tooltip="false"
+                                labelClass="!text-black"
+                                value="{{ $currentSort }}"
+                            />
+                        </div>
                     </div>
                     <div class="result_cards">
                         @foreach ($search_results as $item)
@@ -301,21 +310,38 @@
 @push('js')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const searchSort = document.getElementById('search-sort');
-            if (!searchSort) {
+            const searchSortInput = document.querySelector('input[name="search-sort"]');
+            if (!searchSortInput) {
                 return;
             }
 
-            searchSort.addEventListener('change', (event) => {
-                const url = new URL(window.location.href);
-                const params = url.searchParams;
-                if (event.target.value === 'relevance') {
-                    params.delete('sort');
-                } else {
-                    params.set('sort', event.target.value);
-                }
-                url.search = params.toString();
-                window.location.href = url.toString();
+            // Устанавливаем начальное значение
+            const currentSort = '{{ $currentSort ?? "relevance" }}';
+            searchSortInput.value = currentSort;
+            
+            // Ждем инициализации Alpine.js компонента
+            setTimeout(() => {
+                const event = new Event('input', { bubbles: true });
+                searchSortInput.dispatchEvent(event);
+            }, 100);
+
+            // Обработчик изменения значения в скрытом input
+            let timeoutId;
+            searchSortInput.addEventListener('input', function() {
+                // Дебаунс для предотвращения множественных переходов
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    const url = new URL(window.location.href);
+                    const params = url.searchParams;
+                    const value = this.value;
+                    if (value === 'relevance') {
+                        params.delete('sort');
+                    } else {
+                        params.set('sort', value);
+                    }
+                    url.search = params.toString();
+                    window.location.href = url.toString();
+                }, 100);
             });
         });
     </script>

@@ -11,6 +11,7 @@
 	'tooltip' => true,
   'tooltipModal' => false,
   'tooltipText' => null,
+  'value' => null,
 ])
 <div 
   x-data="{
@@ -59,23 +60,33 @@
     }
   }"
   x-init="() => {
-    window.addEventListener('DOMContentLoaded', () => {
+    const initValue = () => {
       const val = $refs.input.value ?? '';
-      const lab = $refs.dropdownContent.querySelector(`div[data-key='${val}']`)?.innerHTML.trim();
-      if (lab) {
-        setVal(val, lab);
+      if (val) {
+        const lab = $refs.dropdownContent?.querySelector(`div[data-key='${val}']`)?.innerHTML.trim();
+        if (lab) {
+          setVal(val, lab);
+        }
+      } else if (label) {
+        // Если есть начальный label, но нет значения, устанавливаем label
+        $refs.placeholder.classList.add('!text-black');
       }
+    };
+    
+    // Инициализируем значение после того, как Alpine.js полностью загрузится
+    $nextTick(() => {
+      initValue();
+    });
 
-      Livewire.on('resetForm', () => {
-        value = null;
-        label = placeholder;
-      });
+    Livewire.on('resetForm', () => {
+      value = null;
+      label = placeholder;
     });
   }"
   @click.outside="close()"
   class="w-full group text-sm sm:text-base"
 >
-  <input x-ref="input" type="hidden" name="{{ $name }}" {{ $attributes }}>
+  <input x-ref="input" type="hidden" name="{{ $name }}" value="{{ isset($value) ? $value : '' }}" {{ $attributes }}>
 
   @if($title)
     <label class="text-sm sm:text-base text-gray mb-1.5" for="{{ $name }}">{{ $title }}</label>
