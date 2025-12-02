@@ -207,23 +207,18 @@ class SiteController extends Controller
 
     $news = Article::query()
       ->whereHas('author', fn($query) => $query->where('id', 0))
-      ->with([
-        'preview:id,article_id,image',
-        'author:id,username,name,avatar'
-      ])
-      ->select('id', 'title', 'slug', 'created_at', 'author_id', 'preview_id')
       ->orderByDesc('id')
       ->paginate($perPage, ['*'], 'page', $page);
 
     // Если это AJAX запрос, возвращаем JSON
     if ($request->ajax() || $request->wantsJson()) {
-      $html = view('site.pages.insights.partials.news-items', [
-        'items' => $news->items(),
-      ])->render();
+    $html = view('site.pages.insights.partials.news-items', [
+      'items' => $news->items(),
+    ])->render();
 
-      return response()->json([
-        'html' => $html,
-        'next_page' => $news->hasMorePages() ? $news->currentPage() + 1 : null,
+    return response()->json([
+      'html' => $html,
+      'next_page' => $news->hasMorePages() ? $news->currentPage() + 1 : null,
       ]);
     }
 

@@ -384,17 +384,13 @@ class Article extends Model
 
   public static function getLastNews(int|string $maximum_models = 4)
   {
-    // Оптимизированный запрос - загружаем только необходимые поля
     $last_news = static::query()
       ->whereHas('author', fn($query) => $query->where('id', 0))
-      ->with([
-        'preview:id,article_id,image',
-        'author:id,username,name,avatar'
-      ])
-      ->select('id', 'title', 'slug', 'created_at', 'author_id', 'preview_id')
       ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
       ->orderByDesc('id')
+      // ->ddRawSql()
       ->get();
+    
     
     while ($last_news->count() > 0 && $last_news->count() < $maximum_models) {
       $last_news = $last_news->collect()->merge($last_news)->slice(0, $maximum_models);
