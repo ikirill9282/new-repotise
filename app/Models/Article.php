@@ -8,6 +8,7 @@ use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
 use App\Traits\HasKeywords;
