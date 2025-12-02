@@ -7087,7 +7087,7 @@ footer .bottom_by_des .by_to {
 }
 
 .authors_blogers .swiper-button-prev {
-  transform: rotate(180deg) !important;
+  transform: translateY(-50%) rotate(0deg) !important;
 }
 
 @media (max-width: 1263px) {
