@@ -438,14 +438,7 @@ class Product extends Model
       $query->whereIn('id', $includes);
     }
     
-    // Оптимизированный eager loading - загружаем только необходимые поля
-    $query->with([
-      'preview:id,product_id,image',
-      'locations:id,slug,name',
-      'categories:id,slug,name',
-      'types:id,slug,name',
-      'author:id,username,name,avatar'
-    ])
+    $query->with('preview', 'locations', 'categories', 'types')
       ->withCount(['reviews' => function($query) {
         $query->whereNull('parent_id');
       }])
@@ -470,13 +463,7 @@ class Product extends Model
       $fallbackQuery = \App\Models\Product::query()
         ->where('status_id', Status::ACTIVE)
         ->whereNotNull('published_at')
-        ->with([
-          'preview:id,product_id,image',
-          'locations:id,slug,name',
-          'categories:id,slug,name',
-          'types:id,slug,name',
-          'author:id,username,name,avatar'
-        ])
+        ->with('preview', 'locations', 'categories', 'types')
         ->withCount(['reviews' => function($query) {
           $query->whereNull('parent_id');
         }])
