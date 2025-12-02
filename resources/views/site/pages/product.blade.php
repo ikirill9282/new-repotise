@@ -32,11 +32,7 @@
                                 <div class="swiper-wrapper">
                                     @foreach ($gallery as $image)
                                         <div class="swiper-slide">
-                                            <x-optimized-image 
-                                                src="{{ $image->image }}" 
-                                                alt="Product image {{ $image->id }}"
-                                                :lazy="false"
-                                            />
+                                            <img src="{{ url($image->image) }}" alt="Product image {{ $image->id }}" />
                                         </div>
                                     @endforeach
                                 </div>
@@ -45,11 +41,7 @@
                                 <div class="swiper-wrapper">
                                     @foreach ($gallery as $image)
                                         <div class="swiper-slide">
-                                            <x-optimized-image 
-                                                src="{{ $image->image }}" 
-                                                alt="Product thumbnail {{ $image->id }}"
-                                                class="swiper-slide-thumb"
-                                            />
+                                            <img src="{{ url($image->image) }}" alt="Product thumbnail {{ $image->id }}" />
                                         </div>
                                     @endforeach
                                 </div>

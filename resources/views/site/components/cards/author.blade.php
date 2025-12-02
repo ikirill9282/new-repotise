@@ -1,9 +1,9 @@
 <div class="cards_group relative flex flex-col justify-start items-start">
   <div class="img_products item !max-w-none !w-full relative" style="height: 273px; overflow: hidden;">
       <a href="{{ $model->makeProfileUrl() }}" class="block w-full h-full">
-          <x-optimized-image 
+          <img 
               class="main_img object-cover w-full h-full" 
-              src="{{ $model->avatar }}" 
+              src="{{ url($model->avatar) }}" 
               alt="Author {{ $model->getName() }}"
           />
       </a>

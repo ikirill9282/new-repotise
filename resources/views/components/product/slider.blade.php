@@ -47,9 +47,9 @@
         <div class="swiper-slide">
           <div class="h-full flex flex-col gap-2">
             <div class="relative h-60 rounded overflow-hidden">
-                <x-optimized-image 
+                <img 
                   class="max-w-full w-full h-full object-cover" 
-                  src="{{ $product->preview?->image ?? '/storage/images/default_product.png' }}" 
+                  src="{{ url($product->preview?->image ?? '/storage/images/default_product.png') }}" 
                   alt="product {{ $product->id }} image"
                 />
 

@@ -42,11 +42,10 @@
   <div class="item flex flex-col {{ isset($class) ? $class : '' }}">
     <div class="img_products relative" x-data="{}">
 				<a href="{{ $model->makeUrl() }}" class="block">
-        <x-optimized-image 
-            src="{{ $model->preview?->image ?? '/storage/images/default_product.png' }}" 
+        <img 
+            class="main_img object-cover" 
+            src="{{ url($model->preview?->image ?? '/storage/images/default_product.png') }}" 
             alt="model {{ $model->id }} image"
-            class="main_img object-cover"
-            :lazy="false"
         />
 				</a>
 

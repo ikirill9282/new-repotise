@@ -111,7 +111,7 @@
                   <div class="item flex flex-col gap-2">
                       <div class="img_products relative rounded-lg overflow-hidden">
                           <a href="{{ $product->makeUrl() }}" class="block">
-                              <x-optimized-image 
+                              <img 
                                   src="{{ $preview }}" 
                                   alt="Preview of {{ $title }}" 
                                   class="main_img object-cover w-full h-full"
