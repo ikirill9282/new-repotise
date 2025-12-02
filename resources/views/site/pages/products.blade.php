@@ -460,15 +460,17 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Запускаем сразу
+            // Запускаем только один раз при загрузке страницы
             hideEmptyInfCards();
             
-            // Запускаем после небольшой задержки, чтобы убедиться, что limitProductCardTags() выполнился
-            setTimeout(hideEmptyInfCards, 100);
-            setTimeout(hideEmptyInfCards, 500);
-            
-            // Проверяем при изменении DOM (когда теги скрываются/показываются)
-            const observer = new MutationObserver(hideEmptyInfCards);
+            // MutationObserver отключен для предотвращения постоянных перезагрузок
+            // Если нужно, можно включить с debounce
+            /*
+            let hideTimeout;
+            const observer = new MutationObserver(function() {
+                clearTimeout(hideTimeout);
+                hideTimeout = setTimeout(hideEmptyInfCards, 500);
+            });
             const containers = document.querySelectorAll('.inf_cards');
             containers.forEach(container => {
                 observer.observe(container, { 
@@ -478,11 +480,7 @@
                     subtree: true 
                 });
             });
-        });
-        
-        // Также запускаем после загрузки всех скриптов
-        window.addEventListener('load', function() {
-            setTimeout(hideEmptyInfCards, 100);
+            */
         });
     </script>
     <script>
