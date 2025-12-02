@@ -1952,6 +1952,12 @@ footer .bottom_connecting_group .connecting a {
   padding: .75rem 1.25rem;
 }
 
+.search_group .relative {
+  width: 100%;
+  display: flex;
+  gap: 20px;
+}
+
  .search_group .search_block label {
   margin-bottom: 4px;
 }
@@ -1991,6 +1997,7 @@ footer .bottom_connecting_group .connecting a {
   border-radius: 8px;
   background: var(--main, #FC7361);
   color: var(--white, #fff);
+  width: auto !important;
 }
 .search_group .name_tags {
   display: flex;

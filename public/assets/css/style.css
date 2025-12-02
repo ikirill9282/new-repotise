@@ -3896,6 +3896,7 @@ textarea {
   background: var(--white, #FFF);
   width: 100%;
   height: 55px;
+  position: relative;
 }
 .filter_products .about_block .search_filter .search_top .search_input label {
   display: contents;

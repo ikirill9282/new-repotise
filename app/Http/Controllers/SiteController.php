@@ -208,13 +208,30 @@ class SiteController extends Controller
       ->orderByDesc('id')
       ->paginate($perPage, ['*'], 'page', $page);
 
-    $html = view('site.pages.insights.partials.news-items', [
-      'items' => $news->items(),
-    ])->render();
+    // Если это AJAX запрос, возвращаем JSON
+    if ($request->ajax() || $request->wantsJson()) {
+      $html = view('site.pages.insights.partials.news-items', [
+        'items' => $news->items(),
+      ])->render();
 
-    return response()->json([
-      'html' => $html,
-      'next_page' => $news->hasMorePages() ? $news->currentPage() + 1 : null,
+      return response()->json([
+        'html' => $html,
+        'next_page' => $news->hasMorePages() ? $news->currentPage() + 1 : null,
+      ]);
+    }
+
+    // Для обычных запросов возвращаем полноценную HTML страницу
+    $pageModel = Page::where('slug', 'insights')
+      ->with('config')
+      ->first();
+
+    if (is_null($pageModel)) {
+      return (new FallbackController())($request);
+    }
+
+    return view('site.pages.news', [
+      'page' => $pageModel,
+      'news' => $news,
     ]);
   }
 

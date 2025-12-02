@@ -5908,11 +5908,17 @@ input[type="search"]::-webkit-search-cancel-button {
 	border-radius: 8px;
 	background: var(--white, #FFF) !important;
 	width: 100%;
-	max-width: 942px;
+	max-width: 100%;
 	padding: 9px 20px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 	padding-left: 20px!important;
 }
+.error .about_block .search_group .relative {
+	width: 100%;
+	display: flex;
+	gap: 20px;
+}
+
 .error .about_block .search_group .search_block label {
 	margin-bottom: 0;
 	flex-shrink: 0;

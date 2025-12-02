@@ -458,6 +458,31 @@ class Product extends Model
       ->limit($limit)
       ->get();
 
+    // Если указаны конкретные ID, но продукты не найдены - показываем все популярные (fallback)
+    if ($products->isEmpty() && !empty($includes)) {
+      $fallbackQuery = \App\Models\Product::query()
+        ->where('status_id', Status::ACTIVE)
+        ->whereNotNull('published_at')
+        ->with('preview', 'locations', 'categories', 'types')
+        ->withCount(['reviews' => function($query) {
+          $query->whereNull('parent_id');
+        }])
+        ->withCount(['orderProducts as sales_count' => function($query) {
+          $query->whereHas('order', function($q) {
+            $q->where('status_id', '>=', OrderEnum::PAID);
+          });
+        }]);
+
+      $products = $fallbackQuery
+        ->orderByDesc('sales_count')
+        ->orderByDesc('views')
+        ->orderByDesc('reviews_count')
+        ->orderByDesc('rating')
+        ->orderByDesc('created_at')
+        ->limit($limit)
+        ->get();
+    }
+
     // If we have fewer products than requested and have at least one product,
     // duplicate them once (but don't create an infinite loop)
     if ($products->count() > 0 && $products->count() < $limit) {

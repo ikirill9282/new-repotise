@@ -1,26 +1,28 @@
 <div class="search_group">
   <form class="search_block relative search-form {{ isset($form_class) ? $form_class : '' }}" {{ isset($form_id) ? " id=$form_id" : '' }} method="GET" action="{{ url('/search') }}">
       @if (!isset($template))
-        <label for="search">
-          @include('icons.search')
-        </label>
-        <input 
-          type="search"
-          name="q"
-          class="search-input"
-          autocomplete="off"
-          data-hits="{{ isset($hits) ? $hits : 'search-hits' }}"
-          placeholder="{{ isset($placeholder) ? $placeholder : '' }}"
-          @if (isset($attributes) && is_array($attributes))
-            @foreach ($attributes as $key => $val)
-              {{ $key }}="{{ $val }}"
-            @endforeach
-          @endif
-          @if(request()->has('q'))
-            value="{{ request()->get('q') }}"
-          @endif
-        >
-        @include('site.components.hits', ['id' => (isset($hits) ? $hits : 'search-hits')])
+        <div class="relative">
+          <label for="search">
+            @include('icons.search')
+          </label>
+          <input 
+            type="search"
+            name="q"
+            class="search-input"
+            autocomplete="off"
+            data-hits="{{ isset($hits) ? $hits : 'search-hits' }}"
+            placeholder="{{ isset($placeholder) ? $placeholder : '' }}"
+            @if (isset($attributes) && is_array($attributes))
+              @foreach ($attributes as $key => $val)
+                {{ $key }}="{{ $val }}"
+              @endforeach
+            @endif
+            @if(request()->has('q'))
+              value="{{ request()->get('q') }}"
+            @endif
+          >
+          @include('site.components.hits', ['id' => (isset($hits) ? $hits : 'search-hits')])
+        </div>
 
         @if(isset($icon) && !$icon)
         @else
@@ -33,7 +35,7 @@
         
       @elseif ($template == 'products')
         <div class="search_top">
-          <div class="search_input">
+          <div class="search_input relative">
               <label for="search">
                 @include('icons.search', ['stroke' => '#FC7361'])
               </label>
@@ -52,6 +54,7 @@
                   value="{{ request()->get('q') }}"
                 @endif
               >
+              @include('site.components.hits', ['id' => 'search-hits'])
           </div>
           <div class="search_icon">
               <a href="#" class="search-button">
@@ -60,11 +63,9 @@
           </div>
           {{ $buttons ?? '' }}
         </div>
-    
-        @include('site.components.hits', ['id' => 'search-hits'])
 
       @elseif($template === 'filters')
-        <div class="search_input {{ $wrapClass ?? '' }}">
+        <div class="search_input relative {{ $wrapClass ?? '' }}">
           <label class="{{ $labelClass ?? '' }}" for="search">
             @include('icons.search')
           </label>

@@ -30,7 +30,7 @@ $news = \App\Models\Article::getLastNews(5);
             {{-- </div> --}}
           </div>
           
-          <a href="/insights" class="look_more"> Latest Updates
+          <a href="{{ route('insights.news') }}" class="look_more"> Latest Updates
             {{-- {{ print_var('more_text', $variables) }} --}}
           </a>
       </div>

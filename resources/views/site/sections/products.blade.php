@@ -1,5 +1,6 @@
 @php
-$products = \App\Models\Product::getTrendingProducts(includes: $variables->get('products_ids')?->value ?? []);
+$productsIds = $variables->get('products_ids')?->value ?? [];
+$products = \App\Models\Product::getTrendingProducts(limit: 10, includes: $productsIds);
 @endphp
 
 <section class="popular_products">

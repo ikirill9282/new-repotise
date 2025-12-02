@@ -149,6 +149,8 @@
                                     <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
                                         checkout</span>
                                 </div>
+                              @else
+                                <div class="add_to_card_block" style="visibility: hidden; height: 0; margin: 0; padding: 0;"></div>
                               @endif
                             @endif
 
@@ -250,6 +252,8 @@
                                     <span><img src="{{ asset('assets/img/priz.svg') }}" alt="">Send as a gift at
                                         checkout</span>
                                 </div>
+                              @else
+                                <div class="add_to_card_block" style="visibility: hidden; height: 0; margin: 0; padding: 0;"></div>
                               @endif
                             @endif
                             <div class="bottom_informations">
