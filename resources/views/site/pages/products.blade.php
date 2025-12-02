@@ -408,15 +408,19 @@
                 const currentSort = '{{ $currentSort ?? "rating" }}';
                 sortSelectInput.value = currentSort;
                 
-                // Ждем инициализации Alpine.js компонента
-                setTimeout(() => {
-                    const event = new Event('input', { bubbles: true });
-                    sortSelectInput.dispatchEvent(event);
-                }, 100);
+                // УБРАН автоматический вызов события input, который вызывал перезагрузку страницы
+                // Теперь событие срабатывает только при реальном изменении пользователем
 
                 // Обработчик изменения значения
                 let timeoutId;
+                let lastValue = currentSort; // Отслеживаем последнее значение
                 sortSelectInput.addEventListener('input', function() {
+                    // Предотвращаем перезагрузку, если значение не изменилось
+                    if (this.value === lastValue) {
+                        return;
+                    }
+                    lastValue = this.value;
+                    
                     clearTimeout(timeoutId);
                     timeoutId = setTimeout(() => {
                         const url = new URL(window.location.href);
@@ -429,7 +433,7 @@
                         }
                         url.search = params.toString();
                         window.location.href = url.toString();
-                    }, 100);
+                    }, 300); // Увеличена задержка для предотвращения случайных перезагрузок
                 });
             }
 
