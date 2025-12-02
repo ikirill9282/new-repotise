@@ -437,8 +437,8 @@
                                 'class' => 'absolute !bg-white/50 hover:!bg-white !p-2 !rounded-lg !top-2 !right-2 group-has-[.favorite-active]:!bg-white',
                                 'is_following' => auth()->check() ? $creator->hasFollower(auth()->id()) : false,
                               ])
-                              <x-link href="{{ $creator->makeProfileUrl() }}" class="rounded overflow-hidden !leading-0 !border-none">
-                                <img class="object-cover w-full h-full" src="{{ $creator->avatar }}" alt="" class="" />
+                              <x-link href="{{ $creator->makeProfileUrl() }}" class="rounded overflow-hidden !leading-0 !border-none !block" style="height: 238px;">
+                                <img class="object-cover w-full h-full" src="{{ $creator->avatar }}" alt="" />
                               </x-link>
 
                               <x-link href="{{ $creator->makeProfileUrl() }}" class="flex justify-start items-center !gap-2 !border-0 group-has-[a]/card:!text-black">
