@@ -10,20 +10,16 @@
 
 @php
     $src = $src ?: '/storage/images/default_product.png';
-    $lazyAttr = $lazy ? 'loading="lazy"' : '';
-    $fetchpriorityAttr = $fetchpriority ? "fetchpriority=\"{$fetchpriority}\"" : '';
-    $widthAttr = $width ? "width=\"{$width}\"" : '';
-    $heightAttr = $height ? "height=\"{$height}\"" : '';
 @endphp
 
 <img 
     src="{{ url($src) }}" 
     alt="{{ $alt }}"
     class="{{ $class }}"
-    {{ $lazyAttr }}
-    {{ $fetchpriorityAttr }}
-    {{ $widthAttr }}
-    {{ $heightAttr }}
+    @if($lazy) loading="lazy" @endif
+    @if($fetchpriority) fetchpriority="{{ $fetchpriority }}" @endif
+    @if($width) width="{{ $width }}" @endif
+    @if($height) height="{{ $height }}" @endif
     decoding="async"
 >
 
