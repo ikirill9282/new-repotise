@@ -70,12 +70,6 @@
                                 'label' => $item['label'],
                             ];
                         }, $baseMenu);
-
-                        $profileMenu[] = [
-                            'url' => route('favorites'),
-                            'icon' => 'favorite',
-                            'label' => 'Favorites',
-                        ];
                     @endphp
                     <div class="profile-dropdown group">
                         <a href="{{ route('profile') }}" class="profile">
@@ -91,15 +85,9 @@
                         <div class="profile-dropdown__menu">
                             <ul>
                                 @foreach ($profileMenu as $item)
-                                    @php
-                                        $iconParams = ['width' => 16, 'height' => 16];
-                                        if ($item['icon'] === 'favorite') {
-                                            $iconParams['stroke'] = 'currentColor';
-                                        }
-                                    @endphp
                                     <li>
                                         <a href="{{ $item['url'] }}">
-                                            @includeIf('icons.' . $item['icon'], $iconParams)
+                                            @includeIf('icons.' . $item['icon'], ['width' => 16, 'height' => 16])
                                             <span>{{ $item['label'] }}</span>
                                         </a>
                                     </li>
