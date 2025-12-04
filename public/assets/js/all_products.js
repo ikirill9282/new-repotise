@@ -80,7 +80,7 @@ window.onload = function () {
 
 let sliderOne = document.getElementById("slider-1");
 let sliderTwo = document.getElementById("slider-2");
-let minGap = 0;
+let minGap = 500; // Минимальный зазор между ползунками ($500), чтобы они не блокировали друг друга
 let sliderTrack = document.querySelector(".slider-track");
 let sliderMaxValue = document.getElementById("slider-1").max;
 
@@ -94,15 +94,27 @@ function formatCurrency(value) {
 }
 
 function slideOne() {
-    if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
-        sliderOne.value = parseInt(sliderTwo.value) - minGap;
+    if (!sliderOne || !sliderTwo) return;
+    
+    const val1 = parseInt(sliderOne.value);
+    const val2 = parseInt(sliderTwo.value);
+    
+    // Если первый ползунок пытается перейти за второй, устанавливаем минимальный зазор
+    if (val1 >= val2) {
+        sliderOne.value = Math.max(0, val2 - minGap);
     }
     fillColor();
 }
 
 function slideTwo() {
-    if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
-        sliderTwo.value = parseInt(sliderOne.value) + minGap;
+    if (!sliderOne || !sliderTwo) return;
+    
+    const val1 = parseInt(sliderOne.value);
+    const val2 = parseInt(sliderTwo.value);
+    
+    // Если второй ползунок пытается перейти за первый, устанавливаем минимальный зазор
+    if (val2 <= val1) {
+        sliderTwo.value = Math.min(parseInt(sliderTwo.max), val1 + minGap);
     }
     fillColor();
 }
@@ -138,7 +150,7 @@ $(document).ready(function() {
 
     if (currentPage >= lastPage) {
         finished = true;
-        renderEndMessage();
+        // renderEndMessage(); // Disabled - no end message needed
     }
 
     // Infinite scroll DISABLED - uncomment below to re-enable

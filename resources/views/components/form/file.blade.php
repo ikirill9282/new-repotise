@@ -85,7 +85,7 @@
       }
     }
   }"
-  class="relative hover:cursor-pointer"
+  class="relative"
   x-on:dragover.prevent="handleDragOver"
   x-on:dragenter.prevent="handleDragEnter"
   x-on:dragleave.prevent="handleDragLeave"
@@ -95,17 +95,24 @@
   @if($label)
     <div x-on:click.prevent="() => $refs.file.click()" class="!text-gray !mb-2 hover:cursor-pointer">{{ $label }}</div>
   @endif
-  <label 
-    for="{{ $id }}"
+  <div 
     x-bind:class="isDragging ? 'ring-2 ring-active bg-active/10 border-2 border-dashed border-active' : ''"
-    class="rounded-lg bg-light group group-hover:cursor-pointer text-gray transition group-hover:text-active relative block"
+    class="rounded-lg bg-light text-gray transition relative block"
     style="{{ $filename ? 'width: 100%; min-height: 100px; padding: 12px;' : 'width: 100px; height: 100px; min-height: 100px; padding: 12px;' }} display: flex; align-items: center; justify-content: center;"
+    x-on:dragover.prevent="handleDragOver"
+    x-on:dragenter.prevent="handleDragEnter"
+    x-on:dragleave.prevent="handleDragLeave"
+    x-on:drop.prevent="handleDrop"
     >
 
       {{ $slot }}
 
-      <div class="flex {{ $filename ? 'justify-start' : 'justify-center' }} items-center !gap-2 {{ $wrapClass }} group-hover:cursor-pointer group-hover:text-active {{ $filename ? 'relative' : 'absolute inset-0' }} z-50" style="display: flex; align-items: center; {{ $filename ? 'padding: 0;' : 'justify-content: center;' }}">
-        <div class="@if($filename) flex items-center !gap-2 w-full @else flex justify-center items-center !gap-2 @endif">
+      <div class="flex {{ $filename ? 'justify-start' : 'justify-center' }} items-center !gap-2 {{ $wrapClass }} {{ $filename ? 'relative' : 'absolute inset-0' }} z-50" style="display: flex; align-items: center; {{ $filename ? 'padding: 0;' : 'justify-content: center;' }}">
+        <div 
+          x-show="!isDragging"
+          x-on:click.prevent="() => $refs.file.click()"
+          class="@if($filename) flex items-center !gap-2 w-full hover:cursor-pointer hover:text-active @else flex justify-center items-center !gap-2 hover:cursor-pointer hover:text-active @endif"
+        >
           @if($type == 'file')
             @include('icons.document', ['width' => 32, 'height' => 32])
           @else
@@ -116,10 +123,13 @@
             <div class="flex-1 truncate">{{ $filename }}</div>
           @endif
         </div>
-        @if($placeholder)
-          <div class="">{{ $placeholder }}</div>
+        <div x-show="isDragging" class="flex flex-col items-center justify-center !gap-2 text-active font-medium">
+          <div class="text-sm">Drop file here</div>
+        </div>
+        @if($placeholder && !$filename)
+          <div class="" x-show="!isDragging">{{ $placeholder }}</div>
         @endif
       </div>
-    </label>
+    </div>
     {{ $drop ?? '' }}
 </div>

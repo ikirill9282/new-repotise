@@ -146,6 +146,8 @@ function makeQuill(editor) {
                 clipboard: {
                     // Сохраняем форматирование при вставке из Word
                     matchVisual: false,
+                    // Включаем обработку HTML из Word
+                    matchers: [],
                 },
             },
             placeholder: editor.getAttribute("data-placeholder") ?? "",
@@ -154,13 +156,56 @@ function makeQuill(editor) {
         // Сохраняем ссылку на Quill экземпляр для доступа из других мест
         editor.__quill = quill;
 
-        // Обработчик вставки из Word с сохранением форматирования
-        // Используем более простой подход - обрабатываем только элементы, сохраняя весь текст
+        // Улучшенный обработчик вставки из Word с сохранением форматирования
+        // Обрабатываем ссылки
         quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
             const Delta = Quill.import('delta');
             const tagName = node.tagName ? node.tagName.toLowerCase() : '';
             
-            // Обрабатываем параграфы и div'ы - сохраняем выравнивание и размер
+            // Обрабатываем ссылки - сохраняем href и текст
+            if (tagName === 'a') {
+                const href = node.getAttribute('href');
+                if (href && delta.length() > 0) {
+                    // Применяем ссылку ко всему содержимому
+                    delta = delta.compose(new Delta().retain(delta.length(), { link: href }));
+                }
+            }
+            
+            return delta;
+        });
+        
+        // Обрабатываем списки и их элементы
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+            const Delta = Quill.import('delta');
+            const tagName = node.tagName ? node.tagName.toLowerCase() : '';
+            
+            // Обрабатываем элементы списка
+            if (tagName === 'li') {
+                const parent = node.parentNode;
+                if (parent) {
+                    const parentTag = parent.tagName ? parent.tagName.toLowerCase() : '';
+                    if (parentTag === 'ul') {
+                        // Маркированный список
+                        if (delta.length() > 0) {
+                            delta = delta.compose(new Delta().retain(delta.length(), { list: 'bullet' }));
+                        }
+                    } else if (parentTag === 'ol') {
+                        // Нумерованный список
+                        if (delta.length() > 0) {
+                            delta = delta.compose(new Delta().retain(delta.length(), { list: 'ordered' }));
+                        }
+                    }
+                }
+            }
+            
+            return delta;
+        });
+        
+        // Обрабатываем параграфы и div'ы - сохраняем выравнивание и размер
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+            const Delta = Quill.import('delta');
+            const tagName = node.tagName ? node.tagName.toLowerCase() : '';
+            
             if (tagName === 'p' || tagName === 'div') {
                 const attrs = {};
                 const style = node.getAttribute('style') || '';
@@ -197,29 +242,6 @@ function makeQuill(editor) {
                 }
             }
             
-            // Обрабатываем списки
-            if (tagName === 'ul' || tagName === 'ol') {
-                const listType = tagName === 'ul' ? 'bullet' : 'ordered';
-                if (delta.length() > 0) {
-                    delta = delta.compose(new Delta().retain(delta.length(), { list: listType }));
-                }
-            }
-            
-            // Обрабатываем элементы списка
-            if (tagName === 'li') {
-                const parent = node.parentNode;
-                if (parent) {
-                    const parentTag = parent.tagName ? parent.tagName.toLowerCase() : '';
-                    if (parentTag === 'ul' || parentTag === 'ol') {
-                        const listType = parentTag === 'ul' ? 'bullet' : 'ordered';
-                        if (delta.length() > 0) {
-                            delta = delta.compose(new Delta().retain(delta.length(), { list: listType }));
-                        }
-                    }
-                }
-            }
-            
-            // Важно: всегда возвращаем delta, чтобы не потерять текст
             return delta;
         });
 
@@ -332,16 +354,75 @@ function makeQuill(editor) {
             }
         });
         
-        // Дополнительный обработчик для вставки через paste - убеждаемся, что весь текст сохраняется
+        // Дополнительный обработчик для вставки через paste - улучшенная обработка из Word
         editor.addEventListener('paste', function(e) {
+            // Получаем данные из буфера обмена
+            const clipboardData = e.clipboardData || window.clipboardData;
+            const htmlData = clipboardData.getData('text/html');
+            const textData = clipboardData.getData('text/plain');
+            
+            // Если есть HTML данные (из Word), обрабатываем их
+            if (htmlData) {
+                // Создаем временный элемент для парсинга HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlData;
+                
+                // Обрабатываем ссылки - убеждаемся, что они сохраняются
+                const links = tempDiv.querySelectorAll('a');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href && !href.startsWith('#')) {
+                        // Сохраняем ссылку
+                        link.setAttribute('href', href);
+                    }
+                });
+                
+                // Обрабатываем списки - убеждаемся, что структура сохраняется
+                const lists = tempDiv.querySelectorAll('ul, ol');
+                lists.forEach(list => {
+                    // Сохраняем структуру списка
+                    list.setAttribute('data-list-type', list.tagName.toLowerCase());
+                });
+            }
+            
             // Позволяем Quill обработать вставку стандартным способом
             // Затем принудительно обновляем input
             
-            // Для вставки из Word Quill должен обработать HTML автоматически
-            // Мы просто убеждаемся, что input обновляется после вставки
-            
             setTimeout(() => {
                 updateInput();
+                
+                // Применяем стили к спискам после вставки
+                setTimeout(() => {
+                    const editorElement = quill.root;
+                    const allLists = editorElement.querySelectorAll('ul, ol');
+                    
+                    allLists.forEach(list => {
+                        if (list.tagName === 'UL') {
+                            list.style.listStyleType = 'disc';
+                            list.style.listStyle = 'disc outside';
+                        } else if (list.tagName === 'OL') {
+                            list.style.listStyleType = 'decimal';
+                            list.style.listStyle = 'decimal outside';
+                        }
+                        list.style.listStylePosition = 'outside';
+                        list.style.paddingLeft = '30px';
+                        list.style.margin = '15px 0';
+                    });
+                    
+                    const listItems = editorElement.querySelectorAll('li');
+                    listItems.forEach(li => {
+                        li.style.display = 'list-item';
+                        li.style.listStylePosition = 'outside';
+                        li.style.margin = '8px 0';
+                        li.style.paddingLeft = '5px';
+                    });
+                    
+                    // Обновляем input с правильным HTML
+                    if (input) {
+                        input.value = editorElement.innerHTML;
+                    }
+                }, 50);
+                
                 // Дополнительное обновление для Livewire с небольшой задержкой
                 setTimeout(() => {
                     if (input) {
@@ -350,8 +431,8 @@ function makeQuill(editor) {
                         input.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
                         input.dispatchEvent(new Event('blur', { bubbles: true, cancelable: true }));
                     }
-                }, 100);
-            }, 100);
+                }, 150);
+            }, 50);
         }, false);
 
         return quill;

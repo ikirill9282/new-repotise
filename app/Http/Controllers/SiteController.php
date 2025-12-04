@@ -689,11 +689,6 @@ class SiteController extends Controller
       SessionExpire::set('referal', $request->get('referal'), Carbon::now()->addHours(24));
     }
 
-    // Redirect sellers to dashboard
-    if (Auth::check() && Auth::user()->hasRole('creator')) {
-      return redirect()->route('profile.dashboard');
-    }
-
     $page = Page::where('slug', 'sellers')
       ->with('config')
       ->first();

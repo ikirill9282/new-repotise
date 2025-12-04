@@ -5810,6 +5810,21 @@ input[type="search"]::-webkit-search-cancel-button {
 	width: 100%;
 	max-width: 918px;
 	gap: 40px;
+	margin-top: 60px;
+}
+
+.not_found_creators h3 {
+	color: var(--black, #212121);
+	text-align: center;
+	font-size: 26px;
+	font-style: normal;
+	font-weight: 500;
+	line-height: 140%;
+}
+
+.not_found_creators .women_img {
+	width: 468.41px;
+	height: 410.07px;
 }
 
 .col-span-1 .accordion-arrow::after{
@@ -5817,7 +5832,7 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 .jq-toast-wrap{
 	width: fit-content;
-	max-width: 50vw;
+	max-width: 450px;
 }
 
 .jq-icon-success{

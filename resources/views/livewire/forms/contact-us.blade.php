@@ -14,7 +14,7 @@
 
           <x-form.input wire:model="fields.email" type="email" name="email" placeholder="Email" :tooltip="false" />
 
-          <x-form.select wire:model="fields.subject" name="subject" label="Select subject..." :options="['Order Inquiry' => 'Order Inquiry', 'Account Inquiry' => 'Account Inquiry', 'Technical Support' => 'Technical Support','Verification Request' => 'Verification Request','Creator Inquiry' => 'Creator Inquiry','Business Partnership' => 'Business Partnership','Suggestions & Feedback' => 'Suggestions & Feedback','Report an Issue' => 'Report an Issue','Legal Inquiry' => 'Legal Inquiry','General Inquiry' => 'General Inquiry','subject3' => 'Subject3','subject3' => 'Subject3','subject3' => 'Subject3','subject3' => 'Subject3','subject3' => 'Subject3',]" :tooltip="false" />
+          <x-form.select wire:model="fields.subject" name="subject" label="Select subject..." :options="['Order Inquiry' => 'Order Inquiry', 'Account Inquiry' => 'Account Inquiry', 'Technical Support' => 'Technical Support','Verification Request' => 'Verification Request','Creator Inquiry' => 'Creator Inquiry','Business Partnership' => 'Business Partnership','Suggestions & Feedback' => 'Suggestions & Feedback','Report an Issue' => 'Report an Issue','Legal Inquiry' => 'Legal Inquiry','General Inquiry' => 'General Inquiry']" :tooltip="false" />
           {{-- <x-form.select wire:model="fields.subject" name="subject" label="Select subject..." :options="['subject' => 'Subject', 'subject2' => 'Subject2', 'subject3' => 'Subject3',]" :tooltip="false" /> --}}
 
 
@@ -23,7 +23,7 @@
           @if($this->fields['file'])
             <div class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 file-loaded-preview">
               <img class="object-cover w-full h-full" src="{{ $this->fields['file']->temporaryUrl() }}" alt="Uploaded image">
-              <span class="absolute inset-0 flex items-center justify-center text-white text-xs font-medium z-20">file loaded</span>
+              <span class="absolute inset-0 flex items-center justify-center text-white text-xs font-medium z-20">File uploaded</span>
               <button 
                 type="button"
                 wire:click.prevent="removeFile" 

@@ -29,7 +29,8 @@
             label="Select a topic" 
             name="topic"
             :options="[
-              'General Inquiry, Partnerships' => 'General Inquiry, Partnerships', 
+              'General Inquiry' => 'General Inquiry', 
+              'Partnerships' => 'Partnerships',
               'Investing' => 'Investing', 
               'Marketing' => 'Marketing',
               'Collaborations' => 'Collaborations',

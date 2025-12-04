@@ -82,6 +82,34 @@
       value = null;
       label = placeholder;
     });
+
+    // Глобальный обработчик для закрытия при клике вне компонента
+    const handleClickOutside = (event) => {
+      // Проверяем, что элемент все еще существует
+      if (!this.$el || !this.$refs || !this.$refs.dropdown) {
+        return;
+      }
+      
+      const dropdown = this.$refs.dropdown;
+      const isOpen = dropdown && dropdown.classList.contains('opened');
+      
+      if (isOpen && this.$el && !this.$el.contains(event.target)) {
+        this.close();
+      }
+    };
+    
+    // Сохраняем ссылку на обработчик для последующего удаления
+    const clickHandler = handleClickOutside.bind(this);
+    
+    // Используем capture фазу для более надежного определения клика вне
+    document.addEventListener('click', clickHandler, true);
+    
+    // Очистка при удалении компонента
+    if (this.$el) {
+      this.$el.addEventListener('alpine:destroyed', () => {
+        document.removeEventListener('click', clickHandler, true);
+      });
+    }
   }"
   @click.outside="close()"
   class="w-full group text-sm sm:text-base"

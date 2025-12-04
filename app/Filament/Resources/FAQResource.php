@@ -56,7 +56,10 @@ class FAQResource extends Resource
                     TextInput::make('type')
                       ->default('answer')
                       ->disabled(),
-                    RichEditor::make('text'),
+                    RichEditor::make('text')
+                        ->extraInputAttributes([
+                            'data-paste-mode' => 'word',
+                        ]),
                   ])
                   ->mutateRelationshipDataBeforeCreateUsing(function($state) {
                     return $state;

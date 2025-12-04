@@ -56,6 +56,19 @@ class Modals extends Component
       }
     }
 
+    // Support for old modal events
+    #[On('modal.openReg')]
+    public function openReg()
+    {
+      $this->openModal('register');
+    }
+
+    #[On('modal.openAuth')]
+    public function openAuth()
+    {
+      $this->openModal('auth');
+    }
+
     #[On('closeModal')]
     public function closeModal()
     {

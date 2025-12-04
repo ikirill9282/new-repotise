@@ -50,7 +50,7 @@
                           {{-- FOLLOWERS --}}
                           <div class="!p-3">
                             <div class="" x-data="{
-                                      minGap: 0,
+                                      minGap: 50000, // Минимальный зазор между ползунками (50k подписчиков)
                                       sliderOneValue: {{ request()->has('followers_min') ? request()->get('followers_min') : 0 }},
                                       sliderTwoValue: {{ request()->has('followers_max') ? request()->get('followers_max') : 1000000 }},
                                       sliderMinValue: 0,
@@ -64,8 +64,9 @@
                                               return;
                                           }
                                   
-                                          if ((this.sliderOneValue - this.sliderTwoValue) >= 0) {
-                                              this.sliderOneValue = this.sliderTwoValue;
+                                          // Если первый ползунок пытается перейти за второй, устанавливаем минимальный зазор
+                                          if (this.sliderOneValue >= this.sliderTwoValue) {
+                                              this.sliderOneValue = Math.max(this.sliderMinValue, this.sliderTwoValue - this.minGap);
                                               this.fillColor();
                                               return;
                                           }
@@ -85,8 +86,9 @@
                                               return;
                                           }
                                   
-                                          if ((this.sliderTwoValue - this.sliderOneValue) <= 0) {
-                                              this.sliderTwoValue = this.sliderOneValue;
+                                          // Если второй ползунок пытается перейти за первый, устанавливаем минимальный зазор
+                                          if (this.sliderTwoValue <= this.sliderOneValue) {
+                                              this.sliderTwoValue = Math.min(this.sliderMaxValue, this.sliderOneValue + this.minGap);
                                               this.fillColor();
                                               return;
                                           }
@@ -400,7 +402,7 @@
                 <div class="col-span-1">
                   @if($creators->isEmpty())
 									<div class="not_found_creators">
-												<h3 class="text-center"> No creators found... for now <br>  Our community of creators is growing every day. Try broadening your search criteria.</h3>
+												<h3>No creators found... for now <br>Our community of creators is growing every day. Try broadening your search criteria.</h3>
 												<img src="{{ asset('/assets/img/women_img.png') }}" alt=""
 														class="women_img">
 										</div>
@@ -673,13 +675,18 @@
           const currentSort = '{{ $currentSort ?? "name_asc" }}';
           creatorsSortInput.value = currentSort;
           
-          setTimeout(() => {
-            const event = new Event('input', { bubbles: true });
-            creatorsSortInput.dispatchEvent(event);
-          }, 100);
+          // УБРАН автоматический вызов события input, который вызывал перезагрузку страницы
+          // Теперь событие срабатывает только при реальном изменении пользователем
 
           let timeoutId;
+          let lastValue = currentSort; // Отслеживаем последнее значение
           creatorsSortInput.addEventListener('input', function() {
+            // Предотвращаем перезагрузку, если значение не изменилось
+            if (this.value === lastValue) {
+              return;
+            }
+            lastValue = this.value;
+            
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
               const url = new URL(window.location.href);
@@ -688,7 +695,7 @@
               params.set('sort', value);
               url.search = params.toString();
               window.location.href = url.toString();
-            }, 100);
+            }, 300);
           });
         }
   </script>

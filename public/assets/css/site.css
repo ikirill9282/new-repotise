@@ -2358,8 +2358,6 @@ header .search_group input[name="q"]::placeholder {
         position: sticky;
         top: 80px;
         left: 0;
-        max-height: 85vh;
-        overflow: scroll;
     }
 }
 

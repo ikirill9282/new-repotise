@@ -48,8 +48,21 @@
                       <span>{{ $errorInfo['push'] }}</span>
                     @endif
                     <div class="block_view">
-                        <a href="{{ url(print_var('page_button_link', $variables)) }}" class="download">
-                          {{ print_var('page_button_text', $variables) }}
+                        @php
+                          $buttonLink = print_var('page_button_link', $variables);
+                          // Обработка плейсхолдера @paymentLink
+                          if ($buttonLink === '@paymentLink' || empty($buttonLink)) {
+                            // Если есть заказ в сессии, ведем на checkout, иначе на products
+                            $buttonLink = session()->has('checkout') && !empty(session()->get('checkout'))
+                              ? route('checkout') 
+                              : route('products');
+                          } elseif (str_starts_with($buttonLink, '@')) {
+                            // Если другой плейсхолдер, ведем на products
+                            $buttonLink = route('products');
+                          }
+                        @endphp
+                        <a href="{{ $buttonLink }}" class="download">
+                          {{ print_var('page_button_text', $variables) ?? 'Try Again' }}
                         </a>
                     </div>
                 </div>
@@ -181,7 +194,7 @@
                             <div class="descriptions_pay">
                                 <p class="color_black">Payment Status:</p>
                                 <div class="right_text">
-                                    <span class="color_red">{{ data_get($paymentDetails, 'status', $errorInfo['title']) }}</span>
+                                    <span class="color_red">Failed</span>
                                 </div>
                             </div>
                         </div>

@@ -34,10 +34,20 @@ class CabinetController extends Controller
   public function verify(Request $request)
   {
     $user = Auth::user();
-    $verify_session = $user->getStripeVerifySession();
-    $verify_error = ($verify_session && isset($verify_session->last_error) && !empty($verify_session->last_error))
-      ? $verify_session->last_error->reason
-      : null;
+    $verify_error = null;
+    
+    try {
+      $verify_session = $user->getStripeVerifySession();
+      if ($verify_session && isset($verify_session->last_error) && !empty($verify_session->last_error)) {
+        $verify_error = $verify_session->last_error->reason;
+      }
+    } catch (\Exception $e) {
+      Log::warning('Failed to retrieve Stripe verification session', [
+        'user_id' => $user->id,
+        'error' => $e->getMessage(),
+      ]);
+      // Continue without verification session - user can still fill the form
+    }
 
     return view('site.pages.verify', [
       'user' => $user,

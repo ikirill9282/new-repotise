@@ -79,7 +79,10 @@ class PageResource extends Resource
                             ->disableToolbarButtons([
                                 'attachFiles',
                             ])
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->extraInputAttributes([
+                                'data-paste-mode' => 'word',
+                            ]),
                     ]),
                 Section::make('SEO Settings')
                     ->schema([

@@ -5,6 +5,7 @@ namespace App\Livewire\Modals;
 use App\Helpers\CustomEncrypt;
 use App\Models\Article;
 use App\Models\Comment;
+use App\Models\Report as ReportModel;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ class Report extends Component
 
     public array $form = [
         'message' => null,
+        'reason' => null,
     ];
 
     public string $resource;
@@ -39,6 +41,7 @@ class Report extends Component
         $this->submitted = false;
         $this->failed = false;
         $this->form['message'] = null;
+        $this->form['reason'] = null;
 
         $modelId = CustomEncrypt::getId($this->modelHash);
 
@@ -49,7 +52,7 @@ class Report extends Component
 
         $query = match ($this->resource) {
             'review' => Review::query(),
-            'comment' => Comment::query(),
+            'comment' => Comment::query()->with(['author', 'author.options']),
             'article' => Article::query(),
             default => null,
         };
@@ -64,6 +67,11 @@ class Report extends Component
         if (!$this->record) {
             $this->handleMissingTarget();
             return;
+        }
+
+        // Ensure author is loaded for comments
+        if ($this->resource === 'comment' && $this->record && !$this->record->relationLoaded('author')) {
+            $this->record->load('author', 'author.options');
         }
 
         $this->context = $this->buildContext();
@@ -82,44 +90,88 @@ class Report extends Component
             return;
         }
 
-        // Trim message if it's a string
-        $message = $this->form['message'] ?? null;
-        if (is_string($message)) {
-            $message = trim($message);
-            $this->form['message'] = $message;
-        }
+        // Different validation for comments vs articles
+        if ($this->resource === 'comment') {
+            // For comments, require reason checkbox
+            $validator = Validator::make(
+                $this->form,
+                [
+                    'reason' => 'required|string|in:spam,offensive,inappropriate',
+                ],
+                [
+                    'reason.required' => 'Please select a reason for reporting this comment.',
+                    'reason.in' => 'Please select a valid reason.',
+                ]
+            );
+        } else {
+            // For articles/reviews, require text message
+            $message = $this->form['message'] ?? null;
+            if (is_string($message)) {
+                $message = trim($message);
+                $this->form['message'] = $message;
+            }
 
-        // Ensure message is set for validation
-        if (empty($message)) {
-            $this->form['message'] = '';
-        }
+            if (empty($message)) {
+                $this->form['message'] = '';
+            }
 
-        $validator = Validator::make(
-            $this->form,
-            [
-                'message' => 'required|string|min:10|max:200',
-            ],
-            [
-                'message.required' => 'Please describe the error you found. Your message must be at least 10 characters long.',
-                'message.min' => 'Please provide a bit more detail so we can review it properly. Your message must be at least 10 characters long.',
-                'message.max' => 'Your report is too long. Please shorten it to 200 characters.',
-            ]
-        );
+            $validator = Validator::make(
+                $this->form,
+                [
+                    'message' => 'required|string|min:10|max:200',
+                ],
+                [
+                    'message.required' => 'Please describe the error you found. Your message must be at least 10 characters long.',
+                    'message.min' => 'Please provide a bit more detail so we can review it properly. Your message must be at least 10 characters long.',
+                    'message.max' => 'Your report is too long. Please shorten it to 200 characters.',
+                ]
+            );
+        }
 
         if ($validator->fails()) {
             $this->submitted = false;
-            $this->failed = true;
-            $this->resetValidation();
+            $this->failed = false; // Don't show error screen, show validation errors instead
+            
+            // Add validation errors to the form
+            foreach ($validator->errors()->all() as $error) {
+                if ($this->resource === 'comment') {
+                    $this->addError('form.reason', $validator->errors()->first('reason') ?: $error);
+                } else {
+                    $this->addError('form.message', $validator->errors()->first('message') ?: $error);
+                }
+            }
+            
             return;
         }
 
         $data = $validator->validated();
 
         try {
-            $this->record->reports()->create([
+            // Prepare report data
+            $reportData = [
                 'user_id' => Auth::id(),
-                'message' => $data['message'],
-            ]);
+            ];
+
+            if ($this->resource === 'comment') {
+                // For comments, map reason to readable format and save both reason and message
+                $reasonMap = [
+                    'spam' => ReportModel::REASON_SPAM_OR_SCAM,
+                    'offensive' => ReportModel::REASON_OFFENSIVE,
+                    'inappropriate' => ReportModel::REASON_INAPPROPRIATE,
+                ];
+                
+                $reportData['reason'] = $reasonMap[$data['reason']] ?? $data['reason'];
+                $reportData['message'] = $reportData['reason'];
+                $reportData['type'] = ReportModel::TYPE_COMPLAINT;
+            } else {
+                // For articles/reviews, use message
+                $reportData['message'] = $data['message'];
+                $reportData['type'] = ReportModel::TYPE_CONTENT_ERROR;
+            }
+
+            $reportData['status'] = ReportModel::STATUS_NEW;
+
+            $this->record->reports()->create($reportData);
         } catch (Throwable $exception) {
             report($exception);
             $this->failed = true;

@@ -95,6 +95,9 @@ class ProductResource extends Resource
                             ])
                             ->disableToolbarButtons([
                                 // Отключаем только те, которые не нужны
+                            ])
+                            ->extraInputAttributes([
+                                'data-paste-mode' => 'word',
                             ]),
                         
                         Select::make('user_id')

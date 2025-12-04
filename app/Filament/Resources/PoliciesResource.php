@@ -35,6 +35,9 @@ class PoliciesResource extends Resource
                     'attachFiles',
                   ])
                   ->columnSpanFull()
+                  ->extraInputAttributes([
+                    'data-paste-mode' => 'word',
+                  ])
                   ,
             ]);
     }

@@ -14,7 +14,11 @@
                         like you.
                     </p>
                     @if (!auth()->check())
-                        <x-btn x-on:click.prevent="Livewire.dispatch('modal.openReg')">
+                        <x-btn x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'auth' })">
+                            Get Started
+                        </x-btn>
+                    @elseif (auth()->user()->hasRole('creator'))
+                        <x-btn href="{{ route('profile.dashboard') }}">
                             Get Started
                         </x-btn>
                     @else

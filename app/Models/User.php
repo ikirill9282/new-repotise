@@ -615,7 +615,16 @@ class User extends Authenticatable implements HasName, FilamentUser
       $verify = $this->getStripeVerify();
       if (!$verify) return null;
       
-      return Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
+      try {
+        return Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
+      } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::warning('Failed to retrieve Stripe verification session', [
+          'user_id' => $this->id,
+          'verify_code' => $verify->code,
+          'error' => $e->getMessage(),
+        ]);
+        return null;
+      }
     }
 
     public function resetBackup()
