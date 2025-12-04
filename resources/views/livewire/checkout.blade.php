@@ -153,7 +153,7 @@
                         @endif
 
                         {{-- STRIPE --}}
-                        <div class="class="@if($order->cost <= 0) hidden @endif">
+                        <div id="stripe-payment-container" class="@if($order->cost <= 0) hidden @endif">
                           <div wire:ignore>
                               <div id="payment" class="mb-4"></div>
                           </div>
@@ -327,24 +327,59 @@
         }
       };
       const clientSecret = '{{ $this->clientSecret }}';
-      const elements = stripe.elements({clientSecret});
-      const paymentMethod = elements.create('payment');
+      let elements = null;
+      let paymentElement = null;
 
-      if (document.getElementById('payment')) {
-        paymentMethod.mount('#payment');
-      }
+      const mountStripePayment = () => {
+        const paymentContainer = document.getElementById('payment');
+        const stripeContainer = document.getElementById('stripe-payment-container');
+        
+        if (!paymentContainer || !clientSecret) {
+          return;
+        }
 
-      // Скрываем/показываем Stripe элемент при выборе сохраненной карты
+        // Проверяем, что контейнер не скрыт
+        if (stripeContainer && stripeContainer.classList.contains('hidden')) {
+          return;
+        }
+
+        // Если элемент уже смонтирован, не монтируем снова
+        if (paymentContainer.querySelector('.StripeElement')) {
+          return;
+        }
+
+        try {
+          if (!elements) {
+            elements = stripe.elements({clientSecret});
+            paymentElement = elements.create('payment');
+          }
+          paymentElement.mount('#payment');
+        } catch (error) {
+          console.error('Error mounting Stripe payment element:', error);
+        }
+      };
+
+      // Монтируем после загрузки Livewire
       Livewire.on('livewire:init', () => {
+        // Небольшая задержка для гарантии, что DOM готов
+        setTimeout(() => {
+          mountStripePayment();
+        }, 100);
+
+        // Скрываем/показываем Stripe элемент при выборе сохраненной карты
         Livewire.hook('morph.updated', ({ el, component }) => {
           if (component.name === 'checkout') {
-            const paymentMethod = component.get('form.payment_method');
+            const selectedPaymentMethod = component.get('form.payment_method');
             const stripeContainer = document.getElementById('stripe-payment-container');
             if (stripeContainer) {
-              if (paymentMethod && paymentMethod !== '') {
+              if (selectedPaymentMethod && selectedPaymentMethod !== '') {
                 stripeContainer.style.display = 'none';
               } else {
                 stripeContainer.style.display = '';
+                // Перемонтируем элемент при показе
+                setTimeout(() => {
+                  mountStripePayment();
+                }, 100);
               }
             }
           }

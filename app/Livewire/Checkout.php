@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Jobs\CancelPaymentIntents;
 use App\Models\Order;
 use App\Models\Payments;
+use App\Models\Discount;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -49,7 +50,7 @@ class Checkout extends Component
       'payment_method' => null,
     ];
 
-    // public ?string $promocode = null;
+    public ?string $promocode = null;
 
     public function mount(string $order_id)
     {
@@ -60,7 +61,13 @@ class Checkout extends Component
         $this->form['email'] = Auth::user()->email;
       }
 
-      $success_payment = $this->getOrder()->getSuccessPayment();
+      // Инициализируем promocode из заказа, если есть
+      $order = $this->getOrder();
+      if ($order->discount && $order->discount->type === 'promocode') {
+        $this->promocode = $order->discount->code;
+      }
+
+      $success_payment = $order->getSuccessPayment();
       if ($success_payment) {
         return $this->paymentResult('success', $success_payment->stripe_id);
       }
@@ -71,9 +78,37 @@ class Checkout extends Component
       $this->clientSecret = $setupIntent->client_secret;
     }
 
+    public function applyPromocode(): void
+    {
+      $this->validate([
+        'promocode' => 'required|string',
+      ]);
+
+      $order = $this->getOrder();
+      $discount = Discount::where('code', $this->promocode)
+        ->where('type', 'promocode')
+        ->where('active', true)
+        ->first();
+
+      if (!$discount) {
+        $this->addError('promocode', 'Invalid promo code.');
+        return;
+      }
+
+      if (!$discount->isAvailable($order)) {
+        $this->addError('promocode', 'This promo code is not available for your order.');
+        return;
+      }
+
+      $order->applyDiscount($discount);
+      $this->updatePaymentIntent();
+      $this->resetErrorBag('promocode');
+    }
+
     public function removePromocode(): void
     {
       $this->order->removeDiscount();
+      $this->promocode = null;
       $this->updatePaymentIntent();
     }
 

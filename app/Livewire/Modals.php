@@ -155,7 +155,7 @@ class Modals extends Component
     
       if (in_array($this->modal, ['promocodes'])) return '!max-w-7xl';
 
-      if (in_array($this->modal, ['product', 'twofa'])) return '!max-w-4xl';
+      if (in_array($this->modal, ['product', 'twofa', 'report'])) return '!max-w-4xl';
 
       if (in_array($this->modal, ['delete-account'])) return '!max-w-3xl';
 
