@@ -71,11 +71,11 @@
       <div class=""><img src="{{ asset('assets/img/icons/google.svg') }}" alt="Google"></div>
       <div class="transition group-hover:text-active !mt-0.5">Google</div>
     </div>
-    <div class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+    <div wire:click.prevent="fbAuth" class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
       <div class=""><img src="{{ asset('assets/img/icons/facebook.svg') }}" alt="Facebook"></div>
       <div class="transition group-hover:text-active !mt-0.5">Facebook</div>
     </div>
-    <div class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
+    <div wire:click.prevent="xAuth" class="group w-full flex justify-center items-cetner !gap-3 border-1 rounded-lg border-[#F3F2F2] !p-3 transition hover:cursor-pointer hover:border-active">
       <div class=""><img src="{{ asset('assets/img/icons/xai.svg') }}" alt="XAI"></div>
       <div class="transition group-hover:text-active !mt-0.5">X (Twitter)</div>
     </div>
