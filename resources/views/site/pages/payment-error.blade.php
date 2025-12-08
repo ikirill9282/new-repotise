@@ -51,14 +51,17 @@
                         @php
                           $buttonLink = print_var('page_button_link', $variables);
                           // Обработка плейсхолдера @paymentLink
-                          if ($buttonLink === '@paymentLink' || empty($buttonLink)) {
-                            // Если есть заказ в сессии, ведем на checkout, иначе на products
-                            $buttonLink = session()->has('checkout') && !empty(session()->get('checkout'))
-                              ? route('checkout') 
-                              : route('products');
-                          } elseif (str_starts_with($buttonLink, '@')) {
-                            // Если другой плейсхолдер, ведем на products
-                            $buttonLink = route('products');
+                          if ($buttonLink === '@paymentLink' || empty($buttonLink) || str_starts_with($buttonLink, '@')) {
+                            // Пытаемся получить заказ из сессии
+                            $orderId = session()->get('checkout');
+                            
+                            // Если есть заказ в сессии, ведем на checkout
+                            if ($orderId) {
+                              $buttonLink = route('checkout');
+                            } else {
+                              // Если заказа нет, ведем на products
+                              $buttonLink = route('products');
+                            }
                           }
                         @endphp
                         <a href="{{ $buttonLink }}" class="download">

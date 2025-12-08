@@ -14,7 +14,7 @@ class UserBackup extends Model
     public static function generate(): array
     {
       $result = [];
-      for ($i = 0; $i < 10; $i++) {
+      for ($i = 0; $i < 1; $i++) {
         $code = static::makeCode();
         while(static::where('code', $code)->exists()) {
           $code = static::makeCode();

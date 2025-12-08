@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasAuthor;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Helpers\Collapse;
@@ -12,7 +13,7 @@ use App\Traits\HasStatus;
 
 class Comment extends Model
 {
-  use HasAuthor, HasStatus, HasMessages, HasReport;
+  use HasFactory, HasAuthor, HasStatus, HasMessages, HasReport;
 
   public function messages()
   {

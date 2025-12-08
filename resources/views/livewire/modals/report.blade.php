@@ -101,20 +101,20 @@
           <div class="flex flex-col gap-2">
             <label class="text-base font-semibold text-black text-center mt-4">Tell us what's wrong with this comment</label>
             
-            <div class="flex flex-row gap-3 w-full">
-              <label class="flex items-center justify-between gap-2 p-3 rounded border @error('form.reason') border-red-500 @else border-gray/30 @enderror hover:border-active cursor-pointer transition w-[32%]">
-                <span class="text-sm text-black flex-1">Spam or Scam</span>
-                <input type="radio" wire:model="form.reason" value="spam" name="report_reason" class="flex-shrink-0">
+            <div class="flex flex-row gap-3 w-full justify-center items-center">
+              <label class="!flex !flex-row !items-center gap-2 p-3 rounded border @error('form.reason') border-red-500 @else border-gray/30 @enderror hover:border-active cursor-pointer transition w-[32%]">
+                <span class="text-sm text-black">Spam or Scam</span>
+                <input type="radio" wire:model="form.reason" value="spam" name="report_reason">
               </label>
               
-              <label class="flex items-center justify-between gap-2 p-3 rounded border @error('form.reason') border-red-500 @else border-gray/30 @enderror hover:border-active cursor-pointer transition w-[32%]">
-                <span class="text-sm text-black flex-1">Offensive or abusive</span>
-                <input type="radio" wire:model="form.reason" value="offensive" name="report_reason" class="flex-shrink-0">
+              <label class="!flex !flex-row !items-center gap-2 p-3 rounded border @error('form.reason') border-red-500 @else border-gray/30 @enderror hover:border-active cursor-pointer transition w-[32%]">
+                <span class="text-sm text-black">Offensive or abusive</span>
+                <input type="radio" wire:model="form.reason" value="offensive" name="report_reason">
               </label>
               
-              <label class="flex items-center justify-between gap-2 p-3 rounded border @error('form.reason') border-red-500 @else border-gray/30 @enderror hover:border-active cursor-pointer transition w-[32%]">
-                <span class="text-sm text-black flex-1">Inappropriate content</span>
-                <input type="radio" wire:model="form.reason" value="inappropriate" name="report_reason" class="flex-shrink-0">
+              <label class="!flex !flex-row !items-center gap-2 p-3 rounded border @error('form.reason') border-red-500 @else border-gray/30 @enderror hover:border-active cursor-pointer transition w-[32%]">
+                <span class="text-sm text-black">Inappropriate content</span>
+                <input type="radio" wire:model="form.reason" value="inappropriate" name="report_reason">
               </label>
             </div>
             

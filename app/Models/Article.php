@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Helpers\CustomEncrypt;
 use App\Traits\HasAuthor;
 use App\Traits\HasGallery;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ use Mews\Purifier\Facades\Purifier;
 
 class Article extends Model
 {
-  use HasAuthor, HasGallery, Searchable, HasKeywords, HasStatus, HasMessages, HasReport;
+  use HasFactory, HasAuthor, HasGallery, Searchable, HasKeywords, HasStatus, HasMessages, HasReport;
 
   protected Collection|array $all_comments = [];
 

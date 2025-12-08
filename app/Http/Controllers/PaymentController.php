@@ -120,7 +120,7 @@ class PaymentController extends Controller
     'processing_error' => [
       'title' => 'Processing error',
       'message' => 'A processing error occurred. Please try again or use a different payment method. If the issue persists, contact support.',
-      'push' => 'Processing error — try again.',
+      'push' => '', // Убрано дублирование, так как сообщение уже есть в message
     ],
     'self_purchase' => [
       'title' => 'Purchase unavailable',
@@ -411,13 +411,13 @@ class PaymentController extends Controller
   {
     $cart = null;
     $summary = null;
-    $paymentDetails = [
-      'method' => $this->describePaymentMethod($paymentIntent),
-      'order_number' => null,
-      'date' => null,
-      'time' => null,
-      'status' => $error['title'] ?? 'Payment failed',
-    ];
+      $paymentDetails = [
+        'method' => $this->describePaymentMethod($paymentIntent),
+        'order_number' => null,
+        'date' => null,
+        'time' => null,
+        'status' => 'Failed', // Используем просто "Failed" вместо дублирования заголовка
+      ];
 
     $paymentModel = null;
     $paymentIntentId = $request->query('payment_intent');

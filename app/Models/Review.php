@@ -6,11 +6,12 @@ use App\Traits\HasAuthor;
 use App\Traits\HasMessages;
 use App\Traits\HasReport;
 use App\Traits\HasStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-  use HasAuthor, HasStatus, HasMessages, HasReport;
+  use HasFactory, HasAuthor, HasStatus, HasMessages, HasReport;
   
   public function product()
   {

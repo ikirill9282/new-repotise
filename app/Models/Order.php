@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Cart;
 use Illuminate\Support\Collection;
@@ -19,7 +20,7 @@ use Stripe\Service\PaymentIntentService;
 
 class Order extends Model
 {
-    use HasStatus, HasAuthor;
+    use HasFactory, HasStatus, HasAuthor;
 
     protected static int $tax = 5;
 

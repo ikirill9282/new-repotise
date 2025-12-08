@@ -19,11 +19,11 @@ class TwofaDisable extends Component
     public string $backupCode = '';
 
     protected array $messages = [
-        'code.digits' => 'Код должен состоять из 6 цифр.',
-        'code.required_without' => 'Введите код из приложения или резервный код.',
-        'backupCode.size' => 'Резервный код должен содержать 6 символов.',
-        'backupCode.alpha_num' => 'Резервный код может содержать только буквы и цифры.',
-        'backupCode.required_without' => 'Введите резервный код или код из приложения.',
+        'code.digits' => 'The code must consist of 6 digits.',
+        'code.required_without' => 'Please enter a verification code from your app or a backup reset code.',
+        'backupCode.size' => 'The backup reset code must contain 6 characters.',
+        'backupCode.alpha_num' => 'The backup reset code can only contain letters and numbers.',
+        'backupCode.required_without' => 'Please enter a backup reset code or a verification code from your app.',
     ];
 
     public function mount(): void
@@ -52,7 +52,7 @@ class TwofaDisable extends Component
         }
 
         if (!$user->twofa) {
-            $this->dispatch('toastError', ['message' => 'Двухфакторная аутентификация уже отключена.']);
+            $this->dispatch('toastError', ['message' => 'Two-factor authentication is already disabled.']);
             $this->dispatch('twofa-disabled');
             $this->dispatch('closeModal');
             return;
@@ -118,7 +118,7 @@ class TwofaDisable extends Component
 
         $this->reset(['code', 'backupCode']);
 
-        $this->dispatch('closeModal');
+        // Открываем модальное окно успеха (оно заменит текущее модальное окно)
         $this->dispatch('openModal', 'twofa-disable-accept');
         $this->dispatch('twofa-disabled');
     }

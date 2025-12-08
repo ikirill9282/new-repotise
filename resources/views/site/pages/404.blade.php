@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
 @php
-  $variables = $page->variables;
+  $variables = $page->variables ?? collect([]);
 @endphp
 
 @section('content')

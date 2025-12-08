@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use App\Helpers\Slug;
@@ -10,7 +11,7 @@ use Mews\Purifier\Facades\Purifier;
 
 class Category extends Model
 {
-  use Searchable, HasStatus;
+  use HasFactory, Searchable, HasStatus;
 
   protected static function boot()
   {

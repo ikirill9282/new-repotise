@@ -24,9 +24,9 @@ class Twofa extends Component
     public bool $confirmedBackup = false;
 
     protected array $messages = [
-        'code.required' => 'Введите код из приложения.',
-        'code.digits' => 'Код должен содержать 6 цифр.',
-        'confirmedBackup.accepted' => 'Подтвердите, что сохранили резервные коды.',
+        'code.required' => 'Please enter the verification code.',
+        'code.digits' => 'The code must contain 6 digits.',
+        'confirmedBackup.accepted' => 'Please confirm that you have saved your Backup Reset Code.',
     ];
 
     public function mount(): void
@@ -59,7 +59,7 @@ class Twofa extends Component
         $code = preg_replace('/\s+/', '', $validated['code']);
 
         if (!Google2FA::verifyKey($this->secret, $code, 4)) {
-            $this->addError('code', 'Неверный код из приложения. Попробуйте снова.');
+            $this->addError('code', 'Invalid verification code. Please check the code and try again.');
             return;
         }
 
@@ -81,13 +81,13 @@ class Twofa extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            $this->dispatch('toastError', ['message' => 'Не удалось включить 2FA. Попробуйте позже.']);
+            $this->dispatch('toastError', ['message' => 'Failed to enable 2FA. Please try again later.']);
             return;
         }
 
         $this->reset(['code', 'confirmedBackup']);
 
-        $this->dispatch('closeModal');
+        // Открываем модальное окно успеха (оно заменит текущее модальное окно)
         $this->dispatch('openModal', 'twofa-accept');
         $this->dispatch('twofa-enabled');
     }

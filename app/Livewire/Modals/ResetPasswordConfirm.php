@@ -13,6 +13,7 @@ use App\Enums\Action;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class ResetPasswordConfirm extends Component
@@ -40,14 +41,14 @@ class ResetPasswordConfirm extends Component
     public function getMessages()
     {
         return [
-            'form.code.required' => 'The code field is required.',
-            'form.code.exists' => 'The code does not exist or is expired.',
-            'form.code.regex' => 'The code must be a 6-digit number.',
-            'form.code.min' => 'The code must be exactly 6 characters long.',
-            'form.code.max' => 'The code must be exactly 6 characters long.',
+            'form.code.required' => 'Please enter the verification code.',
+            'form.code.exists' => "That code doesn't look right. Please double-check the code from your email and try again.",
+            'form.code.regex' => "That code doesn't look right. Please double-check the code from your email and try again.",
+            'form.code.min' => "That code doesn't look right. Please double-check the code from your email and try again.",
+            'form.code.max' => "That code doesn't look right. Please double-check the code from your email and try again.",
             'form.password.required' => 'The password field is required.',
-            'form.password.min' => 'The password must be at least 8 characters long.',
-            'form.password.regex' => 'The password must include a combination of letters, numbers, and symbols.',
+            'form.password.min' => 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.',
+            'form.password.regex' => 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.',
             'form.password_confirmation.required' => 'The password confirmation field is required.',
             'form.password_confirmation.same' => 'Passwords do not match. Please re-enter.',
         ];
@@ -70,6 +71,16 @@ class ResetPasswordConfirm extends Component
     {
       $this->resend = null;
       SessionExpire::expire('reset_password_code');
+    }
+
+    #[On('reset-password-submit')]
+    public function handleSubmitEvent($payload = [])
+    {
+      // Only handle if this event is for this component
+      if (isset($payload['componentId']) && $payload['componentId'] !== $this->getId()) {
+        return;
+      }
+      $this->submit();
     }
 
     public function fillFromSession()
@@ -101,10 +112,34 @@ class ResetPasswordConfirm extends Component
 
     public function submit()
     {
+      \Log::info('ResetPasswordConfirm::submit called', [
+        'component_id' => $this->getId(),
+        'form_data' => $this->form,
+        'email' => $this->email,
+      ]);
+
+      $messages = [
+        'code.required' => 'Please enter the verification code.',
+        'code.exists' => "That code doesn't look right. Please double-check the code from your email and try again.",
+        'code.regex' => "That code doesn't look right. Please double-check the code from your email and try again.",
+        'code.min' => "That code doesn't look right. Please double-check the code from your email and try again.",
+        'code.max' => "That code doesn't look right. Please double-check the code from your email and try again.",
+        'password.required' => 'The password field is required.',
+        'password.min' => 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.',
+        'password.regex' => 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.',
+        'password_confirmation.required' => 'The password confirmation field is required.',
+        'password_confirmation.same' => 'Passwords do not match. Please re-enter.',
+      ];
+
       $validator = Validator::make($this->form, [
         'code' => 'required|string|min:6|max:6|regex:/^[0-9]+$/|exists:user_verifies,code',
         'password' => 'required|min:8|regex:/[a-zA-Z0-9!@#$%^&*()_+={}\[\]:;"\'<>,.?\/\\-]/',
         'password_confirmation' => 'required|same:password',
+      ], $messages);
+
+      \Log::info('ResetPasswordConfirm::submit validation', [
+        'fails' => $validator->fails(),
+        'errors' => $validator->errors()->toArray(),
       ]);
 
       if ($validator->fails()) {
@@ -115,16 +150,14 @@ class ResetPasswordConfirm extends Component
 
       if (!User::validatePassword($valid['password'])) {
         $strength = User::getPasswordStrength($valid['password']);
-        $message = $strength === 'weak' 
-          ? 'The password is too weak. Please use a medium or strong password with at least 8 characters, including uppercase and lowercase letters, numbers, and symbols.'
-          : 'The password does not meet the security requirements. Please use a medium or strong password.';
+        $message = 'The password is too weak, it must be at least 8 characters long and include a combination of letters, numbers and symbols.';
         $validator->errors()->add('password', $message);
         throw new ValidationException($validator);
       }
 
       if ($valid['password'] !== $valid['password_confirmation']) {
         $validator->errors()->add('password_confirmation', 'Passwords do not match. Please re-enter.');
-        return ;
+        throw new ValidationException($validator);
       }
 
       $user = User::whereHas('verify', fn($query) => $query->where([
@@ -136,15 +169,15 @@ class ResetPasswordConfirm extends Component
 
 
       if (!$user) {
-        $validator->errors()->add('code', 'Code is expired');
+        $validator->errors()->add('code', "That code doesn't look right. Please double-check the code from your email and try again.");
         ResetFailed::dispatch(null, $valid['code'], 'code');
-        return ;
+        throw new ValidationException($validator);
       }
 
       if ($user->verify->where('type', 'reset')->first()?->code !== $valid['code']) {
-        $validator->errors()->add('code', 'Invalid code');
+        $validator->errors()->add('code', "That code doesn't look right. Please double-check the code from your email and try again.");
         ResetFailed::dispatch($user, $valid['code'], 'invalid');
-        return ;
+        throw new ValidationException($validator);
       }
 
       $op = $user->password;
@@ -160,6 +193,11 @@ class ResetPasswordConfirm extends Component
         ->write()
         ;
       
+      \Log::info('ResetPasswordConfirm::submit success', [
+        'user_id' => $user->id,
+        'email' => $user->email,
+      ]);
+
       $this->dispatch('openModal', 'reset-password-success');
     }
 

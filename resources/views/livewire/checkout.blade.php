@@ -153,7 +153,7 @@
                         @endif
 
                         {{-- STRIPE --}}
-                        <div id="stripe-payment-container" class="@if($order->cost <= 0) hidden @endif">
+                        <div id="stripe-payment-container">
                           <div wire:ignore>
                               <div id="payment" class="mb-4"></div>
                           </div>
@@ -332,14 +332,8 @@
 
       const mountStripePayment = () => {
         const paymentContainer = document.getElementById('payment');
-        const stripeContainer = document.getElementById('stripe-payment-container');
         
         if (!paymentContainer || !clientSecret) {
-          return;
-        }
-
-        // Проверяем, что контейнер не скрыт
-        if (stripeContainer && stripeContainer.classList.contains('hidden')) {
           return;
         }
 
@@ -359,9 +353,13 @@
         }
       };
 
-      // Монтируем после загрузки Livewire
+      // Монтируем сразу при загрузке страницы
+      if (document.getElementById('payment') && clientSecret) {
+        mountStripePayment();
+      }
+
+      // Также монтируем после загрузки Livewire на случай, если DOM еще не готов
       Livewire.on('livewire:init', () => {
-        // Небольшая задержка для гарантии, что DOM готов
         setTimeout(() => {
           mountStripePayment();
         }, 100);
@@ -376,7 +374,6 @@
                 stripeContainer.style.display = 'none';
               } else {
                 stripeContainer.style.display = '';
-                // Перемонтируем элемент при показе
                 setTimeout(() => {
                   mountStripePayment();
                 }, 100);
@@ -449,6 +446,28 @@
 
             if (response.action === 'create') {
               try {
+                // Убеждаемся, что elements инициализирован перед использованием
+                if (!elements && clientSecret) {
+                  elements = stripe.elements({clientSecret});
+                  paymentElement = elements.create('payment');
+                  
+                  // Пытаемся смонтировать элемент, если он еще не смонтирован
+                  const paymentContainer = document.getElementById('payment');
+                  if (paymentContainer && !paymentContainer.querySelector('.StripeElement')) {
+                    try {
+                      paymentElement.mount('#payment');
+                      // Даем время на монтирование
+                      await new Promise(resolve => setTimeout(resolve, 500));
+                    } catch (mountError) {
+                      console.warn('Could not mount payment element, continuing anyway:', mountError);
+                    }
+                  }
+                }
+
+                if (!elements) {
+                  throw new Error('Stripe elements not initialized. Please refresh the page.');
+                }
+
                 const { error, setupIntent } = await stripe.confirmSetup({
                   elements,
                   redirect: 'if_required',

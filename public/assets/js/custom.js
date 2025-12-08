@@ -13,6 +13,83 @@ $('a.disabled').on('click', (evt) => evt.preventDefault());
 
 const getCSRF = () => $('meta[name="csrf"]').attr('content');
 
+// Alpine.js components for password reset modal - MUST be defined at the top for immediate availability
+window.timer = window.timer || function timer(endTime) {
+    return {
+        endTime: endTime,
+        remaining: 0,
+        formattedTime: '',
+        inter: null,
+        start() {
+            this.update();
+            this.inter = setInterval(() => { this.update(); }, 1000);
+        },
+        update() {
+            let now = Date.now();
+            this.remaining = Math.max(0, Math.floor((this.endTime - now) / 1000));
+            let minutes = Math.floor((this.remaining % 3600) / 60);
+            let seconds = this.remaining % 60;
+            this.formattedTime = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            if (this.remaining <= 0) {
+                clearInterval(this.inter);
+                if (window.Livewire && window.Livewire.dispatch) {
+                    window.Livewire.dispatch('clearTimer');
+                }
+            }
+        }
+    }
+};
+
+window.passwordStrength = window.passwordStrength || function passwordStrength(wireModel) {
+    return {
+        type: 'password',
+        password: '',
+        strength: 'weak',
+        strengthText: 'Weak',
+        init() {
+            this.$nextTick(() => {
+                const input = this.$el.querySelector('input[name="password"]');
+                if (input && input.value) {
+                    this.checkStrength(input.value);
+                }
+            });
+        },
+        checkStrength(value) {
+            this.password = value || '';
+            if (!this.password) {
+                this.strength = 'weak';
+                this.strengthText = 'Weak';
+                return;
+            }
+            let score = 0;
+            const length = this.password.length;
+            if (length >= 8) score++;
+            if (length >= 12) score++;
+            if (length >= 16) score++;
+            if (/[a-z]/.test(this.password)) score++;
+            if (/[A-Z]/.test(this.password)) score++;
+            if (/\d/.test(this.password)) score++;
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.password)) score++;
+            if (length >= 8 && /[a-z]/.test(this.password) && /[A-Z]/.test(this.password) && /\d/.test(this.password)) {
+                score++;
+            }
+            if (length >= 8 && /[a-z]/.test(this.password) && /[A-Z]/.test(this.password) && /\d/.test(this.password) && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.password)) {
+                score++;
+            }
+            if (score <= 3) {
+                this.strength = 'weak';
+                this.strengthText = 'Weak';
+            } else if (score <= 6) {
+                this.strength = 'medium';
+                this.strengthText = 'Medium';
+            } else {
+                this.strength = 'strong';
+                this.strengthText = 'Strong';
+            }
+        }
+    }
+};
+
 function copyTextToClipboard(text) {
   if (!text) return;
 
@@ -1170,6 +1247,98 @@ function discoverCartDropButtons(container=null) {
         })
       });
     }
+  });
+}
+
+// Ensure Alpine.js functions are available BEFORE morph
+function ensureAlpineFunctions() {
+  // Re-define functions to ensure they're available for Alpine.js
+  window.timer = function timer(endTime) {
+    return {
+      endTime: endTime,
+      remaining: 0,
+      formattedTime: '',
+      inter: null,
+      start() {
+        this.update();
+        this.inter = setInterval(() => { this.update(); }, 1000);
+      },
+      update() {
+        let now = Date.now();
+        this.remaining = Math.max(0, Math.floor((this.endTime - now) / 1000));
+        let minutes = Math.floor((this.remaining % 3600) / 60);
+        let seconds = this.remaining % 60;
+        this.formattedTime = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        if (this.remaining <= 0) {
+          clearInterval(this.inter);
+          if (window.Livewire && window.Livewire.dispatch) {
+            window.Livewire.dispatch('clearTimer');
+          }
+        }
+      }
+    }
+  };
+
+  window.passwordStrength = function passwordStrength(wireModel) {
+    return {
+      type: 'password',
+      password: '',
+      strength: 'weak',
+      strengthText: 'Weak',
+      init() {
+        this.$nextTick(() => {
+          const input = this.$el.querySelector('input[name="password"]');
+          if (input && input.value) {
+            this.checkStrength(input.value);
+          }
+        });
+      },
+      checkStrength(value) {
+        this.password = value || '';
+        if (!this.password) {
+          this.strength = 'weak';
+          this.strengthText = 'Weak';
+          return;
+        }
+        let score = 0;
+        const length = this.password.length;
+        if (length >= 8) score++;
+        if (length >= 12) score++;
+        if (length >= 16) score++;
+        if (/[a-z]/.test(this.password)) score++;
+        if (/[A-Z]/.test(this.password)) score++;
+        if (/\d/.test(this.password)) score++;
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.password)) score++;
+        if (length >= 8 && /[a-z]/.test(this.password) && /[A-Z]/.test(this.password) && /\d/.test(this.password)) {
+          score++;
+        }
+        if (length >= 8 && /[a-z]/.test(this.password) && /[A-Z]/.test(this.password) && /\d/.test(this.password) && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.password)) {
+          score++;
+        }
+        if (score <= 3) {
+          this.strength = 'weak';
+          this.strengthText = 'Weak';
+        } else if (score <= 6) {
+          this.strength = 'medium';
+          this.strengthText = 'Medium';
+        } else {
+          this.strength = 'strong';
+          this.strengthText = 'Strong';
+        }
+      }
+    }
+  };
+}
+
+// Call immediately
+ensureAlpineFunctions();
+
+// Also register hook for Livewire morph
+if (typeof window.Livewire !== 'undefined') {
+  window.Livewire.hook('morph', ensureAlpineFunctions);
+} else {
+  document.addEventListener('livewire:init', () => {
+    window.Livewire.hook('morph', ensureAlpineFunctions);
   });
 }
 

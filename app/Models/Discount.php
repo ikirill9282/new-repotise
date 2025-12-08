@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Action;
 use App\Traits\HasAuthor;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class Discount extends Model
 {
-    use HasAuthor;
+    use HasFactory, HasAuthor;
 
     public static function boot()
     {

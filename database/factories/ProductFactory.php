@@ -13,10 +13,12 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
  */
 class ProductFactory extends Factory
 {
+    protected $model = \App\Models\Product::class;
+
   /**
    * The current password being used by the factory.
    */

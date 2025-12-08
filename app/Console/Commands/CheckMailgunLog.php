@@ -45,7 +45,9 @@ class CheckMailgunLog extends Command
       } while ($resp->ok() && $url && !empty($resp->json('items')));
       
       $event = collect($events)->sortByDesc('timestamp')->first();
-      $item->update(['status' => $event['event'], 'mailgun_id' => $event['id']]);
+      if ($event && isset($event['event']) && isset($event['id'])) {
+        $item->update(['status' => $event['event'], 'mailgun_id' => $event['id']]);
+      }
     }
     // $url = 'https://api.mailgun.net/v1/analytics/logs';
     // $query = [

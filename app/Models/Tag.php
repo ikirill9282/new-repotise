@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Helpers\Slug;
 use Mews\Purifier\Facades\Purifier;
 
 class Tag extends Model
 {
+    use HasFactory;
     
     protected static function boot()
     {

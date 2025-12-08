@@ -163,6 +163,17 @@ class History extends Model
 
     }
 
+    public static function resetCodeInvalid(?User $user, string $code)
+    {
+      return static::warning()
+        ->action(Action::RESET_PASSWORD)
+        ->message('Invalid reset code')
+        ->userId($user?->id ?? null)
+        ->values($code)
+        ->write()
+        ;
+    }
+
     public static function resetCodeSend(User $user)
     {
       return static::info()

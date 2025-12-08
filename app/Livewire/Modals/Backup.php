@@ -33,6 +33,11 @@ class Backup extends Component
       }
     }
 
+    public function submit()
+    {
+      $this->attempt();
+    }
+
     public function attempt()
     {
       if (!$this->canAttempt()) {

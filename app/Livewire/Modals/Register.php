@@ -8,9 +8,12 @@ use App\Models\User;
 use App\Models\History;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Spatie\Permission\Models\Role;
+use App\Jobs\ReferalPromocode;
 
 class Register extends Component
 {
@@ -94,11 +97,13 @@ class Register extends Component
 
       $user->sendVerificationCode(seller: $valid['as_seller']);
       
-      // Reset form
-      $this->resetForm();
+      // Авторизовать пользователя автоматически
+      Auth::login($user);
+      Session::regenerate();
+      ReferalPromocode::dispatch($user);
       
-      // Dispatch event to open success modal
-      $this->dispatch('openModal', 'register-success');
+      // Редирект на страницу dashboard
+      return redirect('/profile/dashboard');
       
     } catch (\Exception $e) {
       Log::error('Registration failed', [
