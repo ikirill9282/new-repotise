@@ -120,7 +120,12 @@ class Auth extends Component
 
     public function googleAuth()
     {
-      return redirect()->away(Socialite::driver('google')->redirect()->getTargetUrl());
+      return redirect()->away(
+        Socialite::driver('google')
+          ->with(['prompt' => 'select_account'])
+          ->redirect()
+          ->getTargetUrl()
+      );
     }
 
     public function fbAuth()
