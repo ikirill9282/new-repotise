@@ -7,6 +7,18 @@
         body {
             background: var(--bg, #F9F9F9);
         }
+        
+        /* Исправление адаптивности для профиля на десктопе */
+        @media (min-width: 1024px) {
+            .profile-wrap .the-content-wrap .container {
+                display: flex !important;
+                flex-direction: row !important;
+            }
+            
+            .profile-wrap .grid {
+                display: grid !important;
+            }
+        }
     </style>
 @endpush
 
@@ -31,8 +43,8 @@
 @endphp
 
 <div class="the-content-wrap profile-wrap !py-6">
-    <div class="container !block">
-        <div class="grid grid-cols-1 lg:grid-cols-[210px_1fr] !gap-3">
+    <div class="container !block !flex lg:!flex-row !flex-col">
+        <div class="grid grid-cols-1 lg:grid-cols-[210px_1fr] !gap-3 w-full">
             <div class="col-span-1 accordion the-profile__sidebar w-full !p-0 group" id="accordionExample2">
                 <div wire:ignore class="accordion-item p-3 !bg-active group-has-[.show]:!bg-white lg:!bg-white transition">
                     <div class="accordion-header the-profile__accord-button px-2 !bg-transparent">

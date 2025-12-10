@@ -2,10 +2,11 @@
   'label' => null,
   'placeholder' => null,
   'tooltip' => true,
+  'tooltipText' => null,
   'max' => 500,
   'name' => null,
 ])
-<div  class="" 
+<div  class="relative" 
     x-ref="base"
     x-data="{
       len: 0,
@@ -37,22 +38,27 @@
       if (!empty($val)) $placeholder = null;
     @endphp
   @endif
-  <x-form.textarea 
-    :placeholder="$placeholder"
-    :label="$label"
-    :tooltip="$tooltip"
-    class="textarea-counter min-h-24"
-    x-on:input="setLen"
-    {{ $attributes }}
-  ></x-form.textarea>
+  <div class="relative">
+    <x-form.textarea 
+      :placeholder="$placeholder"
+      :label="$label"
+      :tooltip="$tooltip"
+      :tooltipText="$tooltipText"
+      class="textarea-counter min-h-24"
+      x-on:input="setLen"
+      {{ $attributes }}
+    ></x-form.textarea>
 
-  <div class="text-sm !text-gray text-right mt-2">
-    <span x-html="len"></span>
-    <span>/</span>
-    <span x-html="max"></span>
+    <div class="text-sm !text-gray text-right mt-2">
+      <span x-html="len"></span>
+      <span>/</span>
+      <span x-html="max"></span>
+    </div>
   </div>
 
-  @error($name)
-    <div class="text-red-500">{{ $message }}</div>
-  @enderror
+  @if($name)
+    @error($name)
+      <div class="text-red-500 !mt-2">{{ $message }}</div>
+    @enderror
+  @endif
 </div>

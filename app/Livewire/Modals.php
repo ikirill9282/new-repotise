@@ -26,13 +26,14 @@ class Modals extends Component
       'edit-contacts',
       'cancelsub',
       'delete-subscription',
-      'delete-subscription-accept',
       'delete-product',
-      'delete-product-accept',
+      'delete-article',
+      // Модальные окна успеха (delete-*-accept, delete-subscription-accept, delete-product-accept) 
+      // НЕ должны быть в oneTime, чтобы они не закрывались автоматически при обновлении компонентов
     ];
 
     // Защищенные модальные окна, которые не должны закрываться при обновлении компонентов
-    protected $protectedModals = ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept'];
+    protected $protectedModals = ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept', 'delete-article-accept'];
     
     protected $previousModal = null;
     protected $previousIsVisible = false;
@@ -45,11 +46,24 @@ class Modals extends Component
           $this->inited = true;
           $this->startShowAnimation();
       } else {
-          $this->isVisible = false;
+          // Не сбрасываем защищенные модальные окна при mount
+          // Если текущее модальное окно защищено, сохраняем его состояние
+          if (!in_array($this->modal, $this->protectedModals)) {
+              $this->isVisible = false;
+          }
       }
       
       $this->previousModal = $this->modal;
       $this->previousIsVisible = $this->isVisible;
+    }
+    
+    public function hydrate()
+    {
+      // При гидратации компонента сохраняем состояние защищенных модальных окон
+      if (in_array($this->modal, $this->protectedModals)) {
+          $this->isVisible = true;
+          $this->inited = true;
+      }
     }
     
     public function updated($propertyName)
@@ -69,7 +83,18 @@ class Modals extends Component
     #[On('openModal')]
     public function openModal($modalName, $args = [])
     {
-      $this->args = $args;
+      // Обработка случая, когда передается массив с ключами modalName и args
+      if (is_array($modalName) && isset($modalName['modalName'])) {
+        $args = $modalName['args'] ?? [];
+        $modalName = $modalName['modalName'];
+      }
+      
+      // Убеждаемся, что modalName - это строка
+      if (!is_string($modalName)) {
+        return;
+      }
+      
+      $this->args = is_array($args) ? $args : [];
       $this->modal = $modalName;
       $this->inited = true;
       $this->startShowAnimation();
@@ -82,7 +107,7 @@ class Modals extends Component
 
       // Всегда отправляем событие modal-opened для модальных окон успеха
       // чтобы предотвратить их автоматическое закрытие
-      if (!in_array($modalName, $this->oneTime) || in_array($modalName, ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept'])) {
+      if (!in_array($modalName, $this->oneTime) || in_array($modalName, ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept', 'delete-article-accept'])) {
         $this->dispatch('modal-opened', ['modal' => $modalName]);
       }
     }
@@ -135,6 +160,25 @@ class Modals extends Component
         $this->isVisible = false;
         $this->dispatch('modal-closing-clean-url');
         $this->dispatch('modalClosing');
+    }
+    
+    public function render()
+    {
+        // При рендеринге сохраняем состояние защищенных модальных окон
+        if (in_array($this->modal, $this->protectedModals)) {
+            if (!$this->isVisible) {
+                $this->isVisible = true;
+            }
+            if (!$this->inited) {
+                $this->inited = true;
+            }
+        }
+        
+        return view('livewire.modals', [
+          'modal' => $this->modal,
+          'isVisible' => $this->isVisible,
+          'args' => $this->args,
+        ]);
     }
 
     public function startShowAnimation()
@@ -242,6 +286,8 @@ class Modals extends Component
         'delete-subscription',
         'delete-product',
         'delete-product-accept',
+        'delete-article',
+        'delete-article-accept',
       ])) return '!max-w-2xl';
       
       if (in_array($this->modal, ['funds', 'contact', 'payment-method'])) return '!max-w-xl';
@@ -249,14 +295,5 @@ class Modals extends Component
       if (in_array($this->modal, ['payout-details'])) return '!max-w-3xl';
 
       return '';
-    }    
-
-    public function render()
-    {
-        return view('livewire.modals', [
-          'modal' => $this->modal,
-          'isVisible' => $this->isVisible,
-          'args' => $this->args,
-        ]);
     }
 }

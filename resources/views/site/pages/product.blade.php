@@ -162,7 +162,7 @@
                                 </div>
                                 <div class="text_inf">
                                     <h4>Creator Refund Policy</h4>
-                                    <p>{{ $product->refund_policy }} days</p>
+                                    <p>{{ $product->refund_policy == 0 ? 'No returns' : $product->refund_policy . ' days' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -260,7 +260,7 @@
                                 </div>
                                 <div class="text_inf">
                                     <h4>Creator Refund Policy</h4>
-                                    <p>{{ $product->refund_policy }} days</p>
+                                    <p>{{ $product->refund_policy == 0 ? 'No returns' : $product->refund_policy . ' days' }}</p>
                                 </div>
                             </div>
                           </div>

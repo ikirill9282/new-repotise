@@ -42,21 +42,50 @@ class MediaOptimizer
         $maxHeight = $options['max_height'] ?? config('media.image.max_height', 2560);
         $quality = $options['quality'] ?? config('media.image.quality', 85);
 
-        $image = $this->imageManager->make($absolutePath);
+        // Проверяем MIME тип файла
+        $mime = mime_content_type($absolutePath) ?: '';
+        $extension = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
 
-        if ($image->width() > $maxWidth || $image->height() > $maxHeight) {
-            $image->resize($maxWidth, $maxHeight, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
+        // Если это WebP и драйвер GD (который не поддерживает WebP), пропускаем оптимизацию
+        if (($mime === 'image/webp' || $extension === 'webp') && config('media.image.driver', 'gd') === 'gd') {
+            // Проверяем, поддерживает ли GD WebP
+            if (!function_exists('imagecreatefromwebp')) {
+                // GD не поддерживает WebP, просто пропускаем оптимизацию
+                // WebP уже оптимизированный формат, так что это нормально
+                return;
+            }
         }
 
-        $image->orientate()->save($absolutePath, $quality);
-
         try {
-            $this->optimizer->optimize($absolutePath);
+            $image = $this->imageManager->make($absolutePath);
+
+            if ($image->width() > $maxWidth || $image->height() > $maxHeight) {
+                $image->resize($maxWidth, $maxHeight, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+            }
+
+            $image->orientate()->save($absolutePath, $quality);
+
+            try {
+                $this->optimizer->optimize($absolutePath);
+            } catch (\Throwable $exception) {
+                // Silently ignore optimizer failures; resized image is already saved.
+            }
+        } catch (\Intervention\Image\Exception\NotReadableException $e) {
+            // Если формат не поддерживается (например, WebP в GD без поддержки), просто пропускаем
+            \Log::warning('Image optimization skipped: ' . $e->getMessage(), [
+                'path' => $absolutePath,
+                'mime' => $mime,
+            ]);
         } catch (\Throwable $exception) {
-            // Silently ignore optimizer failures; resized image is already saved.
+            // Логируем другие ошибки, но не прерываем выполнение
+            \Log::error('Image optimization error: ' . $exception->getMessage(), [
+                'path' => $absolutePath,
+                'mime' => $mime,
+                'exception' => $exception,
+            ]);
         }
     }
 }

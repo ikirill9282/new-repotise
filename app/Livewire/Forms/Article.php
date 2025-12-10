@@ -45,11 +45,13 @@ class Article extends Component
     ];
 
     public $editMode = false;
+    public int $step = 1;
   
     public function mount(?string $article_id, array $default = [])
     {
       $model = is_null($article_id) ? new ModelArticle() : ModelArticle::find(Crypt::decrypt($article_id));
       $this->editMode = $model->exists;
+      $this->step = 1; // Always start at step 1 for new articles
       $this->prepareFormFields($model, $default);
     }
 
@@ -63,6 +65,72 @@ class Article extends Component
     {
       $this->fields['status_id'] = 3;
       $this->submit();
+    }
+
+    public function nextStep()
+    {
+      // Check if text is empty (just HTML tags)
+      $text = ($this->fields['text'] ?? '') == '<h3><br></h3>' || ($this->fields['text'] ?? '') == '<p><br></p>' || empty($this->fields['text'] ?? '')
+        ? '' 
+        : $this->fields['text'] ?? '';
+
+      // Validate step 1 required fields
+      $validator = Validator::make([
+        'title' => $this->fields['title'] ?? '',
+        'text' => $text,
+      ], [
+        'title' => ['required', 'string', "regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/"],
+        'text' => 'required|string',
+      ], [
+        'title.required' => 'The title field is required.',
+        'title.regex' => 'The title must contain only Latin letters, numbers, spaces, and basic punctuation marks (no Cyrillic or other characters).',
+        'text.required' => 'The article content field is required.',
+      ]);
+
+      // Check banner
+      if (empty($this->bannerPath) && empty($this->banner)) {
+        $validator->errors()->add('banner', 'The banner field is required');
+      }
+
+      if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
+
+      // Автоматическое заполнение SEO полей из данных шага 1, если они пустые
+      $this->autoFillSeoFields();
+
+      $this->step = 2;
+      $this->dispatch('stepChanged');
+    }
+
+    protected function autoFillSeoFields()
+    {
+      // Автоматическое заполнение SEO заголовка из заголовка статьи
+      if (empty($this->fields['seo_title']) && !empty($this->fields['title'])) {
+        $this->fields['seo_title'] = mb_substr($this->fields['title'], 0, 70);
+      }
+
+      // Автоматическое заполнение SEO описания из текста статьи
+      if (empty($this->fields['seo_text']) && !empty($this->fields['text'])) {
+        // Убираем HTML теги и получаем чистый текст
+        $plainText = strip_tags($this->fields['text']);
+        $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
+        $plainText = preg_replace('/\s+/', ' ', trim($plainText));
+        $this->fields['seo_text'] = mb_substr($plainText, 0, 160);
+      }
+    }
+
+    public function prevStep()
+    {
+      $this->step = 1;
+      $this->dispatch('stepChanged');
+    }
+
+    public function removeBanner()
+    {
+      $this->banner = null;
+      $this->bannerPath = null;
+      $this->dispatch('bannerRemoved');
     }
 
     public function prepareFormFields(ModelArticle $article, array $default = [])
@@ -169,10 +237,7 @@ class Article extends Component
       $text = $this->editMode ? 'updated' : 'created';
       $this->dispatch('toastSuccess', ['message' => "Article $text successful!"]);
       
-      if (!$this->editMode) {
-        return redirect($model->makeEditUrl());
-      }
-
+      // Always redirect to articles page after creation
       return redirect()->route('profile.articles');
     }
 

@@ -46,9 +46,9 @@
                 </div>
               </div>
               <div class="w-full md:w-auto flex flex-col md:flex-row justify-start md:justify-end items-start md:items-center !gap-3 md:!gap-6 !text-sm md:!text-base">
-                <x-link>Duplicate</x-link>
+                <x-link wire:click.prevent="duplicate('{{ $id }}')" class="cursor-pointer">Duplicate</x-link>
                 <x-link href="{{ $article->makeEditUrl() }}">Edit</x-link>
-                <x-link>Delete</x-link>
+                <x-link wire:click.prevent="delete('{{ $id }}')" class="cursor-pointer">Delete</x-link>
               </div>
             </div>
           @endforeach

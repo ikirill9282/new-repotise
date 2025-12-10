@@ -120,7 +120,7 @@
     <label class="text-sm sm:text-base text-gray mb-1.5" for="{{ $name }}">{{ $title }}</label>
   @endif
 
-  <div class="w-full !p-3 rounded bg-light">
+  <div class="w-full !p-3 rounded bg-light @error($name) border !border-red-500 @enderror">
     <div 
       x-ref="placeholder"
       x-on:click="toggle()" 

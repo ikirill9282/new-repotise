@@ -10,7 +10,7 @@
     <div class="description_orders">
         <div class="title_description">
             <h4>
-              <a href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
+              <a href="{{ $model->makeUrl() }}">{{ \Illuminate\Support\Str::limit($model->title, 50, '...') }}</a>
             </h4>
             <h5>
               <div class="text-sm">{{ currency($model->getPrice()) }}</div>
@@ -87,7 +87,7 @@
         @endif
     </div>
     <h3 class="text-nowrap overflow-hidden text-ellipsis">
-      <a class="transition !text-inherit hover:!text-black" href="{{ $model->makeUrl() }}">{{ $model->title }}</a>
+      <a class="transition !text-inherit hover:!text-black" href="{{ $model->makeUrl() }}">{{ \Illuminate\Support\Str::limit($model->title, 50, '...') }}</a>
     </h3>
     <div class="cost">
       <p>{{ currency($model->getPrice()) }}</p>

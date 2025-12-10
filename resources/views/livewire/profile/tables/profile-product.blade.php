@@ -42,10 +42,11 @@
                 </div>
               </div>
               <div class="w-full md:w-auto flex flex-col md:flex-row justify-start md:justify-end items-start md:items-center !gap-3 md:!gap-6 !text-sm md:!text-base">
-                <x-link>Duplicate</x-link>
+                <x-link wire:click.prevent="duplicate('{{ \Illuminate\Support\Facades\Crypt::encrypt($product->id) }}')" class="cursor-pointer">Duplicate</x-link>
                 <x-link href="{{ $product->makeEditUrl() }}">Edit</x-link>
                 <x-link 
                   wire:click.prevent="$dispatch('openModal', { modalName: 'delete-product', args: { product_id: '{{ \Illuminate\Support\Facades\Crypt::encrypt($product->id) }}' } })"
+                  class="cursor-pointer"
                 >
                   Delete
                 </x-link>

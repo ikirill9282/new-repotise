@@ -86,24 +86,56 @@
                 Livewire.on('modal-opened', event => {
                     const modalName = event[0]?.modal;
                     // Защищаем модальные окна успеха от автоматического закрытия
-                    if (['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept'].includes(modalName)) {
+                    if (['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept', 'delete-article-accept'].includes(modalName)) {
                         protectedModal = modalName;
                     }
                 });
                 
-                // Сбрасываем защиту при закрытии модального окна пользователем и обновляем список продуктов
+                // Сбрасываем защиту при закрытии модального окна пользователем и обновляем список продуктов/статей
+                let isUserClosingModal = false;
+                
+                // Отслеживаем, когда пользователь нажимает кнопку закрытия
+                document.addEventListener('click', (e) => {
+                    // Проверяем, является ли цель клика кнопкой закрытия модального окна
+                    const target = e.target.closest('[wire\\:click], button, a');
+                    if (target) {
+                        const wireClick = target.getAttribute('wire:click');
+                        const wireDispatch = target.getAttribute('wire:click.prevent');
+                        if (wireClick && (wireClick.includes('closeModal') || wireClick.includes('$dispatch'))) {
+                            const currentModal = @this.get('modal');
+                            if (['delete-product-accept', 'delete-article-accept'].includes(currentModal)) {
+                                isUserClosingModal = true;
+                                // Сохраняем информацию о том, что пользователь закрывает модальное окно
+                                sessionStorage.setItem('userClosingModal', currentModal);
+                            }
+                        }
+                    }
+                });
+                
                 window.addEventListener('modalClosing', () => {
                     const currentModal = @this.get('modal');
-                    if (currentModal === protectedModal) {
-                        protectedModal = null;
-                    }
+                    const userClosingModal = sessionStorage.getItem('userClosingModal');
                     
                     // Если закрылось модальное окно delete-product-accept, отправляем событие для обновления списка продуктов
-                    if (currentModal === 'delete-product-accept') {
+                    if (currentModal === 'delete-product-accept' && userClosingModal === 'delete-product-accept') {
                         // Задержка, чтобы модальное окно успело полностью закрыться перед обновлением списка
                         setTimeout(() => {
                             Livewire.dispatch('products-refresh');
+                            sessionStorage.removeItem('userClosingModal');
                         }, 300);
+                    }
+                    
+                    // Если закрылось модальное окно delete-article-accept, отправляем событие для обновления списка статей
+                    if (currentModal === 'delete-article-accept' && userClosingModal === 'delete-article-accept') {
+                        setTimeout(() => {
+                            Livewire.dispatch('articles-refresh');
+                            sessionStorage.removeItem('userClosingModal');
+                        }, 300);
+                    }
+                    
+                    if (currentModal === protectedModal && userClosingModal === currentModal) {
+                        protectedModal = null;
+                        sessionStorage.removeItem('userClosingModal');
                     }
                 });
                 
@@ -144,9 +176,9 @@
                         $componentParams = is_array($this->args) ? $this->args : [];
                         $componentKey = 'modal-' . $this->modal . '-' . md5(json_encode($componentParams));
                         // Для модальных окон успеха используем wire:ignore.self, чтобы предотвратить закрытие при обновлении
-                        $shouldIgnore = in_array($this->modal, ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept']);
+                        $shouldIgnore = in_array($this->modal, ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept', 'delete-article-accept']);
                       @endphp
-                      <div @if($shouldIgnore) wire:ignore.self wire:key="modal-content-{{ $this->modal }}" @endif>
+                      <div @if($shouldIgnore) wire:ignore.self @endif wire:key="modal-content-{{ $this->modal }}">
                         @livewire($componentName, $componentParams, key($componentKey))
                       </div>
                     @endif
@@ -159,7 +191,92 @@
 
 @script()
   <script>
-    Livewire.hook('morphed', function() {
+    Livewire.hook('morphed', function({ el, component }) {
+      // Сохраняем состояние защищенных модальных окон при обновлении компонента
+      const protectedModals = ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept', 'delete-article-accept'];
+      
+      // Находим компонент Modals через DOM элемент
+      const modalElement = document.querySelector('.cartMayBe');
+      if (!modalElement) return;
+      
+      // Ищем wire:id атрибут через все элементы
+      let componentId = null;
+      const allElements = document.querySelectorAll('*');
+      for (let el of allElements) {
+        if (el.hasAttribute && el.hasAttribute('wire:id')) {
+          const id = el.getAttribute('wire:id');
+          if (id && id.includes('modals')) {
+            componentId = id;
+            break;
+          }
+        }
+      }
+      
+      if (!componentId) return;
+      
+      try {
+        const modalComponent = Livewire.find(componentId);
+        if (!modalComponent || typeof modalComponent.get !== 'function') return;
+        
+        const currentModal = modalComponent.get('modal');
+        
+        if (protectedModals.includes(currentModal)) {
+          // Если защищенное модальное окно открыто, убеждаемся, что оно остается открытым
+          // Принудительно устанавливаем состояние, даже если компонент пытается его изменить
+          modalComponent.set('isVisible', true);
+          modalComponent.set('inited', true);
+          if (typeof modalComponent.call === 'function') {
+            modalComponent.call('startShowAnimation');
+          }
+        }
+      } catch (e) {
+        // Игнорируем ошибки при доступе к компоненту
+        console.debug('Error accessing modal component:', e);
+      }
+    });
+    
+    // Дополнительная защита: предотвращаем закрытие защищенных модальных окон при обновлении
+    Livewire.hook('message.processed', ({ component, message }) => {
+      const protectedModals = ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept', 'delete-article-accept'];
+      
+      // Находим компонент Modals через DOM элемент
+      const modalElement = document.querySelector('.cartMayBe');
+      if (!modalElement) return;
+      
+      // Ищем wire:id атрибут через все элементы
+      let componentId = null;
+      const allElements = document.querySelectorAll('*');
+      for (let el of allElements) {
+        if (el.hasAttribute && el.hasAttribute('wire:id')) {
+          const id = el.getAttribute('wire:id');
+          if (id && id.includes('modals')) {
+            componentId = id;
+            break;
+          }
+        }
+      }
+      
+      if (!componentId) return;
+      
+      try {
+        const modalComponent = Livewire.find(componentId);
+        if (!modalComponent || typeof modalComponent.get !== 'function') return;
+        
+        const currentModal = modalComponent.get('modal');
+        
+        if (protectedModals.includes(currentModal)) {
+          // Если защищенное модальное окно открыто, убеждаемся, что оно остается открытым
+          // Принудительно устанавливаем состояние, даже если компонент пытается его изменить
+          modalComponent.set('isVisible', true);
+          modalComponent.set('inited', true);
+          if (typeof modalComponent.call === 'function') {
+            modalComponent.call('startShowAnimation');
+          }
+        }
+      } catch (e) {
+        // Игнорируем ошибки при доступе к компоненту
+        console.debug('Error accessing modal component:', e);
+      }
     });
   </script>
 @endscript

@@ -29,7 +29,7 @@ class Product extends Component
     public array $fields = [];
 
     protected array $default = [
-      'refund_policy' => 90,
+      'refund_policy' => 30,
       'subscription' => false,
     ];
 
@@ -38,7 +38,6 @@ class Product extends Component
     public Collection|array $categories = [];
 
     public $subprice = [
-      'month' => null,
       'quarter' => null,
       'year' => null,
     ];
@@ -92,10 +91,37 @@ class Product extends Component
 
       if ($product->subscription) {
         $this->subprice = [
-          'month' => $product->subprice->month,
-          'quarter' => $product->subprice->quarter,
-          'year' => $product->subprice->year,
+          'quarter' => $product->subprice->quarter ?? null,
+          'year' => $product->subprice->year ?? null,
         ];
+      }
+    }
+
+    /**
+     * Автоматическое заполнение SEO полей при изменении заголовка или описания продукта
+     */
+    public function updated($propertyName)
+    {
+      // Автоматическое заполнение SEO заголовка при изменении заголовка продукта
+      if ($propertyName === 'fields.title') {
+        $value = $this->fields['title'] ?? '';
+        // Заполняем SEO заголовок только если он пустой
+        if (empty($this->fields['seo_title']) && !empty($value)) {
+          $this->fields['seo_title'] = mb_substr($value, 0, 60);
+        }
+      }
+
+      // Автоматическое заполнение SEO описания при изменении описания продукта
+      if ($propertyName === 'fields.text') {
+        $value = $this->fields['text'] ?? '';
+        // Заполняем SEO описание только если оно пустое
+        if (empty($this->fields['seo_text']) && !empty($value)) {
+          // Убираем HTML теги и получаем чистый текст
+          $plainText = strip_tags($value);
+          $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
+          $plainText = preg_replace('/\s+/', ' ', trim($plainText));
+          $this->fields['seo_text'] = mb_substr($plainText, 0, 160);
+        }
       }
     }
 
@@ -192,7 +218,7 @@ class Product extends Component
       
       // Set default refund_policy if not provided
       if (!isset($data['refund_policy']) || $data['refund_policy'] === '' || $data['refund_policy'] === null) {
-        $data['refund_policy'] = $this->default['refund_policy'] ?? 90;
+        $data['refund_policy'] = $this->default['refund_policy'] ?? 30;
       }
 
       // Логируем исходный текст для отладки
@@ -218,9 +244,15 @@ class Product extends Component
         ? Crypt::decrypt($this->attrs['user_id'])
         : Auth::user()->id;
 
-      $data['types'] = is_array($this->types) ? $this->types : $this->types->toArray();
-      $data['locations'] = is_array($this->locations) ? $this->locations : $this->locations->toArray();
-      $data['categories'] = is_array($this->categories) ? $this->categories : $this->categories->toArray();
+      $data['types'] = is_array($this->types) 
+        ? $this->types 
+        : ($this->types instanceof Collection ? $this->types->toArray() : []);
+      $data['locations'] = is_array($this->locations) 
+        ? $this->locations 
+        : ($this->locations instanceof Collection ? $this->locations->toArray() : []);
+      $data['categories'] = is_array($this->categories) 
+        ? $this->categories 
+        : ($this->categories instanceof Collection ? $this->categories->toArray() : []);
 
       $subprice = array_map(function($elem) {
         /** @var string $elem */
@@ -250,20 +282,29 @@ class Product extends Component
 
       // Convert empty strings to null for subscription prices when subscription is false
       if (!($data['subscription'] ?? false)) {
-        $data['month'] = null;
         $data['quarter'] = null;
         $data['year'] = null;
       } else {
         // For subscription products, convert empty strings to null
-        if (isset($data['month']) && $data['month'] === '') {
-          $data['month'] = null;
-        }
         if (isset($data['quarter']) && $data['quarter'] === '') {
           $data['quarter'] = null;
         }
         if (isset($data['year']) && $data['year'] === '') {
           $data['year'] = null;
         }
+      }
+
+      // Автоматическое заполнение SEO полей, если они пустые
+      if (empty($data['seo_title']) && !empty($data['title'])) {
+        $data['seo_title'] = mb_substr($data['title'], 0, 60);
+      }
+      
+      if (empty($data['seo_text']) && !empty($data['text'])) {
+        // Убираем HTML теги и получаем чистый текст
+        $plainText = strip_tags($data['text']);
+        $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
+        $plainText = preg_replace('/\s+/', ' ', trim($plainText));
+        $data['seo_text'] = mb_substr($plainText, 0, 160);
       }
 
       return $data;
@@ -275,31 +316,30 @@ class Product extends Component
       
       $validator = Validator::make($data, [
         'user_id' => 'required|integer',
-        'title' => ['required', 'string', "regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/"],
+        'title' => ['required', 'string', 'max:70', "regex:/^[a-zA-Z0-9\s\-'.,!?():;]+$/"],
         'text' => 'required|string',
         'refund_policy' => 'nullable|integer',
         'subscription' => 'required|boolean',
         'price' => 'required|numeric',
         'sale_price' => 'sometimes|nullable|numeric',
-        'seo_title' => 'sometimes|nullable|string',
-        'seo_text' => 'sometimes|nullable|string',
-        'types' => 'sometimes|nullable|array',
-        'locations' => 'sometimes|nullable|array',
-        'categories' => 'sometimes|nullable|array',
-        'month' => 'required_if:subscription,true|nullable|numeric',
-        'quarter' => 'required_if:subscription,true|nullable|numeric',
-        'year' => 'required_if:subscription,true|nullable|numeric',
+        'seo_title' => 'sometimes|nullable|string|max:70',
+        'seo_text' => 'sometimes|nullable|string|max:160',
+        'types' => 'required|array|min:1',
+        'locations' => 'required|array|min:1',
+        'categories' => 'required|array|min:1',
+        'quarter' => 'sometimes|nullable|numeric',
+        'year' => 'sometimes|nullable|numeric',
       ], [
+        'title.required' => 'The title field is required.',
         'title.regex' => 'The title must contain only Latin letters, numbers, spaces, and basic punctuation marks (no Cyrillic or other characters).',
-        'month' => [
-          'required_if' => 'The month field is required when product is subscription.'
-        ],
-        'quarter' => [
-          'required_if' => 'The month field is required when product is subscription.'
-        ],
-        'year' => [
-          'required_if' => 'The month field is required when product is subscription.'
-        ],
+        'text.required' => 'The product description field is required.',
+        'price.required' => 'The price field is required.',
+        'types.required' => 'Please select at least one product type.',
+        'types.min' => 'Please select at least one product type.',
+        'locations.required' => 'Please select at least one location.',
+        'locations.min' => 'Please select at least one location.',
+        'categories.required' => 'Please select at least one category.',
+        'categories.min' => 'Please select at least one category.',
       ]);
 
       if ($validator->fails()) {
@@ -341,9 +381,9 @@ class Product extends Component
           $model->subprice()->updateOrCreate(
           ['product_id' => $model->id],
           [
-            'month' => $valid['month'],
-            'quarter' => $valid['quarter'],
-            'year' => $valid['year'],
+            'month' => null,
+            'quarter' => $valid['quarter'] ?? null,
+            'year' => $valid['year'] ?? null,
           ]);
         } 
 

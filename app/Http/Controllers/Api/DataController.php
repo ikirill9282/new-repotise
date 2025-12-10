@@ -245,6 +245,7 @@ class DataController extends Controller
         fn($query) => $query->where('title', 'like', "%{$valid['q']}%")
           ->orWhere('slug', 'like', "%{$valid['q']}%")
       )
+      ->orderBy('title', 'asc')
       ->get()
       ->map(function($item) {
         return [

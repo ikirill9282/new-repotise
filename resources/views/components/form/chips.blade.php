@@ -10,6 +10,7 @@
   'tooltipText' => null,
   'single' => false,
   'maxLength' => 50,
+  'maxErrorMessage' => 'You can select a maximum of 5 product types.',
 ])
 
 <div class="relative dropdown text-sm sm:text-base"
@@ -43,7 +44,7 @@
           if (hasError) return;
           
           if (this.selected.length >= {{ $max }}) {
-            this.error = 'Maximum tags';
+            this.error = '{{ $maxErrorMessage }}';
             hasError = true;
             return;
           }
@@ -79,7 +80,7 @@
       const tag = tags[0];
       
       if (this.selected.length >= {{ $max }}) {
-        this.error = 'Maximum tags';
+        this.error = '{{ $maxErrorMessage }}';
         return;
       }
 
@@ -130,7 +131,7 @@
         // Обычный режим множественного выбора
         if (!this.hasVal(val)) {
           if (this.selected.length >= {{ $max }}) {
-            this.error = 'Maximum tags';
+            this.error = '{{ $maxErrorMessage }}';
             return ;
           }
           this.selected.push(val);
@@ -214,7 +215,7 @@
   @endif
   
   {{-- INPUT --}}
-  <div class="bg-light relative rounded-lg flex justify-start items-center">
+  <div class="bg-light relative rounded-lg flex justify-start items-center @if($attributes->get('name')) @error($attributes->get('name')) border !border-red-500 @enderror @else border-transparent @endif">
     <div class="!pl-4">
       @include('icons.search')
     </div>
@@ -287,7 +288,7 @@
 
   @if($attributes->get('name'))
     @error($attributes->get('name'))
-      <div class="text-red-500">{{ $message }}</div>
+      <div class="text-red-500 !mb-2">{{ $message }}</div>
     @enderror
   @endif
 

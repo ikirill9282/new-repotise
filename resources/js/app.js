@@ -17,8 +17,6 @@ import Quill from "quill";
 
 window.Quill = Quill;
 window.AirDatepicker = AirDatepicker;
-window.createDatePicker = createDatePicker;
-window.objectToQueryString = objectToQueryString;
 
 function objectToQueryString(obj) {
   const params = new URLSearchParams();
@@ -80,6 +78,145 @@ function createDatePicker(selector) {
         },
     });
 }
+
+function createBirthdayDatePicker(selector) {
+    const input = document.querySelector(selector);
+    if (!input) return null;
+
+    // Если значение уже есть в формате YYYY-MM-DD, конвертируем его для отображения
+    const currentValue = input.value;
+    let initialDate = null;
+    if (currentValue) {
+        // Проверяем формат YYYY-MM-DD
+        const dateMatch = currentValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (dateMatch) {
+            initialDate = new Date(parseInt(dateMatch[1]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[3]));
+        } else {
+            // Пытаемся распарсить другие форматы (MM/DD/YYYY)
+            const parts = currentValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (parts) {
+                initialDate = new Date(parseInt(parts[3]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            } else {
+                const parsed = new Date(currentValue);
+                if (!isNaN(parsed.getTime())) {
+                    initialDate = parsed;
+                }
+            }
+        }
+    }
+
+    // Создаем скрытое поле для правильного формата даты
+    let hiddenInput = input.parentElement.querySelector('input[name="birthday"][type="hidden"]');
+    if (!hiddenInput && currentValue) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'birthday';
+        // Если значение в формате YYYY-MM-DD, сохраняем его
+        if (currentValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            hiddenInput.value = currentValue;
+        } else if (initialDate) {
+            const year = initialDate.getFullYear();
+            const month = String(initialDate.getMonth() + 1).padStart(2, '0');
+            const day = String(initialDate.getDate()).padStart(2, '0');
+            hiddenInput.value = `${year}-${month}-${day}`;
+        }
+        input.parentElement.appendChild(hiddenInput);
+    }
+
+    const picker = new AirDatepicker(selector, {
+        locale: localeEn,
+        dateFormat(date) {
+            return date.toLocaleString("en-US", {
+                year: "numeric",
+                day: "2-digit",
+                month: "2-digit",
+            });
+        },
+        selectedDates: initialDate ? [initialDate] : [],
+        maxDate: new Date(), // Нельзя выбрать будущую дату
+        autoClose: true,
+        isMobile: false,
+        onRenderCell: ({ date, cellType }) => {
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+            const response = {
+                disabled: true,
+                classes: "disabled-class",
+                attrs: {
+                    title: "Cell is disabled",
+                },
+            };
+
+            if (cellType === "day") {
+                const cellDate = new Date(date);
+                cellDate.setHours(0, 0, 0, 0);
+
+                // Отключаем будущие даты
+                if (cellDate > today) {
+                    return response;
+                }
+            }
+        },
+        onSelect: ({ date, formattedDate, datepicker }) => {
+          // Форматируем дату для отображения в формате MM/DD/YYYY
+          const displayFormat = date.toLocaleString("en-US", {
+              year: "numeric",
+              day: "2-digit",
+              month: "2-digit",
+          });
+          
+          // Устанавливаем отображаемое значение
+          datepicker.$el.value = displayFormat;
+          
+          // Форматируем дату для скрытого поля
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          const hiddenValue = `${year}-${month}-${day}`;
+          
+          // Сохраняем ссылки на элементы для использования после закрытия календаря
+          const inputElement = datepicker.$el;
+          const parentElement = inputElement.parentElement;
+          
+          // Закрываем календарь сначала
+          datepicker.hide();
+          
+          // Обновляем DOM после того, как календарь закрылся
+          setTimeout(function() {
+              // Находим или создаем скрытое поле
+              let hiddenInput = parentElement.querySelector('input[name="birthday"][type="hidden"]');
+              if (!hiddenInput) {
+                  hiddenInput = document.createElement('input');
+                  hiddenInput.type = 'hidden';
+                  hiddenInput.name = 'birthday';
+                  parentElement.appendChild(hiddenInput);
+              }
+              
+              // Устанавливаем значение скрытого поля
+              hiddenInput.value = hiddenValue;
+              
+              // Удаляем name из видимого input только если скрытое поле создано
+              if (hiddenInput && hiddenInput.parentElement) {
+                  inputElement.removeAttribute('name');
+              }
+              
+              // Триггерим событие input
+              const event = new Event('input', {
+                cancelable: true,
+                bubbles: true,
+              });
+              inputElement.dispatchEvent(event);
+          }, 100);
+        },
+    });
+
+    return picker;
+}
+
+// Экспортируем функции в window после их объявления
+window.createDatePicker = createDatePicker;
+window.createBirthdayDatePicker = createBirthdayDatePicker;
+window.objectToQueryString = objectToQueryString;
 
 function makeQuill(editor) {
     {
@@ -248,6 +385,36 @@ function makeQuill(editor) {
         const id = editor.getAttribute("data-model");
         const wrap = editor.closest(".text-editor");
         const input = wrap?.querySelector(`#${id}`);
+        
+        // Функция для обновления счетчика символов
+        const updateCharCounter = () => {
+            try {
+                const text = quill.getText();
+                const charCount = Math.max(0, text.length - 1);
+                
+                // Ищем счетчик по data-атрибуту с data-model
+                const counterElement = document.querySelector(`span.char-count-display[data-model="${id}"]`);
+                
+                if (counterElement) {
+                    counterElement.textContent = charCount;
+                } else {
+                    // Альтернативный поиск в контейнере text-editor
+                    if (wrap) {
+                        const counterByData = wrap.querySelector('[data-char-counter="true"] span:first-child');
+                        if (counterByData) {
+                            counterByData.textContent = charCount;
+                        } else {
+                            const counterByClass = wrap.querySelector('.char-count-display');
+                            if (counterByClass) {
+                                counterByClass.textContent = charCount;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Char counter update error:', e);
+            }
+        };
 
         // Функция для обновления значения input
         const updateInput = () => {
@@ -292,6 +459,22 @@ function makeQuill(editor) {
             if (counter) {
                 counter.innerHTML = quill.getLength() - 1;
             }
+            
+            // Ограничение длины текста до максимума (если указан data-max)
+            const maxLength = parseInt(editor.getAttribute('data-max')) || null;
+            if (maxLength) {
+                const text = quill.getText();
+                const currentLength = text.length - 1; // -1 для учета финального символа новой строки
+                if (currentLength > maxLength) {
+                    const delta = quill.getContents();
+                    const newDelta = delta.slice(0, maxLength);
+                    quill.setContents(newDelta);
+                    quill.setSelection(maxLength);
+                }
+            }
+            
+            // Обновление счетчика символов для Quill редактора
+            updateCharCounter();
         };
 
         // Простая функция для загрузки контента в Quill
@@ -337,11 +520,25 @@ function makeQuill(editor) {
               if (input) {
                   input.value = editorElement.innerHTML;
               }
+              
+              // Обновляем счетчик после загрузки контента
+              updateInput();
           }, 100);
         };
         
         // Загружаем контент после инициализации Quill
         setTimeout(loadContentIntoQuill, 300);
+        
+        // Инициализируем счетчик при загрузке
+        setTimeout(() => {
+            updateInput();
+            updateCharCounter();
+        }, 500);
+        
+        // Обновляем счетчик при каждом изменении текста
+        quill.on('text-change', () => {
+            updateCharCounter();
+        });
 
         // Обработчик изменений текста
         quill.on("text-change", updateInput);

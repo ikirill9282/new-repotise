@@ -133,6 +133,6 @@
           <span class="TrekGuider_span">{{ date('Y', time()) }} TrekGuider Ink.</span>
         </div>
 
-        <div class="text-gray font-thin"><span class="inline-block">Designed by</span><a href="https://milksite.ru/"><span class="inline-block text-white !px-3 !py-1 bg-[#046D53] rounded-lg !ml-3">moloko69</span></a></div>
+        <div class="text-gray font-thin"><span class="inline-block">Designed by</span><a href="https://milksite.ru/"><span class="inline-block text-white !px-3 !py-1 bg-[#046D53] rounded-lg !ml-3">milksite</span></a></div>
     </div>
 </footer>

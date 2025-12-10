@@ -21,7 +21,7 @@
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-medium text-gray-900">{{ $notification->title }}</p>
                         @if($notification->message)
-                            <p class="text-xs text-gray-500 mt-0.5">{{ Str::limit($notification->message, 60) }}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">{{ \Illuminate\Support\Str::limit($notification->message, 60) }}</p>
                         @endif
                         <p class="text-xs text-gray-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
                     </div>

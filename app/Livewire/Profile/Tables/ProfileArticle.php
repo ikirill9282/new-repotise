@@ -7,6 +7,8 @@ use App\Models\Article;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 
 class ProfileArticle extends Component
 {
@@ -15,6 +17,8 @@ class ProfileArticle extends Component
   public bool $all_checked = false;
 
   public string $sorting = 'newest';
+
+  protected $listeners = ['articles-refresh' => '$refresh'];
 
   public function mount($active, ?string $sorting = null)
   {
@@ -27,6 +31,52 @@ class ProfileArticle extends Component
     if (!empty($sorting)) {
       $this->sorting = $sorting;
     }
+  }
+
+  public function duplicate(string $articleId)
+  {
+    try {
+      $article = Article::find(Crypt::decrypt($articleId));
+      
+      if (!$article || $article->user_id !== Auth::id()) {
+        $this->dispatch('toastError', ['message' => 'Article not found or access denied.']);
+        return;
+      }
+
+      $newArticle = $article->replicate(['status_id', 'published_at', 'slug']);
+      $newArticle->status_id = Status::DRAFT;
+      $newArticle->published_at = null;
+      $newArticle->save();
+
+      // Копируем теги
+      if ($article->tags->isNotEmpty()) {
+        $tagIds = $article->tags->pluck('id');
+        $newArticle->tags()->sync($tagIds);
+      }
+
+      // Копируем галерею без оптимизации (файлы уже оптимизированы)
+      $article->copyGallery($newArticle, 'articles');
+
+      $this->dispatch('toastSuccess', ['message' => 'Article duplicated successfully!']);
+      
+      // Перенаправляем на страницу редактирования дублированной статьи
+      return redirect($newArticle->makeEditUrl());
+    } catch (\Exception $e) {
+      Log::error('Error duplicating article', [
+        'article_id' => $articleId,
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString(),
+      ]);
+      $this->dispatch('toastError', ['message' => 'Failed to duplicate article. Please try again.']);
+    }
+  }
+
+  public function delete(string $articleId)
+  {
+    $this->dispatch('openModal', [
+      'modalName' => 'delete-article',
+      'args' => ['article_id' => $articleId]
+    ]);
   }
 
   public function render()

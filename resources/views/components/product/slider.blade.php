@@ -76,7 +76,7 @@
                 class="transition !text-inherit hover:!text-active" 
                 href="{{ $product->makeUrl() }}"
               >
-                {{ $product->title }}
+                {{ \Illuminate\Support\Str::limit($product->title, 50, '...') }}
               </a>
             </div>
             <div class="flex justify-start items-center gap-2">
