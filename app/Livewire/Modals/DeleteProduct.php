@@ -57,14 +57,15 @@ class DeleteProduct extends Component
       // Удаляем товар из поискового индекса
       $product->unsearchable();
 
-      // Отправляем событие для обновления списка продуктов
-      $this->dispatch('products-refresh');
-      
       // Закрываем модальное окно
       $this->dispatch('closeModal');
       
-      // Показываем модальное окно подтверждения
-      $this->dispatch('openModal', 'delete-product-accept');
+      // Открываем модальное окно подтверждения после закрытия предыдущего
+      // Используем JavaScript событие для открытия нового окна с задержкой
+      $this->dispatch('openModalAfterClose', 'delete-product-accept');
+      
+      // НЕ отправляем событие products-refresh здесь, чтобы не закрывать модальное окно
+      // Событие будет отправлено после закрытия модального окна delete-product-accept
     }
 
     public function render()

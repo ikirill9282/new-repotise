@@ -31,6 +31,12 @@ class Modals extends Component
       'delete-product-accept',
     ];
 
+    // Защищенные модальные окна, которые не должны закрываться при обновлении компонентов
+    protected $protectedModals = ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept'];
+    
+    protected $previousModal = null;
+    protected $previousIsVisible = false;
+
     public function mount()
     {
       $this->modal = request()->get('modal', null);
@@ -41,6 +47,23 @@ class Modals extends Component
       } else {
           $this->isVisible = false;
       }
+      
+      $this->previousModal = $this->modal;
+      $this->previousIsVisible = $this->isVisible;
+    }
+    
+    public function updated($propertyName)
+    {
+        // Обновляем предыдущее состояние только для незащищенных модальных окон
+        // Не восстанавливаем защищенные модальные окна здесь, чтобы избежать циклов обновления
+        if (!in_array($this->modal, $this->protectedModals)) {
+            if ($propertyName === 'modal') {
+                $this->previousModal = $this->modal;
+            }
+            if ($propertyName === 'isVisible') {
+                $this->previousIsVisible = $this->isVisible;
+            }
+        }
     }
 
     #[On('openModal')]
@@ -50,10 +73,33 @@ class Modals extends Component
       $this->modal = $modalName;
       $this->inited = true;
       $this->startShowAnimation();
+      
+      // Сохраняем состояние для защищенных модальных окон
+      if (in_array($modalName, $this->protectedModals)) {
+          $this->previousModal = $modalName;
+          $this->previousIsVisible = true;
+      }
 
-      if (!in_array($modalName, $this->oneTime)) {
+      // Всегда отправляем событие modal-opened для модальных окон успеха
+      // чтобы предотвратить их автоматическое закрытие
+      if (!in_array($modalName, $this->oneTime) || in_array($modalName, ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept'])) {
         $this->dispatch('modal-opened', ['modal' => $modalName]);
       }
+    }
+    
+    #[On('openModalAfterClose')]
+    public function openModalAfterClose($modalName, $args = [])
+    {
+      // Этот метод будет вызван через JavaScript после закрытия предыдущего модального окна
+      // Убеждаемся, что предыдущее модальное окно полностью закрыто
+      if ($this->isVisible && $this->modal !== $modalName) {
+        // Если предыдущее окно еще видимо, принудительно закрываем его
+        $this->isVisible = false;
+        $this->modal = null;
+      }
+      
+      // Открываем новое модальное окно
+      $this->openModal($modalName, $args);
     }
 
     // Support for old modal events
@@ -72,6 +118,20 @@ class Modals extends Component
     #[On('closeModal')]
     public function closeModal()
     {
+        $modalToClose = $this->modal;
+        
+        // Если закрывается модальное окно delete-product-accept, отправляем событие для обновления списка продуктов
+        if ($modalToClose === 'delete-product-accept') {
+            // Отправляем событие ДО закрытия модального окна, чтобы оно точно было обработано
+            $this->dispatch('products-refresh');
+        }
+        
+        // Сбрасываем защиту при закрытии модального окна пользователем
+        if (in_array($modalToClose, $this->protectedModals)) {
+            $this->previousModal = null;
+            $this->previousIsVisible = false;
+        }
+        
         $this->isVisible = false;
         $this->dispatch('modal-closing-clean-url');
         $this->dispatch('modalClosing');

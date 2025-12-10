@@ -10,6 +10,7 @@ use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\UserOptions;
 use App\Models\EmailChange;
 use App\Models\UserVerify;
 use Illuminate\Support\Carbon;
@@ -68,14 +69,15 @@ class CabinetController extends Controller
       'zip' => 'required|string',
       'country' => 'required|string',
       'birthday' => 'required|string',
-      'tax_id' => 'sometimes|nullable|string',
+      'tax_id' => 'required|string',
       'phone' => 'sometimes|nullable|string',
-      'youtube' => 'sometimes|nullable|boolean',
-      'tiktok' => 'sometimes|nullable|boolean',
-      'google' => 'sometimes|nullable|boolean',
-      'facebook' => 'sometimes|nullable|boolean',
-      'instagram' => 'sometimes|nullable|boolean',
-      'twitter' => 'sometimes|nullable|boolean',
+      // Social media URLs - валидация URL только если чекбокс отмечен
+      'youtube' => 'sometimes|nullable|url|max:255',
+      'tiktok' => 'sometimes|nullable|url|max:255',
+      'google' => 'sometimes|nullable|url|max:255',
+      'facebook' => 'sometimes|nullable|url|max:255',
+      'instagram' => 'sometimes|nullable|url|max:255',
+      'twitter' => 'sometimes|nullable|url|max:255',
     ], [
       'full_name.required' => 'Please enter your Full Name.',
       'street.required' => 'Please enter a valid Address.',
@@ -85,15 +87,90 @@ class CabinetController extends Controller
       'country.required' => 'Please enter a valid Address.',
       'birthday.required' => 'Please enter a valid Date of Birth.',
       'tax_id.required' => 'Please enter a valid Tax ID or Passport/ID Number.',
+      'youtube.url' => 'Please enter a valid YouTube URL.',
+      'tiktok.url' => 'Please enter a valid TikTok URL.',
+      'google.url' => 'Please enter a valid Google URL.',
+      'facebook.url' => 'Please enter a valid Facebook URL.',
+      'instagram.url' => 'Please enter a valid Instagram URL.',
+      'twitter.url' => 'Please enter a valid X (Twitter) URL.',
     ]);
 
     if (isset($valid['phone'])) $valid['phone'] = preg_replace('/[^0-9]+/is', '', $valid['phone']);
 
-    // Обработка социальных сетей (чекбоксы отправляются только если отмечены)
-    $socialNetworks = ['youtube', 'tiktok', 'google', 'facebook', 'instagram', 'twitter'];
-    foreach ($socialNetworks as $network) {
-      // Если чекбокс отмечен в запросе, сохраняем true, иначе null
-      $valid[$network] = $request->has($network) ? true : null;
+    // Обработка социальных сетей
+    $socialNetworks = [
+      'youtube' => 'youtube',
+      'tiktok' => 'tiktok',
+      'google' => 'google',
+      'facebook' => 'facebook',
+      'instagram' => 'instagram',
+      'twitter' => 'xai', // В базе данных поле называется xai
+    ];
+    
+    // Проверка обязательности URL для отмеченных чекбоксов
+    foreach ($socialNetworks as $formField => $dbField) {
+      $checkboxName = $formField . '_check';
+      // Чекбоксы отправляются только если отмечены, поэтому проверяем наличие в запросе
+      if ($request->has($checkboxName) && $request->input($checkboxName)) {
+        // Если чекбокс отмечен, URL обязателен
+        if (empty($valid[$formField])) {
+          return redirect()->back()->withErrors([
+            $formField => 'Please enter a valid URL for ' . ucfirst($formField) . '.',
+          ])->withInput();
+        }
+      }
+    }
+    
+    // Обработка и сохранение URL соцсетей
+    foreach ($socialNetworks as $formField => $dbField) {
+      $checkboxName = $formField . '_check';
+      if ($request->has($checkboxName) && $request->input($checkboxName) && !empty($valid[$formField])) {
+        // Сохраняем URL в правильное поле базы данных
+        $valid[$dbField] = $valid[$formField];
+      } else {
+        // Если чекбокс не отмечен или URL пустой, очищаем поле
+        $valid[$dbField] = null;
+      }
+      // Удаляем временное поле из формы
+      unset($valid[$formField]);
+    }
+    
+    // Проверка уникальности URL соцсетей
+    $options = $user->options()->firstOrCreate([]);
+    $visibility = $options->getSocialVisibility();
+    
+    foreach ($socialNetworks as $formField => $dbField) {
+      if (!empty($valid[$dbField])) {
+        $existingUser = UserOptions::where($dbField, $valid[$dbField])
+          ->where('user_id', '!=', $user->id)
+          ->first();
+        if ($existingUser) {
+          return redirect()->back()->withErrors([
+            $formField => 'This ' . ucfirst($formField) . ' profile is already linked to another account.',
+          ])->withInput();
+        }
+        // Устанавливаем видимость для заполненных соцсетей
+        $visibility[$dbField] = true;
+      } else {
+        // Скрываем соцсети без URL
+        $visibility[$dbField] = false;
+      }
+    }
+    
+    // Обновляем видимость соцсетей
+    $valid['social_visibility'] = $visibility;
+
+    // Сохраняем значение country для Stripe до преобразования
+    $countryName = $valid['country'] ?? null;
+
+    // Обработка country - находим страну по названию и сохраняем country_id
+    if (isset($valid['country'])) {
+      $country = \App\Models\Country::where('name', $valid['country'])->first();
+      if ($country) {
+        $valid['country_id'] = $country->id;
+      }
+      // Удаляем строковое поле country, так как в таблице используется country_id
+      unset($valid['country']);
     }
 
     $user->options()->update($valid);
@@ -102,7 +179,7 @@ class CabinetController extends Controller
         'line1' => $valid['street'],
         'line2' => $valid['street2'] ?? null,
         'city' => $valid['city'],
-        'country' => $valid['country'],
+        'country' => $countryName,
         'postal_code' => $valid['zip'],
         'state' => $valid['state'],
       ],

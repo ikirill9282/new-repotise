@@ -235,22 +235,40 @@
                                     </div>
 
                                     {{-- Date of Birth --}}
+                                    @php
+                                        $birthdayInputId = 'birthday-input-' . uniqid();
+                                        $birthdayValue = old('birthday', $user->options->birthday ?? '');
+                                        // Форматируем значение для отображения в формате MM/DD/YYYY если оно в формате YYYY-MM-DD
+                                        if ($birthdayValue && preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthdayValue)) {
+                                            $date = \Carbon\Carbon::createFromFormat('Y-m-d', $birthdayValue);
+                                            $birthdayDisplayValue = $date->format('m/d/Y');
+                                        } else {
+                                            $birthdayDisplayValue = $birthdayValue;
+                                        }
+                                    @endphp
                                     <div class="form-group w-full" data-field="birthday">
                                         <label class="half req !w-full">
                                             <span class="label-name">Date of Birth</span>
                                             <div class="relative">
-                                            <input 
-                                              type="date" 
-                                              name="birthday" 
-                                              class="@error('birthday') error @enderror"
-                                              placeholder="MM/DD/YYYY" 
-                                              data-required="true"
-                                                    value="{{ old('birthday', $user->options->birthday ?? '') }}"
-                                                    style="padding-right: 40px;"
-                                            >
-                                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: #A4A0A0;">
-                                                    @include('icons.calendar')
-                                                </div>
+                                                <input 
+                                                  type="text" 
+                                                  id="{{ $birthdayInputId }}"
+                                                  class="@error('birthday') error @enderror"
+                                                  placeholder="MM/DD/YYYY" 
+                                                  data-required="true"
+                                                  value="{{ $birthdayDisplayValue }}"
+                                                  style="padding-right: 40px; cursor: pointer;"
+                                                  autocomplete="off"
+                                                  readonly
+                                                >
+                                                @if($birthdayValue && preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthdayValue))
+                                                    <input type="hidden" name="birthday" id="birthday-hidden-{{ $birthdayInputId }}" value="{{ $birthdayValue }}">
+                                                @else
+                                                    <input type="hidden" name="birthday" id="birthday-hidden-{{ $birthdayInputId }}" value="">
+                                                @endif
+                                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" style="color: #A4A0A0;" id="calendar-icon-{{ $birthdayInputId }}">
+                                                        @include('icons.calendar')
+                                                    </div>
                                             </div>
                                         </label>
                                         @error('birthday')
@@ -279,7 +297,7 @@
 
                                     {{-- Tax ID or Passport/ID Number --}}
                                     <div class="form-group w-full" data-field="tax_id">
-                                        <label>
+                                        <label class="req">
                                             <span class="label-name">Tax ID or Passport/ID Number</span>
                                             <input 
                                                 type="text" 
@@ -287,6 +305,8 @@
                                                 class="@error('tax_id') error @enderror"
                                                 placeholder="Enter your Tax ID (SSN) or Passport/ID Number"
                                                 value="{{ old('tax_id', $user->options->tax_id ?? '') }}"
+                                                data-required="true"
+                                                required
                                             >
                                         </label>
                                         @error('tax_id')
@@ -296,107 +316,203 @@
                               @endif
 
                                 {{-- Social Media Verification --}}
-                                <div data-field="social">
+                                <div class="form-group w-full" data-field="social">
                                     <h2>Social Media Verification (Recommended)</h2>
-                                    <p>
+                                    <p style="margin-bottom: 20px;">
                                         To expedite and strengthen your account verification, we highly recommend linking
                                         your social media profiles.
                                     </p>
                                     <div class="profile-social-wrap">
-                                        <label class="check-label">
-                                            <div class="checkbox">
-                                                <div class="item">
-                                                    <img src="{{ asset('assets/img/icons/youtube.svg') }}" alt="">
-                                                    <span>
-                                                        Youtube channel
-                                                    </span>
+                                        {{-- YouTube --}}
+                                        <div class="social-item-wrapper">
+                                            <label class="check-label">
+                                                <div class="checkbox">
+                                                    <div class="item">
+                                                        <img src="{{ asset('assets/img/icons/youtube.svg') }}" alt="">
+                                                        <span>
+                                                            Youtube channel
+                                                        </span>
+                                                    </div>
+                                                    <div class="checkbox-item {{ empty($user->options?->youtube ?? null) ? '' : 'active' }}">
+                                                        <input type="checkbox" name="youtube_check" id="youtube_check" class="social-checkbox" data-social="youtube" {{ empty($user->options?->youtube ?? null) ? '' : 'checked' }}>
+                                                        <span class="decor"></span>
+                                                    </div>
                                                 </div>
-                                                <div class="checkbox-item {{ empty($user->options?->youtube ?? null) ? '' : 'active' }}">
-                                                    <input type="checkbox" name="youtube" {{ empty($user->options?->youtube ?? null) ? '' : 'checked' }}>
-                                                    <span class="decor"></span>
-                                                </div>
+                                            </label>
+                                            <div class="social-url-input" id="youtube_url_wrapper" style="display: {{ empty($user->options?->youtube ?? null) ? 'none' : 'block' }}; margin-top: 10px;">
+                                                <input 
+                                                    type="url" 
+                                                    name="youtube" 
+                                                    id="youtube_url"
+                                                    class="form-control @error('youtube') error @enderror" 
+                                                    placeholder="https://youtube.com/@yourchannel"
+                                                    value="{{ old('youtube', $user->options->youtube ?? '') }}"
+                                                >
+                                                @error('youtube')
+                                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                @enderror
                                             </div>
-                                        </label>
-                                        <label class="check-label">
-                                            <div class="checkbox">
-                                                <div class="item">
-                                                    <img src="{{ asset('assets/img/icons/tiktok.svg') }}" alt="">
-                                                    <span>
-                                                        TikTok Account
-                                                    </span>
+                                        </div>
+                                        {{-- TikTok --}}
+                                        <div class="social-item-wrapper">
+                                            <label class="check-label">
+                                                <div class="checkbox">
+                                                    <div class="item">
+                                                        <img src="{{ asset('assets/img/icons/tiktok.svg') }}" alt="">
+                                                        <span>
+                                                            TikTok Account
+                                                        </span>
+                                                    </div>
+                                                    <div class="checkbox-item {{ empty($user->options?->tiktok ?? null) ? '' : 'active' }}">
+                                                        <input type="checkbox" name="tiktok_check" id="tiktok_check" class="social-checkbox" data-social="tiktok" {{ empty($user->options?->tiktok ?? null) ? '' : 'checked' }}>
+                                                        <span class="decor"></span>
+                                                    </div>
                                                 </div>
-                                                <div class="checkbox-item {{ empty($user->options?->tiktok ?? null) ? '' : 'active' }}">
-                                                    <input type="checkbox" name="tiktok" {{ empty($user->options?->tiktok ?? null) ? '' : 'checked' }}>
-                                                    <span class="decor"></span>
-                                                </div>
+                                            </label>
+                                            <div class="social-url-input" id="tiktok_url_wrapper" style="display: {{ empty($user->options?->tiktok ?? null) ? 'none' : 'block' }}; margin-top: 10px;">
+                                                <input 
+                                                    type="url" 
+                                                    name="tiktok" 
+                                                    id="tiktok_url"
+                                                    class="form-control @error('tiktok') error @enderror" 
+                                                    placeholder="https://tiktok.com/@yourusername"
+                                                    value="{{ old('tiktok', $user->options->tiktok ?? '') }}"
+                                                >
+                                                @error('tiktok')
+                                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                @enderror
                                             </div>
-                                        </label>
-                                        <label class="check-label">
-                                            <div class="checkbox">
-                                                <div class="item">
-                                                    <img src="{{ asset('assets/img/icons/google.svg') }}" alt="">
-                                                    <span>
-                                                        Google Account
-                                                    </span>
+                                        </div>
+                                        {{-- Google --}}
+                                        <div class="social-item-wrapper">
+                                            <label class="check-label">
+                                                <div class="checkbox">
+                                                    <div class="item">
+                                                        <img src="{{ asset('assets/img/icons/google.svg') }}" alt="">
+                                                        <span>
+                                                            Google Account
+                                                        </span>
+                                                    </div>
+                                                    <div class="checkbox-item {{ empty($user->options?->google ?? null) ? '' : 'active' }}">
+                                                        <input type="checkbox" name="google_check" id="google_check" class="social-checkbox" data-social="google" {{ empty($user->options?->google ?? null) ? '' : 'checked' }}>
+                                                        <span class="decor"></span>
+                                                    </div>
                                                 </div>
-                                                <div class="checkbox-item {{ empty($user->options?->google ?? null) ? '' : 'active' }}">
-                                                    <input type="checkbox" name="google" {{ empty($user->options?->google ?? null) ? '' : 'checked' }}>
-                                                    <span class="decor"></span>
-                                                </div>
+                                            </label>
+                                            <div class="social-url-input" id="google_url_wrapper" style="display: {{ empty($user->options?->google ?? null) ? 'none' : 'block' }}; margin-top: 10px;">
+                                                <input 
+                                                    type="url" 
+                                                    name="google" 
+                                                    id="google_url"
+                                                    class="form-control @error('google') error @enderror" 
+                                                    placeholder="https://plus.google.com/yourprofile"
+                                                    value="{{ old('google', $user->options->google ?? '') }}"
+                                                >
+                                                @error('google')
+                                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                @enderror
                                             </div>
-                                        </label>
-                                        <label class="check-label">
-                                            <div class="checkbox">
-                                                <div class="item">
-                                                    <img src="{{ asset('assets/img/icons/facebook.svg') }}" alt="">
-                                                    <span>
-                                                        Facebook Account/Page
-                                                    </span>
+                                        </div>
+                                        {{-- Facebook --}}
+                                        <div class="social-item-wrapper">
+                                            <label class="check-label">
+                                                <div class="checkbox">
+                                                    <div class="item">
+                                                        <img src="{{ asset('assets/img/icons/facebook.svg') }}" alt="">
+                                                        <span>
+                                                            Facebook Account/Page
+                                                        </span>
+                                                    </div>
+                                                    <div class="checkbox-item {{ empty($user->options?->facebook ?? null) ? '' : 'active' }}">
+                                                        <input type="checkbox" name="facebook_check" id="facebook_check" class="social-checkbox" data-social="facebook" {{ empty($user->options?->facebook ?? null) ? '' : 'checked' }}>
+                                                        <span class="decor"></span>
+                                                    </div>
                                                 </div>
-                                                <div class="checkbox-item {{ empty($user->options?->facebook ?? null) ? '' : 'active' }}">
-                                                    <input type="checkbox" name="facebook" {{ empty($user->options?->facebook ?? null) ? '' : 'checked' }}>
-                                                    <span class="decor"></span>
-                                                </div>
+                                            </label>
+                                            <div class="social-url-input" id="facebook_url_wrapper" style="display: {{ empty($user->options?->facebook ?? null) ? 'none' : 'block' }}; margin-top: 10px;">
+                                                <input 
+                                                    type="url" 
+                                                    name="facebook" 
+                                                    id="facebook_url"
+                                                    class="form-control @error('facebook') error @enderror" 
+                                                    placeholder="https://facebook.com/yourprofile"
+                                                    value="{{ old('facebook', $user->options->facebook ?? '') }}"
+                                                >
+                                                @error('facebook')
+                                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                @enderror
                                             </div>
-                                        </label>
-                                        <label class="check-label">
-                                            <div class="checkbox">
-                                                <div class="item">
-                                                    <img src="{{ asset('assets/img/icons/insta.svg') }}" alt="">
-                                                    <span>
-                                                        Instagram Account
-                                                    </span>
+                                        </div>
+                                        {{-- Instagram --}}
+                                        <div class="social-item-wrapper">
+                                            <label class="check-label">
+                                                <div class="checkbox">
+                                                    <div class="item">
+                                                        <img src="{{ asset('assets/img/icons/insta.svg') }}" alt="">
+                                                        <span>
+                                                            Instagram Account
+                                                        </span>
+                                                    </div>
+                                                    <div class="checkbox-item {{ empty($user->options?->instagram ?? null) ? '' : 'active' }}">
+                                                        <input type="checkbox" name="instagram_check" id="instagram_check" class="social-checkbox" data-social="instagram" {{ empty($user->options?->instagram ?? null) ? '' : 'checked' }}>
+                                                        <span class="decor"></span>
+                                                    </div>
                                                 </div>
-                                                <div class="checkbox-item {{ empty($user->options?->instagram ?? null) ? '' : 'active' }}">
-                                                    <input type="checkbox" name="instagram" {{ empty($user->options?->instagram ?? null) ? '' : 'checked' }}>
-                                                    <span class="decor"></span>
-                                                </div>
+                                            </label>
+                                            <div class="social-url-input" id="instagram_url_wrapper" style="display: {{ empty($user->options?->instagram ?? null) ? 'none' : 'block' }}; margin-top: 10px;">
+                                                <input 
+                                                    type="url" 
+                                                    name="instagram" 
+                                                    id="instagram_url"
+                                                    class="form-control @error('instagram') error @enderror" 
+                                                    placeholder="https://instagram.com/yourusername"
+                                                    value="{{ old('instagram', $user->options->instagram ?? '') }}"
+                                                >
+                                                @error('instagram')
+                                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                @enderror
                                             </div>
-                                        </label>
-                                        <label class="check-label">
-                                            <div class="checkbox">
-                                                <div class="item">
-                                                    <img src="{{ asset('assets/img/icons/xai.svg') }}" alt="">
-                                                    <span>
-                                                        X (Twitter) Account
-                                                    </span>
+                                        </div>
+                                        {{-- X (Twitter) --}}
+                                        <div class="social-item-wrapper">
+                                            <label class="check-label">
+                                                <div class="checkbox">
+                                                    <div class="item">
+                                                        <img src="{{ asset('assets/img/icons/xai.svg') }}" alt="">
+                                                        <span>
+                                                            X (Twitter) Account
+                                                        </span>
+                                                    </div>
+                                                    <div class="checkbox-item {{ empty($user->options?->xai ?? null) ? '' : 'active' }}">
+                                                        <input type="checkbox" name="twitter_check" id="twitter_check" class="social-checkbox" data-social="twitter" {{ empty($user->options?->xai ?? null) ? '' : 'checked' }}>
+                                                        <span class="decor"></span>
+                                                    </div>
                                                 </div>
-                                                <div class="checkbox-item {{ empty($user->options?->twitter ?? null) ? '' : 'active' }}">
-                                                    <input type="checkbox" name="twitter" {{ empty($user->options?->twitter ?? null) ? '' : 'checked' }}>
-                                                    <span class="decor"></span>
-                                                </div>
+                                            </label>
+                                            <div class="social-url-input" id="twitter_url_wrapper" style="display: {{ empty($user->options?->xai ?? null) ? 'none' : 'block' }}; margin-top: 10px;">
+                                                <input 
+                                                    type="url" 
+                                                    name="twitter" 
+                                                    id="twitter_url"
+                                                    class="form-control @error('twitter') error @enderror" 
+                                                    placeholder="https://x.com/yourusername"
+                                                    value="{{ old('twitter', $user->options->xai ?? '') }}"
+                                                >
+                                                @error('twitter')
+                                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                @enderror
                                             </div>
-                                        </label>
+                                        </div>
                                     </div>
-                                    <p>
-                                        Don't see your social network listed? <a href="{{ route('help-center') }}">Contact us</a> to verify other
+                                    <p style="margin-top: 20px;">
+                                        Don't see your social network listed? <a href="{{ route('help-center') }}" class="text-[#FC7361] hover:underline">Contact us</a> to verify other
                                         social media profiles manually.
                                     </p>
                                 </div>
 
                               @if(!auth()->user()->verify()->where('type', 'stripe')->exists())
                                     {{-- Текст соглашения перед кнопкой --}}
-                                    <div class="info" style="margin: 30px 0 20px 0;">
+                                    <div class="info" style="margin: 10px 0;">
                                         <span>
                                             By clicking 'Continue', you certify that the information provided is accurate and truthful. This data will be used for account verification, tax form generation, and you are providing your digital signature for these purposes. You also agree to our <a href="{{ url('/policies') }}">Terms of Service</a>, <a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a>, and <a href="{{ url('/policies') }}">Other Terms</a>.
                                         </span>
@@ -491,6 +607,507 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Обработка кнопки Back
+            const backButton = document.querySelector('.back');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Используем history.back() для возврата на предыдущую страницу
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        // Если истории нет, переходим на главную страницу
+                        window.location.href = '{{ route("home") }}';
+                    }
+                });
+            }
+            
+            // Валидация формы перед отправкой
+            const verificationForm = document.getElementById('verification-form');
+            if (verificationForm) {
+                verificationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Form validation started');
+                    
+                    // Удаляем предыдущие сообщения об ошибках
+                    document.querySelectorAll('.field-error-message').forEach(el => el.remove());
+                    document.querySelectorAll('input.error').forEach(el => el.classList.remove('error'));
+                    
+                    const requiredFields = [
+                        { 
+                            name: 'full_name', 
+                            selector: 'input[name="full_name"]',
+                            message: 'Please enter your Full Name.',
+                            container: '[data-field="full_name"]'
+                        },
+                        { 
+                            name: 'street', 
+                            selector: 'input[name="street"]',
+                            message: 'Please enter a valid Address.',
+                            container: '.address-section'
+                        },
+                        { 
+                            name: 'city', 
+                            selector: 'input[name="city"]',
+                            message: 'Please enter a valid Address.',
+                            container: '.address-section'
+                        },
+                        { 
+                            name: 'state', 
+                            selector: 'input[name="state"]',
+                            message: 'Please enter a valid Address.',
+                            container: '.address-section'
+                        },
+                        { 
+                            name: 'zip', 
+                            selector: 'input[name="zip"]',
+                            message: 'Please enter a valid Address.',
+                            container: '.address-section'
+                        },
+                        { 
+                            name: 'country', 
+                            selector: 'input[name="country"]',
+                            message: 'Please enter a valid Address.',
+                            container: '.address-section'
+                        },
+                        { 
+                            name: 'birthday', 
+                            selector: 'input[name="birthday"][type="hidden"]',
+                            message: 'Please enter a valid Date of Birth.',
+                            container: '[data-field="birthday"]',
+                            visibleSelector: '#{{ $birthdayInputId }}'
+                        },
+                        { 
+                            name: 'tax_id', 
+                            selector: 'input[name="tax_id"]',
+                            message: 'Please enter a valid Tax ID or Passport/ID Number.',
+                            container: '[data-field="tax_id"]'
+                        }
+                    ];
+                    
+                    let firstErrorField = null;
+                    let isValid = true;
+                    
+                    requiredFields.forEach(field => {
+                        let fieldElement = document.querySelector(field.selector);
+                        let fieldValue = '';
+                        
+                        // Для birthday проверяем скрытое поле или видимое
+                        if (field.name === 'birthday') {
+                            if (fieldElement) {
+                                fieldValue = fieldElement.value.trim();
+                            }
+                            // Если скрытого поля нет или оно пустое, проверяем видимое поле
+                            if (!fieldValue && field.visibleSelector) {
+                                const visibleInput = document.querySelector(field.visibleSelector);
+                                if (visibleInput) {
+                                    fieldValue = visibleInput.value.trim();
+                                    // Если значение есть в видимом поле, но нет скрытого, создаем его
+                                    if (fieldValue && !fieldElement) {
+                                        const dateMatch = fieldValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                                        if (dateMatch) {
+                                            const year = dateMatch[3];
+                                            const month = String(dateMatch[1]).padStart(2, '0');
+                                            const day = String(dateMatch[2]).padStart(2, '0');
+                                            fieldValue = `${year}-${month}-${day}`;
+                                            
+                                            fieldElement = document.createElement('input');
+                                            fieldElement.type = 'hidden';
+                                            fieldElement.name = 'birthday';
+                                            fieldElement.id = 'birthday-hidden-{{ $birthdayInputId }}';
+                                            fieldElement.value = fieldValue;
+                                            visibleInput.parentElement.appendChild(fieldElement);
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            if (fieldElement) {
+                                fieldValue = fieldElement.value.trim();
+                            }
+                        }
+                        
+                        // Проверяем, заполнено ли поле
+                        if (!fieldValue) {
+                            isValid = false;
+                            
+                            // Находим элемент для отображения ошибки
+                            const container = document.querySelector(field.container);
+                            let errorContainer = null;
+                            let inputToHighlight = null;
+                            
+                            if (field.name === 'birthday') {
+                                inputToHighlight = document.querySelector(field.visibleSelector);
+                                if (container) {
+                                    errorContainer = container.querySelector('label') || container;
+                                }
+                            } else {
+                                inputToHighlight = fieldElement;
+                                if (container) {
+                                    const fieldWrapper = container.querySelector(field.selector);
+                                    if (fieldWrapper) {
+                                        errorContainer = fieldWrapper.closest('.form-group') || fieldWrapper.closest('label') || fieldWrapper.parentElement;
+                                    } else {
+                                        errorContainer = container;
+                                    }
+                                } else if (fieldElement) {
+                                    errorContainer = fieldElement.closest('.form-group') || fieldElement.closest('label') || fieldElement.parentElement;
+                                }
+                            }
+                            
+                            // Добавляем класс error к полю
+                            if (inputToHighlight) {
+                                inputToHighlight.classList.add('error');
+                            }
+                            
+                            // Создаем сообщение об ошибке
+                            const errorMessage = document.createElement('span');
+                            errorMessage.className = 'text-red-500 field-error-message';
+                            errorMessage.style.display = 'block';
+                            errorMessage.style.marginTop = '5px';
+                            errorMessage.textContent = field.message;
+                            
+                            // Добавляем сообщение об ошибке
+                            if (errorContainer) {
+                                // Проверяем, нет ли уже сообщения об ошибке
+                                const existingError = errorContainer.querySelector('.field-error-message');
+                                if (!existingError) {
+                                    errorContainer.appendChild(errorMessage);
+                                }
+                            } else if (inputToHighlight && inputToHighlight.parentElement) {
+                                inputToHighlight.parentElement.appendChild(errorMessage);
+                            }
+                            
+                            // Сохраняем первое поле с ошибкой для прокрутки
+                            if (!firstErrorField) {
+                                firstErrorField = inputToHighlight || fieldElement || container;
+                            }
+                        }
+                    });
+                    
+                    // Если есть ошибки, прокручиваем к первому полю с ошибкой
+                    if (!isValid && firstErrorField) {
+                        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Фокусируемся на поле, если это input
+                        if (firstErrorField.tagName === 'INPUT') {
+                            setTimeout(() => {
+                                firstErrorField.focus();
+                                firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 300);
+                        }
+                        return false;
+                    }
+                    
+                    // Если все поля заполнены, отправляем форму
+                    this.submit();
+                });
+            }
+            
+            // Обработка показа/скрытия полей URL для соцсетей
+            const socialCheckboxes = document.querySelectorAll('.social-checkbox');
+            socialCheckboxes.forEach(checkbox => {
+                const socialName = checkbox.getAttribute('data-social');
+                const urlWrapper = document.getElementById(socialName + '_url_wrapper');
+                const urlInput = document.getElementById(socialName + '_url');
+                
+                // Находим родительский элемент checkbox-item для добавления класса active
+                const checkboxItem = checkbox.closest('.checkbox-item');
+                
+                // Функция для обновления состояния
+                function updateCheckboxState(isChecked) {
+                    if (checkboxItem) {
+                        if (isChecked) {
+                            checkboxItem.classList.add('active');
+                        } else {
+                            checkboxItem.classList.remove('active');
+                        }
+                    }
+                    
+                    if (urlWrapper) {
+                        if (isChecked) {
+                            urlWrapper.style.display = 'block';
+                            if (urlInput) {
+                                urlInput.focus();
+                            }
+                        } else {
+                            urlWrapper.style.display = 'none';
+                            if (urlInput) {
+                                urlInput.value = '';
+                            }
+                        }
+                    }
+                }
+                
+                // Инициализация состояния при загрузке
+                updateCheckboxState(checkbox.checked);
+                
+                // Обработчик изменения чекбокса
+                checkbox.addEventListener('change', function() {
+                    updateCheckboxState(this.checked);
+                });
+                
+                // Обработчик клика на label для переключения чекбокса
+                const label = checkbox.closest('.check-label');
+                if (label) {
+                    label.addEventListener('click', function(e) {
+                        // Если клик был не на самом чекбоксе, переключаем его
+                        if (e.target !== checkbox && !checkbox.contains(e.target)) {
+                            e.preventDefault();
+                            checkbox.checked = !checkbox.checked;
+                            updateCheckboxState(checkbox.checked);
+                            // Триггерим событие change для других обработчиков
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            });
+            
+            // Инициализация календаря для даты рождения
+            const birthdayInputId = '{{ $birthdayInputId }}';
+            let birthdayPicker = null;
+            let initAttempts = 0;
+            const maxAttempts = 100; // Увеличиваем количество попыток
+            
+            function initBirthdayDatePicker() {
+                initAttempts++;
+                
+                const input = document.querySelector('#' + birthdayInputId);
+                if (!input) {
+                    if (initAttempts < maxAttempts) {
+                        setTimeout(initBirthdayDatePicker, 100);
+                    } else {
+                        console.error('Birthday input element not found:', birthdayInputId);
+                    }
+                    return;
+                }
+                
+                if (input.dataset.pickerInitialized === 'true') {
+                    return; // Уже инициализирован
+                }
+                
+                // Проверяем наличие AirDatepicker
+                if (typeof window.AirDatepicker === 'undefined') {
+                    if (initAttempts < maxAttempts) {
+                        setTimeout(initBirthdayDatePicker, 100);
+                    } else {
+                        console.error('AirDatepicker library not loaded');
+                    }
+                    return;
+                }
+                
+                // Пытаемся использовать createBirthdayDatePicker, если доступна
+                if (typeof window.createBirthdayDatePicker === 'function') {
+                    try {
+                        birthdayPicker = window.createBirthdayDatePicker('#' + birthdayInputId);
+                        if (birthdayPicker) {
+                            input.dataset.pickerInitialized = 'true';
+                            input._birthdayPicker = birthdayPicker;
+                            setupCalendarHandlers();
+                            console.log('Birthday date picker initialized using createBirthdayDatePicker');
+                            return;
+                        }
+                    } catch (error) {
+                        console.warn('Error using createBirthdayDatePicker, falling back to direct initialization:', error);
+                    }
+                }
+                
+                // Если функция недоступна, создаем календарь напрямую
+                try {
+                    const currentValue = input.value;
+                    let initialDate = null;
+                    
+                    // Парсим текущее значение
+                    if (currentValue) {
+                        const dateMatch = currentValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                        if (dateMatch) {
+                            initialDate = new Date(parseInt(dateMatch[1]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[3]));
+                        } else {
+                            const parts = currentValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                            if (parts) {
+                                initialDate = new Date(parseInt(parts[3]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                            } else {
+                                const parsed = new Date(currentValue);
+                                if (!isNaN(parsed.getTime())) {
+                                    initialDate = parsed;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Находим или создаем скрытое поле
+                    let hiddenInput = input.parentElement.querySelector('input[name="birthday"][type="hidden"]');
+                    if (!hiddenInput) {
+                        hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'birthday';
+                        hiddenInput.id = 'birthday-hidden-' + birthdayInputId;
+                        if (currentValue && currentValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                            hiddenInput.value = currentValue;
+                        } else if (initialDate) {
+                            const year = initialDate.getFullYear();
+                            const month = String(initialDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(initialDate.getDate()).padStart(2, '0');
+                            hiddenInput.value = `${year}-${month}-${day}`;
+                        }
+                        input.parentElement.appendChild(hiddenInput);
+                    }
+                    
+                    // Импортируем локаль (если доступна) или используем дефолтную
+                    // Локаль может быть доступна через window или нужно импортировать
+                    let localeEn = null;
+                    if (typeof window.localeEn !== 'undefined') {
+                        localeEn = window.localeEn;
+                    }
+                    
+                    // Конфигурация календаря
+                    const pickerConfig = {
+                        dateFormat: function(date) {
+                            return date.toLocaleString("en-US", {
+                                year: "numeric",
+                                day: "2-digit",
+                                month: "2-digit",
+                            });
+                        },
+                        selectedDates: initialDate ? [initialDate] : [],
+                        maxDate: new Date(),
+                        autoClose: true,
+                        isMobile: false,
+                        onRenderCell: function({ date, cellType }) {
+                            const today = new Date();
+                            today.setHours(23, 59, 59, 999);
+                            const response = {
+                                disabled: true,
+                                classes: "disabled-class",
+                                attrs: {
+                                    title: "Cell is disabled",
+                                },
+                            };
+                            
+                            if (cellType === "day") {
+                                const cellDate = new Date(date);
+                                cellDate.setHours(0, 0, 0, 0);
+                                if (cellDate > today) {
+                                    return response;
+                                }
+                            }
+                        },
+                        onSelect: function({ date, formattedDate, datepicker }) {
+                            const displayFormat = date.toLocaleString("en-US", {
+                                year: "numeric",
+                                day: "2-digit",
+                                month: "2-digit",
+                            });
+                            
+                            // Устанавливаем отображаемое значение
+                            datepicker.$el.value = displayFormat;
+                            
+                            // Форматируем дату для скрытого поля
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const hiddenValue = `${year}-${month}-${day}`;
+                            
+                            // Сохраняем ссылку на элемент для использования после закрытия календаря
+                            const inputElement = datepicker.$el;
+                            const parentElement = inputElement.parentElement;
+                            
+                            // Закрываем календарь сначала
+                            datepicker.hide();
+                            
+                            // Обновляем DOM после того, как календарь закрылся
+                            setTimeout(function() {
+                                // Находим или создаем скрытое поле
+                                let hiddenInput = parentElement.querySelector('input[name="birthday"][type="hidden"]');
+                                if (!hiddenInput) {
+                                    hiddenInput = document.createElement('input');
+                                    hiddenInput.type = 'hidden';
+                                    hiddenInput.name = 'birthday';
+                                    hiddenInput.id = 'birthday-hidden-' + birthdayInputId;
+                                    parentElement.appendChild(hiddenInput);
+                                }
+                                
+                                // Устанавливаем значение скрытого поля
+                                hiddenInput.value = hiddenValue;
+                                
+                                // Удаляем name из видимого input только если скрытое поле создано
+                                if (hiddenInput && hiddenInput.parentElement) {
+                                    inputElement.removeAttribute('name');
+                                }
+                                
+                                // Триггерим событие input
+                                const event = new Event('input', {
+                                    cancelable: true,
+                                    bubbles: true,
+                                });
+                                inputElement.dispatchEvent(event);
+                            }, 100);
+                        },
+                    };
+                    
+                    // Добавляем локаль, если доступна
+                    if (localeEn) {
+                        pickerConfig.locale = localeEn;
+                    }
+                    
+                    // Создаем календарь напрямую
+                    birthdayPicker = new window.AirDatepicker('#' + birthdayInputId, pickerConfig);
+                    
+                    input.dataset.pickerInitialized = 'true';
+                    input._birthdayPicker = birthdayPicker;
+                    setupCalendarHandlers();
+                    console.log('Birthday date picker initialized directly using AirDatepicker');
+                } catch (error) {
+                    console.error('Error initializing birthday date picker:', error);
+                    if (initAttempts < maxAttempts) {
+                        setTimeout(initBirthdayDatePicker, 100);
+                    }
+                }
+            }
+            
+            function setupCalendarHandlers() {
+                const input = document.querySelector('#' + birthdayInputId);
+                if (!input || !birthdayPicker) return;
+                
+                function openCalendar(e) {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    if (birthdayPicker) {
+                        try {
+                            if (typeof birthdayPicker.show === 'function') {
+                                birthdayPicker.show();
+                            } else if (typeof birthdayPicker.open === 'function') {
+                                birthdayPicker.open();
+                            }
+                        } catch (err) {
+                            console.error('Error opening calendar:', err);
+                        }
+                    }
+                }
+                
+                const calendarIcon = document.getElementById('calendar-icon-' + birthdayInputId);
+                if (calendarIcon) {
+                    calendarIcon.style.pointerEvents = 'auto';
+                    calendarIcon.style.cursor = 'pointer';
+                    calendarIcon.addEventListener('click', openCalendar);
+                }
+                
+                input.addEventListener('click', openCalendar);
+                input.addEventListener('focus', openCalendar);
+            }
+            
+            // Запускаем инициализацию
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(initBirthdayDatePicker, 200);
+                });
+            } else {
+                setTimeout(initBirthdayDatePicker, 200);
+            }
+            
             // Скрываем все подсказки по умолчанию
             const allSidebarItems = document.querySelectorAll('.sidebar-item');
             allSidebarItems.forEach(item => {
@@ -603,7 +1220,7 @@
 
             // Обработчик для секции Social Media
             const socialSection = document.querySelector('[data-field="social"]');
-            const socialCheckboxes = document.querySelectorAll('.profile-social-wrap input[type="checkbox"], .profile-social-wrap label');
+            const socialMediaElements = document.querySelectorAll('.profile-social-wrap input[type="checkbox"], .profile-social-wrap label');
             
             if (socialSection) {
                 socialSection.addEventListener('click', function(e) {
@@ -612,7 +1229,7 @@
                 });
             }
             
-            socialCheckboxes.forEach(element => {
+            socialMediaElements.forEach(element => {
                 element.addEventListener('click', function(e) {
                     showSidebarItem('social');
                 });
@@ -685,6 +1302,225 @@
         .form-group[data-field] input,
         .form-group[data-field] textarea {
             cursor: text;
+        }
+        
+        .social-item-wrapper {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .social-url-input {
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .social-url-input input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .social-url-input input:focus {
+            outline: none;
+            border-color: #FC7361;
+        }
+        
+        .social-url-input input.error {
+            border-color: #dc3545;
+        }
+        
+        .profile-social-wrap {
+            width: 100%;
+        }
+        
+        /* Кастомные стили для AirDatepicker в красно-оранжевой палитре */
+        .air-datepicker {
+            --adp-color-primary: #FC7361 !important;
+            --adp-color-primary-hover: #e86552 !important;
+            --adp-color-current-date: #FC7361 !important;
+            --adp-color-selected-date: #ffffff !important;
+            --adp-color-selected-date-background: #FC7361 !important;
+            --adp-color-day-name: #212529 !important;
+            --adp-color-day-name-hover: #FC7361 !important;
+            --adp-color-cell-hover: rgba(252, 115, 97, 0.15) !important;
+            --adp-color-cell-selected: #ffffff !important;
+            --adp-color-cell-selected-background: #FC7361 !important;
+            --adp-color-cell-selected-hover: #e86552 !important;
+            --adp-color-cell-disabled: #A4A0A0 !important;
+            --adp-color-cell-disabled-background: #f5f5f5 !important;
+            --adp-color-cell-other-month: #A4A0A0 !important;
+            --adp-color-cell-other-month-hover: rgba(252, 115, 97, 0.1) !important;
+            --adp-color-nav-arrow-hover: #FC7361 !important;
+            --adp-color-nav-action-hover: #FC7361 !important;
+            --adp-color-nav-action-active: #FC7361 !important;
+            --adp-color-button-hover: rgba(252, 115, 97, 0.1) !important;
+            --adp-color-button-active: #FC7361 !important;
+            --adp-color-button-active-text: #ffffff !important;
+            --adp-color-button-text: #212529 !important;
+            --adp-color-button-text-hover: #FC7361 !important;
+            --adp-border-radius: 8px;
+            --adp-font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+            --adp-font-size: 14px;
+            --adp-width: 300px;
+            --adp-z-index: 100;
+            box-shadow: 0 4px 16px rgba(252, 115, 97, 0.2) !important;
+            border: 1px solid rgba(252, 115, 97, 0.3) !important;
+            background-color: #ffffff;
+        }
+
+        .air-datepicker--pointer {
+            --adp-pointer-color: #FC7361 !important;
+        }
+        
+        .air-datepicker--pointer::before {
+            border-bottom-color: #FC7361 !important;
+        }
+
+        .air-datepicker-nav {
+            border-bottom: 1px solid rgba(252, 115, 97, 0.15) !important;
+            padding: 12px 16px;
+            background-color: #ffffff;
+        }
+
+        .air-datepicker-nav--title {
+            color: #212529 !important;
+            font-weight: 600;
+        }
+
+        .air-datepicker-nav--title:hover {
+            color: #FC7361 !important;
+        }
+
+        .air-datepicker-nav--action {
+            color: #212529 !important;
+            transition: all 0.2s ease;
+        }
+
+        .air-datepicker-nav--action:hover {
+            color: #FC7361 !important;
+            background-color: rgba(252, 115, 97, 0.1) !important;
+        }
+
+        .air-datepicker-nav--action svg {
+            fill: currentColor;
+        }
+
+        /* Стили для названий дней недели */
+        .air-datepicker--day-name {
+            color: #212529 !important;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        /* Выходные дни (суббота и воскресенье) - оранжевый цвет */
+        .air-datepicker--day-name:nth-child(6),
+        .air-datepicker--day-name:nth-child(7) {
+            color: #FC7361 !important;
+            font-weight: 700;
+        }
+
+        /* Ячейки календаря */
+        .air-datepicker-cell {
+            color: #212529 !important;
+            transition: all 0.2s ease;
+        }
+
+        .air-datepicker-cell:hover {
+            background-color: rgba(252, 115, 97, 0.15) !important;
+            color: #FC7361 !important;
+        }
+
+        /* Выбранная дата */
+        .air-datepicker-cell.-selected- {
+            background-color: #FC7361 !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .air-datepicker-cell.-selected-:hover {
+            background-color: #e86552 !important;
+            color: #ffffff !important;
+        }
+
+        /* Текущая дата (сегодня) */
+        .air-datepicker-cell.-current- {
+            color: #FC7361 !important;
+            font-weight: 600;
+        }
+
+        .air-datepicker-cell.-current-.-selected- {
+            background-color: #FC7361 !important;
+            color: #ffffff !important;
+        }
+
+        /* Отключенные даты */
+        .air-datepicker-cell.-disabled- {
+            color: #A4A0A0 !important;
+            background-color: #f5f5f5 !important;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Даты из других месяцев */
+        .air-datepicker-cell.-other-month- {
+            color: #A4A0A0 !important;
+            opacity: 0.4;
+        }
+
+        .air-datepicker-cell.-other-month-:hover {
+            background-color: rgba(252, 115, 97, 0.05) !important;
+            color: #FC7361 !important;
+        }
+
+        /* Кнопки внизу календаря */
+        .air-datepicker--buttons {
+            border-top: 1px solid rgba(252, 115, 97, 0.15) !important;
+            padding: 8px;
+            background-color: #ffffff;
+        }
+
+        .air-datepicker--button {
+            color: #212529 !important;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+            padding: 6px 12px;
+        }
+
+        .air-datepicker--button:hover {
+            background-color: rgba(252, 115, 97, 0.1) !important;
+            color: #FC7361 !important;
+        }
+
+        .air-datepicker--button.-active- {
+            background-color: #FC7361 !important;
+            color: #ffffff !important;
+        }
+
+        .air-datepicker--button.-active-:hover {
+            background-color: #e86552 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Переопределение стандартных цветов AirDatepicker */
+        .air-datepicker-cell.-selected-,
+        .air-datepicker-cell.-selected-.-current- {
+            background: #FC7361 !important;
+            color: #ffffff !important;
+        }
+        
+        .air-datepicker-cell.-range-from-,
+        .air-datepicker-cell.-range-to- {
+            background: #FC7361 !important;
+            color: #ffffff !important;
+        }
+        
+        .air-datepicker-cell.-in-range- {
+            background: rgba(252, 115, 97, 0.1) !important;
         }
         
         @media (max-width: 992px) {

@@ -26,6 +26,39 @@
                     url.searchParams.delete('modal');
                     window.history.replaceState({}, document.title, url.toString());
                 });
+                // Обработчик для открытия модального окна после закрытия предыдущего
+                let pendingModalToOpen = null;
+                let isOpeningModal = false;
+                
+                Livewire.on('openModalAfterClose', (event) => {
+                    const modalName = Array.isArray(event) ? event[0] : event;
+                    if (isOpeningModal) {
+                        // Если уже открываем модальное окно, игнорируем повторные вызовы
+                        return;
+                    }
+                    pendingModalToOpen = modalName;
+                    isOpeningModal = true;
+                    
+                    // Ждем завершения анимации закрытия (300ms) и затем открываем новое окно
+                    setTimeout(() => {
+                        if (pendingModalToOpen && !@this.get('isVisible')) {
+                            @this.call('openModalAfterClose', pendingModalToOpen);
+                            pendingModalToOpen = null;
+                            // Сбрасываем флаг через небольшую задержку
+                            setTimeout(() => {
+                                isOpeningModal = false;
+                            }, 100);
+                        } else {
+                            isOpeningModal = false;
+                        }
+                    }, 450);
+                });
+                
+                // Отслеживаем открытие модального окна, чтобы сбросить флаг
+                Livewire.on('modal-opened', () => {
+                    isOpeningModal = false;
+                    pendingModalToOpen = null;
+                });
                 Livewire.on('startShowAnimation', () => {
                     @this.call('startShowAnimation')
                 });
@@ -46,6 +79,34 @@
                       initCartSlider();
                     }, 10);
                 });
+                
+                // Защита от закрытия модального окна delete-product-accept при обновлении компонентов
+                let protectedModal = null;
+                
+                Livewire.on('modal-opened', event => {
+                    const modalName = event[0]?.modal;
+                    // Защищаем модальные окна успеха от автоматического закрытия
+                    if (['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept'].includes(modalName)) {
+                        protectedModal = modalName;
+                    }
+                });
+                
+                // Сбрасываем защиту при закрытии модального окна пользователем и обновляем список продуктов
+                window.addEventListener('modalClosing', () => {
+                    const currentModal = @this.get('modal');
+                    if (currentModal === protectedModal) {
+                        protectedModal = null;
+                    }
+                    
+                    // Если закрылось модальное окно delete-product-accept, отправляем событие для обновления списка продуктов
+                    if (currentModal === 'delete-product-accept') {
+                        // Задержка, чтобы модальное окно успело полностью закрыться перед обновлением списка
+                        setTimeout(() => {
+                            Livewire.dispatch('products-refresh');
+                        }, 300);
+                    }
+                });
+                
 								window.addEventListener('modalClosing', () => {
 									document.querySelector('.cartMayBe')?.classList.remove('goRight');
 									document.body.classList.remove('overflow-hidden');
@@ -82,8 +143,12 @@
                         $componentName = 'modals.' . $this->modal;
                         $componentParams = is_array($this->args) ? $this->args : [];
                         $componentKey = 'modal-' . $this->modal . '-' . md5(json_encode($componentParams));
+                        // Для модальных окон успеха используем wire:ignore.self, чтобы предотвратить закрытие при обновлении
+                        $shouldIgnore = in_array($this->modal, ['delete-product-accept', 'delete-subscription-accept', 'cancelsub-accept']);
                       @endphp
-                      @livewire($componentName, $componentParams, key($componentKey))
+                      <div @if($shouldIgnore) wire:ignore.self wire:key="modal-content-{{ $this->modal }}" @endif>
+                        @livewire($componentName, $componentParams, key($componentKey))
+                      </div>
                     @endif
               </x-card>
             </div>
