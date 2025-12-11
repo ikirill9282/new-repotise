@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Throwable;
+use App\Services\IpRateLimitService;
 
 class Report extends Component
 {
@@ -88,6 +89,34 @@ class Report extends Component
             $this->dispatch('closeModal');
             $this->dispatch('openModal', 'auth');
             return;
+        }
+        
+        $user = Auth::user();
+        $ipAddress = request()->ip();
+        $rateLimitService = app(IpRateLimitService::class);
+        
+        // Check limits based on resource type
+        if ($this->resource === 'comment') {
+            // Check if user already reported this comment
+            if ($rateLimitService->hasUserReported($user->id, 'report_comment', $this->record->id)) {
+                $this->failed = true;
+                $this->dispatch('toastError', ['message' => 'You have already reported this comment.']);
+                return;
+            }
+            
+            // Check IP limit (10 reports per hour)
+            if (!$rateLimitService->isAllowed($ipAddress, 'report_comment', 10, 60)) {
+                $this->failed = true;
+                $this->dispatch('toastError', ['message' => 'Too many reports from this IP address. Please try again in 1 hour.']);
+                return;
+            }
+        } elseif ($this->resource === 'article') {
+            // Check IP limit (5 reports per hour)
+            if (!$rateLimitService->isAllowed($ipAddress, 'report_article', 5, 60)) {
+                $this->failed = true;
+                $this->dispatch('toastError', ['message' => 'Too many error reports from this IP address. Please try again in 1 hour.']);
+                return;
+            }
         }
 
         // Different validation for comments vs articles
@@ -172,6 +201,10 @@ class Report extends Component
             $reportData['status'] = ReportModel::STATUS_NEW;
 
             $this->record->reports()->create($reportData);
+            
+            // Record successful attempt
+            $action = $this->resource === 'comment' ? 'report_comment' : 'report_article';
+            $rateLimitService->recordAttempt($ipAddress, $action, true, $user->id, $this->record->id);
         } catch (Throwable $exception) {
             report($exception);
             $this->failed = true;

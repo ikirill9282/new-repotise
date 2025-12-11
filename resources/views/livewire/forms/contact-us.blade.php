@@ -19,6 +19,12 @@
 
 
           <x-form.textarea-counter wire:model="fields.text" name="text" class="min-h-24" id="ta" placeholder="Your Message<br> Please provide details about your request" :tooltip="false"></x-form.textarea-counter>
+          
+          <div class="!mb-4" id="recaptcha-v2-container-contact"></div>
+          <input type="hidden" wire:model="fields.recaptcha_token" name="recaptcha_token" id="recaptcha_token_contact">
+          @error('fields.recaptcha_token')
+            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+          @enderror
 
           @if($this->fields['file'])
             <div class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 file-loaded-preview">
@@ -80,3 +86,30 @@
     </div>
   </x-card>
 </div>
+
+@push('js')
+<script>
+  @php
+    $recaptchaSiteKey = config('services.recaptcha.site_key');
+  @endphp
+  
+  @if($recaptchaSiteKey)
+  // reCAPTCHA v2 callback for contact form
+  window.onRecaptchaV2Load = function() {
+    Livewire.hook('morph.updated', ({ el, component }) => {
+      if (document.getElementById('recaptcha-v2-container-contact') && !document.getElementById('recaptcha-v2-widget-contact')) {
+        grecaptcha.render('recaptcha-v2-container-contact', {
+          'sitekey': '{{ $recaptchaSiteKey }}',
+          'callback': function(token) {
+            @this.set('fields.recaptcha_token', token);
+          },
+          'expired-callback': function() {
+            @this.set('fields.recaptcha_token', null);
+          }
+        });
+      }
+    });
+  };
+  @endif
+</script>
+@endpush

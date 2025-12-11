@@ -37,12 +37,20 @@
           <x-form.checkbox wire:model="form.backup" label="Use Backup Code" />
         </div>
       @endif
+      
+      @if($this->showRecaptchaV2)
+        <div class="!mb-4" id="recaptcha-v2-container"></div>
+        <input type="hidden" wire:model="form.recaptcha_token" name="recaptcha_token" id="recaptcha_token">
+        @error('form.recaptcha_token')
+          <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+        @enderror
+      @endif
 
     @endif
 
     <div class="flex justify-between items-center !gap-2">
       <x-btn wire:click.prevent="$dispatch('closeModal')" class="basis-1/3" gray>Cancel</x-btn>
-      <x-btn wire:click.prevent="attempt" class="basis-2/3" >Continue</x-btn>
+      <x-btn wire:click.prevent="attempt" class="basis-2/3" id="login-submit-btn">Continue</x-btn>
     </div>
 
     <div class="flex items-center justify-center">
@@ -71,3 +79,54 @@
     </div>
   </div>
 </div>
+
+@push('js')
+<script>
+  @php
+    $recaptchaSiteKey = config('services.recaptcha.site_key');
+  @endphp
+  
+  @if($recaptchaSiteKey)
+  // reCAPTCHA v3 for login
+  document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.querySelector('form[wire\\:submit\\.prevent="attempt"]');
+    const submitBtn = document.getElementById('login-submit-btn');
+    
+    if (loginForm && submitBtn && typeof grecaptcha !== 'undefined') {
+      loginForm.addEventListener('submit', function(e) {
+        const step = @js($this->step);
+        const showRecaptchaV2 = @js($this->showRecaptchaV2 ?? false);
+        
+        if (step === 2 && !showRecaptchaV2) {
+          e.preventDefault();
+          
+          grecaptcha.ready(function() {
+            grecaptcha.execute('{{ $recaptchaSiteKey }}', {action: 'login'}).then(function(token) {
+              @this.set('recaptcha_token', token);
+              @this.call('attempt');
+            });
+          });
+        }
+      });
+    }
+  });
+  
+  // reCAPTCHA v2 callback
+  window.onRecaptchaV2Load = function() {
+    Livewire.hook('morph.updated', ({ el, component }) => {
+      if (component.showRecaptchaV2 && document.getElementById('recaptcha-v2-container') && !document.getElementById('recaptcha-v2-widget')) {
+        grecaptcha.render('recaptcha-v2-container', {
+          'sitekey': '{{ $recaptchaSiteKey }}',
+          'callback': function(token) {
+            @this.set('form.recaptcha_token', token);
+          },
+          'expired-callback': function() {
+            @this.set('form.recaptcha_token', null);
+          }
+        });
+      }
+    });
+  };
+  @endif
+</script>
+@endpush

@@ -475,11 +475,17 @@ header .about_block .right_group_block .cart svg:hover {
 
 .ma-main-img {
     flex-basis: 50%;
+    min-height: 300px;
+    position: relative;
+    overflow: hidden;
 }
 
 .why_need_baby_monitor .about_block .img_main {
     width: 100% !important;
     max-width: 100% !important;
+    height: auto !important;
+    object-fit: cover;
+    display: block;
 }
 
 .popular_products .about_block .products_item .item:last-child {

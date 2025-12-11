@@ -13,6 +13,8 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Carbon;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
+use App\Services\RecaptchaService;
+use App\Services\IpRateLimitService;
 
 class Auth extends Component
 {
@@ -23,11 +25,26 @@ class Auth extends Component
         'password' => null,
         '2fa' => null,
         'backup' => null,
+        'recaptcha_token' => null,
     ];
 
     public ?string $user_id = null;
 
     public int $step = 1;
+    
+    public ?string $recaptcha_token = null;
+    
+    public bool $showRecaptchaV2 = false;
+    
+    protected function getRecaptchaService(): RecaptchaService
+    {
+        return app(RecaptchaService::class);
+    }
+    
+    protected function getRateLimitService(): IpRateLimitService
+    {
+        return app(IpRateLimitService::class);
+    }
 
     public function prepareEmail()
     {
@@ -65,6 +82,20 @@ class Auth extends Component
         return $this->prepareEmail();
       }
 
+      $ipAddress = request()->ip();
+      $rateLimitService = $this->getRateLimitService();
+      
+      // Check IP block
+      if ($rateLimitService->isBlocked($ipAddress, 'login')) {
+        $validator = Validator::make([], []);
+        $validator->errors()->add('email', 'Your IP address has been temporarily blocked due to multiple failed login attempts. Please try again in 1 hour.');
+        throw new ValidationException($validator);
+      }
+
+      // Check failed attempts to show reCAPTCHA v2
+      $failedAttempts = $rateLimitService->getRemainingAttempts($ipAddress, 'login', 10, 60);
+      $this->showRecaptchaV2 = (10 - $failedAttempts) >= 3;
+
       $validator = Validator::make(
         $this->form,
         [
@@ -72,12 +103,14 @@ class Auth extends Component
           'password' => 'required|string',
           '2fa' => 'sometimes|nullable|string',
           'backup' => 'sometimes|nullable|boolean',
+          'recaptcha_token' => $this->showRecaptchaV2 ? 'required|string' : 'sometimes|nullable|string',
         ],
         [
           'email.required' => 'Please enter your email address.',
           'email.email' => 'Please enter a valid email address.',
           'email.exists' => 'Account with this email was not found.',
           'password.required' => 'Please enter your password.',
+          'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
         ]
       );
 
@@ -86,6 +119,24 @@ class Auth extends Component
       }
 
       $valid = $validator->validated();
+      
+      // Verify reCAPTCHA
+      $recaptchaService = $this->getRecaptchaService();
+      if ($this->showRecaptchaV2) {
+        $recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
+        if (!$recaptchaResult['success']) {
+          $validator->errors()->add('form.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+          throw new ValidationException($validator);
+        }
+      } else {
+        // Verify reCAPTCHA v3
+        $recaptchaResult = $recaptchaService->verifyV3($this->recaptcha_token, 'login');
+        if (!$recaptchaResult['success']) {
+          $validator->errors()->add('recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+          throw new ValidationException($validator);
+        }
+      }
+
       $user = $this->getUser()?->fresh();
 
       if ($user && !$user->active && $this->canRestoreFromDeletion($user)) {
@@ -99,6 +150,7 @@ class Auth extends Component
       }
 
       if (!$user || !$user->active) {
+        $rateLimitService->recordAttempt($ipAddress, 'login', false, $user?->id);
         $validator->errors()->add('email', 'Your account is temporarily locked. Please try again later or contact support.');
         throw new ValidationException($validator);
       }
@@ -108,12 +160,14 @@ class Auth extends Component
       }
 
       if (AuthFacade::attempt(['email' => $valid['email'], 'password' => $valid['password']], true)) {
+        $rateLimitService->recordAttempt($ipAddress, 'login', true, $user->id);
         Session::regenerate(true);
         $url = str_ireplace('&modal=auth', '', url()->previous());
         $url = str_ireplace('?modal=auth', '', $url);
         return redirect($url);
       }
       
+      $rateLimitService->recordAttempt($ipAddress, 'login', false, $user->id);
       $validator->errors()->add('email', 'Invalid email or password. Please try again.');
       throw new ValidationException($validator);
     }

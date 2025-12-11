@@ -14,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Spatie\Permission\Models\Role;
 use App\Jobs\ReferalPromocode;
+use App\Services\RecaptchaService;
+use App\Services\IpRateLimitService;
 
 class Register extends Component
 {
@@ -24,7 +26,21 @@ class Register extends Component
     'password' => null,
     'repeat_password' => null,
     'as_seller' => false,
+    'recaptcha_token' => null,
   ];
+  
+  public ?string $recaptcha_token = null;
+  public bool $showRecaptchaV2 = false;
+  
+  protected function getRecaptchaService(): RecaptchaService
+  {
+    return app(RecaptchaService::class);
+  }
+  
+  protected function getRateLimitService(): IpRateLimitService
+  {
+    return app(IpRateLimitService::class);
+  }
 
   public function mount(?string $email = null)
   {
@@ -40,12 +56,25 @@ class Register extends Component
       'as_seller' => $this->form['as_seller'] ?? false
     ]);
     
+    $ipAddress = request()->ip();
+    $rateLimitService = $this->getRateLimitService();
+    
+    // Check IP limit for registration (5 per 24 hours)
+    if (!$rateLimitService->isAllowed($ipAddress, 'register', 5, 60 * 24)) {
+      $validator = Validator::make([], []);
+      $validator->errors()->add('email', 'Too many registration attempts from this IP address. Please try again later.');
+      throw new ValidationException($validator);
+    }
+    
     try {
       $validator = Validator::make($this->form, [
         'email' => 'required|email|max:255|unique:users,email',
         'password' => 'required|min:8|regex:/[a-zA-Z0-9!@#$%^&*()_+={}\[\]:;"\'<>,.?\/\\-]/',
         'repeat_password' => 'required|same:password',
         'as_seller' => 'boolean',
+        'recaptcha_token' => $this->showRecaptchaV2 ? 'required|string' : 'sometimes|nullable|string',
+      ], [
+        'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
       ]);
 
       if ($validator->fails()) {
@@ -53,6 +82,30 @@ class Register extends Component
       }
 
       $valid = $validator->valid();
+      
+      // Verify reCAPTCHA
+      $recaptchaService = $this->getRecaptchaService();
+      if ($this->showRecaptchaV2) {
+        $recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
+        if (!$recaptchaResult['success']) {
+          $validator->errors()->add('form.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+          throw new ValidationException($validator);
+        }
+      } else {
+        // Verify reCAPTCHA v3
+        $recaptchaResult = $recaptchaService->verifyV3($this->recaptcha_token, 'register');
+        if (!$recaptchaResult['success']) {
+          $validator->errors()->add('recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+          throw new ValidationException($validator);
+        }
+        
+        // Show v2 if score is too low
+        if ($recaptchaResult['low_score'] ?? false) {
+          $this->showRecaptchaV2 = true;
+          $validator->errors()->add('recaptcha_token', 'Please complete the additional verification.');
+          throw new ValidationException($validator);
+        }
+      }
 
       // Validate password strength
       if (!User::validatePassword($valid['password'])) {
@@ -94,6 +147,9 @@ class Register extends Component
       }
 
       History::userCreated($user);
+      
+      // Record successful registration attempt
+      $rateLimitService->recordAttempt($ipAddress, 'register', true, $user->id);
 
       $user->sendVerificationCode(seller: $valid['as_seller']);
       

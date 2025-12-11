@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
+use App\Services\RecaptchaService;
+use App\Services\IpRateLimitService;
 
 class Backup extends Component
 {
@@ -18,7 +20,18 @@ class Backup extends Component
 
     public array $form = [
       'code' => null,
+      'recaptcha_token' => null,
     ];
+    
+    protected function getRecaptchaService(): RecaptchaService
+    {
+        return app(RecaptchaService::class);
+    }
+    
+    protected function getRateLimitService(): IpRateLimitService
+    {
+        return app(IpRateLimitService::class);
+    }
 
     public ?string $user_id;
 
@@ -46,12 +59,33 @@ class Backup extends Component
         return ;
       }
 
+      $ipAddress = request()->ip();
+      $rateLimitService = $this->getRateLimitService();
+      
+      // Check IP limit for 2FA reset (5 per hour)
+      if (!$rateLimitService->isAllowed($ipAddress, 'reset_2fa', 5, 60)) {
+        $validator = Validator::make([], []);
+        $validator->errors()->add('code', 'Too many 2FA reset attempts from this IP address. Please try again in 1 hour.');
+        throw new ValidationException($validator);
+      }
+
       $available_attempts = SessionExpire::get('backup') ?? 0;
       $validator = Validator::make($this->form, [
         'code' => 'required|string|min:6|max:6|regex:/^[a-zA-Z0-9]+$/',
+        'recaptcha_token' => 'required|string',
+      ], [
+        'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
       ]);
 
       if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
+
+      // Verify reCAPTCHA v2
+      $recaptchaService = $this->getRecaptchaService();
+      $recaptchaResult = $recaptchaService->verifyV2($this->form['recaptcha_token'] ?? null);
+      if (!$recaptchaResult['success']) {
+        $validator->errors()->add('form.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
         throw new ValidationException($validator);
       }
 
@@ -60,6 +94,7 @@ class Backup extends Component
       $backups = $user->backup->pluck('code')->values()->toArray();
       
       if (!in_array($valid['code'], $backups)) {
+        $rateLimitService->recordAttempt($ipAddress, 'reset_2fa', false, $user->id);
         $validator->errors()->add('code', 'Invalid backup code.');
         SessionExpire::set('backup', ($available_attempts+1), Carbon::now()->modify('+1 hour'));
 
@@ -72,6 +107,9 @@ class Backup extends Component
       if ($user->backup()->get()->isEmpty()) {
         $user->resetBackup();
       }
+      
+      // Record successful attempt
+      $rateLimitService->recordAttempt($ipAddress, 'reset_2fa', true, $user->id);
       
       $this->dispatch('openModal', 'backup-accept');
     }

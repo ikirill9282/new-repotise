@@ -40,6 +40,12 @@
         </div>
 
         <x-form.textarea-counter wire:model="fields.text" :tooltip="false" name="text" placeholder="Text your message"></x-form.textarea-counter>
+        
+        <div class="!mb-4" id="recaptcha-v2-container-invest"></div>
+        <input type="hidden" wire:model="fields.recaptcha_token" name="recaptcha_token" id="recaptcha_token_invest">
+        @error('fields.recaptcha_token')
+          <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+        @enderror
 
         <x-btn wire:click.prevent="submit" class="sm:!w-auto self-center lg:self-start sm:!px-12">Start Partnership</x-btn>
       </div>
@@ -54,3 +60,30 @@
     </div>
   </div>
 </div>
+
+@push('js')
+<script>
+  @php
+    $recaptchaSiteKey = config('services.recaptcha.site_key');
+  @endphp
+  
+  @if($recaptchaSiteKey)
+  // reCAPTCHA v2 callback for invest form
+  window.onRecaptchaV2Load = function() {
+    Livewire.hook('morph.updated', ({ el, component }) => {
+      if (document.getElementById('recaptcha-v2-container-invest') && !document.getElementById('recaptcha-v2-widget-invest')) {
+        grecaptcha.render('recaptcha-v2-container-invest', {
+          'sitekey': '{{ $recaptchaSiteKey }}',
+          'callback': function(token) {
+            @this.set('fields.recaptcha_token', token);
+          },
+          'expired-callback': function() {
+            @this.set('fields.recaptcha_token', null);
+          }
+        });
+      }
+    });
+  };
+  @endif
+</script>
+@endpush

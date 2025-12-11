@@ -64,6 +64,15 @@
       });
     </script>
     @endif
+    
+    @php
+      $recaptchaSiteKey = config('services.recaptcha.site_key');
+    @endphp
+    @if($recaptchaSiteKey)
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaV2Load&render=explicit" async defer></script>
+    @endif
 </head>
 
 <body class="text-dark">

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Form;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\OptimizeMedia;
+use App\Services\RecaptchaService;
 
 class ContactUs extends Component
 {
@@ -21,7 +22,13 @@ class ContactUs extends Component
       'subject' => null,
       'text' => null,
       'file' => null,
+      'recaptcha_token' => null,
     ];
+    
+    protected function getRecaptchaService(): RecaptchaService
+    {
+        return app(RecaptchaService::class);
+    }
 
 
     public function submit(Request $request)
@@ -32,6 +39,9 @@ class ContactUs extends Component
         'subject' => 'required|string',
         'text' => 'required|string',
         'file' => 'sometimes|nullable|file|max:102400',
+        'recaptcha_token' => 'required|string',
+      ], [
+        'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
       ]);
 
       if ($validator->fails()) {
@@ -39,6 +49,17 @@ class ContactUs extends Component
       }
 
       $valid = $validator->validated();
+      
+      // Verify reCAPTCHA v2
+      $recaptchaService = $this->getRecaptchaService();
+      $recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
+      if (!$recaptchaResult['success']) {
+        $validator->errors()->add('fields.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+        throw new ValidationException($validator);
+      }
+      
+      // Remove recaptcha_token from data before saving
+      unset($valid['recaptcha_token']);
       if (!empty($valid['file'])) {
         $disk = config('filesystems.default');
         $path = $valid['file']->store('forms', $disk);

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use App\Services\RecaptchaService;
 
 class Invest extends Component
 {
@@ -15,7 +16,13 @@ class Invest extends Component
       'name' => null,
       'topic' => null,
       'text' => null,
+      'recaptcha_token' => null,
     ];
+    
+    protected function getRecaptchaService(): RecaptchaService
+    {
+        return app(RecaptchaService::class);
+    }
     
     public function submit()
     {
@@ -23,6 +30,9 @@ class Invest extends Component
         'name' => 'required|string',
         'topic' => 'required|string',
         'text' => 'required|string',
+        'recaptcha_token' => 'required|string',
+      ], [
+        'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
       ]);
 
       if ($validator->fails()) {
@@ -30,6 +40,17 @@ class Invest extends Component
       }
 
       $valid = $validator->validated();
+      
+      // Verify reCAPTCHA v2
+      $recaptchaService = $this->getRecaptchaService();
+      $recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
+      if (!$recaptchaResult['success']) {
+        $validator->errors()->add('fields.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+        throw new ValidationException($validator);
+      }
+      
+      // Remove recaptcha_token from data before saving
+      unset($valid['recaptcha_token']);
       Form::create([
         'source' => 'Investment',
         'user_id' => Auth::check() ? Auth::user()->id : 0,
