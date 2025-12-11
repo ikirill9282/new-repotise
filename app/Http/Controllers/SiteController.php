@@ -713,15 +713,18 @@ class SiteController extends Controller
     ]);
   }
 
-  public function gift(Request $request)
+  public function gift(string $token)
   {
-    try {
-      $order_id = Crypt::decrypt($request->get('h'));
-    } catch (\Exception $e) {
-      return redirect('/');
+    $gift = \App\Models\Gift::where('token', $token)->first();
+    
+    if (!$gift || !$gift->canBeClaimed()) {
+      return view('site.pages.gift-error', [
+        'title' => 'This gift link is no longer available',
+        'text' => 'This gift link is no longer active. It may have already been claimed, canceled, or the link might be incorrect. If you believe this is a mistake, please contact TrekGuider support.',
+      ]);
     }
 
-    $order = Order::find($order_id);
+    $gift->load(['order.order_products.product.preview', 'order.buyer']);
     
     $page = Page::where('slug', 'gift')
       ->with('config')
@@ -729,7 +732,8 @@ class SiteController extends Controller
     
     return view('site.pages.gift', [
       'page' => $page,
-      'order' => $order,
+      'gift' => $gift,
+      'order' => $gift->order,
     ]);
   }
   

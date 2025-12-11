@@ -59,18 +59,18 @@
                     </svg>
                     <h2>You've Been Gifted Something Special!</h2>
                     <div class="block_text">
-                        <p>"A congratulatory quote with a large text, for example, congratulations to you, Losyash, on your
-                            102nd birthday! <br>
-                            <span>I wish you to live as long, old per"</span>
-                        </p>
-                        <h3 class="emeil">From: <a href="mailto:{{ $order->user->email }}">{{ $order->user->profile }}</a></h3>
+                        @if($order->recipient_message)
+                            <p>{{ $order->recipient_message }}</p>
+                        @endif
+                        <h3 class="emeil">From: <a href="mailto:{{ $order->buyer->email ?? $order->user->email }}">{{ $order->buyer->getName() ?? $order->user->getName() }}</a></h3>
                     </div>
-                    <a href="#" class="claim_gift open_auth">Claim Your Gift</a>
+                    @livewire('claim-gift', ['token' => $gift->token ?? ''])
                 </div>
                 <div class="block_cards">
                     <div class="swiper mySwiper2">
                         <div class="swiper-wrapper">
-                          @foreach ($order->products as $product)
+                          @foreach ($order->order_products as $orderProduct)
+                            @php $product = $orderProduct->product; @endphp
                             <div class="swiper-slide">
                                 <div class="item">
                                     <img src="{{ $product->preview->image }}" alt="Preview" class="main_img object-cover">

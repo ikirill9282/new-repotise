@@ -8,11 +8,14 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\Order;
+use App\Models\Gift;
 use App\Models\RevenueShare;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\DB;
 use Stripe\PaymentIntent;
+use App\Jobs\DeliveryGift;
 
 class ProcessOrder implements ShouldQueue, ShouldBeUnique
 {
@@ -111,16 +114,33 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
           }
         }
 
-        ReferalFreeProduct::dispatch($this->order->user);
-        
-        if ($this->order->gift) {
-          DeliveryGift::dispatch($this->order);
+        // Обработка подарков
+        if ($this->order->is_gift_order && $this->order->status_id == EnumsOrder::PAID) {
+          $this->processGiftOrder();
+        } else {
+          // Обычный заказ - создаем покупки для buyer_user_id
+          ReferalFreeProduct::dispatch($this->order->buyer ?? $this->order->user);
         }
 
         PayReward::dispatch($this->order);
       }
     }
 
+
+    protected function processGiftOrder(): void
+    {
+      // Создаем запись Gift
+      $gift = Gift::create([
+        'order_id' => $this->order->id,
+        'buyer_user_id' => $this->order->buyer_user_id ?? $this->order->user_id,
+        'recipient_email' => $this->order->recipient,
+        'status' => Gift::STATUS_CREATED,
+      ]);
+
+      // Покупатель НЕ получает доступ к продукту при подарке
+      // Письма будут отправлены через DeliveryGift job
+      DeliveryGift::dispatch($this->order);
+    }
 
     function distributeCommission(float $commission, array $items)
     {

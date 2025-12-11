@@ -167,12 +167,29 @@ class Checkout extends Component
 
     public function checkValidtion()
     {
+      $order = $this->getOrder();
+      
+      // Проверка возможности подарка
+      if ($this->form['gift']) {
+        if ($this->hasSubscriptions($order)) {
+          throw new ValidationException(
+            Validator::make([], [])->errors()->add('gift', 'Gifts are not available for subscription products.')
+          );
+        }
+        
+        if ($this->hasOnlyFreeProducts($order)) {
+          throw new ValidationException(
+            Validator::make([], [])->errors()->add('gift', 'Sending gifts is only available for paid products.')
+          );
+        }
+      }
+
       $validator = Validator::make($this->form, [
         'fullname' => 'required|string',
         'email' => 'required|email',
         'gift' => 'required|boolean',
         'recipient' => 'required_if_accepted:form.gift|nullable|email',
-        'recipient_message' => 'required_if_accepted:form.gift|nullable|string',
+        'recipient_message' => 'required_if_accepted:form.gift|nullable|string|max:150',
         'payment_method' => 'sometimes|nullable|string',
       ]);
 
@@ -183,6 +200,27 @@ class Checkout extends Component
 
       $valid = $validator->validated();
       return ['action' => isset($valid['payment_method']) ? $valid['payment_method'] : 'create'];
+    }
+
+    protected function hasSubscriptions(Order $order): bool
+    {
+      $order->loadMissing('order_products.product');
+      return $order->order_products->contains(function ($orderProduct) {
+        return $orderProduct->product && $orderProduct->product->subscription;
+      });
+    }
+
+    protected function hasOnlyFreeProducts(Order $order): bool
+    {
+      $order->loadMissing('order_products.product');
+      return $order->order_products->every(function ($orderProduct) {
+        if (!$orderProduct->product) {
+          return false;
+        }
+        $price = $orderProduct->product->price ?? 0;
+        $salePrice = $orderProduct->product->sale_price ?? 0;
+        return ($price - $salePrice) <= 0;
+      });
     }
 
     #[On('makePayment')]
@@ -199,33 +237,53 @@ class Checkout extends Component
 
       DB::beginTransaction();
       try {
+        $buyerUser = null;
+        
+        // Создание/поиск покупателя (buyer_user_id)
         if (!Auth::check()) {
-          $pwd = User::makePassword();
-          $user = User::firstOrCreate(
+          $buyerUser = User::firstOrCreate(
             ['email' => $this->form['email']],
             [
               'username' => $this->form['fullname'],
-              'password' => $pwd,
+              'password' => User::makePassword(),
             ]
           );
-
-          $order->update(['user_id' => $user->id]);
-          $user->sendPassword($pwd);
-          $user->sendVerificationCode();
         } else {
-          $user = $order->user;
+          $buyerUser = Auth::user();
         }
+
+        // Сохраняем buyer_user_id в заказ до оплаты
+        $order->update([
+          'buyer_user_id' => $buyerUser->id,
+          'user_id' => $buyerUser->id, // Для совместимости
+        ]);
+
+        // Если покупатель был создан, отправляем письмо №5 (User Created)
+        if (!Auth::check() && $buyerUser->wasRecentlyCreated) {
+          // Письмо будет отправлено через систему email-шаблонов
+          // Пока используем существующую логику
+          $buyerUser->sendVerificationCode();
+        }
+
+        $user = $buyerUser;
 
       if ($this->orderContainsSelfProduct($order, $user)) {
         DB::rollBack();
         return redirect()->route('payment.error', ['reason' => 'self_purchase']);
       }
 
-        if ($this->form['gift'] && $this->form['recipient'] !== $order->user->email) {
+        // Обработка подарка
+        if ($this->form['gift'] && $this->form['recipient'] !== $buyerUser->email) {
           $order->update([
-            'gift' => 1,
+            'is_gift_order' => true,
+            'gift' => 1, // Для обратной совместимости
             'recipient' => $this->form['recipient'],
-            'recipient_message' => $this->form['recipient_message'],
+            'recipient_message' => $this->form['recipient_message'] ?? null,
+          ]);
+        } else {
+          $order->update([
+            'is_gift_order' => false,
+            'gift' => 0,
           ]);
         }
         
@@ -422,6 +480,19 @@ class Checkout extends Component
       $order = $this->getOrder();
       $paymentMethods = collect([]); // По умолчанию пустая коллекция
       
+      $canGift = true;
+      $giftDisabledReason = null;
+      
+      if ($order) {
+        if ($this->hasSubscriptions($order)) {
+          $canGift = false;
+          $giftDisabledReason = 'Gifts are not available for subscription products.';
+        } elseif ($this->hasOnlyFreeProducts($order)) {
+          $canGift = false;
+          $giftDisabledReason = 'Sending gifts is only available for paid products.';
+        }
+      }
+      
       if ($order && $order?->user_id && $order?->user) {
         try {
           $paymentMethods = $order->user->paymentMethods();
@@ -455,6 +526,8 @@ class Checkout extends Component
         'order' => $order,
         'user' => $order?->user,
         'paymentMethods' => $paymentMethods,
+        'canGift' => $canGift,
+        'giftDisabledReason' => $giftDisabledReason,
       ]);
     }
 

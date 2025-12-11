@@ -85,6 +85,16 @@ class Order extends Model
       return $this->belongsTo(Discount::class, 'discount_id', 'id');
     }
 
+    public function gift()
+    {
+      return $this->hasOne(Gift::class);
+    }
+
+    public function buyer()
+    {
+      return $this->belongsTo(User::class, 'buyer_user_id', 'id');
+    }
+
     public function getLatestPayment()
     {
       return $this->payments()

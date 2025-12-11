@@ -2,8 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Mail\Gift;
+use App\Mail\GiftRecipient;
+use App\Mail\GiftBuyerRegistered;
+use App\Mail\GiftBuyerGuest;
 use App\Models\Order;
+use App\Models\Gift;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,20 +38,33 @@ class DeliveryGift implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-      $user = User::where('email', $this->order->recipient)->first();
-      if (!$user) {
-        $credentials = [
-          'email' => $this->order->recipient,
-          'password' => User::makePassword(),
-        ];
-        $user = User::create($credentials);
+      $gift = $this->order->gift;
+      if (!$gift) {
+        return;
       }
 
-      Mail::to($user->email)
-        ->send(new Gift(
-          $user,
-          $this->order,
-          $credentials
-        ));
+      $buyer = $this->order->buyer ?? $this->order->user;
+      
+      // Письмо покупателю
+      if ($buyer->wasRecentlyCreated || !$buyer->email_verified_at) {
+        // Покупатель - гость → письмо №2
+        Mail::to($buyer->email)->send(new GiftBuyerGuest($buyer, $this->order, $gift));
+      } else {
+        // Покупатель - зарегистрированный → письмо №1
+        Mail::to($buyer->email)->send(new GiftBuyerRegistered($buyer, $this->order, $gift));
+      }
+
+      // Письмо получателю → письмо №3
+      $recipientUser = User::where('email', $gift->recipient_email)->first();
+      if (!$recipientUser) {
+        // Создаем пользователя для получателя, но без пароля (установит сам)
+        $recipientUser = User::create([
+          'email' => $gift->recipient_email,
+          'username' => preg_replace("/^(.*?)@.*$/is", "$1", $gift->recipient_email),
+          'password' => User::makePassword(), // Временный пароль, нужно будет установить свой
+        ]);
+      }
+
+      Mail::to($gift->recipient_email)->send(new GiftRecipient($recipientUser, $this->order, $gift));
     }
 }

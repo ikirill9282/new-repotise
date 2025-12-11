@@ -113,7 +113,7 @@ Route::get('/products/{product}', [SiteController::class, 'product'])->name('pro
 Route::get('/payment', [SiteController::class, 'payment'])->name('payment');
 Route::get('/sellers', [SiteController::class, 'sellers'])->name('sellers');
 Route::get('/referal', [SiteController::class, 'referal'])->name('referal');
-Route::get('/gift', [SiteController::class, 'gift'])->name('gift');
+Route::get('/gift/{token}', [SiteController::class, 'gift'])->name('gift');
 Route::get('/investments', [SiteController::class, 'investments'])->name('investments');
 
 // Products

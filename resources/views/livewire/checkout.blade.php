@@ -52,13 +52,14 @@
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <input wire:model="form.gift" type="checkbox" name="is-gift" value="false"
-                                        id="gift-false" class="is-gift w-0 h-0">
+                                        id="gift-false" class="is-gift w-0 h-0" {{ !$canGift ? 'disabled' : '' }}>
                                     <label
-                                        class="nav-link text-primary fw-semibold position-relative is-gift-button {{ $this->form['gift'] ? 'active' : '' }}"
+                                        class="nav-link text-primary fw-semibold position-relative is-gift-button {{ $this->form['gift'] ? 'active' : '' }} {{ !$canGift ? 'opacity-50 cursor-not-allowed' : '' }}"
                                         id="pills-profile-tab" for="gift-false" data-value="1" data-bs-toggle="pill"
                                         data-bs-target="#pills-profile" type="button" role="tab"
                                         aria-controls="pills-profile"
-                                        aria-selected="{{ $this->form['gift'] ? 'true' : 'false' }}">
+                                        aria-selected="{{ $this->form['gift'] ? 'true' : 'false' }}"
+                                        @if(!$canGift) title="{{ $giftDisabledReason }}" @endif>
                                         Send as Gift
                                     </label>
                                 </li>
