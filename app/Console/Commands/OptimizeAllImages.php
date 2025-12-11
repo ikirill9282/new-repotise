@@ -55,6 +55,15 @@ class OptimizeAllImages extends Command
 
         $this->info("Found {$totalImages} images to optimize.");
         
+        // Проверяем большие файлы
+        $largeFiles = array_filter($images, function($path) {
+            return filesize($path) > 500 * 1024; // > 500KB
+        });
+        $largeFilesCount = count($largeFiles);
+        if ($largeFilesCount > 0) {
+            $this->warn("Found {$largeFilesCount} large files (>500KB) that will be optimized more aggressively.");
+        }
+        
         if (!$this->confirm("Do you want to proceed?", true)) {
             $this->info("Optimization cancelled.");
             return 0;

@@ -67,8 +67,18 @@ class MediaOptimizer
             $originalHeight = $image->height();
             $needsResize = $originalWidth > $maxWidth || $originalHeight > $maxHeight;
 
+            // Для больших файлов (>500KB) применяем более агрессивную оптимизацию
+            $isLargeFile = $originalSize > 500 * 1024; // 500KB
+            if ($isLargeFile) {
+                // Для больших файлов снижаем качество еще больше
+                $quality = max(50, $quality - 10); // Минимум 50%, но на 10% меньше обычного
+                // И уменьшаем максимальный размер
+                $maxWidth = min($maxWidth, 1000);
+                $maxHeight = min($maxHeight, 1000);
+            }
+
             // Всегда применяем оптимизацию, даже если размер уже правильный (для сжатия)
-            if ($needsResize) {
+            if ($needsResize || $isLargeFile) {
                 $image->resize($maxWidth, $maxHeight, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
