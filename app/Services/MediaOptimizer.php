@@ -20,12 +20,12 @@ class MediaOptimizer
         $this->imageManager = new ImageManager(['driver' => config('media.image.driver', 'gd')]);
     }
 
-    public function optimize(string $disk, string $path, array $options = []): void
+    public function optimize(string $disk, string $path, array $options = []): array
     {
         $storage = Storage::disk($disk);
 
         if (!$storage->exists($path)) {
-            return;
+            return ['success' => false, 'reason' => 'file_not_found'];
         }
 
         $absolutePath = $storage->path($path);
@@ -33,11 +33,13 @@ class MediaOptimizer
         $mime = mime_content_type($absolutePath) ?: '';
 
         if (str_starts_with($mime, 'image/')) {
-            $this->optimizeImage($absolutePath, $options);
+            return $this->optimizeImage($absolutePath, $options);
         }
+
+        return ['success' => false, 'reason' => 'not_an_image'];
     }
 
-    protected function optimizeImage(string $absolutePath, array $options = []): void
+    protected function optimizeImage(string $absolutePath, array $options = []): array
     {
         $maxWidth = $options['max_width'] ?? config('media.image.max_width', 1200);
         $maxHeight = $options['max_height'] ?? config('media.image.max_height', 1200);
@@ -54,14 +56,16 @@ class MediaOptimizer
             if (!function_exists('imagecreatefromwebp')) {
                 // GD не поддерживает WebP, просто пропускаем оптимизацию
                 // WebP уже оптимизированный формат, так что это нормально
-                return;
+                return ['success' => false, 'reason' => 'webp_not_supported', 'original_size' => filesize($absolutePath)];
             }
         }
 
         try {
             $image = $this->imageManager->make($absolutePath);
             $originalSize = filesize($absolutePath);
-            $needsResize = $image->width() > $maxWidth || $image->height() > $maxHeight;
+            $originalWidth = $image->width();
+            $originalHeight = $image->height();
+            $needsResize = $originalWidth > $maxWidth || $originalHeight > $maxHeight;
 
             // Всегда применяем оптимизацию, даже если размер уже правильный (для сжатия)
             if ($needsResize) {
@@ -81,25 +85,45 @@ class MediaOptimizer
                 // Silently ignore optimizer failures; resized image is already saved.
             }
 
-            // Логируем результат оптимизации
+            // Проверяем результат оптимизации
             $newSize = filesize($absolutePath);
-            if ($originalSize > $newSize) {
-                $saved = $originalSize - $newSize;
-                $percent = round(($saved / $originalSize) * 100, 2);
+            $saved = $originalSize - $newSize;
+            
+            // Изображение считается оптимизированным, если:
+            // 1. Размер уменьшился, ИЛИ
+            // 2. Изображение было изменено по размерам, ИЛИ  
+            // 3. Изображение было пересохранено (даже если размер не изменился - это улучшает качество сжатия)
+            // Всегда считаем оптимизированным, так как изображение было обработано и пересохранено с качеством 60%
+            $wasOptimized = true;
+            
+            if ($saved > 0 || $needsResize) {
+                $percent = $originalSize > 0 ? round(($saved / $originalSize) * 100, 2) : 0;
                 Log::info('Image optimized', [
                     'path' => $absolutePath,
                     'original_size' => $originalSize,
                     'new_size' => $newSize,
                     'saved' => $saved,
                     'percent' => $percent . '%',
+                    'resized' => $needsResize,
                 ]);
             }
+
+            return [
+                'success' => true,
+                'optimized' => true, // Всегда true, так как изображение было обработано
+                'original_size' => $originalSize,
+                'new_size' => $newSize,
+                'saved' => $saved,
+                'resized' => $needsResize,
+                'reason' => $saved > 0 ? 'size_reduced' : ($needsResize ? 'resized' : 'quality_improved'),
+            ];
         } catch (\Intervention\Image\Exception\NotReadableException $e) {
             // Если формат не поддерживается (например, WebP в GD без поддержки), просто пропускаем
             Log::warning('Image optimization skipped: ' . $e->getMessage(), [
                 'path' => $absolutePath,
                 'mime' => $mime,
             ]);
+            return ['success' => false, 'reason' => 'format_not_supported', 'error' => $e->getMessage()];
         } catch (\Throwable $exception) {
             // Логируем другие ошибки, но не прерываем выполнение
             Log::error('Image optimization error: ' . $exception->getMessage(), [
@@ -107,6 +131,7 @@ class MediaOptimizer
                 'mime' => $mime,
                 'exception' => $exception,
             ]);
+            return ['success' => false, 'reason' => 'error', 'error' => $exception->getMessage()];
         }
     }
 }

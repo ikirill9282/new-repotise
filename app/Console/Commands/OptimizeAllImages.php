@@ -67,6 +67,7 @@ class OptimizeAllImages extends Command
         $skipped = 0;
         $errors = 0;
         $totalSaved = 0;
+        $reasons = [];
 
         // Обрабатываем изображения батчами
         $batches = array_chunk($images, $batchSize);
@@ -77,23 +78,20 @@ class OptimizeAllImages extends Command
                     $relativePath = str_replace($storage->path(''), '', $imagePath);
                     $relativePath = ltrim($relativePath, '/\\');
                     
-                    // Проверяем размер файла до оптимизации
-                    $originalSize = File::size($imagePath);
+                    // Оптимизируем и получаем результат
+                    $result = $optimizer->optimize($disk, $relativePath, ['force' => $force]);
                     
-                    // Оптимизируем
-                    $optimizer->optimize($disk, $relativePath, ['force' => $force]);
-                    
-                    // Проверяем размер после оптимизации
-                    if (File::exists($imagePath)) {
-                        $newSize = File::size($imagePath);
-                        if ($newSize < $originalSize) {
-                            $totalSaved += ($originalSize - $newSize);
-                            $optimized++;
-                        } else {
-                            $skipped++;
+                    if ($result['success'] && isset($result['optimized']) && $result['optimized']) {
+                        // Изображение успешно оптимизировано
+                        $optimized++;
+                        if (isset($result['saved']) && $result['saved'] > 0) {
+                            $totalSaved += $result['saved'];
                         }
                     } else {
+                        // Изображение пропущено
                         $skipped++;
+                        $reason = $result['reason'] ?? 'unknown';
+                        $reasons[$reason] = ($reasons[$reason] ?? 0) + 1;
                     }
                 } catch (\Throwable $e) {
                     $errors++;
@@ -125,6 +123,23 @@ class OptimizeAllImages extends Command
                 ['Space saved', $this->formatBytes($totalSaved)],
             ]
         );
+
+        // Показываем причины пропуска, если есть
+        if (!empty($reasons)) {
+            $this->newLine();
+            $this->info("Reasons for skipping:");
+            foreach ($reasons as $reason => $count) {
+                $reasonText = match($reason) {
+                    'webp_not_supported' => 'WebP not supported by GD',
+                    'format_not_supported' => 'Format not supported',
+                    'already_optimized' => 'Already optimized',
+                    'not_an_image' => 'Not an image file',
+                    'file_not_found' => 'File not found',
+                    default => ucfirst(str_replace('_', ' ', $reason)),
+                };
+                $this->line("  - {$reasonText}: {$count}");
+            }
+        }
 
         return 0;
     }
