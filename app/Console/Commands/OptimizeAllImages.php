@@ -14,11 +14,7 @@ class OptimizeAllImages extends Command
      *
      * @var string
      */
-    protected $signature = 'images:optimize-all 
-                            {--disk=public : Storage disk to optimize}
-                            {--path=images : Path to optimize}
-                            {--batch=50 : Number of images to process per batch}
-                            {--force : Force re-optimization of already optimized images}';
+    protected $signature = 'images:optimize-all {--disk=public : Storage disk to optimize} {--path=images : Path to optimize} {--batch=50 : Number of images to process per batch} {--force : Force re-optimization of already optimized images}';
 
     /**
      * The console command description.

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Spatie\ImageOptimizer\OptimizerChain;
@@ -85,7 +86,7 @@ class MediaOptimizer
             if ($originalSize > $newSize) {
                 $saved = $originalSize - $newSize;
                 $percent = round(($saved / $originalSize) * 100, 2);
-                \Log::info('Image optimized', [
+                Log::info('Image optimized', [
                     'path' => $absolutePath,
                     'original_size' => $originalSize,
                     'new_size' => $newSize,
@@ -95,13 +96,13 @@ class MediaOptimizer
             }
         } catch (\Intervention\Image\Exception\NotReadableException $e) {
             // Если формат не поддерживается (например, WebP в GD без поддержки), просто пропускаем
-            \Log::warning('Image optimization skipped: ' . $e->getMessage(), [
+            Log::warning('Image optimization skipped: ' . $e->getMessage(), [
                 'path' => $absolutePath,
                 'mime' => $mime,
             ]);
         } catch (\Throwable $exception) {
             // Логируем другие ошибки, но не прерываем выполнение
-            \Log::error('Image optimization error: ' . $exception->getMessage(), [
+            Log::error('Image optimization error: ' . $exception->getMessage(), [
                 'path' => $absolutePath,
                 'mime' => $mime,
                 'exception' => $exception,
