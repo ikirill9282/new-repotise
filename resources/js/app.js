@@ -645,51 +645,61 @@ window.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    Livewire.hook("morphed", () => {
-        const editors = document.querySelectorAll(".quill-editor");
-        editors.forEach((editor) => {
-          if (!builded_editors.includes(editor)) {
-            makeQuill(editor);
-            builded_editors.push(editor);
-          } else {
-            // Если редактор уже создан, просто перезагружаем контент
-            const quillInstance = editor.__quill;
-            if (quillInstance) {
-              const id = editor.getAttribute("data-model");
-              const wrap = editor.closest(".text-editor");
-              const input = wrap?.querySelector(`#${id}`);
-              if (input && input.value) {
-                setTimeout(() => {
-                  quillInstance.root.innerHTML = input.value;
-                  
-                  // Применяем стили к спискам
+    // Setup Livewire hook when available
+    function setupLivewireQuillHook() {
+      if (window.Livewire && window.Livewire.hook) {
+        Livewire.hook("morphed", () => {
+          const editors = document.querySelectorAll(".quill-editor");
+          editors.forEach((editor) => {
+            if (!builded_editors.includes(editor)) {
+              makeQuill(editor);
+              builded_editors.push(editor);
+            } else {
+              // Если редактор уже создан, просто перезагружаем контент
+              const quillInstance = editor.__quill;
+              if (quillInstance) {
+                const id = editor.getAttribute("data-model");
+                const wrap = editor.closest(".text-editor");
+                const input = wrap?.querySelector(`#${id}`);
+                if (input && input.value) {
                   setTimeout(() => {
-                    const allLists = quillInstance.root.querySelectorAll('ul, ol');
-                    allLists.forEach(list => {
-                      if (list.tagName === 'UL') {
-                        list.style.listStyleType = 'disc';
-                        list.style.listStyle = 'disc outside';
-                      } else if (list.tagName === 'OL') {
-                        list.style.listStyleType = 'decimal';
-                        list.style.listStyle = 'decimal outside';
-                      }
-                      list.style.listStylePosition = 'outside';
-                      list.style.paddingLeft = '30px';
-                      list.style.margin = '15px 0';
-                    });
+                    quillInstance.root.innerHTML = input.value;
                     
-                    const listItems = quillInstance.root.querySelectorAll('li');
-                    listItems.forEach(li => {
-                      li.style.display = 'list-item';
-                      li.style.listStylePosition = 'outside';
-                      li.style.margin = '8px 0';
-                      li.style.paddingLeft = '5px';
-                    });
-                  }, 100);
-                }, 200);
+                    // Применяем стили к спискам
+                    setTimeout(() => {
+                      const allLists = quillInstance.root.querySelectorAll('ul, ol');
+                      allLists.forEach(list => {
+                        if (list.tagName === 'UL') {
+                          list.style.listStyleType = 'disc';
+                          list.style.listStyle = 'disc outside';
+                        } else if (list.tagName === 'OL') {
+                          list.style.listStyleType = 'decimal';
+                          list.style.listStyle = 'decimal outside';
+                        }
+                        list.style.listStylePosition = 'outside';
+                        list.style.paddingLeft = '30px';
+                        list.style.margin = '15px 0';
+                      });
+                      
+                      const listItems = quillInstance.root.querySelectorAll('li');
+                      listItems.forEach(li => {
+                        li.style.display = 'list-item';
+                        li.style.listStylePosition = 'outside';
+                        li.style.margin = '8px 0';
+                        li.style.paddingLeft = '5px';
+                      });
+                    }, 100);
+                  }, 200);
+                }
               }
             }
-          }
+          });
         });
-    });
+      } else {
+        // Wait for Livewire to load
+        document.addEventListener('livewire:init', setupLivewireQuillHook, { once: true });
+      }
+    }
+    
+    setupLivewireQuillHook();
 });

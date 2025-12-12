@@ -724,7 +724,7 @@ class SiteController extends Controller
       ]);
     }
 
-    $gift->load(['order.order_products.product.preview', 'order.buyer']);
+    $gift->load(['order.order_products.product.preview', 'order.buyer', 'order.order_products']);
     
     $page = Page::where('slug', 'gift')
       ->with('config')

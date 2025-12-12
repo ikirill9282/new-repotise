@@ -15,6 +15,7 @@ use App\Jobs\ProcessOrder;
 use App\Services\StripeClient;
 use App\Traits\HasAuthor;
 use App\Models\RevenueShare;
+use App\Models\Gift;
 use Illuminate\Support\Facades\DB;
 use Stripe\Service\PaymentIntentService;
 
@@ -287,6 +288,7 @@ class Order extends Model
     {
       return [
           'user_id' => $this->user_id,
+          'buyer_user_id' => $this->buyer_user_id ?? $this->user_id,
           // 'payment_id' => $this->payment_id,
           'cost' => $this->getTotal(),
           'tax' => $this->getTax(),
@@ -294,7 +296,8 @@ class Order extends Model
           'cost_without_tax' => $this->getAmount(),
           'status_id' => EnumsOrder::NEW,
           'discount_id' => $this->discount_id,
-          'recipient' => $this->recipent ?? null,
+          'is_gift_order' => $this->is_gift_order ?? false,
+          'recipient' => $this->recipient ?? null,
           'recipient_message' => $this->recipient_message ?? null,
       ];
     }

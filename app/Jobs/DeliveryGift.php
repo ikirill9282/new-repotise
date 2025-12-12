@@ -46,7 +46,10 @@ class DeliveryGift implements ShouldQueue, ShouldBeUnique
       $buyer = $this->order->buyer ?? $this->order->user;
       
       // Письмо покупателю
-      if ($buyer->wasRecentlyCreated || !$buyer->email_verified_at) {
+      // Проверяем, был ли пользователь создан недавно (в течение последних 5 минут) - значит гость
+      $isGuestBuyer = $buyer->created_at->isAfter(now()->subMinutes(5)) && !$buyer->email_verified_at;
+      
+      if ($isGuestBuyer) {
         // Покупатель - гость → письмо №2
         Mail::to($buyer->email)->send(new GiftBuyerGuest($buyer, $this->order, $gift));
       } else {

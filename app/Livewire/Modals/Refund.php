@@ -4,6 +4,7 @@ namespace App\Livewire\Modals;
 
 use App\Models\OrderProducts;
 use App\Models\RefundRequest;
+use App\Models\Gift;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
@@ -44,12 +45,35 @@ class Refund extends Component
             return;
         }
 
-        $orderProduct = OrderProducts::with(['order', 'product.author', 'refundRequest'])
+        $orderProduct = OrderProducts::with(['order.gift', 'product.author', 'refundRequest'])
             ->whereKey($orderProductId)
             ->when($orderId, fn($query) => $query->where('order_id', $orderId))
             ->first();
 
-        if (!$orderProduct || !$orderProduct->order || $orderProduct->order->user_id !== Auth::id()) {
+        if (!$orderProduct || !$orderProduct->order) {
+            $this->errorMessage = 'You do not have permission to request a refund for this product.';
+            return;
+        }
+
+        $order = $orderProduct->order;
+        
+        // Проверяем права доступа
+        $hasAccess = false;
+        if ($order->is_gift_order && $order->gift) {
+            // Для подарков: доступ есть только у buyer_user_id
+            $hasAccess = $order->buyer_user_id === Auth::id();
+            
+            // Для подарков рефанд доступен только если gift.status = created
+            if ($hasAccess && $order->gift->status !== \App\Models\Gift::STATUS_CREATED) {
+                $this->errorMessage = 'Refunds are not available for claimed gifts.';
+                return;
+            }
+        } else {
+            // Для обычных заказов: доступ есть у user_id
+            $hasAccess = $order->user_id === Auth::id();
+        }
+
+        if (!$hasAccess) {
             $this->errorMessage = 'You do not have permission to request a refund for this product.';
             return;
         }
@@ -95,10 +119,13 @@ class Refund extends Component
 
         $valid = $validator->validated();
 
+        $order = $this->orderProduct->order;
+        $buyerId = $order->is_gift_order ? ($order->buyer_user_id ?? Auth::id()) : Auth::id();
+        
         RefundRequest::create([
             'order_id' => $this->orderProduct->order_id,
             'order_product_id' => $this->orderProduct->id,
-            'buyer_id' => Auth::id(),
+            'buyer_id' => $buyerId,
             'seller_id' => $this->orderProduct->product->author->id ?? null,
             'status' => 'pending',
             'reason' => $valid['reason'],

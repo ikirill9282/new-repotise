@@ -20,7 +20,9 @@ class ClaimGift extends Component
     public function mount(string $token)
     {
         $this->token = $token;
-        $this->gift = Gift::where('token', $token)->with(['order.order_products.product'])->first();
+        $this->gift = Gift::where('token', $token)
+            ->with(['order.order_products.product.preview', 'order.buyer', 'buyer'])
+            ->first();
     }
 
     public function claim()
@@ -36,8 +38,8 @@ class ClaimGift extends Component
 
         $user = Auth::user();
 
-        // Проверяем, что email совпадает
-        if ($user->email !== $this->gift->recipient_email) {
+        // Проверяем, что email совпадает или это тот же пользователь (разрешаем если покупатель и получатель один и тот же)
+        if ($user->email !== $this->gift->recipient_email && $this->gift->buyer_user_id !== $user->id) {
             $this->addError('email', 'This gift was sent to a different email address.');
             return;
         }
@@ -83,9 +85,12 @@ class ClaimGift extends Component
             ]);
 
             // Отправляем письмо покупателю
-            Mail::to($this->gift->buyer->email)->send(
-                new GiftClaimed($this->gift->buyer, $originalOrder, $this->gift)
-            );
+            $buyer = $this->gift->buyer;
+            if ($buyer) {
+                Mail::to($buyer->email)->send(
+                    new GiftClaimed($buyer, $originalOrder, $this->gift)
+                );
+            }
         });
 
         return redirect()->route('profile.purchases');

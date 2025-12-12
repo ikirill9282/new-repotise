@@ -278,7 +278,14 @@ const EditorButtons = function() {
       const resource = $(elem).closest('.editor-wrap').data('resource');
       
       if (action === 'report') {
-        Livewire.dispatch('openModal', { modalName: 'report', args: { model: hash, resource: resource } });
+        if (window.Livewire && window.Livewire.dispatch) {
+          Livewire.dispatch('openModal', { modalName: 'report', args: { model: hash, resource: resource } });
+        } else {
+          // Fallback: wait for Livewire to load
+          document.addEventListener('livewire:init', () => {
+            Livewire.dispatch('openModal', { modalName: 'report', args: { model: hash, resource: resource } });
+          }, { once: true });
+        }
       }
 
       if (action === 'edit') {
@@ -977,7 +984,14 @@ const AuthButtons = function() {
       if (!this.buttons.includes(elem)) {
         $(elem).on('click', function(evt) {
           evt.preventDefault();
-          Livewire.dispatch("openModal", { modalName: "auth" });
+          if (window.Livewire && window.Livewire.dispatch) {
+            Livewire.dispatch("openModal", { modalName: "auth" });
+          } else {
+            // Fallback: wait for Livewire to load
+            document.addEventListener('livewire:init', () => {
+              Livewire.dispatch("openModal", { modalName: "auth" });
+            }, { once: true });
+          }
         });
       }
     });
@@ -1345,29 +1359,39 @@ if (typeof window.Livewire !== 'undefined') {
 $(document).ready(function() {
   discoverCartDropButtons();
 
-  Livewire.hook('morphed',  ({ el, component }) => {
-    discoverCartDropButtons(el);
+  // Wait for Livewire to be available before setting up hooks
+  function setupLivewireHooks() {
+    if (window.Livewire && window.Livewire.hook) {
+      Livewire.hook('morphed',  ({ el, component }) => {
+        discoverCartDropButtons(el);
 
-    window.LikeButtons.discover();
-    window.CartCounter.discover();
-    window.CopyToClipboard.discover();
-    window.EmojiButtons.discover();
-    window.ReadMoreButtons.discover();
-    window.CartButtons.discover(el || 'body');
+        window.LikeButtons.discover();
+        window.CartCounter.discover();
+        window.CopyToClipboard.discover();
+        window.EmojiButtons.discover();
+        window.ReadMoreButtons.discover();
+        window.CartButtons.discover(el || 'body');
 
-    $('[data-input="percent"]').on('input', function(evt) {
-      $(this).val(evt.target.value.replace(/[^0-9\.]+/is, '') + '%');
-    });
+        $('[data-input="percent"]').on('input', function(evt) {
+          $(this).val(evt.target.value.replace(/[^0-9\.]+/is, '') + '%');
+        });
 
-    $('[data-input="integer"]').on('input', function(evt) {
-      $(this).val(evt.target.value.replace(/[^0-9]+/is, ''));
-    });
+        $('[data-input="integer"]').on('input', function(evt) {
+          $(this).val(evt.target.value.replace(/[^0-9]+/is, ''));
+        });
 
-    $('[data-input="price"]').on('input', function(evt) {
-      $(this).val('$' + evt.target.value.replace(/[^0-9.]/g, ''));
-    });
+        $('[data-input="price"]').on('input', function(evt) {
+          $(this).val('$' + evt.target.value.replace(/[^0-9.]/g, ''));
+        });
 
-  });
+      });
+    } else {
+      // If Livewire is not loaded yet, wait for it
+      document.addEventListener('livewire:init', setupLivewireHooks, { once: true });
+    }
+  }
+  
+  setupLivewireHooks();
 
   [...document.querySelectorAll('.stars_filter')].map(stars => {
     $(stars)
@@ -1422,42 +1446,52 @@ $(document).ready(function() {
   });
 
 
-  Livewire.on('toastSuccess', params => {
-    const message = params[0]?.message;
-    $.toast({
-      text: message,
-      icon: 'success',
-      heading: 'Success',
-      position: 'top-right',
-      hideAfter: 5000,
-    });
-  });
-
-  Livewire.on('toastError', params => {
-    const message = params[0]?.message;
-    $.toast({
-      text: message,
-      icon: 'error',
-      heading: 'Error',
-      position: 'top-right',
-      hideAfter: 5000,
-    });
-  });
-
-  Livewire.on('setCartCounter', params => {
-    const count = params[0]?.count;
-    console.log(count);
-    
-    if (count !== undefined) {
-      if (count > 0) {
-        $('.cart-counter').html(count);
-        $('.cart-counter').removeClass('hidden');
-        $('.cart-counter').attr('style', '');
-      } else {
-        $('.cart-counter').fadeOut(function() {
-          $(this).addClass('hidden');
+  // Setup Livewire event listeners
+  function setupLivewireEvents() {
+    if (window.Livewire && window.Livewire.on) {
+      Livewire.on('toastSuccess', params => {
+        const message = params[0]?.message;
+        $.toast({
+          text: message,
+          icon: 'success',
+          heading: 'Success',
+          position: 'top-right',
+          hideAfter: 5000,
         });
-      }
+      });
+
+      Livewire.on('toastError', params => {
+        const message = params[0]?.message;
+        $.toast({
+          text: message,
+          icon: 'error',
+          heading: 'Error',
+          position: 'top-right',
+          hideAfter: 5000,
+        });
+      });
+
+      Livewire.on('setCartCounter', params => {
+        const count = params[0]?.count;
+        console.log(count);
+        
+        if (count !== undefined) {
+          if (count > 0) {
+            $('.cart-counter').html(count);
+            $('.cart-counter').removeClass('hidden');
+            $('.cart-counter').attr('style', '');
+          } else {
+            $('.cart-counter').fadeOut(function() {
+              $(this).addClass('hidden');
+            });
+          }
+        }
+      });
+    } else {
+      // If Livewire is not loaded yet, wait for it
+      document.addEventListener('livewire:init', setupLivewireEvents, { once: true });
     }
-  });
+  }
+  
+  setupLivewireEvents();
 });

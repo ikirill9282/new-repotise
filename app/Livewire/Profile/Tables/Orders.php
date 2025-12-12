@@ -62,6 +62,28 @@ class Orders extends Component
       return redirect()->route('checkout');
     }
 
+    public function openResendGiftModal(string $encryptedGiftId): void
+    {
+        $this->dispatch(
+            'openModal',
+            modalName: 'resend-gift',
+            args: [
+                'gift_id' => $encryptedGiftId,
+            ],
+        );
+    }
+
+    public function openEditRecipientModal(string $encryptedGiftId): void
+    {
+        $this->dispatch(
+            'openModal',
+            modalName: 'edit-recipient',
+            args: [
+                'gift_id' => $encryptedGiftId,
+            ],
+        );
+    }
+
     public function render()
     {
       $user = $this->getUser();
@@ -72,6 +94,8 @@ class Orders extends Component
           ->with([
             'order_products.product.preview',
             'order_products.refundRequest',
+            'gift',
+            'buyer',
           ])
           ->orderByDesc('created_at')
           ->get(),

@@ -64,7 +64,9 @@
                         @endif
                         <h3 class="emeil">From: <a href="mailto:{{ $order->buyer->email ?? $order->user->email }}">{{ $order->buyer->getName() ?? $order->user->getName() }}</a></h3>
                     </div>
-                    @livewire('claim-gift', ['token' => $gift->token ?? ''])
+                    @if(isset($gift))
+                        @livewire('claim-gift', ['token' => $gift->token])
+                    @endif
                 </div>
                 <div class="block_cards">
                     <div class="swiper mySwiper2">
@@ -104,7 +106,7 @@
                           </svg>
                           </div>
                         <div class="swiper-pagination"></div>
-                        <p class="items_number">Items <span>({{ $order->products->count() }})</span></p>
+                        <p class="items_number">Items <span>({{ $order->order_products->count() }})</span></p>
                     </div>
                 </div>
             </div>

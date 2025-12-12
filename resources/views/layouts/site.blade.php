@@ -70,6 +70,10 @@
     @endphp
     @if($recaptchaSiteKey)
     <!-- Google reCAPTCHA -->
+    <script>
+      // Define onRecaptchaV2Load stub if not already defined
+      window.onRecaptchaV2Load = window.onRecaptchaV2Load || function() {};
+    </script>
     <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
     <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaV2Load&render=explicit" async defer></script>
     @endif
@@ -90,6 +94,9 @@
       @livewire('modals')
 
     @include('site.components.accept_cookie')
+    
+    @livewireScripts
+    
     <script src="{{ asset('/assets/js/custom.js') }}"></script>
     <script>
       let parallaxes = new makeParallax();
@@ -110,8 +117,6 @@
     <script src="{{ asset('/assets/js/cookie-manager.js') }}"></script>
 
     @vite('resources/js/app.js')
-
-    @livewireScripts
 
     @stack('js')
 

@@ -28,7 +28,7 @@ class GiftBuyerGuest extends Mailable
         public Gift $gift,
     )
     {
-        $this->trigger = Action::GIFT_SEND;
+        $this->trigger = Action::GIFT_BUYER_GUEST;
     }
 
     /**

@@ -5,23 +5,24 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        // Используем прямой SQL для изменения типа колонки
-        DB::statement('ALTER TABLE `user_options` MODIFY `tax_id` VARCHAR(255) NULL');
-    }
+return new class extends Migration {
+	/**
+	 * Run the migrations.
+	 */
+	public function up(): void
+	{
+		Schema::table('user_options', function (Blueprint $table) {
+			$table->string('tax_id')->nullable()->change();
+		});
+	}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        // Возвращаем обратно к integer (но это может привести к потере данных для длинных значений)
-        DB::statement('ALTER TABLE `user_options` MODIFY `tax_id` INT NULL');
-    }
+	/**
+	 * Reverse the migrations.
+	 */
+	public function down(): void
+	{
+		Schema::table('user_options', function (Blueprint $table) {
+			$table->integer('tax_id')->nullable()->change();
+		});
+	}
 };

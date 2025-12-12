@@ -217,6 +217,16 @@ class User extends Authenticatable implements HasName, FilamentUser
       return $this->hasMany(Order::class);
     }
 
+    public function giftsAsBuyer()
+    {
+      return $this->hasMany(\App\Models\Gift::class, 'buyer_user_id');
+    }
+
+    public function giftsAsRecipient()
+    {
+      return $this->hasMany(\App\Models\Gift::class, 'recipient_user_id');
+    }
+
     public function referrer()
     {
       return $this->hasOneThrough(User::class, UserReferal::class, 'referal_id', 'id', 'id', 'owner_id');

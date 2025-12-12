@@ -18,6 +18,10 @@ enum Action
   public const PROMOCODE_CREATED = 'Promocode Created';
   public const REFERAL_PROMOCODE_CREATED = 'Referal Promocode Created';
   public const GIFT_SEND = 'Gift sended.';
+  public const GIFT_BUYER_REGISTERED = 'Gift Buyer Registered';
+  public const GIFT_BUYER_GUEST = 'Gift Buyer Guest';
+  public const GIFT_RECIPIENT = 'Gift Recipient';
+  public const GIFT_CLAIMED = 'Gift Claimed';
   public const ACCOUNT_DELETION_CODE = 'Account Deletion Verification';
   public const DONATION_RECEIVED = 'Donation Received';
   public const DONATION_SENT = 'Donation Sent';
@@ -38,6 +42,10 @@ enum Action
       self::PROMOCODE_CREATED,
       self::REFERAL_PROMOCODE_CREATED,
       self::GIFT_SEND,
+      self::GIFT_BUYER_REGISTERED,
+      self::GIFT_BUYER_GUEST,
+      self::GIFT_RECIPIENT,
+      self::GIFT_CLAIMED,
       self::ACCOUNT_DELETION_CODE,
       self::DONATION_RECEIVED,
       self::DONATION_SENT,

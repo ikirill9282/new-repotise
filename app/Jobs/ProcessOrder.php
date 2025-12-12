@@ -49,7 +49,10 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
         if ($paymentIntent->status == PaymentIntent::STATUS_SUCCEEDED) {
 
           $amount = $paymentIntent->amount / 100; // cents!
-          $platform_fee = $this->order->author->options->getFee();
+          
+          // Загружаем buyer для получения platform_fee
+          $buyer = $this->order->buyer ?? $this->order->user;
+          $platform_fee = $buyer->options->getFee();
 
           $charge = Cashier::stripe()->charges->retrieve(
             $paymentIntent->latest_charge,
@@ -73,8 +76,13 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
             $referal_reward = 0;
             $author_amount = $amount_paid - $stripe_fee - $service_amount - $referal_reward;
 
+            // Для подарков используем buyer_user_id, для обычных заказов - user_id
+            $buyerId = $this->order->is_gift_order 
+              ? ($this->order->buyer_user_id ?? $this->order->user_id)
+              : $this->order->user_id;
+            
             $revenue = [
-              'user_id' => $this->order->user_id,
+              'user_id' => $buyerId,
               'author_id' => $order_product->product->user_id,
               'product_id' => $order_product->product_id,
               'order_id' => $this->order->id,
@@ -117,6 +125,7 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
         // Обработка подарков
         if ($this->order->is_gift_order && $this->order->status_id == EnumsOrder::PAID) {
           $this->processGiftOrder();
+          // Для подарков покупатель НЕ получает доступ к продукту
         } else {
           // Обычный заказ - создаем покупки для buyer_user_id
           ReferalFreeProduct::dispatch($this->order->buyer ?? $this->order->user);

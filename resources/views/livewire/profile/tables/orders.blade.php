@@ -32,74 +32,127 @@
                       <div class="w-20 h-24 rounded overflow-hidden shrink-0">
                         <img class="w-full h-full object-cover" src="{{ $order_product->product->preview->image }}" alt="Image">
                       </div>
-                      <x-link 
-                        href="{{ $order_product->product->makeUrl() }}" 
-                        class="!border-0 group-has-[a]:!text-black break-words"
-                        >
-                          {{ $order_product->product->title }}
-                        </x-link>
+                      <div class="flex flex-col gap-1">
+                        <x-link 
+                          href="{{ $order_product->product->makeUrl() }}" 
+                          class="!border-0 group-has-[a]:!text-black break-words"
+                          >
+                            {{ $order_product->product->title }}
+                          </x-link>
+                        @if($order->is_gift_order && $order->buyer_user_id === $user->id)
+                          <span class="text-xs">🎁 Gift purchase</span>
+                        @endif
+                      </div>
                     </div>
                   </td>
                   <td class="bg-clip-content !px-0 !border-light">
                     <div class="!p-3 flex items-start justify-start gap-4 group flex-wrap">
                       @if($order->status_id !== \App\Enums\Order::NEW)
-                        <div class="flex group">
-                          @if(!$order_product->refunded)
-                            <x-link 
-                              class="group-has-[a]:!text-active" 
-                              wire:click.prevent="openProductModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')"
-                            >
-                              View & Download
-                            </x-link>
-                          @else
-                            <div class="flex group opacity-0">View &amp; Download</div>
-                          @endif
-                        </div>
-                        <div class="flex flex-col items-start justify-start gap-2">
-                          @php
-                            $canLeaveReview = $user->canWriteReview($order_product->product)
-                              && !($refundRequest && $refundRequest->status === 'approved');
-                          @endphp
-                          @if ($canLeaveReview)
-                            <x-link 
-                              href="{{ $order_product->product->makeUrl() }}#review" 
-                              class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
-                            >
-                              Leave Review
-                            </x-link>
-                          @endif
-                          @if($refundRequest)
+                        @php
+                          $isGiftBuyer = $order->is_gift_order && $order->buyer_user_id === $user->id;
+                          $isGiftRecipient = $order->is_gift_order && $order->buyer_user_id !== $user->id;
+                          $gift = $order->gift;
+                        @endphp
+                        
+                        @if($isGiftBuyer && $gift)
+                          {{-- Для покупателя подарка --}}
+                          <div class="flex flex-col items-start justify-start gap-2 w-full">
+                            @if($gift->status === \App\Models\Gift::STATUS_CREATED)
+                              <div class="text-gray-400 text-sm">Gift sent to {{ $gift->recipient_email }}</div>
+                              <div class="flex flex-col items-start gap-1">
+                                @php
+                                  $encryptedGiftId = \Illuminate\Support\Facades\Crypt::encryptString((string) $gift->id);
+                                @endphp
+                                <x-link 
+                                  wire:click.prevent="openEditRecipientModal('{{ $encryptedGiftId }}')" 
+                                  class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black text-sm"
+                                >
+                                  Edit recipient email
+                                </x-link>
+                                <x-link 
+                                  wire:click.prevent="openResendGiftModal('{{ $encryptedGiftId }}')" 
+                                  class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black text-sm"
+                                >
+                                  Resend gift email
+                                </x-link>
+                                @php
+                                  // Рефанд доступен только если gift.status = created и по товару разрешён рефанд
+                                  $canRefundGift = !$order_product->refunded && !$refundRequest && $gift->status === \App\Models\Gift::STATUS_CREATED;
+                                @endphp
+                                @if($canRefundGift)
+                                  <x-link 
+                                    wire:click.prevent="openRefundModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')" 
+                                    class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black text-sm"
+                                  >
+                                    Request refund
+                                  </x-link>
+                                @endif
+                              </div>
+                            @elseif($gift->status === \App\Models\Gift::STATUS_CLAIMED)
+                              <div class="text-gray-400 text-sm">Gift claimed on {{ $gift->claimed_at->format('d.m.Y') }}</div>
+                            @endif
+                          </div>
+                        @else
+                          {{-- Обычная покупка или получатель подарка --}}
+                          <div class="flex group">
+                            @if(!$order_product->refunded)
+                              <x-link 
+                                class="group-has-[a]:!text-active" 
+                                wire:click.prevent="openProductModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')"
+                              >
+                                View & Download
+                              </x-link>
+                            @else
+                              <div class="flex group opacity-0">View &amp; Download</div>
+                            @endif
+                          </div>
+                          <div class="flex flex-col items-start justify-start gap-2">
                             @php
-                              $status = $refundRequest->status ?? 'pending';
-                              $statusLabel = match ($status) {
-                                'approved' => 'Returned',
-                                'rejected' => 'Return Denied',
-                                'pending' => 'Return Requested',
-                                default => ucfirst(str_replace('_', ' ', (string) $status)),
-                              };
-                              $reason = $refundRequest->reason
-                                ? ucfirst(str_replace('_', ' ', $refundRequest->reason))
-                                : null;
-                              $details = trim(strip_tags($refundRequest->details ?? ''));
+                              $canLeaveReview = $user->canWriteReview($order_product->product)
+                                && !($refundRequest && $refundRequest->status === 'approved');
                             @endphp
-                            <div class="text-left max-w-xs">
-                              <span class="text-gray-400 cursor-not-allowed block">{{ $statusLabel }}</span>
-                              @if($reason)
-                                <span class="text-xs text-gray-400 block">{{ $reason }}</span>
-                              @endif
-                              @if($details)
-                                <span class="text-xs text-gray-400 block">{{ $details }}</span>
-                              @endif
-                            </div>
-                          @else
-                            <x-link 
-                              wire:click.prevent="openRefundModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')" 
-                              class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
-                            >
-                              Refund
-                            </x-link>
-                          @endif
-                        </div>
+                            @if ($canLeaveReview)
+                              <x-link 
+                                href="{{ $order_product->product->makeUrl() }}#review" 
+                                class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
+                              >
+                                Leave Review
+                              </x-link>
+                            @endif
+                            @if($refundRequest)
+                              @php
+                                $status = $refundRequest->status ?? 'pending';
+                                $statusLabel = match ($status) {
+                                  'approved' => 'Returned',
+                                  'rejected' => 'Return Denied',
+                                  'pending' => 'Return Requested',
+                                  default => ucfirst(str_replace('_', ' ', (string) $status)),
+                                };
+                                $reason = $refundRequest->reason
+                                  ? ucfirst(str_replace('_', ' ', $refundRequest->reason))
+                                  : null;
+                                $details = trim(strip_tags($refundRequest->details ?? ''));
+                              @endphp
+                              <div class="text-left max-w-xs">
+                                <span class="text-gray-400 cursor-not-allowed block">{{ $statusLabel }}</span>
+                                @if($reason)
+                                  <span class="text-xs text-gray-400 block">{{ $reason }}</span>
+                                @endif
+                                @if($details)
+                                  <span class="text-xs text-gray-400 block">{{ $details }}</span>
+                                @endif
+                              </div>
+                            @elseif(!$isGiftRecipient)
+                              {{-- Refund показываем только если это не получатель подарка --}}
+                              <x-link 
+                                wire:click.prevent="openRefundModal('{{ $encryptedOrderProductId }}', '{{ $encryptedOrderId }}')" 
+                                class="group-has-[a]:hover:!text-black group-has-[a]:hover:!border-black"
+                              >
+                                Refund
+                              </x-link>
+                            @endif
+                          </div>
+                        @endif
                       @else
                         <div class="flex group opacity-0">View & Download</div>
                         <div class="flex flex-col items-start justify-start gap-2">
