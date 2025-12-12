@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Gift;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -38,12 +39,24 @@ class DeliveryGift implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-      $gift = $this->order->gift;
-      if (!$gift) {
+      // Проверяем, является ли заказ подарком
+      if ($this->order->gift != 1) {
         return;
       }
 
-      $buyer = $this->order->buyer ?? $this->order->user;
+      // Получаем запись Gift через связь
+      $gift = Gift::where('order_id', $this->order->id)->first();
+      if (!$gift) {
+        Log::error('Gift record not found for order', ['order_id' => $this->order->id]);
+        return;
+      }
+
+      // Получаем покупателя из Gift
+      $buyer = $gift->buyer;
+      if (!$buyer) {
+        Log::error('Buyer not found for gift', ['gift_id' => $gift->id, 'order_id' => $this->order->id]);
+        return;
+      }
       
       // Письмо покупателю
       // Проверяем, был ли пользователь создан недавно (в течение последних 5 минут) - значит гость

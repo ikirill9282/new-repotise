@@ -39,8 +39,8 @@
                           >
                             {{ $order_product->product->title }}
                           </x-link>
-                        @if($order->is_gift_order && $order->buyer_user_id === $user->id)
-                          <span class="text-xs">🎁 Gift purchase</span>
+                        @if($order->gift == 1)
+                          <span class="text-xs">🎁 Gift</span>
                         @endif
                       </div>
                     </div>
