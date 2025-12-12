@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Stripe\PaymentIntent;
 use App\Jobs\DeliveryGift;
 
@@ -76,9 +77,9 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
             $referal_reward = 0;
             $author_amount = $amount_paid - $stripe_fee - $service_amount - $referal_reward;
 
-            // Для подарков используем buyer_user_id, для обычных заказов - user_id
-            $buyerId = $this->order->is_gift_order 
-              ? ($this->order->buyer_user_id ?? $this->order->user_id)
+            // Для подарков используем buyer из метаданных Stripe, для обычных заказов - user_id
+            $buyerId = $this->order->gift == 1 
+              ? $this->getBuyerUserIdForGift()
               : $this->order->user_id;
             
             $revenue = [
@@ -123,12 +124,12 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
         }
 
         // Обработка подарков
-        if ($this->order->is_gift_order && $this->order->status_id == EnumsOrder::PAID) {
+        if ($this->order->gift == 1 && $this->order->status_id == EnumsOrder::PAID) {
           $this->processGiftOrder();
           // Для подарков покупатель НЕ получает доступ к продукту
         } else {
-          // Обычный заказ - создаем покупки для buyer_user_id
-          ReferalFreeProduct::dispatch($this->order->buyer ?? $this->order->user);
+          // Обычный заказ - создаем покупки для user_id
+          ReferalFreeProduct::dispatch($this->order->user);
         }
 
         PayReward::dispatch($this->order);
@@ -138,17 +139,52 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
 
     protected function processGiftOrder(): void
     {
+      // Находим покупателя подарка
+      $buyerUserId = $this->getBuyerUserIdForGift();
+      
+      if (!$buyerUserId) {
+        Log::error('Cannot find buyer for gift order', ['order_id' => $this->order->id]);
+        return;
+      }
+
       // Создаем запись Gift
       $gift = Gift::create([
         'order_id' => $this->order->id,
-        'buyer_user_id' => $this->order->buyer_user_id ?? $this->order->user_id,
+        'buyer_user_id' => $buyerUserId,
         'recipient_email' => $this->order->recipient,
+        'recipient_user_id' => $this->order->user_id, // user_id теперь указывает на получателя
         'status' => Gift::STATUS_CREATED,
       ]);
 
       // Покупатель НЕ получает доступ к продукту при подарке
       // Письма будут отправлены через DeliveryGift job
       DeliveryGift::dispatch($this->order);
+    }
+
+    protected function getBuyerUserIdForGift(): ?int
+    {
+      // Пытаемся найти покупателя по email из метаданных Stripe
+      try {
+        $payment = $this->order->getLatestPayment();
+        if ($payment && $payment->stripe_id) {
+          $paymentIntent = Cashier::stripe()->paymentIntents->retrieve($payment->stripe_id);
+          $buyerEmail = $paymentIntent->metadata->buyer_email ?? null;
+          
+          if ($buyerEmail) {
+            $buyer = User::where('email', $buyerEmail)->first();
+            if ($buyer) {
+              return $buyer->id;
+            }
+          }
+        }
+      } catch (\Exception $e) {
+        Log::error('Error getting buyer from Stripe metadata', [
+          'order_id' => $this->order->id,
+          'error' => $e->getMessage(),
+        ]);
+      }
+
+      return null;
     }
 
     function distributeCommission(float $commission, array $items)

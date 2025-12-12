@@ -15,19 +15,28 @@
             <div class="thanks_block">
                 <div class="text_left">
                     @include('site.components.heading', ['variables' => $variables->filter(fn($item) => str_contains($item->name, 'page'))])
-                    <p>{{ print_var('page_subtitle', $variables) }}</p>
+                    @if($order->gift == 1)
+                      <p>Your gift has been sent! The recipient will receive a notification email. The gift will appear in their "My Purchases" section.</p>
+                    @else
+                      <p>{{ print_var('page_subtitle', $variables) }}</p>
+                    @endif
                     <div class="block_view">
-                        @if(auth()->check() && !empty($downloadModalArgs))
-                          <a 
-                            href="#"
-                            class="download"
-                            x-data="{}"
-                            x-on:click.prevent='Livewire.dispatch("openModal", { modalName: "product", args: @json($downloadModalArgs) })'
-                          >
-                            {{ print_var('left_button_text', $variables) }}
-                          </a>
+                        @if($order->gift == 1)
+                          {{-- Для подарка не показываем кнопку Download Now --}}
+                          <a href="{{ route('profile.purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">View My Purchases</a>
+                        @else
+                          @if(auth()->check() && !empty($downloadModalArgs))
+                            <a 
+                              href="#"
+                              class="download"
+                              x-data="{ args: {{ json_encode($downloadModalArgs, JSON_HEX_APOS | JSON_HEX_QUOT) }} }"
+                              x-on:click.prevent="Livewire.dispatch('openModal', { modalName: 'product', args: args })"
+                            >
+                              {{ print_var('left_button_text', $variables) }}
+                            </a>
+                          @endif
+                          <a href="{{ route('profile.purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">{{ print_var('right_button_text', $variables) }}</a>
                         @endif
-                        <a href="{{ route('profile.purchases') }}" class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}">{{ print_var('right_button_text', $variables) }}</a>
                     </div>
                 </div>
                 <img src="{{ asset('assets/img/checked.png') }}" alt="" class="checked">

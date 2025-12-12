@@ -252,12 +252,6 @@ class Checkout extends Component
           $buyerUser = Auth::user();
         }
 
-        // Сохраняем buyer_user_id в заказ до оплаты
-        $order->update([
-          'buyer_user_id' => $buyerUser->id,
-          'user_id' => $buyerUser->id, // Для совместимости
-        ]);
-
         // Если покупатель был создан, отправляем письмо №5 (User Created)
         // Письмо будет отправлено через систему email-шаблонов с триггером USER_CREATED
         if (!Auth::check() && $buyerUser->wasRecentlyCreated) {
@@ -265,27 +259,43 @@ class Checkout extends Component
           // Не отправляем пароль напрямую - пользователь установит его через попап
         }
 
-        $user = $buyerUser;
+        // Обработка подарка
+        $recipientUser = null;
+        if ($this->form['gift'] && !empty($this->form['recipient']) && $this->form['recipient'] !== $buyerUser->email) {
+          // Находим или создаем пользователя для получателя подарка
+          $recipientUser = User::firstOrCreate(
+            ['email' => $this->form['recipient']],
+            [
+              'username' => explode('@', $this->form['recipient'])[0],
+              'password' => User::makePassword(),
+            ]
+          );
+
+          // Присваиваем заказ получателю подарка
+          $order->update([
+            'user_id' => $recipientUser->id,
+            'gift' => 1,
+            'recipient' => $this->form['recipient'],
+            'recipient_message' => $this->form['recipient_message'] ?? null,
+          ]);
+
+          $user = $recipientUser; // Используем получателя для проверок
+        } else {
+          // Обычная покупка - присваиваем заказ покупателю
+          $order->update([
+            'user_id' => $buyerUser->id,
+            'gift' => 0,
+            'recipient' => null,
+            'recipient_message' => null,
+          ]);
+
+          $user = $buyerUser;
+        }
 
       if ($this->orderContainsSelfProduct($order, $user)) {
         DB::rollBack();
         return redirect()->route('payment.error', ['reason' => 'self_purchase']);
       }
-
-        // Обработка подарка
-        if ($this->form['gift'] && $this->form['recipient'] !== $buyerUser->email) {
-          $order->update([
-            'is_gift_order' => true,
-            'gift' => 1, // Для обратной совместимости
-            'recipient' => $this->form['recipient'],
-            'recipient_message' => $this->form['recipient_message'] ?? null,
-          ]);
-        } else {
-          $order->update([
-            'is_gift_order' => false,
-            'gift' => 0,
-          ]);
-        }
         
         $paymentMethod = $this->addUserPaymentMethod($user, $pm_id);
         $paymentIntent = null;
@@ -311,6 +321,15 @@ class Checkout extends Component
         }
 
         if ($need_creation) {
+          $metadata = [
+            'order_id' => $order->id,
+          ];
+          
+          // Сохраняем email покупателя в метаданных для подарков
+          if ($order->gift == 1) {
+            $metadata['buyer_email'] = $this->form['email'];
+          }
+          
           $paymentIntent = Cashier::stripe()->paymentIntents->create([
             'customer' => $user->stripe_id,
             'amount' => $order->getTotal() * 100, // cents!
@@ -319,9 +338,7 @@ class Checkout extends Component
             'confirmation_method' => 'automatic',
             'confirm' => true,
             'return_url' => route('payment.success'),
-            'metadata' => [
-              'order_id' => $order->id,
-            ],
+            'metadata' => $metadata,
           ]);
 
           $order->payments()->create([
