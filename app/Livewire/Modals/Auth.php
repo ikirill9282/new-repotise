@@ -135,22 +135,26 @@ class Auth extends Component
 
 		$valid = $validator->validated();
 
-		// Verify reCAPTCHA
+		// Verify reCAPTCHA (only if configured)
 		$recaptchaService = $this->getRecaptchaService();
-		if ($this->showRecaptchaV2) {
-			$recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
-			if (!$recaptchaResult['success']) {
-				$validator->errors()->add('form.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
-				throw new ValidationException($validator);
-			}
-		} else {
-			// Verify reCAPTCHA v3
-			$recaptchaResult = $recaptchaService->verifyV3($this->recaptcha_token, 'login');
-			if (!$recaptchaResult['success']) {
-				// If V3 fails, enable V2 for the next attempt
-				$this->showRecaptchaV2 = true;
-				$validator->errors()->add('recaptcha_token', 'Verification failed. Please complete the captcha below.');
-				throw new ValidationException($validator);
+		$siteKey = $recaptchaService->getSiteKey();
+		
+		if (!empty($siteKey)) {
+			if ($this->showRecaptchaV2) {
+				$recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
+				if (!$recaptchaResult['success']) {
+					$validator->errors()->add('form.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+					throw new ValidationException($validator);
+				}
+			} else {
+				// Verify reCAPTCHA v3
+				$recaptchaResult = $recaptchaService->verifyV3($this->recaptcha_token, 'login');
+				if (!$recaptchaResult['success']) {
+					// If V3 fails, enable V2 for the next attempt
+					$this->showRecaptchaV2 = true;
+					$validator->errors()->add('recaptcha_token', 'Verification failed. Please complete the captcha below.');
+					throw new ValidationException($validator);
+				}
 			}
 		}
 

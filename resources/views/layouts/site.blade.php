@@ -71,8 +71,20 @@
     @if($recaptchaSiteKey)
     <!-- Google reCAPTCHA -->
     <script>
-      // Define onRecaptchaV2Load stub if not already defined
-      window.onRecaptchaV2Load = window.onRecaptchaV2Load || function() {};
+      // Global reCAPTCHA callback registry
+      window.recaptchaCallbacks = window.recaptchaCallbacks || [];
+      window.onRecaptchaV2Load = function() {
+        // Call all registered callbacks
+        window.recaptchaCallbacks.forEach(function(callback) {
+          try {
+            if (typeof callback === 'function') {
+              callback();
+            }
+          } catch (e) {
+            console.error('reCAPTCHA callback error:', e);
+          }
+        });
+      };
     </script>
     <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
     <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaV2Load&render=explicit" async defer></script>

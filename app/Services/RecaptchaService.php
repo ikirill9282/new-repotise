@@ -13,9 +13,9 @@ class RecaptchaService
 
     public function __construct()
     {
-        $this->siteKey = config('services.recaptcha.site_key', '');
-        $this->secretKey = config('services.recaptcha.secret_key', '');
-        $this->v3Threshold = (float) config('services.recaptcha.v3_threshold', 0.5);
+        $this->siteKey = config('services.recaptcha.site_key') ?? '';
+        $this->secretKey = config('services.recaptcha.secret_key') ?? '';
+        $this->v3Threshold = (float) (config('services.recaptcha.v3_threshold') ?? 0.5);
     }
 
     /**

@@ -94,13 +94,20 @@
     const recaptchaSiteKey = @js($recaptchaSiteKey);
     
     function executeRecaptchaV3() {
-      if (!window.Livewire || typeof grecaptcha === 'undefined') {
-        return;
+      if (typeof grecaptcha === 'undefined') {
+        console.warn('reCAPTCHA not loaded yet');
+        return Promise.resolve();
+      }
+      
+      if (!window.Livewire) {
+        console.warn('Livewire not available');
+        return Promise.resolve();
       }
       
       const component = window.Livewire.find(componentId);
       if (!component) {
-        return;
+        console.warn('Component not found:', componentId);
+        return Promise.resolve();
       }
       
       const step = component.get('step');
@@ -108,14 +115,41 @@
       
       // Only execute reCAPTCHA v3 if needed (step 2, no v2)
       if (step === 2 && !showRecaptchaV2) {
-        grecaptcha.ready(function() {
-          grecaptcha.execute(recaptchaSiteKey, {action: 'login'}).then(function(token) {
-            component.set('recaptcha_token', token);
-          }).catch(function(error) {
-            console.error('reCAPTCHA error:', error);
+        return new Promise(function(resolve, reject) {
+          grecaptcha.ready(function() {
+            grecaptcha.execute(recaptchaSiteKey, {action: 'login'}).then(function(token) {
+              component.set('recaptcha_token', token);
+              resolve(token);
+            }).catch(function(error) {
+              console.error('reCAPTCHA error:', error);
+              reject(error);
+            });
           });
         });
       }
+      
+      return Promise.resolve();
+    }
+    
+    // Make function globally available
+    window.executeAuthRecaptchaV3 = executeRecaptchaV3;
+    
+    // Listen for form submission to ensure token is fresh
+    const submitBtn = document.getElementById('login-submit-btn');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function(e) {
+        const component = window.Livewire?.find(componentId);
+        if (component) {
+          const step = component.get('step');
+          const showRecaptchaV2 = component.get('showRecaptchaV2') ?? false;
+          // Only generate token if step 2 and not showing v2
+          if (step === 2 && !showRecaptchaV2 && typeof grecaptcha !== 'undefined') {
+            executeRecaptchaV3().catch(function(error) {
+              console.error('Failed to generate reCAPTCHA token:', error);
+            });
+          }
+        }
+      });
     }
     
     // Execute reCAPTCHA when component updates to step 2
@@ -335,8 +369,8 @@
       });
     }
     
-    // Define the function globally for onRecaptchaV2Load callback
-    window.onRecaptchaV2Load = function() {
+    // Register callback for reCAPTCHA v2 initialization
+    function initAuthRecaptcha() {
       // Setup when Livewire is available
       if (window.Livewire) {
         setupRecaptchaV2();
@@ -348,7 +382,16 @@
           setTimeout(() => renderRecaptchaV2(), 200);
         }, { once: true });
       }
-    };
+    }
+    
+    // Register callback in global registry
+    if (typeof window.recaptchaCallbacks !== 'undefined') {
+      window.recaptchaCallbacks.push(initAuthRecaptcha);
+    } else {
+      // Fallback: register when registry is available
+      window.recaptchaCallbacks = window.recaptchaCallbacks || [];
+      window.recaptchaCallbacks.push(initAuthRecaptcha);
+    }
     
     // Also try to setup immediately if both are available
     if (window.Livewire && typeof grecaptcha !== 'undefined') {
