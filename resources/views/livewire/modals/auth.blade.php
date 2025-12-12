@@ -38,13 +38,14 @@
         </div>
       @endif
       
-      @if($this->showRecaptchaV2)
+      {{-- reCAPTCHA disabled --}}
+      {{-- @if($this->showRecaptchaV2)
         <div class="!mb-4" id="recaptcha-v2-container"></div>
         <input type="hidden" wire:model="form.recaptcha_token" name="recaptcha_token" id="recaptcha_token">
         @error('form.recaptcha_token')
           <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
         @enderror
-      @endif
+      @endif --}}
 
     @endif
 
@@ -82,12 +83,14 @@
 
 @push('js')
 <script>
+  {{-- reCAPTCHA disabled --}}
   @php
-    $recaptchaSiteKey = config('services.recaptcha.site_key');
+    // $recaptchaSiteKey = config('services.recaptcha.site_key');
     $componentId = $this->getId();
   @endphp
   
-  @if($recaptchaSiteKey)
+  {{-- @if($recaptchaSiteKey) --}}
+  @if(false)
   // reCAPTCHA v3 for login - execute automatically before attempt
   (function() {
     const componentId = @js($componentId);

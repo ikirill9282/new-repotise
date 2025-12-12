@@ -76,11 +76,13 @@ class Auth extends Component
 		$this->user_id = Crypt::encrypt($user->id);
 		$this->step = 2;
 
+		// reCAPTCHA disabled
 		// Check if we need to show reCAPTCHA v2 when moving to step 2
-		$ipAddress = request()->ip();
-		$rateLimitService = $this->getRateLimitService();
-		$failedAttempts = $rateLimitService->getRemainingAttempts($ipAddress, 'login', 10, 60);
-		$this->showRecaptchaV2 = (10 - $failedAttempts) >= 3;
+		// $ipAddress = request()->ip();
+		// $rateLimitService = $this->getRateLimitService();
+		// $failedAttempts = $rateLimitService->getRemainingAttempts($ipAddress, 'login', 10, 60);
+		// $this->showRecaptchaV2 = (10 - $failedAttempts) >= 3;
+		$this->showRecaptchaV2 = false;
 	}
 
 	public function attempt()
@@ -104,12 +106,14 @@ class Auth extends Component
 			throw new ValidationException($validator);
 		}
 
+		// reCAPTCHA disabled
 		// Check failed attempts to show reCAPTCHA v2
 		// Only update if not already shown (to prevent hiding after validation errors)
-		if (!$this->showRecaptchaV2) {
-			$failedAttempts = $rateLimitService->getRemainingAttempts($ipAddress, 'login', 10, 60);
-			$this->showRecaptchaV2 = (10 - $failedAttempts) >= 3;
-		}
+		// if (!$this->showRecaptchaV2) {
+		// 	$failedAttempts = $rateLimitService->getRemainingAttempts($ipAddress, 'login', 10, 60);
+		// 	$this->showRecaptchaV2 = (10 - $failedAttempts) >= 3;
+		// }
+		$this->showRecaptchaV2 = false;
 
 		$validator = Validator::make(
 			$this->form,
@@ -118,14 +122,15 @@ class Auth extends Component
 				'password' => 'required|string',
 				'2fa' => 'sometimes|nullable|string',
 				'backup' => 'sometimes|nullable|boolean',
-				'recaptcha_token' => $this->showRecaptchaV2 ? 'required|string' : 'sometimes|nullable|string',
+				// reCAPTCHA disabled
+				// 'recaptcha_token' => $this->showRecaptchaV2 ? 'required|string' : 'sometimes|nullable|string',
 			],
 			[
 				'email.required' => 'Please enter your email address.',
 				'email.email' => 'Please enter a valid email address.',
 				'email.exists' => 'Account with this email was not found.',
 				'password.required' => 'Please enter your password.',
-				'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
+				// 'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
 			]
 		);
 
@@ -135,28 +140,29 @@ class Auth extends Component
 
 		$valid = $validator->validated();
 
+		// reCAPTCHA verification disabled
 		// Verify reCAPTCHA (only if configured)
-		$recaptchaService = $this->getRecaptchaService();
-		$siteKey = $recaptchaService->getSiteKey();
-		
-		if (!empty($siteKey)) {
-			if ($this->showRecaptchaV2) {
-				$recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
-				if (!$recaptchaResult['success']) {
-					$validator->errors()->add('form.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
-					throw new ValidationException($validator);
-				}
-			} else {
-				// Verify reCAPTCHA v3
-				$recaptchaResult = $recaptchaService->verifyV3($this->recaptcha_token, 'login');
-				if (!$recaptchaResult['success']) {
-					// If V3 fails, enable V2 for the next attempt
-					$this->showRecaptchaV2 = true;
-					$validator->errors()->add('recaptcha_token', 'Verification failed. Please complete the captcha below.');
-					throw new ValidationException($validator);
-				}
-			}
-		}
+		// $recaptchaService = $this->getRecaptchaService();
+		// $siteKey = $recaptchaService->getSiteKey();
+		// 
+		// if (!empty($siteKey)) {
+		// 	if ($this->showRecaptchaV2) {
+		// 		$recaptchaResult = $recaptchaService->verifyV2($valid['recaptcha_token'] ?? null);
+		// 		if (!$recaptchaResult['success']) {
+		// 			$validator->errors()->add('form.recaptcha_token', 'reCAPTCHA verification failed. Please try again.');
+		// 			throw new ValidationException($validator);
+		// 		}
+		// 	} else {
+		// 		// Verify reCAPTCHA v3
+		// 		$recaptchaResult = $recaptchaService->verifyV3($this->recaptcha_token, 'login');
+		// 		if (!$recaptchaResult['success']) {
+		// 			// If V3 fails, enable V2 for the next attempt
+		// 			$this->showRecaptchaV2 = true;
+		// 			$validator->errors()->add('recaptcha_token', 'Verification failed. Please complete the captcha below.');
+		// 			throw new ValidationException($validator);
+		// 		}
+		// 	}
+		// }
 
 		$user = $this->getUser()?->fresh();
 
