@@ -65,7 +65,8 @@
     </script>
     @endif
     
-    @php
+    {{-- reCAPTCHA disabled --}}
+    {{-- @php
       $recaptchaSiteKey = config('services.recaptcha.site_key');
     @endphp
     @if($recaptchaSiteKey)
@@ -88,7 +89,7 @@
     </script>
     <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
     <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaV2Load&render=explicit" async defer></script>
-    @endif
+    @endif --}}
 </head>
 
 <body class="text-dark">
