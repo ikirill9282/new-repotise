@@ -30,7 +30,7 @@ class Cart
     $this->updateCart($this->template);
   }
 
-  public function addProduct(int $product_id, ?int $count = null): void
+  public function addProduct(int $product_id, ?int $count = null, ?string $subscription_period = null): void
   {
     if (!isset($this->cart['products'])) $this->cart['products'] = [];
 
@@ -38,13 +38,20 @@ class Cart
       foreach($this->cart['products'] as &$product) {
         if ($product['id'] == $product_id) {
           $product['count'] = $count ?? 1;
+          if ($subscription_period !== null) {
+            $product['subscription_period'] = $subscription_period;
+          }
         }
       }
     } else {
-      $this->cart['products'][] = [
+      $productData = [
         'id' => $product_id,
         'count' => $count,
       ];
+      if ($subscription_period !== null) {
+        $productData['subscription_period'] = $subscription_period;
+      }
+      $this->cart['products'][] = $productData;
     }
 
     $this->updateCart($this->cart);
@@ -78,6 +85,28 @@ class Cart
   public function inCart(int $id): bool
   {
     return collect($this->cart['products'])->where('id', $id)->isNotEmpty();
+  }
+
+  public function hasSubscriptions(): bool
+  {
+    if (!$this->hasProducts()) {
+      return false;
+    }
+    
+    return collect($this->getProducts())->contains(function ($product) {
+      return isset($product['subscription_period']);
+    });
+  }
+
+  public function getSubscriptionProducts(): array
+  {
+    if (!$this->hasProducts()) {
+      return [];
+    }
+    
+    return collect($this->getProducts())->filter(function ($product) {
+      return isset($product['subscription_period']);
+    })->values()->all();
   }
 
   public function getCartCount(): int

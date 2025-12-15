@@ -13,8 +13,41 @@
               <a href="{{ $model->makeUrl() }}">{{ \Illuminate\Support\Str::limit($model->title, 50, '...') }}</a>
             </h4>
             <h5>
-              <div class="text-sm">{{ currency($model->getPrice()) }}</div>
-              <span>{{ currency($model->getPriceWithoutDiscount()) }}</span>
+              @php
+                $pivot = $model->pivot ?? $model->pivot;
+                $isSubscription = isset($pivot['subscription_period']) && $model->subscription && $model->subprice;
+                
+                if ($isSubscription) {
+                  // Для подписок показываем итоговую стоимость за весь период
+                  $period = $pivot['subscription_period'];
+                  $totalPrice = $model->subprice->getPeriodPrice($period);
+                  $totalPriceWithoutDiscount = $model->subprice->getPeriodPriceWithoutDiscount($period);
+                  
+                  $displayPrice = $totalPrice;
+                  $displayPriceWithoutDiscount = $totalPriceWithoutDiscount;
+                  
+                  // Формируем метку периода
+                  $periodLabels = [
+                    'month' => 'Monthly',
+                    'quarter' => 'Quarterly',
+                    'year' => 'Yearly',
+                  ];
+                  $periodLabel = $periodLabels[$period] ?? ucfirst($period);
+                } else {
+                  $displayPrice = $model->getPrice();
+                  $displayPriceWithoutDiscount = $model->getPriceWithoutDiscount();
+                  $periodLabel = '';
+                }
+              @endphp
+              <div class="text-sm">
+                {{ currency($displayPrice) }}
+                @if($periodLabel)
+                  <span class="text-xs text-gray-500 block">{{ $periodLabel }}</span>
+                @endif
+              </div>
+              @if($displayPriceWithoutDiscount > $displayPrice)
+                <span>{{ currency($displayPriceWithoutDiscount) }}</span>
+              @endif
             </h5>
         </div>
         <p>{{ $model->categories->pluck('title')->join(', ') }}</p>

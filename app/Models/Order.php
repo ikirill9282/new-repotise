@@ -232,11 +232,36 @@ class Order extends Model
         $products = $cart->getCartProducts();
         $result = array_map(function($item) use ($products) {
           $product = $products->where('id', $item['id'])->first();
-          $product->pivot = [
-            'count' => $item['count'],
-            'price' => $product->price,
-            'sale_price' => $product->sale_price,
-          ];
+          
+          // Если это подписка с периодом, используем цену подписки за месяц
+          $price = $product->price;
+          $sale_price = $product->sale_price;
+          
+          if (isset($item['subscription_period']) && $product->subscription && $product->subprice) {
+            // Получаем итоговую стоимость за весь период подписки
+            $period = $item['subscription_period'];
+            $totalPrice = $product->subprice->getPeriodPrice($period);
+            $totalPriceWithoutDiscount = $product->subprice->getPeriodPriceWithoutDiscount($period);
+            
+            // Для подписок price - это итоговая стоимость за весь период с учетом скидки, sale_price - разница
+            $price = $totalPriceWithoutDiscount;
+            $sale_price = $totalPriceWithoutDiscount - $totalPrice;
+            
+            // Сохраняем период подписки в pivot
+            $product->pivot = [
+              'count' => $item['count'],
+              'price' => $price,
+              'sale_price' => $sale_price,
+              'subscription_period' => $period,
+            ];
+          } else {
+            $product->pivot = [
+              'count' => $item['count'],
+              'price' => $price,
+              'sale_price' => $sale_price,
+            ];
+          }
+          
           return $product;
         }, $cart->getProducts());
       }

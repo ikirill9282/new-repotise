@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 use App\Models\Order;
+use App\Models\Product;
 use App\Services\Cart as CartService;
+use Illuminate\Support\Facades\Crypt;
 use Livewire\Attributes\On;
 
 class Cart extends Component
@@ -58,6 +60,42 @@ class Cart extends Component
     {
       $cart = new CartService();
       if ($cart->hasProducts()) {
+        // Проверяем наличие подписок в корзине
+        if ($cart->hasSubscriptions()) {
+          $subscriptionProducts = $cart->getSubscriptionProducts();
+          
+          // Если в корзине только одна подписка, перенаправляем на страницу оформления подписки
+          if (count($subscriptionProducts) === 1 && count($cart->getProducts()) === 1) {
+            $subscriptionProduct = $subscriptionProducts[0];
+            $product = Product::find($subscriptionProduct['id']);
+            
+            if ($product) {
+              // Проверяем, что пользователь не пытается купить свой продукт
+              if (Auth::check() && $product->user_id === Auth::id()) {
+                $cart->removeFromCart($product->id);
+                $this->prepareOrder();
+                $this->dispatch('toastError', ['message' => 'You cannot purchase your own products.']);
+                return;
+              }
+              
+              // Сохраняем данные подписки в сессию и очищаем корзину
+              $product_id = Crypt::encrypt($product->id);
+              Session::put('checkout-sub', [
+                'period' => $subscriptionProduct['subscription_period'],
+                'product_id' => $product_id
+              ]);
+              $cart->flushCart();
+              
+              return redirect()->route('checkout.subscription');
+            }
+          } else {
+            // Если в корзине несколько подписок или подписки + обычные продукты
+            $this->dispatch('toastError', ['message' => 'Please process subscriptions separately from regular products.']);
+            return;
+          }
+        }
+        
+        // Обычная обработка корзины для не-подписок
         $order = Order::preparing($cart);
         $blockedProductIds = [];
 

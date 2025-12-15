@@ -22,48 +22,25 @@ class ProductSubscribe extends Component
 
     public function moveCheckout(string $period)
     {
-      // $product = $this->getProduct();
+      $product = $this->getProduct();
       
-      // $cost = match($period) {
-      //   'month' => $product->subprice->getMonthSum(),
-      //   'quarter' => $product->subprice->getQuarterSum(),
-      //   'year' => $product->subprice->getYearSum(),
-      // };
-      // $costWithoutDiscount = match($period) {
-      //   'month' => $product->subprice->getMonthSumWithoutDiscount(),
-      //   'quarter' => $product->subprice->getQuarterSumWithoutDiscount(),
-      //   'year' => $product->subprice->getYearSumWithoutDiscount(),
-      // };
-      // $discount = match($period) {
-      //   'month' => round(($product->getPrice() / 100 * $product->subprice->month), 2),
-      //   'quarter' => round(($product->getPrice() / 100 * $product->subprice->quarter), 2),
-      //   'year' => round(($product->getPrice() / 100 * $product->subprice->year), 2),
-      // };
+      if (!$product) {
+        $this->dispatch('toastError', ['message' => 'Product not found.']);
+        return;
+      }
 
-      // $order = new Order();
-      // $order->user_id = Auth::user()?->id ?? 0;
-      // $order->status_id = EnumsOrder::NEW;
-      // $order->cost = $cost;
-      // $order->type = 'sub';
-      // $order->sub_period = $period;
-      // $order->cost_without_discount = $costWithoutDiscount;
-      // $order->cost_without_tax = $costWithoutDiscount;
-      // $order->discount_amount = $discount;
-      // $order->save();
+      if (Auth::check() && $product->user_id === Auth::id()) {
+        $this->dispatch('toastError', ['message' => 'You cannot purchase your own product.']);
+        return;
+      }
 
-      // $order->order_products()->create([
-      //   'order_id' => $order->id,
-      //   'product_id' => $product->id,
-      //   'price' => $product->price,
-      //   'sale_price' => $product->sale_price,
-      //   'count' => 1,
-      //   'discount' => $discount,
-      //   'total' => $cost,
-      //   'total_without_discount' => $costWithoutDiscount,
-      // ]);
-
-      Session::put('checkout-sub', ['period' => $period, 'product_id' => $this->product_id]);
-      return redirect()->route('checkout.subscription');
+      $cart = new Cart();
+      $product_id = Crypt::decrypt($this->product_id);
+      $cart->addProduct($product_id, 1, $period);
+      
+      $this->dispatch('refreshCart');
+      $this->dispatch('openModal', ['modalName' => 'cart']);
+      $this->dispatch('toastSuccess', ['message' => 'Subscription added to cart.']);
     }
 
     public function getProduct(): ?Product
