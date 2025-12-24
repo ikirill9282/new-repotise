@@ -16,6 +16,7 @@ class UserOptions extends Model
         'creator_visible' => 'boolean',
         'show_donate' => 'boolean',
         'show_products' => 'boolean',
+        'showcase_products_only_selected' => 'boolean',
         'show_insights' => 'boolean',
         'notification_settings' => 'array',
         'social_visibility' => 'array',
@@ -30,9 +31,24 @@ class UserOptions extends Model
     {
       parent::boot();
 
+      parent::creating(function (Model $model) {
+        // Default "Open for Collaboration" ON for sellers/creators.
+        // (DB default may be 0 in older schemas, so enforce it at the app level.)
+        if (!isset($model->collaboration) || $model->collaboration === null) {
+          try {
+            $user = $model->user()->first();
+            if ($user && ($user->hasRole('creator') || $user->hasRole('seller'))) {
+              $model->collaboration = true;
+            }
+          } catch (\Throwable $e) {
+            // ignore and keep default
+          }
+        }
+      });
+
       parent::created(function(Model $model) {
         if (empty($model->avatar)) {
-          $model->update(['avatar' => '/storage/images/default_avatar.png	']);
+          $model->update(['avatar' => '/storage/images/default_avatar.png']);
         }
       });
     }

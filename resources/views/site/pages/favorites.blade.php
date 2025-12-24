@@ -51,6 +51,7 @@
                                 <div style="min-width: 150px;">
                                     <x-form.select 
                                         name="favorites-products-sort"
+                                        :compact="true"
                                         :label="$productsSort === 'price_high' ? 'Price: High to Low' : ($productsSort === 'price_low' ? 'Price: Low to High' : ($productsSort === 'rating' ? 'Top Rated' : ($productsSort === 'popular' ? 'Most Popular' : ($productsSort === 'newest' ? 'Newest First' : 'Oldest First'))))"
                                         :options="[
                                             'price_high' => 'Price: High to Low',
@@ -94,6 +95,7 @@
                                 <div style="min-width: 150px;">
                                     <x-form.select 
                                         name="favorites-creators-sort"
+                                        :compact="true"
                                         :label="$creatorsSort === 'name_asc' ? 'Name (A-Z)' : ($creatorsSort === 'name_desc' ? 'Name (Z-A)' : 'Followers (High to Low)')"
                                         :options="[
                                             'name_asc' => 'Name (A-Z)',

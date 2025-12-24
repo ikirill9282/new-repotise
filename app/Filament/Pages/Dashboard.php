@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
+use Filament\Pages\Concerns\InteractsWithHeaderActions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -20,6 +21,7 @@ use App\Filament\Widgets\NotificationsWidget;
 use App\Filament\Widgets\KeyMetricsWidget;
 use App\Filament\Widgets\RecentActivityWidget;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class Dashboard extends Page implements HasForms
 {
@@ -42,18 +44,35 @@ class Dashboard extends Page implements HasForms
 
     public function mount(): void
     {
+        // #region agent log
+        Log::info('DEBUG: Dashboard mount() entry', ['hypothesisId' => 'B', 'location' => 'Dashboard.php:43']);
+        // #endregion
+        
         // Инициализируем widgetsUpdateKey
         $this->widgetsUpdateKey = 0;
         
         // Инициализируем форму
-        $this->form->fill([
-            'date_preset' => session('dashboard_date_preset', 'last_30_days'),
-            'start_date' => session('dashboard_start_date'),
-            'end_date' => session('dashboard_end_date'),
-        ]);
+        try {
+            $this->form->fill([
+                'date_preset' => session('dashboard_date_preset', 'last_30_days'),
+                'start_date' => session('dashboard_start_date'),
+                'end_date' => session('dashboard_end_date'),
+            ]);
+            // #region agent log
+            Log::info('DEBUG: form filled successfully', ['hypothesisId' => 'B', 'date_preset' => session('dashboard_date_preset', 'last_30_days')]);
+            // #endregion
+        } catch (\Exception $e) {
+            // #region agent log
+            Log::error('DEBUG: form fill error', ['hypothesisId' => 'B', 'error' => $e->getMessage()]);
+            // #endregion
+        }
         
         // Устанавливаем даты по умолчанию
         $this->updateDates();
+        
+        // #region agent log
+        Log::info('DEBUG: mount() exit', ['hypothesisId' => 'B', 'widgetsUpdateKey' => $this->widgetsUpdateKey, 'startDate' => $this->startDate, 'endDate' => $this->endDate]);
+        // #endregion
     }
 
     public function form(Form $form): Form
@@ -91,6 +110,9 @@ class Dashboard extends Page implements HasForms
 
     protected function updateDates(): void
     {
+        // #region agent log
+        Log::info('DEBUG: updateDates() entry', ['hypothesisId' => 'F']);
+        // #endregion
         try {
             $state = $this->form->getRawState();
             $preset = $state['date_preset'] ?? 'last_30_days';
@@ -112,6 +134,10 @@ class Dashboard extends Page implements HasForms
             // Сохраняем session сразу
             session()->save();
             
+            // #region agent log
+            Log::info('DEBUG: session saved', ['hypothesisId' => 'F', 'startDate' => $this->startDate, 'endDate' => $this->endDate, 'sessionStart' => session('dashboard_start_date'), 'sessionEnd' => session('dashboard_end_date')]);
+            // #endregion
+            
             // Инкрементируем ключ для принудительного обновления виджетов через wire:key
             // Это заставит Livewire пересоздать всю страницу с новыми датами
             $this->widgetsUpdateKey++;
@@ -122,7 +148,10 @@ class Dashboard extends Page implements HasForms
                 end: $this->endDate
             );
         } catch (\Exception $e) {
-            \Log::error('Error updating dashboard dates', [
+            // #region agent log
+            Log::error('DEBUG: updateDates() error', ['hypothesisId' => 'F', 'error' => $e->getMessage()]);
+            // #endregion
+            Log::error('Error updating dashboard dates', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -183,26 +212,82 @@ class Dashboard extends Page implements HasForms
 
     protected function getUserWidgets(): array
     {
-        return [
+        // #region agent log
+        Log::info('DEBUG: getUserWidgets() called', ['hypothesisId' => 'G']);
+        // #endregion
+        $widgets = [
             UsersWidget::class,
             ActivityWidget::class,
         ];
+        // #region agent log
+        Log::info('DEBUG: getUserWidgets() return', ['hypothesisId' => 'G', 'widgets' => $widgets, 'count' => count($widgets)]);
+        // #endregion
+        return $widgets;
     }
 
     protected function getProductWidgets(): array
     {
-        return [
+        // #region agent log
+        Log::info('DEBUG: getProductWidgets() called', ['hypothesisId' => 'G']);
+        // #endregion
+        $widgets = [
             ProductsWidget::class,
             TransactionsWidget::class,
         ];
+        // #region agent log
+        Log::info('DEBUG: getProductWidgets() return', ['hypothesisId' => 'G', 'widgets' => $widgets, 'count' => count($widgets)]);
+        // #endregion
+        return $widgets;
     }
 
     protected function getSystemWidgets(): array
     {
-        return [
+        // #region agent log
+        Log::info('DEBUG: getSystemWidgets() called', ['hypothesisId' => 'G']);
+        // #endregion
+        $widgets = [
             ComplaintsWidget::class,
             ModerationWidget::class,
             NotificationsWidget::class,
         ];
+        // #region agent log
+        Log::info('DEBUG: getSystemWidgets() return', ['hypothesisId' => 'G', 'widgets' => $widgets, 'count' => count($widgets)]);
+        // #endregion
+        return $widgets;
+    }
+
+    /**
+     * Get the header widgets for this page.
+     * Filament automatically renders these widgets above the page content.
+     */
+    protected function getHeaderWidgets(): array
+    {
+        // #region agent log
+        Log::info('DEBUG: Dashboard getHeaderWidgets() called', ['hypothesisId' => 'I']);
+        // #endregion
+        
+        // Return all widgets that should be available on the dashboard
+        // Filament will automatically render them in the header
+        $allWidgets = array_merge(
+            [KeyMetricsWidget::class],
+            $this->getUserWidgets(),
+            $this->getProductWidgets(),
+            $this->getSystemWidgets(),
+            [RecentActivityWidget::class, RevenueWidget::class]
+        );
+        
+        // #region agent log
+        Log::info('DEBUG: Dashboard getHeaderWidgets() return', ['hypothesisId' => 'I', 'widgets' => $allWidgets, 'count' => count($allWidgets)]);
+        // #endregion
+        
+        return $allWidgets;
+    }
+
+    public function render(): \Illuminate\Contracts\View\View
+    {
+        // #region agent log
+        Log::info('DEBUG: Dashboard render() called', ['hypothesisId' => 'D']);
+        // #endregion
+        return parent::render();
     }
 }

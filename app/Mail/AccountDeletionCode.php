@@ -32,7 +32,7 @@ class AccountDeletionCode extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirm Account Deletion',
+            subject: 'Your TrekGuider Account Deletion Code',
         );
     }
 

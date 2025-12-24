@@ -10,16 +10,19 @@
           <div class="flex justify-start items-start sm:items-center !gap-4 2xl:!gap-8 flex-col sm:flex-row">
             <div class="block">
               <label class="text-gray" for="product-analytics-status">Product Status:</label>
-              <select
-                class="tg-select"
+              @php
+                $productStatusFilterOptions = ['' => 'All Statuses'] + ($statusOptions ?? []);
+              @endphp
+              <x-form.select
+                name="product-analytics-status"
+                :compact="true"
+                :tooltip="false"
+                labelClass="!text-black"
                 wire:model.live="statusFilter"
-                id="product-analytics-status"
-                >
-                <option value="">All Statuses</option>
-                @foreach($statusOptions as $value => $label)
-                  <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
-              </select>
+                value="{{ $statusFilter ?? '' }}"
+                :label="$productStatusFilterOptions[$statusFilter ?? ''] ?? 'All Statuses'"
+                :options="$productStatusFilterOptions"
+              />
             </div>
           </div>
         </div>

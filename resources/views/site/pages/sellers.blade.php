@@ -22,7 +22,7 @@
                             Get Started
                         </x-btn>
                     @else
-                        <x-btn href="{{ route('verify') }}">
+                        <x-btn href="{{ route('profile.dashboard') }}">
                             Get Started
                         </x-btn>
                     @endif

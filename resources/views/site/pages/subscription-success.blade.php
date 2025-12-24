@@ -26,8 +26,11 @@
               >
                 {{ print_var('left_button_text', $variables) ?? 'View subscriptions' }}
               </a>
-              <a href="{{ $product?->makeUrl() ?? route('products') }}" class="view_purchas">
-                {{ print_var('right_button_text', $variables) ?? 'Back to product' }}
+              <a
+                href="{{ route('profile.purchases') }}"
+                class="view_purchas {{ auth()->check() ? '' : 'open_auth' }}"
+              >
+                {{ print_var('right_button_text', $variables) ?? 'View my purchases' }}
               </a>
             </div>
           </div>

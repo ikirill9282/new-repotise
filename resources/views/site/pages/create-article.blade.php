@@ -7,7 +7,7 @@
         <x-breadcrumbs class="!mb-10" :breadcrumbs="[
           'My Account' => route('profile'),
           'My Articles' => route('profile.articles'),
-          'Create Article (1/2)' => route('profile.articles.create'),
+          'Create Article' => route('profile.articles.create'),
         ]" />
 
         @livewire('forms.article', [

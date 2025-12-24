@@ -24,6 +24,8 @@ class DonationSent extends Mailable
         public User $seller,
         public float $amount,
         public bool $monthlySupport = false,
+        public ?string $nextPaymentDateLabel = null,
+        public ?string $donationDateLabel = null,
     ) {
         $this->trigger = Action::DONATION_SENT;
     }
@@ -34,9 +36,9 @@ class DonationSent extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->monthlySupport 
-                ? 'Monthly Support Subscription Confirmed' 
-                : 'Donation Confirmation',
+            subject: $this->monthlySupport
+                ? "You're Supporting {$this->seller->getName()} Monthly! (Recurring Donation Set Up)"
+                : "Thank You for Your Donation to {$this->seller->getName()}! (Receipt)",
         );
     }
 

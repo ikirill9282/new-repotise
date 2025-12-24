@@ -34,6 +34,7 @@ use App\Traits\HasGallery;
 use Stripe\Identity\VerificationSession;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -85,12 +86,32 @@ class User extends Authenticatable implements HasName, FilamentUser
 
       self::created(function($model) {
         $model->resetBackup();
-        $model->createOrGetStripeCustomer([
-          'metadata' => [
-            'user_id' => $model->id,
-          ]
+        try {
+          // Only create Stripe customer if Stripe is configured
+          if (config('cashier.key') || config('services.stripe.key')) {
+            $model->createOrGetStripeCustomer([
+              'metadata' => [
+                'user_id' => $model->id,
+              ]
+            ]);
+          }
+        } catch (\Exception $e) {
+          // Skip Stripe customer creation if Stripe is not configured
+          // Log only if it's not an authentication error (missing API key)
+          if (!str_contains($e->getMessage(), 'No API key provided')) {
+            Log::warning('Failed to create Stripe customer for user ' . $model->id . ': ' . $e->getMessage());
+          }
+        }
+        $model->options()->create([
+          'description' => null,
+          // Email notifications: enabled by default for new users.
+          'notification_settings' => [
+            'product_updates' => true,
+            'referral_updates' => true,
+            'news_updates' => true,
+            'insights_updates' => true,
+          ],
         ]);
-        $model->options()->create(['description' => null]);
         $model->notifications()->create([
           'type' => 'info',
           'message' => 'Welcome to TrekGuider! Please, complete your profile and verify your email address.',
@@ -326,8 +347,32 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function avatar(): Attribute
     {
       return Attribute::make(
-        get: fn() => $this->options?->avatar,
+        get: fn() => $this->options?->avatar ?: '/storage/images/default_avatar.png',
       );
+    }
+
+    /**
+     * Get the avatar URL for Filament
+     */
+    public function getAvatarUrl(): ?string
+    {
+        $avatar = $this->avatar;
+        if (empty($avatar)) {
+            return url('/storage/images/default_avatar.png');
+        }
+        
+        // If avatar is already a full URL, return it
+        if (str_starts_with($avatar, 'http://') || str_starts_with($avatar, 'https://')) {
+            return $avatar;
+        }
+        
+        // If avatar starts with /, use url() helper to generate full URL
+        if (str_starts_with($avatar, '/')) {
+            return url($avatar);
+        }
+        
+        // Otherwise, treat as relative path and use asset()
+        return asset($avatar);
     }
 
     public static function makePassword(): string
@@ -564,7 +609,8 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function sendResetCode()
     {
-      $mail = new ResetCode($this);
+      $code = $this->getResetCode();
+      $mail = new ResetCode($this, $code);
       Mail::to($this->email)->send($mail);
       MailReset::dispatch($this);
     }
@@ -610,7 +656,8 @@ class User extends Authenticatable implements HasName, FilamentUser
       }
 
       SessionExpire::set('reset_password_email', $this->email, Carbon::now()->addHour());
-      SessionExpire::set('reset_password_code', $this->code, Carbon::now()->addMinutes(3));
+      // Allow requesting a new reset code after 1 minute
+      SessionExpire::set('reset_password_code', (string) $code, Carbon::now()->addMinutes(1));
 
       return $model->code;
     }
@@ -628,7 +675,7 @@ class User extends Authenticatable implements HasName, FilamentUser
       try {
         return Cashier::stripe()->identity->verificationSessions->retrieve($verify->code);
       } catch (\Exception $e) {
-        \Illuminate\Support\Facades\Log::warning('Failed to retrieve Stripe verification session', [
+        Log::warning('Failed to retrieve Stripe verification session', [
           'user_id' => $this->id,
           'verify_code' => $verify->code,
           'error' => $e->getMessage(),

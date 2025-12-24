@@ -17,6 +17,8 @@ import Quill from "quill";
 
 window.Quill = Quill;
 window.AirDatepicker = AirDatepicker;
+// Expose english locale for pages that initialize datepickers inline.
+window.localeEn = localeEn;
 
 function objectToQueryString(obj) {
   const params = new URLSearchParams();
@@ -283,7 +285,7 @@ function makeQuill(editor) {
                 clipboard: {
                     // Сохраняем форматирование при вставке из Word
                     matchVisual: false,
-                    // Включаем обработку HTML из Word
+                    // Включаем обработку HTML из Word - сохраняем все форматирование
                     matchers: [],
                 },
             },
@@ -293,13 +295,104 @@ function makeQuill(editor) {
         // Сохраняем ссылку на Quill экземпляр для доступа из других мест
         editor.__quill = quill;
 
-        // Улучшенный обработчик вставки из Word с сохранением форматирования
-        // Обрабатываем ссылки
-        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+        // Импортируем Delta один раз для использования во всех matchers
             const Delta = Quill.import('delta');
+
+        // Улучшенный обработчик вставки из Word с сохранением форматирования 1:1
+        
+        // Обрабатываем форматирование текста (жирный, курсив, подчеркивание)
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
             const tagName = node.tagName ? node.tagName.toLowerCase() : '';
+            const attrs = {};
+            
+            // Жирный текст (strong, b)
+            if (tagName === 'strong' || tagName === 'b') {
+                attrs.bold = true;
+            }
+            
+            // Курсив (em, i)
+            if (tagName === 'em' || tagName === 'i') {
+                attrs.italic = true;
+            }
+            
+            // Подчеркивание (u)
+            if (tagName === 'u') {
+                attrs.underline = true;
+            }
+            
+            // Заголовки - преобразуем в размер
+            if (tagName.match(/^h[1-6]$/)) {
+                const level = parseInt(tagName.charAt(1));
+                if (level <= 2) {
+                    attrs.size = 'large';
+                } else if (level >= 5) {
+                    attrs.size = 'small';
+                }
+                attrs.bold = true; // Заголовки обычно жирные
+            }
+            
+            // Применяем атрибуты
+            if (Object.keys(attrs).length > 0 && delta.length() > 0) {
+                delta = delta.compose(new Delta().retain(delta.length(), attrs));
+            }
+            
+            return delta;
+        });
+        
+        // Обрабатываем стили из атрибута style (Word часто использует inline стили)
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+            const style = node.getAttribute('style') || '';
+            const attrs = {};
+            
+            if (style) {
+                // Жирный через font-weight
+                if (style.match(/font-weight:\s*(bold|700|800|900)/i)) {
+                    attrs.bold = true;
+                }
+                
+                // Курсив через font-style
+                if (style.match(/font-style:\s*italic/i)) {
+                    attrs.italic = true;
+                }
+                
+                // Подчеркивание через text-decoration
+                if (style.match(/text-decoration:\s*underline/i)) {
+                    attrs.underline = true;
+                }
+                
+                // Размер шрифта
+                const fontSizeMatch = style.match(/font-size:\s*([\d.]+)px/i);
+                if (fontSizeMatch) {
+                    const size = parseFloat(fontSizeMatch[1]);
+                    if (size < 12) {
+                        attrs.size = 'small';
+                    } else if (size > 16) {
+                        attrs.size = 'large';
+                    }
+                }
+                
+                // Выравнивание
+                const textAlignMatch = style.match(/text-align:\s*([^;]+)/i);
+                if (textAlignMatch) {
+                    const align = textAlignMatch[1].trim();
+                    if (['left', 'center', 'right', 'justify'].includes(align)) {
+                        attrs.align = align;
+                    }
+                }
+            }
+            
+            // Применяем атрибуты
+            if (Object.keys(attrs).length > 0 && delta.length() > 0) {
+                delta = delta.compose(new Delta().retain(delta.length(), attrs));
+            }
+            
+            return delta;
+        });
             
             // Обрабатываем ссылки - сохраняем href и текст
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+            const tagName = node.tagName ? node.tagName.toLowerCase() : '';
+            
             if (tagName === 'a') {
                 const href = node.getAttribute('href');
                 if (href && delta.length() > 0) {
@@ -313,7 +406,6 @@ function makeQuill(editor) {
         
         // Обрабатываем списки и их элементы
         quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-            const Delta = Quill.import('delta');
             const tagName = node.tagName ? node.tagName.toLowerCase() : '';
             
             // Обрабатываем элементы списка
@@ -340,7 +432,6 @@ function makeQuill(editor) {
         
         // Обрабатываем параграфы и div'ы - сохраняем выравнивание и размер
         quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-            const Delta = Quill.import('delta');
             const tagName = node.tagName ? node.tagName.toLowerCase() : '';
             
             if (tagName === 'p' || tagName === 'div') {
@@ -381,6 +472,39 @@ function makeQuill(editor) {
             
             return delta;
         });
+        
+        // Обрабатываем вложенные элементы форматирования (например, strong внутри em)
+        // Quill автоматически обрабатывает вложенные элементы, но нужно убедиться, что они применяются правильно
+        quill.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
+            // Обрабатываем текстовые узлы для сохранения форматирования родительских элементов
+            let parent = node.parentNode;
+            const attrs = {};
+            
+            while (parent && parent.nodeType === Node.ELEMENT_NODE) {
+                const tagName = parent.tagName ? parent.tagName.toLowerCase() : '';
+                const style = parent.getAttribute('style') || '';
+                
+                // Проверяем форматирование родительских элементов
+                if (tagName === 'strong' || tagName === 'b' || style.match(/font-weight:\s*(bold|700|800|900)/i)) {
+                    attrs.bold = true;
+                }
+                if (tagName === 'em' || tagName === 'i' || style.match(/font-style:\s*italic/i)) {
+                    attrs.italic = true;
+                }
+                if (tagName === 'u' || style.match(/text-decoration:\s*underline/i)) {
+                    attrs.underline = true;
+                }
+                
+                parent = parent.parentNode;
+            }
+            
+            // Применяем атрибуты к дельте
+            if (Object.keys(attrs).length > 0 && delta.length() > 0) {
+                delta = delta.compose(new Delta().retain(delta.length(), attrs));
+            }
+            
+            return delta;
+        });
 
         const id = editor.getAttribute("data-model");
         const wrap = editor.closest(".text-editor");
@@ -417,43 +541,47 @@ function makeQuill(editor) {
         };
 
         // Функция для обновления значения input
+        // Флаг для предотвращения циклов обновления
+        let isUpdating = false;
+        let lastUpdateTime = 0;
+        let lastUpdateContent = '';
+        
         const updateInput = () => {
+            // Защита от циклов: не обновляем чаще чем раз в 200мс
+            const now = Date.now();
+            const content = quill.root.innerHTML;
+            
+            // Если контент не изменился и прошло меньше 200мс, не обновляем
+            if (isUpdating || (now - lastUpdateTime < 200 && content === lastUpdateContent)) {
+                return;
+            }
+            
+            isUpdating = true;
+            lastUpdateTime = now;
+            lastUpdateContent = content;
+            
             if (id && input) {
-                const content = quill.root.innerHTML;
+                // Получаем HTML напрямую из DOM
+                const htmlString = quill.root.innerHTML;
                 
-                // Логируем для отладки
-                console.log('Quill content length:', content.length);
-                console.log('Quill content preview:', content.substring(0, 200));
-                
-                input.value = content;
-
-                // Используем Livewire синхронизацию для обновления
-                const event = new Event("input", {
-                    bubbles: true,
-                    cancelable: true,
-                });
-
-                input.dispatchEvent(event);
-                
-                // Также триггерим change событие для Livewire
-                const changeEvent = new Event("change", {
-                    bubbles: true,
-                    cancelable: true,
-                });
-                input.dispatchEvent(changeEvent);
-                
-                // Для Livewire используем wire:model синхронизацию через событие
-                // Livewire автоматически отслеживает изменения в input с wire:model
-                if (window.Livewire && input.hasAttribute('wire:model')) {
-                    // Дополнительно триггерим событие для Livewire
-                    const livewireEvent = new CustomEvent('input', {
+                // Устанавливаем значение просто и без лишних проверок
+                if (input.value !== htmlString) {
+                    input.value = htmlString;
+                    
+                    // Триггерим событие для Livewire (только если значение изменилось)
+                    const inputEvent = new Event("input", {
                         bubbles: true,
                         cancelable: true,
-                        detail: { value: content }
                     });
-                    input.dispatchEvent(livewireEvent);
+                    input.dispatchEvent(inputEvent);
                 }
+                
             }
+            
+            // Снимаем флаг после небольшой задержки
+            setTimeout(() => {
+                isUpdating = false;
+            }, 300); // Увеличиваем задержку для предотвращения конфликтов
 
             const counter = wrap?.querySelector(".text-counter");
             if (counter) {
@@ -477,160 +605,321 @@ function makeQuill(editor) {
             updateCharCounter();
         };
 
-        // Простая функция для загрузки контента в Quill
+        // Простая функция для загрузки контента в Quill (только один раз при инициализации)
         const loadContentIntoQuill = () => {
           let content = input?.value || '';
           
           if (!content) {
-            // Если контента нет, проверяем еще раз через некоторое время (для Livewire)
-            setTimeout(() => loadContentIntoQuill(), 500);
-            return;
+            return; // Не загружаем пустой контент и не проверяем повторно
           }
           
-          // Просто загружаем контент напрямую через innerHTML
+          // Загружаем контент напрямую через innerHTML только один раз
           quill.root.innerHTML = content;
           
-          // Применяем стили к спискам
-          setTimeout(() => {
-              const editorElement = quill.root;
-              const allLists = editorElement.querySelectorAll('ul, ol');
-              
-              allLists.forEach(list => {
-                  if (list.tagName === 'UL') {
-                      list.style.listStyleType = 'disc';
-                      list.style.listStyle = 'disc outside';
-                  } else if (list.tagName === 'OL') {
-                      list.style.listStyleType = 'decimal';
-                      list.style.listStyle = 'decimal outside';
-                  }
-                  list.style.listStylePosition = 'outside';
-                  list.style.paddingLeft = '30px';
-                  list.style.margin = '15px 0';
-              });
-              
-              const listItems = editorElement.querySelectorAll('li');
-              listItems.forEach(li => {
-                  li.style.display = 'list-item';
-                  li.style.listStylePosition = 'outside';
-                  li.style.margin = '8px 0';
-                  li.style.paddingLeft = '5px';
-              });
-              
-              // Обновляем input
-              if (input) {
-                  input.value = editorElement.innerHTML;
+          // Применяем стили к спискам только один раз при загрузке
+          const editorElement = quill.root;
+          const allLists = editorElement.querySelectorAll('ul, ol');
+          
+          allLists.forEach(list => {
+              if (list.tagName === 'UL') {
+                  list.style.listStyleType = 'disc';
+                  list.style.listStyle = 'disc outside';
+              } else if (list.tagName === 'OL') {
+                  list.style.listStyleType = 'decimal';
+                  list.style.listStyle = 'decimal outside';
               }
-              
-              // Обновляем счетчик после загрузки контента
-              updateInput();
-          }, 100);
+              list.style.listStylePosition = 'outside';
+              list.style.paddingLeft = '30px';
+              list.style.margin = '15px 0';
+          });
+          
+          const listItems = editorElement.querySelectorAll('li');
+          listItems.forEach(li => {
+              li.style.display = 'list-item';
+              li.style.listStylePosition = 'outside';
+              li.style.margin = '8px 0';
+              li.style.paddingLeft = '5px';
+          });
+          
+          // Обновляем счетчик только один раз
+          updateCharCounter();
         };
         
-        // Загружаем контент после инициализации Quill
-        setTimeout(loadContentIntoQuill, 300);
-        
-        // Инициализируем счетчик при загрузке
-        setTimeout(() => {
-            updateInput();
-            updateCharCounter();
-        }, 500);
+        // Загружаем контент только один раз после инициализации Quill
+        setTimeout(loadContentIntoQuill, 100);
         
         // Обновляем счетчик при каждом изменении текста
         quill.on('text-change', () => {
             updateCharCounter();
         });
 
-        // Обработчик изменений текста
-        quill.on("text-change", updateInput);
-        
-        // Обработчик изменений редактора (включая вставку)
-        quill.on("editor-change", (eventName, ...args) => {
-            if (eventName === 'text-change' || eventName === 'selection-change') {
-                // Небольшая задержка для обработки вставки
-                setTimeout(updateInput, 10);
+        // Обработчик изменений текста - используем debounce для предотвращения циклов
+        let textChangeTimeout = null;
+        quill.on("text-change", (delta, oldDelta, source) => {
+            // Игнорируем изменения от программного обновления (source === 'api')
+            if (source === 'api' || isUpdating) {
+                return;
             }
+            
+            // Отменяем предыдущий таймер
+            if (textChangeTimeout) {
+                clearTimeout(textChangeTimeout);
+            }
+            
+            // Обновляем с задержкой, чтобы избежать множественных вызовов
+            textChangeTimeout = setTimeout(() => {
+                if (!isUpdating) {
+                    updateInput();
+                }
+            }, 500); // Увеличиваем задержку для стабильности
         });
         
-        // Дополнительный обработчик для вставки через paste - улучшенная обработка из Word
+        // Отслеживаем потерю фокуса
+        quill.on('selection-change', (range, oldRange, source) => {
+            // Selection change handler
+        });
+        
+        // Отслеживаем потерю фокуса на редакторе
+        editor.addEventListener('blur', () => {
+            // Blur handler
+        });
+        
+        // Отслеживаем получение фокуса
+        editor.addEventListener('focus', () => {
+            // Focus handler
+        });
+        
+        // Обработчик изменений редактора - отключаем для предотвращения циклов
+        // quill.on("editor-change", (eventName, ...args) => {
+        //     // Отключено для предотвращения циклов при вставке
+        // });
+        
+        // Обработчик для вставки через paste - сохраняем все стили 1:1 из Word
         editor.addEventListener('paste', function(e) {
             // Получаем данные из буфера обмена
             const clipboardData = e.clipboardData || window.clipboardData;
             const htmlData = clipboardData.getData('text/html');
             const textData = clipboardData.getData('text/plain');
-            
-            // Если есть HTML данные (из Word), обрабатываем их
+            // Если есть HTML данные (из Word), обрабатываем их с сохранением всех стилей
             if (htmlData) {
+                e.preventDefault(); // Отменяем стандартную обработку
+                
                 // Создаем временный элемент для парсинга HTML
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = htmlData;
                 
-                // Обрабатываем ссылки - убеждаемся, что они сохраняются
-                const links = tempDiv.querySelectorAll('a');
-                links.forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (href && !href.startsWith('#')) {
-                        // Сохраняем ссылку
-                        link.setAttribute('href', href);
-                    }
-                });
+                // Функция для очистки небезопасных элементов, но сохранения всех стилей
+                const cleanAndPreserveStyles = (element) => {
+                    // Разрешенные теги
+                    const allowedTags = ['p', 'div', 'span', 'strong', 'b', 'em', 'i', 'u', 'a', 
+                                       'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br'];
+                    
+                    // Разрешенные атрибуты
+                    const allowedAttributes = ['href', 'style', 'class'];
+                    
+                    // Обрабатываем все элементы
+                    const allElements = element.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        const tagName = el.tagName.toLowerCase();
+                        
+                        // Удаляем неразрешенные теги, но сохраняем их содержимое
+                        if (!allowedTags.includes(tagName)) {
+                            const parent = el.parentNode;
+                            while (el.firstChild) {
+                                parent.insertBefore(el.firstChild, el);
+                            }
+                            parent.removeChild(el);
+                            return;
+                        }
+                        
+                        // Очищаем неразрешенные атрибуты
+                        Array.from(el.attributes).forEach(attr => {
+                            if (!allowedAttributes.includes(attr.name.toLowerCase())) {
+                                el.removeAttribute(attr.name);
+                            }
+                        });
+                        
+                        // Сохраняем все стили из атрибута style - очищаем только опасные
+                        const style = el.getAttribute('style') || '';
+                        if (style) {
+                            // Очищаем только опасные стили (javascript:, expression и т.д.)
+                            // Но сохраняем ВСЕ остальные стили, включая отступы и интервалы
+                            let safeStyle = style
+                                .replace(/javascript:/gi, '')
+                                .replace(/expression\(/gi, '')
+                                .replace(/on\w+\s*=/gi, '')
+                                .replace(/url\s*\(\s*['"]?\s*javascript:/gi, 'url('); // Очищаем javascript в url()
+                            
+                            // Нормализуем line-height: ограничиваем разумными значениями (1.2-1.6)
+                            safeStyle = safeStyle.replace(/line-height:\s*([\d.]+)(pt|px|em|rem|%)?/gi, (match, value, unit) => {
+                                const numValue = parseFloat(value);
+                                if (!isNaN(numValue)) {
+                                    if (numValue > 1.6) {
+                                        return 'line-height: 1.6'; // Максимум 1.6
+                                    } else if (numValue < 1.2) {
+                                        return 'line-height: 1.2'; // Минимум 1.2
+                                    }
+                                    // Оставляем как есть, если в пределах 1.2-1.6, но убираем единицы измерения для числовых значений
+                                    if (!unit || unit === '') {
+                                        return `line-height: ${numValue}`;
+                                    }
+                                }
+                                return match; // Оставляем как есть, если не удалось распарсить
+                            });
+                            
+                            el.setAttribute('style', safeStyle);
+                        }
+                        
+                        // Для элементов без inline стилей сохраняем computed стили
+                        // Это важно для элементов, у которых стили заданы через классы в Word
+                        if (!el.getAttribute('style') && window.getComputedStyle) {
+                            const computed = window.getComputedStyle(el);
+                            const importantStyles = [];
+                            
+                            // Сохраняем ВСЕ важные стили: отступы, интервалы, выравнивание, размеры
+                            const styleProps = [
+                                'margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right',
+                                'padding', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right',
+                                'line-height', 'text-indent', 'text-align', 'font-size', 'font-weight',
+                                'font-style', 'text-decoration', 'color', 'background-color',
+                                'letter-spacing', 'word-spacing', 'text-transform', 'white-space'
+                            ];
+                            
+                            styleProps.forEach(prop => {
+                                let value = computed.getPropertyValue(prop);
+                                
+                                // Нормализуем line-height: ограничиваем разумными значениями (1.2-1.6)
+                                if (prop === 'line-height' && value) {
+                                    const numValue = parseFloat(value);
+                                    if (!isNaN(numValue)) {
+                                        if (numValue > 1.6) {
+                                            value = '1.6';
+                                        } else if (numValue < 1.2) {
+                                            value = '1.2';
+                                        } else {
+                                            value = numValue.toString();
+                                        }
+                                    }
+                                }
+                                
+                                // Сохраняем все значения, кроме дефолтных
+                                if (value && 
+                                    value !== 'normal' && 
+                                    value !== 'none' && 
+                                    value !== '0px' && 
+                                    value !== '0' && 
+                                    value !== 'rgba(0, 0, 0, 0)' && 
+                                    value !== 'transparent' &&
+                                    value !== 'auto') {
+                                    importantStyles.push(`${prop}: ${value}`);
+                                }
+                            });
+                            
+                            if (importantStyles.length > 0) {
+                                el.setAttribute('style', importantStyles.join('; '));
+                            }
+                        }
+                    });
+                    
+                    return element;
+                };
                 
-                // Обрабатываем списки - убеждаемся, что структура сохраняется
-                const lists = tempDiv.querySelectorAll('ul, ol');
-                lists.forEach(list => {
-                    // Сохраняем структуру списка
-                    list.setAttribute('data-list-type', list.tagName.toLowerCase());
-                });
+                // Очищаем и сохраняем стили
+                cleanAndPreserveStyles(tempDiv);
+                
+                // Получаем HTML со всеми сохраненными стилями
+                const cleanedHTML = tempDiv.innerHTML;
+                
+                // Вставляем HTML напрямую в DOM редактора, минуя Quill's Delta преобразование
+                // Это сохранит все inline стили 1:1
+                const range = quill.getSelection(true);
+                const currentHTML = quill.root.innerHTML;
+                
+                if (range) {
+                    // Удаляем выделенный текст, если есть
+                    if (range.length > 0) {
+                        quill.deleteText(range.index, range.length);
+                    }
+                    
+                    // Получаем HTML до и после точки вставки напрямую из DOM
+                    // Это сохранит все существующие стили
+                    const beforeHTML = quill.root.innerHTML.substring(0, quill.root.innerHTML.length);
+                    const textBefore = quill.getText(0, range.index);
+                    const textAfter = quill.getText(range.index, quill.getLength() - 1);
+                    
+                    // Находим позицию вставки в HTML
+                    // Простой подход: вставляем новый HTML в конец существующего
+                    // Но лучше: находим узел в DOM и вставляем туда
+                    const editorHTML = quill.root.innerHTML;
+                    
+                    // Если редактор пустой или почти пустой, просто заменяем содержимое
+                    if (editorHTML.trim() === '' || editorHTML.trim() === '<p><br></p>') {
+                        // Убираем все <p><br></p> из начала вставляемого HTML
+                        const cleanPastedHTML = cleanedHTML.replace(/^(<p><br><\/p>\s*)+/, '');
+                        quill.root.innerHTML = cleanPastedHTML;
+                    } else {
+                        // Вставляем новый HTML в конец
+                        // Убираем последний <p><br></p> если он есть
+                        const cleanEditorHTML = editorHTML.replace(/(<p><br><\/p>\s*)+$/, '');
+                        // Убираем все <p><br></p> из начала вставляемого HTML
+                        const cleanPastedHTML = cleanedHTML.replace(/^(<p><br><\/p>\s*)+/, '');
+                        quill.root.innerHTML = cleanEditorHTML + cleanPastedHTML;
+                    }
+                    
+                    // НЕ вызываем quill.update() - это может перезаписать стили
+                    // Вместо этого просто обновляем input
+                    
+                    // Временно отключаем обновление, чтобы избежать циклов с обработчиками событий Quill
+                    isUpdating = true;
+                    
+                    // Обновляем input сразу, но только один раз
+            setTimeout(() => {
+                        if (isUpdating) {
+                updateInput();
+                            // Снимаем флаг после обновления
+                            setTimeout(() => {
+                                isUpdating = false;
+                            }, 200);
+                        }
+                    }, 100);
+                    
+                    // Устанавливаем курсор в конец
+            setTimeout(() => {
+                        const newLength = quill.getLength();
+                        quill.setSelection(newLength - 1);
+                    }, 10);
+                } else {
+                    // Если нет выделения, вставляем в конец
+                    const cleanEditorHTML = currentHTML.replace(/(<p><br><\/p>\s*)+$/, '');
+                    // Убираем все <p><br></p> из начала вставляемого HTML
+                    const cleanPastedHTML = cleanedHTML.replace(/^(<p><br><\/p>\s*)+/, '');
+                    
+                    // Временно отключаем обновление
+                    isUpdating = true;
+                    quill.root.innerHTML = cleanEditorHTML + cleanPastedHTML;
+                    
+                    setTimeout(() => {
+                        if (isUpdating) {
+                            updateInput();
+                            setTimeout(() => {
+                                isUpdating = false;
+                            }, 200);
+                        }
+                    }, 100);
+                }
+                
+                // Обновляем input один раз после вставки
+                setTimeout(() => {
+                    if (!isUpdating) {
+                        updateInput();
+                    }
+                }, 100);
+                
+                return;
             }
             
-            // Позволяем Quill обработать вставку стандартным способом
-            // Затем принудительно обновляем input
-            
-            setTimeout(() => {
-                updateInput();
-                
-                // Применяем стили к спискам после вставки
-                setTimeout(() => {
-                    const editorElement = quill.root;
-                    const allLists = editorElement.querySelectorAll('ul, ol');
-                    
-                    allLists.forEach(list => {
-                        if (list.tagName === 'UL') {
-                            list.style.listStyleType = 'disc';
-                            list.style.listStyle = 'disc outside';
-                        } else if (list.tagName === 'OL') {
-                            list.style.listStyleType = 'decimal';
-                            list.style.listStyle = 'decimal outside';
-                        }
-                        list.style.listStylePosition = 'outside';
-                        list.style.paddingLeft = '30px';
-                        list.style.margin = '15px 0';
-                    });
-                    
-                    const listItems = editorElement.querySelectorAll('li');
-                    listItems.forEach(li => {
-                        li.style.display = 'list-item';
-                        li.style.listStylePosition = 'outside';
-                        li.style.margin = '8px 0';
-                        li.style.paddingLeft = '5px';
-                    });
-                    
-                    // Обновляем input с правильным HTML
-                    if (input) {
-                        input.value = editorElement.innerHTML;
-                    }
-                }, 50);
-                
-                // Дополнительное обновление для Livewire с небольшой задержкой
-                setTimeout(() => {
-                    if (input) {
-                        // Триггерим все необходимые события для Livewire
-                        input.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-                        input.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
-                        input.dispatchEvent(new Event('blur', { bubbles: true, cancelable: true }));
-                    }
-                }, 150);
-            }, 50);
-        }, false);
+            // Если нет HTML, используем стандартную обработку Quill
+        }, true); // Используем capture phase для перехвата до обработки Quill
 
         return quill;
     }
@@ -654,45 +943,9 @@ window.addEventListener("DOMContentLoaded", function () {
             if (!builded_editors.includes(editor)) {
               makeQuill(editor);
               builded_editors.push(editor);
-            } else {
-              // Если редактор уже создан, просто перезагружаем контент
-              const quillInstance = editor.__quill;
-              if (quillInstance) {
-                const id = editor.getAttribute("data-model");
-                const wrap = editor.closest(".text-editor");
-                const input = wrap?.querySelector(`#${id}`);
-                if (input && input.value) {
-                  setTimeout(() => {
-                    quillInstance.root.innerHTML = input.value;
-                    
-                    // Применяем стили к спискам
-                    setTimeout(() => {
-                      const allLists = quillInstance.root.querySelectorAll('ul, ol');
-                      allLists.forEach(list => {
-                        if (list.tagName === 'UL') {
-                          list.style.listStyleType = 'disc';
-                          list.style.listStyle = 'disc outside';
-                        } else if (list.tagName === 'OL') {
-                          list.style.listStyleType = 'decimal';
-                          list.style.listStyle = 'decimal outside';
-                        }
-                        list.style.listStylePosition = 'outside';
-                        list.style.paddingLeft = '30px';
-                        list.style.margin = '15px 0';
-                      });
-                      
-                      const listItems = quillInstance.root.querySelectorAll('li');
-                      listItems.forEach(li => {
-                        li.style.display = 'list-item';
-                        li.style.listStylePosition = 'outside';
-                        li.style.margin = '8px 0';
-                        li.style.paddingLeft = '5px';
-                      });
-                    }, 100);
-                  }, 200);
-                }
-              }
             }
+            // НЕ перезагружаем контент для существующих редакторов - это вызывает конфликты
+            // Livewire сам обновит через события input/change
           });
         });
       } else {

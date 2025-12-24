@@ -1,0 +1,1121 @@
+﻿Технические  уведомления платформы
+I. Управление Аккаунтом Пользователя
+Email:
+1. Название: Welcome to TrekGuider! Let's Confirm Your Email
+   * Триггер: Новый пользователь успешно ввел данные для регистрации.
+   * Получатель: Новый Пользователь (Покупатель/Продавец).
+   * Тип: Email
+   * Цель: Приветствие, предоставление ссылки для верификации email адреса, базовая информация.
+   * Body: 
+Hi there,
+Welcome to TrekGuider! We're thrilled you've joined our community of travel explorers.
+Just one more step to get started: please confirm your email address by clicking the button below:
+[Verify Your Email Address] (Button)
+Didn't sign up for TrekGuider? No worries, you can safely ignore this email.
+Adventure awaits,
+The TrekGuider Crew
+2. Название: Your TrekGuider Password Reset Code
+   * Триггер: Пользователь запросил сброс пароля на сайте и ожидает код.
+   * Получатель: Пользователь.
+   * Тип: Email
+   * Цель: Доставить код для ввода на странице сброса пароля.
+   * Body:
+Hi {User_Name_Placeholder},
+We received a request to reset the password for your TrekGuider account.
+Here's your code to set a new password:
+{Six_Digit_Code_Placeholder}
+This code will expire in 1 hour for your security.
+If you didn't request this, you can safely ignore this email. If you have any security concerns, please reach out to our support team.
+Best,
+The TrekGuider Team
+3. Название: Your TrekGuider Email Address Has Been Updated
+   * Триггер: Пользователь успешно изменил свой email адрес (после подтверждения нового, если требуется).
+   * Получатель: Пользователь (на старый и новый email).
+   * Тип: Email
+   * Цель: Уведомление об изменении email (безопасность).
+   * Title (for new email address): Your TrekGuider Email Address Has Been Updated
+   * Body (for new email address):
+Hi {User_Name_Placeholder},
+Just confirming: the email address for your TrekGuider account has been successfully updated to this one.
+If you didn't make this change, please contact our support team immediately.
+All the best,
+The TrekGuider Team
+   * Title (for old email address): Security Alert: Your TrekGuider Email Was Changed
+   * Body (for old email address):
+Hi {User_Name_Placeholder},
+The email address for your TrekGuider account was recently changed to {New_Email_Address_Placeholder}.
+If this was you, no action is needed.
+If you didn't make this change, please contact our support team immediately so we can help secure your account.
+Stay safe,
+The TrekGuider Team
+4. Название: Your TrekGuider Account Deletion Code
+   * Триггер: Пользователь подтвердил свое намерение удалить аккаунт (ввел пароль) и ожидает код.
+   * Получатель: Пользователь.
+   * Тип: Email
+   * Цель: Доставить код для финального подтверждения удаления аккаунта.
+   * Body:
+Hi {User_Name_Placeholder},
+We've received your request to delete your TrekGuider account. To confirm this action, please use the following code:
+{Six_Digit_Code_Placeholder}
+Once you confirm with this code, your account and all associated data will be scheduled for permanent deletion in 30 days. You can cancel this deletion by simply logging back into your account anytime within these 30 days.
+If you didn't request this, or if you've changed your mind and don't want to use this code, please ignore this email. If you have security concerns, contact our support team immediately.
+Best,
+The TrekGuider Team
+
+
+Всплывающее (на сайте):
+5.  Название: Email Confirmed! ✅
+* Триггер: Пользователь кликнул по ссылке подтверждения в письме "Подтвердите ваш email и добро пожаловать!".
+* Получатель: Пользователь.
+* Тип: Всплывающее (на сайте)
+* Цель: Уведомить об успешной верификации email.
+* Push Text: Your email address has been successfully verified.
+6. Название: Password Updated! 🔒
+   * Триггер: Пользователь успешно установил новый пароль.
+   * Получатель: Пользователь.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Уведомление о смене пароля.
+   * Push Text: Your password has been successfully changed.
+7. Название: Email Updated!
+   * Триггер: Пользователь успешно изменил свой email адрес в настройках профиля.
+   * Получатель: Пользователь.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Подтверждение успешного изменения email.
+   * Push Text: Your email address has been successfully updated.
+8. Название: Account Deletion Canceled 👍
+   * Триггер: Пользователь вошел в аккаунт в течение 30-дневного периода после запроса на удаление.
+   * Получатель: Пользователь.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Информировать пользователя, что процедура удаления его аккаунта была отменена.
+   * Push Text: Your account deletion request has been canceled. Welcome back!
+II. Покупки, Заказы и Корзина
+Email:
+1. Название: Your TrekGuider Order #{order_number_placeholder} is Confirmed! (Access Your Goodies)
+   * Триггер: Успешное завершение покупки (разовой или первого платежа по подписке).
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Детали заказа, сумма, ссылка на продукт(ы), инструкции или прямые ссылки для доступа/скачивания цифровых товаров.
+   * Body:
+Hi [User_Name_Placeholder], 
+Great news! Your TrekGuider order is confirmed, and your travel resources are ready.
+Here's a quick summary:
+Order Number: {order_number_placeholder}
+Date: {order_date_placeholder}
+Your Items:
+   * {Product_Name_1_Placeholder} - ${Price_1_Placeholder}
+[Access Your Product] (Button/Link)
+   * {Product_Name_2_Placeholder} - ${Price_2_Placeholder} (If applicable)
+[Access Your Product] (Button/Link)
+Order Total: ${Total_Order_Amount_Placeholder}
+You can always find your order details and access your purchases under "My Purchases" in your TrekGuider account.
+Questions about your order? Our support team is happy to help.
+Happy exploring,
+The TrekGuider Crew
+   2. Название: Heads Up: Payment Issue with Your TrekGuider Order #{order_number_placeholder}
+   * Триггер: Неудачная попытка оплаты заказа.
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Сообщить о проблеме, предложить попробовать снова или обновить платежные данные.
+   * Body:
+Hi [User_Name_Placeholder],
+We had a little trouble processing the payment for your recent TrekGuider order (#{Order_Number_Placeholder}).
+Unfortunately, the transaction didn't go through. This can happen for a few reasons, like insufficient funds, an expired card, or a typo in the card details.
+Could you please update your payment information or try a different method to complete your purchase?
+[Update Payment Info / Retry Purchase] (Button/Link)
+If you're still running into issues or think this might be an error, it's a good idea to check with your bank or card provider. Of course, our support team is also here to assist.
+We're here to help!
+The TrekGuider Team
+Всплывающее (на сайте):
+   3.   Название: Added to Favorites! ❤️
+   * Триггер: Пользователь добавляет товар в список желаний.
+   * Получатель: Покупатель.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Мгновенное подтверждение действия.
+   * Push Text: {Product_Name_Placeholder} } is now in your favorites.
+   4. Название: Promo Code Applied! 🎉
+   * Триггер: Пользователь вводит и применяет действительный промокод на странице оформления заказа.
+   * Получатель: Покупатель.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Подтвердить применение скидки.
+   * Push Text: Success! Your promo code has been applied.
+   5. Название: Promo Code Not Working?
+   * Триггер: Пользователь вводит недействительный или истекший промокод на странице оформления заказа.
+   * Получатель: Покупатель.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Сообщить об ошибке применения промокода ({причина ошибки}).
+   * Push Text: Hmm, that promo code didn't work.
+III. Подписки (Покупатель и Продавец)
+Email:
+   1. Название: You're In! Your "{Product_Name_Placeholder}" Subscription is Active!
+   * Триггер: Покупатель оформил новую подписку.
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Подтверждение деталей подписки (продукт, цена, дата след. списания).
+   * Body:
+Hi [User_Name_Placeholder],
+Welcome aboard! Your subscription to "{Product_Name_Placeholder}" on TrekGuider is now active and ready for you to explore.
+Here are your subscription details:
+   * Product: {Product_Name_Placeholder}
+   * Price: ${Subscription_Price_Placeholder} per {Subscription_Period_Placeholder (e.g., month/year)}
+   * Next Billing Date: {Next_Billing_Date_Placeholder}
+You can manage your subscription, view billing history, and access your content anytime through your TrekGuider Account Settings or under "My Purchases".
+[Manage Your Subscription] (Button/Link)
+We're excited to have you with us!
+The TrekGuider Crew
+   2. Название: Your TrekGuider Subscription Payment for "{Product_Name_Placeholder}" (Receipt)
+   * Триггер: Успешное автоматическое списание средств за продление подписки.
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Чек за период, подтверждение продления.
+   * Body:
+Hi [User_Name_Placeholder],
+Just a quick note to confirm your recurring payment for the "{Product_Name_Placeholder}" subscription on TrekGuider was successful.
+Payment Details:
+   * Product: {Product_Name_Placeholder}
+   * Amount Paid: ${Amount_Paid_Placeholder}
+   * Billing Period: {Current_Billing_Period_Placeholder (e.g., January 15, 2025 - February 14, 2026)}
+   * Next Billing Date: {Next_Billing_Date_Placeholder}
+Your access to "{Product_Name_Placeholder}" continues without a hitch. You can view your full billing history in your Account Settings.
+[View Billing History] (Button/Link)
+Thanks for being a valued subscriber!
+The TrekGuider Team
+   3. Название: Heads Up: Payment Issue with Your "{Product_Name_Placeholder}" Subscription
+   * Триггер: Неудачное автоматическое списание средств (например, карта истекла).
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Уведомить о проблеме, попросить обновить платежные данные.
+   * Body:
+Hi [User_Name_Placeholder],
+We encountered a snag processing the payment for your "{Product_Name_Placeholder}" subscription on TrekGuider.
+To keep your access uninterrupted, please take a moment to update your payment information in your Account Settings:
+[Update Payment Information] (Button/Link)
+We'll try to process the payment again in a few days. If the issue isn't resolved, your subscription might be paused.
+If you have any questions or need a hand, our support team is ready to help.
+Best,
+The TrekGuider Team
+   4. Название: Confirmation: Your Subscription to "{Product_Name_Placeholder}" Has Been Canceled
+   * Триггер: Покупатель или администратор отменил подписку.
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Подтвердить отмену, указать дату окончания доступа.
+   * Body:
+Hi [User_Name_Placeholder],
+This email confirms that your subscription to "{Product_Name_Placeholder}" on TrekGuider has been canceled, as requested.
+You'll still have full access to the content until the end of your current billing period on {End_of_Access_Date_Placeholder}. This can be found under "My Purchases" in your account.
+Should you decide to come back, resubscribing is easy through your account or the product page.
+We're sorry to see you go and hope to welcome you back to the adventure soon!
+All the best,
+The TrekGuider Team
+   5. Название: Your TrekGuider Subscription to "{Product_Name_Placeholder}" Has Expired
+   * Триггер: Подписка закончилась (не была продлена после отмены или ошибки оплаты).
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Уведомить об окончании доступа.
+   * Body:
+Hi [User_Name_Placeholder],
+Just letting you know that your subscription to "{Product_Name_Placeholder}" on TrekGuider expired on {Expiration_Date_Placeholder}.
+This usually happens if a subscription was canceled and not set to renew, or if we couldn't process a payment after a few tries. Your access to the content from this subscription has now ended.
+Want to jump back in? You can easily start a new subscription anytime:
+[Resubscribe to "{Product_Name_Placeholder}"] (Button/Link)
+If you think this is a mistake, please get in touch with our support team.
+Best,
+The TrekGuider Team
+   6. Название: Friendly Reminder: Your Card for TrekGuider Subscriptions is Expiring Soon
+   * Триггер: Срок действия карты, используемой для подписки, скоро истекает.
+   * Получатель: Покупатель.
+   * Тип: Email
+   * Цель: Попросить обновить платежные данные во избежание прерывания подписки.
+   * Body:
+Hi [User_Name_Placeholder],
+Just a friendly heads-up: the payment card ending in XXXX, which you use for your TrekGuider subscription(s), is set to expire soon.
+To make sure your subscriptions continue smoothly and without interruption, please update your payment information in your Account Settings before {Card_Expiration_Date_Placeholder}:
+[Update Your Card Details] (Button/Link)
+A quick update now will keep your adventures going!
+If you have any questions, just let us know.
+Thanks,
+The TrekGuider Team
+
+
+Всплывающее (на сайте):
+   7.   Название: New Subscriber! 🥳
+   * Триггер: Покупатель оформил подписку на продукт продавца.
+   * Получатель: Продавец.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Информировать о новом подписчике.
+   * Push Text: Awesome! Someone just subscribed to your product: "{Product_Name_Placeholder}"!
+   8. Название: Subscription Canceled
+   * Триггер: Покупатель отменил подписку на продукт продавца.
+   * Получатель: Продавец.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Информировать об отмене.
+   * Push Text: A user has canceled their subscription to your product: "{Product_Name_Placeholder}".
+IV. Донаты (Покупатель и Продавец)
+Email:
+   1. Название: Thank You for Your Donation to {Author_Name_Placeholder}! (Receipt)
+   * Триггер: Успешное совершение доната.
+   * Получатель: Донатор (Покупатель).
+   * Тип: Email
+   * Цель: Подтверждение суммы и получателя доната.
+   * Body:
+Hi [User_Name_Placeholder],
+Thank you so much for your generous donation to {Author_Name_Placeholder} on TrekGuider! Your support is truly appreciated and makes a real difference.
+Here are the details of your contribution:
+   * Recipient: {Author_Name_Placeholder}
+   * Amount: ${Donation_Amount_Placeholder}
+   * Date: {Date_of_Donation_Placeholder}
+Your contribution helps {Author_Name_Placeholder} continue to share their passion and create amazing travel content for everyone to enjoy.
+With gratitude,
+The TrekGuider Team
+   2. Название: You're Supporting {Author_Name_Placeholder} {Monthly}! (Recurring Donation Set Up)
+   * Триггер: Пользователь успешно оформил рекуррентный донат.
+   * Получатель: Донатор.
+   * Тип: Email
+   * Цель: Подтверждение деталей подписки на донат (сумма, периодичность, получатель).
+   * Body:
+Hi [User_Name_Placeholder],
+Thank you for setting up a recurring {monthly} donation to support {Author_Name_Placeholder} on TrekGuider! Your ongoing commitment is fantastic.
+Here are your recurring donation details:
+   * Recipient: {Author_Name_Placeholder}
+   * Amount: ${Donation_Amount_Placeholder} per {Donation_Period_Placeholder (e.g., month)}
+   * Next Payment Date: {Next_Payment_Date_Placeholder}
+You can manage your recurring donations anytime from your TrekGuider Account Settings:
+[Manage Your Donations] (Button/Link)
+We, and {Author_Name_Placeholder}, truly appreciate your continued support!
+The TrekGuider Team
+   3. Название: Your Recurring Donation Payment to {Author_Name_Placeholder} Was Successful (Receipt)
+   * Триггер: Успешное автоматическое списание средств за рекуррентный донат.
+   * Получатель: Донатор.
+   * Тип: Email
+   * Цель: Чек за период, подтверждение поддержки.
+   * Body:
+Hi [User_Name_Placeholder],
+Just a quick confirmation: your scheduled recurring donation payment to {Author_Name_Placeholder} on TrekGuider was successful.
+Payment Details:
+   * Recipient: {Author_Name_Placeholder}
+   * Amount Paid: ${Amount_Paid_Placeholder}
+   * For the period: {Current_Donation_Period_Placeholder}
+   * Next Payment Date: {Next_Payment_Date_Placeholder}
+Thank you for your continued support – it helps {Author_Name_Placeholder} keep the adventures coming!
+Best,
+The TrekGuider Team
+   4. Название: Heads Up: Payment Issue with Your Recurring Donation to {Author_Name_Placeholder}
+   * Триггер: Неудачное автоматическое списание средств за рекуррентный донат.
+   * Получатель: Донатор.
+   * Тип: Email
+   * Цель: Уведомить о проблеме, попросить обновить платежные данные.
+   * Body:
+Hi [User_Name_Placeholder],
+We encountered a little snag processing the payment for your recurring donation to {Author_Name_Placeholder} on TrekGuider.
+To ensure your support continues without interruption, please take a moment to update your payment information in your Account Settings:
+[Update Payment Information] (Button/Link)
+If your payment details aren't updated, your recurring donation might be paused.
+If you have any questions, our support team is here to help.
+Best,
+The TrekGuider Team
+   5. Название: Confirmation: Your Recurring Donation to {Author_Name_Placeholder} Has Been Canceled
+   * Триггер: Донатор или администратор отменил подписку на донат.
+   * Получатель: Донатор.
+   * Тип: Email
+   * Цель: Подтвердить отмену рекуррентного доната.
+   * Body:
+Hi [User_Name_Placeholder],
+This email confirms that your recurring donation to {Author_Name_Placeholder} on TrekGuider has been canceled.
+No further payments will be processed for this donation.
+We, and {Author_Name_Placeholder}, thank you sincerely for your past support.
+If you ever wish to set up a new donation in the future, you can easily do so from {Author_Name_Placeholder}'s Creator page on TrekGuider.
+All the best,
+The TrekGuider Team
+
+
+Всплывающее (на сайте):
+   6.  Название: New Donation! 💰
+   * Триггер: Продавец получил новый донат.
+   * Получатель: Продавец.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Информировать о полученном донате.
+   * Push Text: You've received a ${Donation_Amount_Placeholder} donation! Thank your supporter!
+   7. Название: New Recurring Supporter! 🌟
+   * Триггер: Пользователь оформил рекуррентный донат продавцу.
+   * Получатель: Продавец.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Информировать о новом подписчике-донаторе.
+   * Push Text: Awesome! Someone has started a recurring donation to support you.
+   8. Название: Recurring Donation Canceled
+   * Триггер: Пользователь отменил рекуррентный донат продавцу.
+   * Получатель: Продавец.
+   * Тип: Всплывающее (на сайте)
+   * Цель: Информировать об отмене подписки на донат.
+   * Push Text: A user has canceled their recurring donation.
+V. Покупка в Подарок (Покупатель и Получатель)
+Email:
+   1. Название: You Just Gifted Some Adventure! ("{Product_Name_Placeholder}" Sent!)
+   * Триггер: Успешная покупка товара в подарок зарегистрированным пользователем.
+   * Получатель: Покупатель (Зарегистрированный Даритель).
+   * Тип: Email
+   * Цель: Детали заказа, информация о получателе, подтверждение отправки подарка.
+   * Body:
+Hi [Gifter_User_Name_Placeholder],
+How thoughtful! You've successfully gifted "{Product_Name_Placeholder}" through TrekGuider.
+We've sent an email to {Recipient_Email_Placeholder} with all the details on how to claim their awesome new travel resource.
+Here's a quick recap of your gift:
+   * Gifted Item: {Product_Name_Placeholder}
+   * Sent To: {Recipient_Email_Placeholder}
+   * Amount: ${Gift_Price_Placeholder}
+   * Date: {Date_of_Purchase_Placeholder}
+(If a message was included):
+   * Your Message: "{Personal_Message_Placeholder}"
+We'll let you know as soon as {Recipient_Name_Placeholder_if_known_else_generic_like_the_recipient} claims their gift. You can also view your gift purchase details in the "My Purchases" section of your TrekGuider account.
+Thanks for sharing the spirit of exploration!
+The TrekGuider Crew
+      1. Название: Welcome to TrekGuider & Your Gift of "{Product_Name_Placeholder}" is Sent!
+      * Триггер: Успешная покупка товара в подарок пользователем, который не был зарегистрирован (и был автоматически зарегистрирован в процессе).
+      * Получатель: Новый Покупатель (Автоматически Зарегистрированный Даритель).
+      * Тип: Email
+      * Цель: Приветствие, подтверждение покупки подарка, детали заказа, информация о получателе, и предложение установить пароль для нового аккаунта.
+Body:
+Hi there,
+Welcome to TrekGuider, and thank you for choosing us to gift "{Product_Name_Placeholder}"! How thoughtful of you.
+We've created a TrekGuider account for you using this email address ({Gifter_Email_Placeholder}) so you can easily manage your purchases and explore more.
+First, let's set up your password to access your new account:
+[Set Your Password & Access Your Account] (Button/Link)
+About your gift:
+We've sent an email to {Recipient_Email_Placeholder} with all the details on how to claim their awesome new travel resource.
+Here's a quick recap of your gift purchase:
+         * Gifted Item: {Product_Name_Placeholder}
+         * Sent To: {Recipient_Email_Placeholder}
+         * Amount: ${Gift_Price_Placeholder}
+         * Date: {Date_of_Purchase_Placeholder}
+(If a message was included):
+         * Your Message: "{Personal_Message_Placeholder}"
+Once you set your password, you'll be able to log in, view your gift purchase in "My Purchases," and we'll also notify you by email as soon as {Recipient_Name_Placeholder_if_known_else_generic_like_the_recipient} claims their gift.
+We're thrilled to have you and hope you enjoy exploring TrekGuider!
+Adventure awaits,
+The TrekGuider Crew
+            2. Название: Surprise! {Gifter_Name_Placeholder} Sent You a Gift on TrekGuider!
+            * Триггер: Сразу после покупки подарка.
+            * Получатель: Получатель Подарка (Email).
+            * Тип: Email
+            * Цель: Сообщить о подарке, предоставить сообщение от дарителя и ссылку для получения ({gift_claim_link}).
+            * Body:
+Hi there,
+You've got a gift! {Gifter_Name_Placeholder} has thoughtfully sent you "{Product_Name_Placeholder}" through TrekGuider.
+(If a message was included):
+{Gifter_Name_Placeholder} also sent this message along:
+"{Personal_Message_from_Gifter_Placeholder}"
+Ready to unwrap your new travel guide? Click here to claim it:
+[Claim Your Gift] (Button/Link)
+If you're new to TrekGuider, we'll quickly guide you through setting up an account so you can access your gift. Once claimed, you can always find it in your "My Purchases" section.
+Enjoy your new adventure resource!
+The TrekGuider Team
+            3. Название: Great News! Your Gift of "{Product_Name_Placeholder}" Has Been Claimed!
+            * Триггер: Получатель успешно активировал подарок по ссылке.
+            * Получатель: Покупатель (Даритель).
+            * Тип: Email
+            * Цель: Информировать, что подарок получен.
+            * Body:
+Hi [Gifter_User_Name_Placeholder],
+Just wanted to let you know – your gift of "{Product_Name_Placeholder}" to {Recipient_Email_or_Name_Placeholder} has been successfully claimed!
+We hope they love it and it sparks some amazing travels.
+Thanks again for choosing TrekGuider to share the joy of discovery!
+The TrekGuider Crew
+            4. Название: Friendly Nudge: Your TrekGuider Gift from {Gifter_Name_Placeholder} is Waiting!
+            * Триггер: Через X дней после отправки, если подарок не активирован.
+            * Получатель: Получатель Подарка (Email).
+            * Тип: Email
+            * Цель: Напомнить о подарке и предоставить ссылку еще раз.
+            * Body:
+Hi there,
+Just a little reminder that you have an unclaimed gift from {Gifter_Name_Placeholder} waiting for you on TrekGuider: "{Product_Name_Placeholder}".
+Don't let it gather dust! Click the link below to claim your travel goodies:
+[Claim Your Gift Now] (Button/Link)
+If you've already claimed this, feel free to ignore this email.
+Happy travels,
+The TrekGuider Team
+VI. Регистрация и Верификация Продавца (Stripe Connect)
+Email:
+            1. Название: Action Needed: Set Up Your Payout Information on TrekGuider
+            * Триггер: Stripe API вернул статус action_required или requirements.currently_due.
+            * Получатель: Продавец.
+            * Тип: Email
+            * Цель: Срочно уведомить о необходимости предоставить/обновить информацию в Stripe (с указанием требуемых полей {verification_requirements_due_list}). Критически важно!
+            * Body:
+Hi [User_Name_Placeholder],
+To enable payouts for your earnings as a Creator on TrekGuider, our secure payment processing system requires some additional information (or an update to your existing details). This is a standard step to ensure everything is secure and compliant for your payouts.
+Here’s what’s needed to set up or update your payout details:
+            * {verification_requirements_due_list_placeholder}
+(Example: "Confirm your identity," "Provide bank account details for deposits," "Verify your address.")
+Please log in to your TrekGuider account and go to your Dashboard to provide this information as soon as you can:
+[Set Up/Update Payout Information] (Button/Link)
+To avoid any delays or temporary holds on your payouts, please complete this by {due_date_if_any_placeholder}.
+If you have any questions, our TrekGuider support team is ready to assist.
+Best,
+The TrekGuider Team
+               1. Название: You're Verified! Your TrekGuider Account is Ready for Payouts!
+               * Триггер: Stripe API вернул статус verified. (Это уведомление также покрывает сценарий, когда покупатель проходит верификацию для вывода средств и по сути получает статус, аналогичный продавцу для этих операций).
+               * Получатель: Продавец (или Пользователь, прошедший верификацию для выплат).
+               * Тип: Email
+               * Цель: Поздравить с успешной верификацией.
+               * Body:
+Hi [User_Name_Placeholder],
+Fantastic news! Your full verification for receiving payouts on TrekGuider is complete.
+This means you're all set to:
+               * Receive payouts for your earnings as a Creator.
+               * Withdraw funds from your TrekGuider balance.
+Thanks for taking care of this important step!
+Happy earning,
+The TrekGuider Team
+               2. Название: Important: Action Required for Your TrekGuider Account Verification
+               * Триггер: Stripe API вернул статус restricted (возможно, после неудачных попыток).
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Сообщить о проблеме и возможном ограничении функционала, направить в поддержку.
+               * Body:
+Hi [User_Name_Placeholder],
+We're writing because there seems to be an issue with the verification of your TrekGuider account information. This might be due to details that couldn't be confirmed or need a bit more attention.
+This could mean your account currently has some restrictions, like a temporary hold on payouts.
+Please log in to your TrekGuider Dashboard to see what's needed, or reach out to our support team so we can help you get this sorted:
+[Review Verification Requirements] (Button/Link)
+We're here to help you through it.
+Sincerely,
+The TrekGuider Team
+               3. Название: Reminder: Complete Full ID Verification to Keep Your Payouts Coming
+               * Триггер: Продавец достиг порога $100 дохода, но не прошел полную верификацию (ID+селфи) в Stripe.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Уведомить о необходимости пройти полную верификацию для продолжения получения выплат.
+               * Body:
+Hi [User_Name_Placeholder],
+Congrats on reaching $100 in earnings on TrekGuider! To enable payouts, our payment system requires a full identity verification. This typically involves submitting a photo of your ID and a selfie – it's a standard security measure for all Creators receiving payments.
+To ensure your payouts can be processed without a hitch, please complete this quick verification process in your Dashboard:
+[Complete Full ID Verification] (Button/Link)
+This step is crucial for us to maintain a secure and compliant platform for all our creators.
+If you have any questions along the way, please don't hesitate to contact support.
+Thanks,
+The TrekGuider Team
+               4. Название: You've Leveled Up! Your TrekGuider Creator Tier is Now {New_Seller_Tier_Name_Placeholder}!
+               * Триггер: Автоматическое изменение уровня продавца на основе объема продаж или других критериев платформы.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Информировать о новом уровне комиссии и/или объеме хранилища.
+               * Body:
+Hi [User_Name_Placeholder],
+Congratulations! We're excited to let you know that you've advanced to the {New_Seller_Tier_Name_Placeholder} Creator tier on TrekGuider!
+This reflects your awesome performance and comes with some great perks, including:
+               * New Commission Rate: {New_Commission_Rate_Placeholder}%
+               * Storage Space: {New_Storage_Limit_Placeholder} GB
+You can find all the details about your new tier and benefits in your Dashboard.
+Keep up the amazing work – we love seeing you succeed!
+The TrekGuider Team
+
+
+Всплывающее (на сайте):
+6. Название: Oops! Check Your Info 🧐
+               * Триггер: При попытке отправки формы регистрации продавца данные не прошли серверную проверку.
+               * Получатель: Пользователь (потенциальный продавец).
+               * Тип: Всплывающее (на сайте)
+               * Цель: Сообщить об ошибке ввода данных на странице регистрации продавца.
+               * Push Text: Please double-check the information you entered. Some fields might be incorrect or missing.
+VII. Выплаты и Способы Вывода Средств
+Email:
+               1. Название: Your TrekGuider Payout Method Confirmation Code
+               * Триггер: Пользователь (Покупатель или Продавец) добавляет новый способ вывода средств и ожидает код.
+               * Получатель: Пользователь (Покупатель/Продавец).
+               * Тип: Email
+               * Цель: Доставить код для подтверждения добавления нового способа вывода средств.
+               * Body:
+Hi [User_Name_Placeholder],
+To securely add your new payout method on TrekGuider, please use this confirmation code:
+{Six_Digit_Code_Placeholder}
+This extra step helps keep your account and payout information safe.
+If you didn't request to add a new payout method, please ignore this email. If you have any security concerns, contact our support team right away.
+Best,
+The TrekGuider Team
+               2. Название: Good News! Your TrekGuider Payout is On Its Way!
+               * Триггер: Stripe инициировал выплату на счет продавца (payout.created, payout.updated -> in_transit).
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Уведомить об отправке выплаты и ожидаемой дате поступления ({payout_date_expected}).
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+Great news! A payout from your TrekGuider account has been sent and is currently being processed.
+Amount: ${Payout_Amount_Placeholder}
+Expected Arrival Date: {Payout_Date_Expected_Placeholder} (Please note: this can vary depending on your bank's processing times.)
+Funds typically arrive in your bank account within a few business days, but it can occasionally take a bit longer.
+Happy earnings!
+The TrekGuider Team
+               3. Название: Heads Up: Issue with Your Recent TrekGuider Payout
+               * Триггер: Stripe не смог выполнить выплату (payout.failed).
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Сообщить о проблеме, указать причину ({payout_failure_reason}), попросить проверить реквизиты. Критически важно!
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+We're writing to let you know there was an issue processing your recent payout from TrekGuider.
+Reason: {Payout_Failure_Reason_Placeholder}
+(Examples: "Invalid bank account details," "Account frozen," "Unable to verify account holder.")
+Please take a moment to review your payout information in your TrekGuider Account Settings and make sure all details are accurate and up-to-date.
+[Review Your Payout Settings] (Button/Link)
+If the issue continues or you need a hand, please reach out to TrekGuider support.
+Sincerely,
+The TrekGuider Team
+               4. Название: Important Notice: Your TrekGuider Payouts Are Temporarily Paused
+               * Триггер: Администратор вручную приостановил выплаты для продавца.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Уведомить о приостановке выплат.
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+This email is to inform you that payouts from your TrekGuider account have been temporarily paused.
+This is usually due to a pending account review or an issue that requires your attention. Please check your account notifications or contact TrekGuider support for more details on why this has happened and what steps are needed to resolve it.
+We're working to get this sorted for you as quickly as possible.
+Sincerely,
+The TrekGuider Team
+               5. Название: Good News! Your TrekGuider Payouts Have Been Resumed
+               * Триггер: Администратор вручную возобновил выплаты для продавца.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Уведомить о возобновлении выплат.
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+Great news! The temporary pause on payouts from your TrekGuider account has been lifted, and your payouts are now back on track.
+Any pending payouts will be processed according to our usual schedule.
+Thank you for your patience!
+The TrekGuider Team
+               6. Название: Your TrekGuider Withdrawal is Being Processed!
+               * Триггер: Запрос на вывод средств покупателем одобрен и выплата инициирована.
+               * Получатель: Покупатель.
+               * Тип: Email
+               * Цель: Уведомить об отправке выплаты.
+               * Body:
+Hi [Buyer_User_Name_Placeholder],
+Just letting you know that your request to withdraw funds from your TrekGuider account balance has been approved, and your payout is now being processed.
+Amount: ${Withdrawal_Amount_Placeholder}
+Destination: {Payout_Method_Details_Placeholder} (e.g., Bank account ending in XXXX, PayPal: yourname@example.com)
+Please allow a few business days for the funds to appear in your account. Processing times can vary depending on your chosen payout method.
+You can track the status in your TrekGuider account.
+Best,
+The TrekGuider Team
+               7. Название: Heads Up: Issue with Your TrekGuider Withdrawal Request
+               * Триггер: Выплата покупателю не удалась.
+               * Получатель: Покупатель.
+               * Тип: Email
+               * Цель: Сообщить о проблеме с выплатой.
+               * Body:
+Hi [Buyer_User_Name_Placeholder],
+We encountered an issue while trying to process your recent withdrawal request from your TrekGuider account balance.
+Reason: {Withdrawal_Failure_Reason_Placeholder}
+(Examples: "Incorrect payout details provided," "Payout method was rejected by the processor.")
+Please double-check your payout method details in your TrekGuider Account Settings and then try submitting the withdrawal request again.
+[Update Your Payout Methods] (Button/Link)
+If you need further assistance, our support team is here to help.
+Sincerely,
+The TrekGuider Team
+
+
+Всплывающее (на сайте):
+               8. Название: Payout Method Added! ✅
+               * Триггер: Пользователь успешно добавил и подтвердил (например, кодом из email) новый способ вывода средств.
+               * Получатель: Пользователь (Покупатель/Продавец).
+               * Тип: Всплывающее (на сайте)
+               * Цель: Подтвердить успешное добавление и верификацию способа вывода.
+               * Push Text: Your new payout method has been successfully added and verified.
+               9. Название: Verification Needed for Withdrawal ⚠️
+               * Триггер: Покупатель инициировал вывод средств с баланса (>= $40), но не прошел необходимую верификацию (например, W-9/W-8).
+               * Получатель: Покупатель.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Сообщить о необходимости пройти верификацию для вывода средств, предоставить ссылку/инструкции.
+               * Push Text: To withdraw funds, please complete your account verification first.
+VIII. Споры и Возвраты
+Email:
+               1. Название: Action Required: New Refund Request for Your Product "{Product_Name_Placeholder}"
+               * Триггер: Покупатель запросил возврат по продукту продавца.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Информировать о запросе, предоставить детали и ссылку для ответа.
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+A customer has requested a refund for your product, "{Product_Name_Placeholder}", on TrekGuider.
+Request Details:
+               * Product: {Product_Name_Placeholder}
+               * Order ID: {Order_ID_Placeholder}
+               * Reason for Refund: {Refund_Reason_Placeholder}
+Please review this request and respond within 30 days by visiting your Dashboard:
+[Link_to_Refund_Request_Management_Page_Placeholder]
+If no action is taken by {Response_Deadline_Date_Placeholder}, the refund may be automatically processed according to our platform policies.
+Best,
+The TrekGuider Team
+               2. Название: Friendly Reminder: Respond to Refund Request for "{Product_Name_Placeholder}"
+               * Триггер: За 3 дня до автоматического одобрения возврата (если продавец не ответил).
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Напомнить о необходимости отреагировать на запрос.
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+Just a friendly reminder that the refund request for your product, "{Product_Name_Placeholder}" (Order ID: {Order_ID_Placeholder}), is still awaiting your response.
+To ensure your input is considered, please review and respond by {Response_Deadline_Date_Placeholder}. If no action is taken by this date, the refund may be processed automatically.
+You can manage this request in your Dashboard:
+[Manage Refund Request] (Button/Link)
+Thanks,
+The TrekGuider Team
+               3. Название: Update on Your Refund Request for Order #{Order_ID_Placeholder}
+               * Триггер: Запрос на возврат обработан (продавцом, админом или автоматически).
+               * Получатель: Покупатель.
+               * Тип: Email
+               * Цель: Сообщить итоговое решение по запросу.
+               * Body:
+Hi [Buyer_User_Name_Placeholder],
+Here's an update on your refund request for TrekGuider Order #{Order_ID_Placeholder} (Product: "{Product_Name_Placeholder}").
+Status: {Refund_Status_Placeholder}
+(Примечание: "Approved," "Declined,")
+(If Approved):
+Your refund of ${Refund_Amount_Placeholder} has been processed. Please allow 3-10 business days for the funds to reflect in your account, as processing times can vary by bank or payment provider.
+(If Declined):
+Unfortunately, your refund request has been declined. Reason: {Reason_for_Decline_Placeholder}.
+If you have further questions, please contact the Creator directly or reach out to TrekGuider support for clarification.
+Sincerely,
+The TrekGuider Team
+               4. Название: Important Notice: Funds Withheld Due to Lost Chargeback Dispute
+               * Триггер: Спор (Chargeback) по транзакции продавца проигран, и с баланса продавца удерживается сумма.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Информировать продавца об удержании средств, указать сумму и детали транзакции.
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+This email is to inform you about a chargeback dispute (Transaction ID: {Transaction_ID_Placeholder}) related to your product, "{Product_Name_Placeholder}".
+Unfortunately, the dispute was ultimately resolved in favor of the cardholder. As a result, funds amounting to ${Chargeback_Amount_Placeholder} (this amount may include the original transaction value and any applicable dispute fees from the payment processor) will be debited from your TrekGuider balance.
+We understand that chargebacks can be challenging. For more information on understanding and preventing chargebacks, please visit our Help Center or contact our support team.
+Sincerely,
+The TrekGuider Team
+Всплывающее (на сайте):
+5. Название: Chargeback Alert! ⚠️
+               * Триггер: Покупатель открыл спор по транзакции продавца.
+               * Получатель: Продавец.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Уведомить продавца об открытии спора.
+               * Push Text: A chargeback dispute has been opened for one of your transactions. Please check your dashboard for details.
+
+
+IX. Налоги и Сборы с Продавцов (Stripe Connect)
+Email:
+               1. Название: Important Tax Info: Action May Be Needed for Your Form 1099-K
+               * Триггер: Доход продавца (US, W-9) достиг $600.
+               * Получатель: Продавец (US, W-9).
+               * Тип: Email
+               * Цель: Напомнить о налоговых обязательствах, попросить проверить/подтвердить данные W-9.
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+As you've reached or are approaching $600 in gross earnings on TrekGuider this calendar year, we want to give you a heads-up about potential U.S. tax reporting requirements.
+If you're a U.S. person or entity, a Form 1099-K detailing your gross earnings processed through our platform may be issued by our payment processing partner. To help ensure this form is accurate if issued, please take a moment to verify that your tax information (such as your W-9 details) is correct and up-to-date in your TrekGuider Dashboard.
+[Review/Update Your Tax Information] (Button/Link)
+Please note: This isn't tax advice. For specific questions about your tax obligations, it's always best to consult with a tax professional.
+Best,
+The TrekGuider Team
+               2. Название: Good News! Your {Tax_Year_Placeholder} Form 1099-K is Ready
+               * Триггер: Stripe сгенерировал и/или отправил форму 1099.
+               * Получатель: Продавец (US, W-9, Eligible).
+               * Тип: Email
+               * Цель: Уведомить о доступности формы, предоставить ссылку ({tax_form_link}).
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+Great news for tax time! Your Form 1099-K for the {Tax_Year_Placeholder} tax year, which details your gross earnings processed through TrekGuider, is now available.
+You can securely access and download your Form 1099-K directly from TrekGuider Dashboard:
+{Direct_Link_to_Tax_Form_Placeholder_or_Clear_Instructions}
+Please keep this form for your tax records.
+If you have questions about accessing your form, please contact TrekGuider support. For specific tax advice, please consult a tax professional.
+Thanks,
+The TrekGuider Team
+               3. Название: Notice of Fee Deduction: {Fee_Type_Placeholder}
+               * Триггер: Успешное списание сбора (например, за 1099 или Dispute Fee) с баланса продавца.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Информировать о списании, сумме ({fee_amount}) и типе ({fee_type}).
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+This is a quick heads-up to let you know that a fee has been deducted from your TrekGuider balance.
+Fee Details:
+               * Type: {Fee_Type_Placeholder}
+               * Amount: ${Fee_Amount_Placeholder}
+               * Date: {Date_of_Deduction_Placeholder}
+               * Reason/Related Transaction (if applicable): {Fee_Reason_or_Transaction_ID_Placeholder}
+You can always view a detailed breakdown of all transactions and fees in your TrekGuider Dashboard.
+Best,
+The TrekGuider Team
+               4. Название: URGENT: Payouts Paused Due to Failed Fee Deduction
+               * Триггер: Неудачная попытка списания сбора с баланса продавца.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Сообщить об ошибке, причине (недостаточно средств) и о том, что выплаты временно заблокированы. Критически важно!
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+We're writing to inform you that an attempt to deduct a required fee ({Fee_Type_Placeholder} of ${Fee_Amount_Placeholder}) from your TrekGuider account balance was unsuccessful due to insufficient funds.
+As a result, your payouts have been temporarily paused until this outstanding fee is covered.
+Please ensure your TrekGuider account balance has sufficient funds to cover this. Future earnings will be applied to this outstanding fee first. Once the fee is successfully collected, your payouts will automatically resume.
+If you have questions or need to discuss this, please contact TrekGuider support immediately.
+Sincerely,
+The TrekGuider Team
+
+
+X. Управление Контентом Продавца (Продукты и Статьи)
+Email:
+               1. Название: Success! Your "{Content_Title_Placeholder}" is Now Live on TrekGuider!
+               * Триггер: Администратор одобрил продукт/статью.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Уведомить об успешной публикации.
+               * Body:
+Fantastic news! Your {Content_Type_Placeholder} (e.g., product listing, article) titled "{Content_Title_Placeholder}" has passed moderation and is now published and live on TrekGuider for everyone to see.
+Check it out here: [View Your Published Content] (Button/Link)
+We're thrilled to feature your contribution as a Creator to the TrekGuider community!
+Happy sharing,
+The TrekGuider Crew
+               2. Название: Action Needed: Revisions Required for Your "{Content_Title_Placeholder}"
+               * Триггер: Администратор отклонил продукт/статью.
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Сообщить об отклонении, указать причину ({moderation_reason}).
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+Our moderation team has reviewed your {Content_Type_Placeholder} titled "{Content_Title_Placeholder}", and it needs a few revisions before we can publish it on TrekGuider.
+Here’s what needs attention:
+               * {moderation_reason_1_placeholder}
+               * {moderation_reason_2_placeholder}
+Please make the necessary changes and resubmit your content for another look via your Dashboard:
+[Edit Your Content] (Button/Link)
+If you have any questions, our content guidelines are a great resource, or feel free to contact support.
+Best,
+The TrekGuider Team
+Всплывающее (на сайте):
+3. Название: Content Submitted! 👍
+               * Триггер: Продавец отправил продукт/статью на модерацию.
+               * Получатель: Продавец.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Мгновенное подтверждение получения на проверку.
+               * Push Text: Your {Content_Type_Placeholder (e.g., product/article)} "{Content_Title_Placeholder}" is now with our moderation team for review.
+
+
+XI. Комментарии, Отзывы и Взаимодействия
+Всплывающее (на сайте):
+               1. Название: New Review! 💬
+               * Триггер: На продукт продавца оставлен новый отзыв (после одобрения).
+               * Получатель: Продавец.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Информировать о новом отзыве, предоставить ссылку.
+               * Push Text: You've received a new review for your product: "{Product_Name_Placeholder}". 
+               2. Название: New Reply! 📬
+               * Триггер: На комментарий/отзыв пользователя ответили (продавец или админ).
+               * Получатель: Автор исходного комментария/отзыва.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Информировать об ответе, предоставить ссылку.
+               * Push Text: You have a new reply to your comment/review. 
+XII. Поддержка и Обратная Связь
+Email:
+               1. Название: We've Got Your TrekGuider Support Request #{Ticket_ID_Placeholder} 
+               * Триггер: Пользователь отправил запрос через контактную форму.
+               * Получатель: Пользователь/Посетитель.
+               * Тип: Email
+               * Цель: Подтвердить получение, сообщить Ticket ID.
+               * Body:
+Hi [User_Name_or_Visitor_Name_Placeholder],
+Thanks for reaching out to TrekGuider support! We've received your request and created a ticket with the ID: #{Ticket_ID_Placeholder}.
+Our team will review your inquiry and get back to you as soon as we can, usually within 24-48 business hours.
+If you need to add any more information to your request, simply reply to this email.
+Best,
+The TrekGuider Support Team
+               2. Название: An Update on Your TrekGuider Support Request #{Ticket_ID_Placeholder}
+               * Триггер: Администратор ответил на тикет.
+               * Получатель: Пользователь/Посетитель.
+               * Тип: Email
+               * Цель: Доставить ответ администратора.
+               * Body:
+Hi [User_Name_or_Visitor_Name_Placeholder],
+Here's an update regarding your support request #{Ticket_ID_Placeholder}:
+{Admin_Response_Placeholder}
+(This will contain the admin's reply)
+If you have any further questions or if there's anything else we can help with, please don't hesitate to reply to this email.
+All the best,
+The TrekGuider Support Team
+
+
+Уведомление в админ-панели:
+3. Название: 📥 New Support Ticket
+               * Триггер: Поступил новый запрос через контактную форму.
+               * Получатель: Администратор.
+               * Тип: Уведомление в админ-панели
+               * Цель: Оповестить о необходимости обработки нового тикета.
+               * Notification Text (for Admin Panel): New support request #{Ticket_ID_Placeholder} from {User_Email_or_Name_Placeholder}. Subject: {Ticket_Subject_Placeholder}. Needs attention.
+XIII. Реферальная Программа
+Email:
+               1. Название: Sweet! Your Referral Just Made a Purchase (Here's Your Promo Code!)
+               * Триггер: Приглашенный покупатель совершил первую покупку в течение 7 дней после регистрации.
+               * Получатель: Реферер.
+               * Тип: Email
+               * Цель: Информировать о выполнении условия и доставить промокод на скидку 15%.
+               * Body:
+Hi [Referrer_User_Name_Placeholder],
+Awesome news! Your referred friend, {Referred_User_Name_Placeholder}, just made their first purchase on TrekGuider!
+To say thanks for spreading the word, here’s a 15% discount promo code for your next TrekGuider adventure:
+{Promo_Code_for_Referrer_Placeholder}
+Just pop this code in at checkout to enjoy your discount.
+Thanks for being such a key part of the TrekGuider community!
+Happy travels,
+The TrekGuider Crew
+               2. Название: You Earned It! Claim Your Free Product Reward from TrekGuider!
+               * Триггер: Реферер успешно пригласил 10 покупателей, совершивших покупку.
+               * Получатель: Реферер.
+               * Тип: Email
+               * Цель: Сообщить о возможности выбрать бесплатный продукт (продукт от платформы стоимостью до $50 или продукт от продавцов платформы стоимостью до $25), предоставить промокод или инструкции.
+               * Body:
+Hi [Referrer_User_Name_Placeholder],
+Incredible work! You've successfully referred 10 new customers who made a purchase on TrekGuider – that's amazing!
+As a special thank you, you get to choose a free product:
+               * Pick any product created by TrekGuider (our own platform goodies!) up to $50 in value, OR
+               * Choose any product from other talented Creators on TrekGuider up to $25 in value.
+To claim your reward, use this promo code at checkout when you've found the perfect eligible product:
+{Free_Product_Promo_Code_Placeholder}
+Thank you for your fantastic contribution to our growing community of explorers!
+The TrekGuider Crew
+               3. Название: Congrats! You've Locked In Your Special Creator Terms!
+               * Триггер: Приглашенный продавец достиг $300 продаж за первый месяц.
+               * Получатель: Реферал-Продавец.
+               * Тип: Email
+               * Цель: Поздравить и подтвердить сохранение комиссии 4% и хранилища Tier 3.
+               * Body:
+Hi [Referred_Seller_User_Name_Placeholder],
+Huge congratulations! We're thrilled to let you know you've crushed the initial sales goal by achieving $300 in sales within your first month as a Creator on TrekGuider.
+This means you've officially secured your special referral program terms:
+               * Commission Rate: 4%
+               * Storage Tier: Tier 3 ({Tier_3_Storage_Amount_Placeholder} GB)
+Keep that fantastic momentum going! We're excited to support your continued success on TrekGuider.
+Best regards,
+The TrekGuider Team
+               4. Название: An Update on Your TrekGuider Creator Terms
+               * Триггер: Приглашенный продавец НЕ достиг $300 продаж за первый месяц.
+               * Получатель: Реферал-Продавец.
+               * Тип: Email
+               * Цель: Уведомить о переходе на стандартный уровень 3 (комиссия 5%, хранилище 1ГБ).
+               * Body:
+Hi [Referred_Seller_User_Name_Placeholder],
+This email is to provide an update on your Creator terms with TrekGuider. The initial 30-day period for the referral program's special sales target has now concluded. As the $300 sales goal wasn't met during this time, your account will now transition to our standard Tier 3 Creator terms:
+               * Commission Rate: 5%
+               * Storage: 1GB
+We encourage you to explore all the tools and resources TrekGuider offers to help grow your sales. If you have any questions or need support, please don't hesitate to reach out.
+
+
+Sincerely,
+The TrekGuider Team
+               5. Название: Update: Your Referral Bonus Rate for Creator {Referred_Seller_Name_Placeholder}
+               * Триггер: Приглашенный продавец зарегистрировался (или по истечении 30 дней после регистрации реферала-продавца).
+               * Получатель: Реферер.
+               * Тип: Email
+               * Цель: Уведомить об изменении ставки % бонуса от продавца-реферала (например, по истечении 30 дней).
+               * Body:
+Hi [Referrer_User_Name_Placeholder],
+This is an update regarding your referral bonus from sales made by {Referred_Seller_Name_Placeholder}, the Creator you referred to TrekGuider.
+Now that the initial 30-day period for {Referred_Seller_Name_Placeholder}'s special introductory terms has passed, your referral bonus rate from their sales may be adjusted according to our standard referral program terms.
+For specific details on ongoing commission rates after this initial period, please refer to our official Referral Program Terms page: [Link to Referral Program Terms]
+You can always view your earnings and referral statistics in your TrekGuider dashboard.
+Thanks for helping the TrekGuider community thrive!
+Best regards,
+The TrekGuider Team
+
+
+Всплывающее (на сайте):
+               6. Название: Referral Bonus! 💸
+               * Триггер: Рефереру начислен бонус (например, % от продажи реферала-продавца, деньги на баланс, скидка и т.д., кроме промокода за первую покупку реферала-покупателя).
+               * Получатель: Реферер.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Сообщить о бонусе и его деталях ({referral_bonus_details}).
+               * Push Text: Ka-ching! You've earned a referral bonus of {referral_bonus_details_placeholder}. Check your rewards!
+
+7. Название: New Referral! 🎉
+               * Триггер: Пользователь зарегистрировался по реферальной ссылке.
+               * Получатель: Реферер.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Сообщить об успешном привлечении нового пользователя, указать тип: покупатель/продавец.
+               * Push Text: You have a new referral: {Referred_User_Name_Placeholder}!
+XIV. Уведомления для Администраторов (Системные)
+Email:
+               1. Название: 🔴 URGENT: CRITICAL Stripe API Failure on TrekGuider
+               * Триггер: Сбой при взаимодействии с Stripe API.
+               * Получатель: Администратор(ы).
+               * Тип: Email (может дублировать уведомление в админ-панели)
+               * Цель: Срочное оповещение о критической ошибке.
+               * Body:
+Subject: URGENT ACTION REQUIRED: Critical Stripe API Interaction Failure
+A critical error occurred during an API call to Stripe on the TrekGuider platform.
+Timestamp: {Timestamp_of_Error_Placeholder}
+Error Details: {Specific_Error_Message_or_Code_Placeholder}
+Affected Area/Process: {Affected_Process_Placeholder} (e.g., Payment Processing, Payout Initiation, Subscription Update)
+Immediate investigation is required. Please check server logs and the Stripe dashboard for comprehensive details.
+[Link to Admin Dashboard/Relevant Log Section]
+The TrekGuider System Monitoring
+               2. Название: ⚠️ ERROR: Stripe Webhook Processing Failed on TrekGuider
+               * Триггер: Не удалось обработать входящий webhook от Stripe.
+               * Получатель: Администратор(ы).
+               * Тип: Email (может дублировать уведомление в админ-панели)
+               * Цель: Оповещение о проблеме с обработкой вебхуков.
+               * Body:
+Subject: ACTION REQUIRED: Stripe Webhook Processing Error 
+Failed to process an incoming Stripe webhook.
+Timestamp: {Timestamp_of_Failure_Placeholder}
+Webhook Event ID: {Stripe_Event_ID_Placeholder}
+Webhook Type: {Stripe_Webhook_Type_Placeholder (e.g., charge.succeeded, customer.subscription.deleted)}
+Error Details: {Specific_Processing_Error_Placeholder}
+This may result in data inconsistencies. Please investigate the webhook event in the Stripe dashboard and server logs.
+[Link_to_Admin_Webhook_Monitoring_Tool_or_Stripe_Dashboard_Placeholder]
+               3. Название: TrekGuider Platform Status Report - {Date_Range_Placeholder (e.g., Daily/Weekly - January 15, 2026)}
+               * Триггер: По расписанию.
+               * Получатель: Администратор(ы).
+               * Тип: Email
+               * Цель: Сводка ключевых метрик, проблемных зон.
+               * Body:
+Subject: TrekGuider Weekly Platform Report
+Hello Admin Team,
+Here is the weekly status report for the TrekGuider platform:
+📈 Key Metrics:
+               * New Users: {New_Users_Count_Placeholder}
+               * Total Sales: ${Total_Sales_Amount_Placeholder}
+               * New Products/Listings: {New_Listings_Count_Placeholder}
+               * New Products/ Travel Insights Published: {New_Listings_Count_Placeholder}
+               * Active Subscriptions: {Active_Subscriptions_Count_Placeholder}
+               * Commission Income: {money generated $}
+⚠️ Areas Requiring Attention:
+               * Failed Payments: {Failed_Payments_Count_Placeholder}
+               * Open Support Tickets (High Priority): {High_Priority_Tickets_Count_Placeholder}
+               * System Errors (Non-Critical): {Non_Critical_Errors_Count_Placeholder}
+⚙️ System Health:
+               * Stripe API Health: {Stripe_API_Status_Placeholder (e.g., Normal, Degraded Performance)}
+               * Server Uptime: {Server_Uptime_Percentage_Placeholder}%
+For more detailed analytics, please visit the admin dashboard:
+[Link_to_Admin_Analytics_Dashboard_Placeholder]
+The TrekGuider System
+               4. Название: 🟡 ALERT: Large Refund Request (Over $500) - {Order_ID_or_Refund_Request_ID_Placeholder}
+               * Триггер: Сумма запроса на возврат превышает $500.
+               * Получатель: Администратор (Support/Finance Email).
+               * Тип: Email
+               * Цель: Привлечь внимание к потенциально крупной потере средств.
+               * Body:
+Subject: ATTENTION: High-Value Refund Request (> $500) - Order {Order_ID_or_Refund_Request_ID_Placeholder}
+A refund request exceeding $500 has been submitted on TrekGuider.
+Request Details:
+               * Request/Order ID: {Order_ID_or_Refund_Request_ID_Placeholder}
+               * Amount: ${Refund_Amount_Placeholder}
+               * Product: "{Product_Name_Placeholder}"
+               * Creator: {Seller_User_Name_Placeholder} ({Seller_User_ID_Placeholder})
+               * Customer: {Customer_User_Name_Placeholder} ({Customer_User_ID_Placeholder})
+Please review this request promptly in the admin panel to ensure appropriate handling.
+[Link_to_Admin_Refund_Management_Page_Placeholder]
+Finance/Support Admin Team
+               5. Название: 🛡️ SECURITY ALERT: Suspicious Activity Detected on TrekGuider
+               * Триггер: Срабатывание правил фрод-мониторинга.
+               * Получатель: Администратор (Security Email).
+               * Тип: Email
+               * Цель: Оповестить о необходимости расследования.
+               * Body:
+Subject: URGENT SECURITY INVESTIGATION: Potential Fraudulent Activity Detected
+The TrekGuider monitoring system has detected suspicious activity that may indicate fraudulent behavior or a security concern.
+Activity Type: {Type_of_Suspicious_Activity_Placeholder} (e.g., Multiple failed login attempts from unusual IP, High-velocity transaction attempts, Suspected compromised account)
+Details/Affected User(s)/IP(s): {Details_of_Activity_and_Users_Placeholder}
+Timestamp of Detection: {Timestamp_of_Detection_Placeholder}
+Immediate investigation is required. Please access security logs and relevant user profiles.
+[Access Security Dashboard/Logs]
+TrekGuider Security Team
+               6. Название: ⚙️ CONFIGURATION CHANGE: Critical TrekGuider Setting Modified
+               * Триггер: Изменение важных настроек в админ-панели.
+               * Получатель: Администратор (Admin Email).
+               * Тип: Email
+               * Цель: Информировать об изменениях для контроля.
+               * Body:
+Subject: AUDIT ALERT: Critical TrekGuider Platform Setting Changed
+A critical platform setting was modified in the TrekGuider admin panel.
+Change Details:
+               * Setting Changed: {Setting_Name_Placeholder} (e.g., Stripe API Keys, Default Platform Commission, Master Security Flag)
+               * Changed By (Admin User): {Admin_User_Who_Made_Change_Placeholder}
+               * Timestamp: {Timestamp_of_Change_Placeholder}
+               * Previous Value: {Old_Setting_Value_Placeholder} (If available and logged)
+               * New Value: {New_Setting_Value_Placeholder}
+Please verify this change was authorized and intended. If not, take appropriate corrective action immediately.
+[View Audit Log/Setting History]
+TrekGuider Admin Oversight
+
+
+Уведомление в админ-панели
+
+7. Название: ⏳ Account Deletion Queued
+               * Триггер: Пользователь подтвердил удаление своего аккаунта, инициирована 30-дневная процедура.
+               * Получатель: Администратор.
+               * Тип: Уведомление в админ-панели
+               * Цель: Информировать администратора о предстоящем удалении аккаунта.
+               * Notification Text: User {UserID_or_Email_Placeholder} has confirmed account deletion. Account scheduled for removal in 30 days.
+
+
+XV. Использование Платформы и Лимиты (Продавец)
+Всплывающее (на сайте):
+               1. Название: Storage Warning 💾
+               * Триггер: Использование дискового пространства продавцом достигло X% (например, 80%) от выделенного лимита.
+               * Получатель: Продавец.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Предупредить о скором достижении лимита хранилища.
+               * Push Text: Heads up! You're using {Current_Usage_Percentage_Placeholder}% of your file storage. Time to manage files or consider an upgrade?
+               2. Название: Storage Limit Reached! ⛔
+               * Триггер: Использование дискового пространства продавцом превысило выделенный лимит.
+               * Получатель: Продавец.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Уведомить о превышении лимита и возможных последствиях (например, невозможность загрузки новых файлов).
+               * Push Text: Oops! You've hit your file storage limit. You won't be able to upload new files until you free up space or upgrade your plan
+XVI. Вовлеченность и Активность Пользователей
+Email:
+               1. Название: You're Crushing It! Congrats on {Milestone_Description_Placeholder} on TrekGuider!
+               * Триггер: Автоматическое отслеживание ключевых показателей эффективности продавца (продажи, подписчики и т.д.).
+               * Получатель: Продавец.
+               * Тип: Email
+               * Цель: Поздравить продавца, повысить его мотивацию и лояльность.
+               * Body:
+Hi [Seller_User_Name_Placeholder],
+Wow, check you out! We're absolutely thrilled to congratulate you on hitting a major milestone on TrekGuider: {Milestone_Description_Placeholder}!
+(Examples for Milestone: "Your First 100 Sales!", "Reaching 500 Followers!", "Earning $1,000 on the Platform!")
+This is a fantastic achievement and truly shows off your hard work and the amazing quality of your travel content. Your unique Travel Insights are clearly resonating with explorers!
+We're so proud to have you in our Creator community. Here's to many more successes and adventures ahead!
+Cheers,
+The TrekGuider Crew
+
+
+Всплывающее (на сайте):
+2. Название: Now Following! ✅
+               * Триггер: Пользователь подписывается на обновления/статьи конкретного автора.
+               * Получатель: Пользователь.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Подтвердить успешную подписку.
+               * Push Text: You are now following {Author_Name_Placeholder}. Their new "Travel Insights" will appear in your favorites.
+               3. Название: New Travel Insight! 🗺️
+               * Триггер: Автор, на которого подписан пользователь, публикует новую статью.
+               * Получатель: Пользователь.
+               * Тип: Всплывающее (на сайте) (можно сделать опциональным в настройках)
+               * Цель: Информировать о релевантном новом контенте.
+               * Push Text: {Author_Name_Placeholder} just published: "{Article_Title_Placeholder}". 
+               4. Название: Your Travel Insight is a Hit! 🔥
+               * Триггер: Статья продавца достигает определенного порога просмотров/лайков.
+               * Получатель: Продавец.
+               * Тип: Всплывающее (на сайте) (можно сделать отключаемым или агрегировать)
+               * Цель: Мотивировать продавца, показывать активность вокруг его контента.
+               * Push Text: Your "Travel Insight" - "{Article_Title_Placeholder}" - just hit {X_Views_or_Likes_Count_Placeholder} views/likes! Awesome work!
+               5. Название: New Sale! 💰
+               * Триггер: Продавец продал один из своих разовых цифровых продуктов.
+               * Получатель: Продавец.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Информировать продавца о новой продаже.
+               * Push Text: Ka-ching! You just sold: "{Product_Name_Placeholder}"!
+XVII. Общие Всплывающие Уведомления (UI/UX)
+Всплывающее (на сайте):
+               1. Название: Link Copied! 🔗
+               * Триггер: Пользователь нажимает кнопку "Поделиться" или "Скопировать ссылку".
+               * Получатель: Пользователь.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Подтвердить, что ссылка успешно скопирована.
+               * Push Text: Link copied to your clipboard. Ready to share!
+               2. Название: Title: Settings Saved! ✅
+               * Триггер: Пользователь изменяет и сохраняет настройки своего профиля, уведомлений и т.д.
+               * Получатель: Пользователь.
+               * Тип: Всплывающее (на сайте)
+               * Цель: Подтвердить успешное сохранение изменений.
+               * Push Text: Your settings have been successfully saved.

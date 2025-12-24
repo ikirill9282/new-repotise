@@ -71,9 +71,11 @@ class Backup extends Component
 
       $available_attempts = SessionExpire::get('backup') ?? 0;
       $validator = Validator::make($this->form, [
-        'code' => 'required|string|min:6|max:6|regex:/^[a-zA-Z0-9]+$/',
+        // Allow old 6-char codes for existing users, and new safer 8-15 char codes.
+        'code' => 'required|string|regex:/^(?:[A-Za-z0-9]{6}|[A-Za-z0-9]{8,15})$/',
         'recaptcha_token' => 'required|string',
       ], [
+        'code.regex' => 'Invalid backup code format.',
         'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
       ]);
 

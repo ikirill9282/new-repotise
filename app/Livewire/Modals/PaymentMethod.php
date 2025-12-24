@@ -34,16 +34,32 @@ class PaymentMethod extends Component
         }
 
         if (empty($user->stripe_id)) {
-            $user->createOrGetStripeCustomer();
+            try {
+                $user->createOrGetStripeCustomer();
+            } catch (\Exception $e) {
+                Log::error('Failed to create Stripe customer', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                ]);
+                abort(500, 'Unable to initialize payment. Please contact support.');
+            }
         }
 
-        $intent = Cashier::stripe()->setupIntents->create([
-            'customer' => $user->stripe_id,
-            'payment_method_types' => ['card'],
-            'usage' => 'off_session',
-        ]);
+        try {
+            $intent = Cashier::stripe()->setupIntents->create([
+                'customer' => $user->stripe_id,
+                'payment_method_types' => ['card'],
+                'usage' => 'off_session',
+            ]);
 
-        $this->clientSecret = $intent->client_secret;
+            $this->clientSecret = $intent->client_secret;
+        } catch (\Exception $e) {
+            Log::error('Failed to create Stripe setup intent', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            abort(500, 'Unable to initialize payment. Please contact support.');
+        }
 
         // Dispatch event after a small delay to ensure DOM is ready
         $this->dispatch('payment-method-open');
@@ -86,17 +102,33 @@ class PaymentMethod extends Component
         }
 
         if (empty($user->stripe_id)) {
-            $user->createOrGetStripeCustomer();
+            try {
+                $user->createOrGetStripeCustomer();
+            } catch (\Exception $e) {
+                Log::error('Failed to create Stripe customer in createNewSetupIntent', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                ]);
+                return;
+            }
         }
 
-        // Create a new SetupIntent for each modal opening
-        $intent = Cashier::stripe()->setupIntents->create([
-            'customer' => $user->stripe_id,
-            'payment_method_types' => ['card'],
-            'usage' => 'off_session',
-        ]);
+        try {
+            // Create a new SetupIntent for each modal opening
+            $intent = Cashier::stripe()->setupIntents->create([
+                'customer' => $user->stripe_id,
+                'payment_method_types' => ['card'],
+                'usage' => 'off_session',
+            ]);
 
-        $this->clientSecret = $intent->client_secret;
+            $this->clientSecret = $intent->client_secret;
+        } catch (\Exception $e) {
+            Log::error('Failed to create Stripe setup intent in createNewSetupIntent', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            return;
+        }
         
         // Dispatch event with new client secret
         $this->dispatch('payment-method-client-secret-updated', ['clientSecret' => $this->clientSecret]);
@@ -121,7 +153,15 @@ class PaymentMethod extends Component
             // Dispatch globally (for other components like Funds, Withdraw, etc.)
             $this->dispatch('payment-method-added', $paymentMethod->id);
             
-            $this->dispatch('toastSuccess', ['message' => 'Payment method added successfully.']);
+            // VI.toast.8 (TЗ): Payout Method Added! ✅ (when coming from payout-method verification flow)
+            if (session()->pull('payout_method_verified', false)) {
+                $this->dispatch('toastSuccess', [
+                    'heading' => 'Payout Method Added! ✅',
+                    'message' => 'Your new payout method has been successfully added and verified.',
+                ]);
+            } else {
+                $this->dispatch('toastSuccess', ['message' => 'Payment method added successfully.']);
+            }
             $this->dispatch('payment-method-close');
             $this->dispatch('closeModal');
         } catch (\Throwable $exception) {

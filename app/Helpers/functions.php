@@ -5,6 +5,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Likes;
 use Illuminate\Support\Facades\Crypt;
+use Mews\Purifier\Facades\Purifier;
 
 if (! function_exists('print_var')) {
   function print_var($name, Collection|array|null $resource = null)
@@ -269,5 +270,27 @@ if (! function_exists('stripe_webhook_secret')) {
     
     // Fallback to config/env
     return config('services.stripe.webhook_secret') ?? config('cashier.webhook.secret');
+  }
+}
+
+if (! function_exists('rich_text')) {
+  /**
+   * Render user/admin-provided text as safe HTML.
+   *
+   * - If input already contains HTML tags, we sanitize and return it.
+   * - If input is plain text, we preserve line breaks via <br> and sanitize.
+   */
+  function rich_text(?string $value, string $profile = 'default'): string
+  {
+    $value = $value ?? '';
+
+    // Detect presence of HTML tags (common for Word/Docs pastes).
+    $hasHtml = $value !== strip_tags($value);
+
+    $html = $hasHtml
+      ? $value
+      : nl2br(e($value));
+
+    return Purifier::clean($html, $profile);
   }
 }

@@ -8,6 +8,7 @@ use App\Filament\Widgets\Concerns\HasDashboardDateRange;
 use App\Models\Product;
 use App\Enums\Status;
 use App\Filament\Resources\ProductResource;
+use Illuminate\Support\Facades\Log;
 
 class ProductsWidget extends BaseWidget
 {
@@ -22,6 +23,9 @@ class ProductsWidget extends BaseWidget
 
     protected function getStats(): array
     {
+        // #region agent log
+        Log::info('DEBUG: ProductsWidget getStats() entry', ['hypothesisId' => 'H']);
+        // #endregion
         // Активные товары (не зависит от периода)
         $activeProducts = Product::query()
             ->where('status_id', Status::ACTIVE)
@@ -32,6 +36,9 @@ class ProductsWidget extends BaseWidget
             ->where('status_id', Status::PENDING)
             ->count();
 
+        // #region agent log
+        Log::info('DEBUG: ProductsWidget getStats() return', ['hypothesisId' => 'H', 'activeProducts' => $activeProducts, 'pendingProducts' => $pendingProducts]);
+        // #endregion
         return [
             Stat::make('Active Products', number_format($activeProducts))
                 ->description('Published')

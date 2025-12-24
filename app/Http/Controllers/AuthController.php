@@ -148,6 +148,12 @@ class AuthController extends Controller
         Session::regenerate();
         ReferalPromocode::dispatch($user);
 
+        // I.toast.5 (TЗ): Email Confirmed! ✅
+        $request->session()->flash('toast_success', [
+          'message' => 'Your email address has been successfully verified.',
+          'heading' => 'Email Confirmed! ✅',
+        ]);
+
         // If seller, redirect to profile (not verification page) - new logic
         // Seller can use all tools, but payout will be disabled until Full Name is set
         if (boolval($valid['seller'])) {

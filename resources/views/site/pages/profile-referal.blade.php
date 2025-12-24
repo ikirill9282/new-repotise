@@ -113,8 +113,6 @@
 
             </ul>
 
-            <x-link href="{{ route('referal') }}" class="mt-2">Learn more</x-link>
-
           </div>
           <div class="w-[1px] bg-gray md:!mx-2"></div>
 
@@ -140,7 +138,7 @@
 
             </ul>
 
-            <x-link href="{{ route('sellers') }}" class="mt-2">Learn more</x-link>
+            <x-link href="{{ route('referal') }}" class="mt-2">Learn more</x-link>
           </div>
         </div>
 

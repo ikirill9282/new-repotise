@@ -21,7 +21,7 @@ class TwofaDisable extends Component
     protected array $messages = [
         'code.digits' => 'The code must consist of 6 digits.',
         'code.required_without' => 'Please enter a verification code from your app or a backup reset code.',
-        'backupCode.size' => 'The backup reset code must contain 6 characters.',
+        'backupCode.regex' => 'The backup reset code must be 8-15 characters (letters/numbers).',
         'backupCode.alpha_num' => 'The backup reset code can only contain letters and numbers.',
         'backupCode.required_without' => 'Please enter a backup reset code or a verification code from your app.',
     ];
@@ -60,7 +60,8 @@ class TwofaDisable extends Component
 
         $validated = $this->validate([
             'code' => ['nullable', 'digits:6', 'required_without:backupCode'],
-            'backupCode' => ['nullable', 'alpha_num', 'size:6', 'required_without:code'],
+            // Allow old 6-char codes for existing users, and new safer 8-15 char codes.
+            'backupCode' => ['nullable', 'string', 'regex:/^(?:[A-Za-z0-9]{6}|[A-Za-z0-9]{8,15})$/', 'required_without:code'],
         ], $this->messages);
 
         $authCode = preg_replace('/\s+/', '', $validated['code'] ?? '');

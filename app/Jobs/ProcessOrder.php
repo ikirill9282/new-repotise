@@ -15,8 +15,10 @@ use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Stripe\PaymentIntent;
 use App\Jobs\DeliveryGift;
+use App\Mail\OrderConfirmed;
 
 class ProcessOrder implements ShouldQueue, ShouldBeUnique
 {
@@ -48,6 +50,28 @@ class ProcessOrder implements ShouldQueue, ShouldBeUnique
         $paymentIntent = $this->order->getSuccessPayment()?->asStripePaymentIntent();
         
         if ($paymentIntent->status == PaymentIntent::STATUS_SUCCEEDED) {
+          // II.email.1 (TЗ): Order confirmed (buyer gets access instructions)
+          try {
+            $buyer = $this->order->buyer ?? $this->order->user;
+
+            // For gift orders, buyer may be stored in stripe metadata; prefer it when available
+            if ($this->order->gift == 1) {
+              $buyerId = $this->getBuyerUserIdForGift();
+              if ($buyerId) {
+                $buyer = User::find($buyerId) ?? $buyer;
+              }
+            }
+
+            if ($buyer) {
+              $this->order->loadMissing(['order_products.product']);
+              Mail::to($buyer->email)->send(new OrderConfirmed($buyer, $this->order));
+            }
+          } catch (\Throwable $e) {
+            Log::warning('Failed to send order confirmation email', [
+              'order_id' => $this->order->id,
+              'error' => $e->getMessage(),
+            ]);
+          }
 
           $amount = $paymentIntent->amount / 100; // cents!
           

@@ -200,6 +200,9 @@
   .user-custom-text p {
     font-size: 1rem !important;
     line-height: 1.5rem !important;
+    /* Tailwind preflight resets p margins to 0; restore readable paragraph spacing.
+       Inline margins (from Word/Docs) will still win over this rule. */
+    margin: 0 0 0.75rem 0;
   }
 
   .user-custom-text h1,

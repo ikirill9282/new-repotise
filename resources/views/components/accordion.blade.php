@@ -23,7 +23,7 @@
               </button>
           </div>
           <div id="collapse-{{ $key }}" class="accordion-collapse collapse" data-bs-parent="{{ $parent }}">
-            <p class="py-3">{{ $item['text'] ?? '' }}</p>
+            <div class="py-3 user-custom-text">{!! rich_text($item['text'] ?? '') !!}</div>
           </div>
       </div>
     @endforeach

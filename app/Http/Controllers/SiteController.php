@@ -54,6 +54,7 @@ class SiteController extends Controller
     $tags = User::whereHas('roles', fn($query) => $query->where('name', 'creator'))
       ->orderByDesc('id')
       ->select('username')
+      ->limit(5)
       ->get()
       ->pluck('username')
       ->map(fn($val) => ['title' => "@$val"]);

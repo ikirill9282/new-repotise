@@ -39,6 +39,7 @@
                         <div style="min-width: 150px;">
                             <x-form.select 
                                 name="search-sort"
+                                :compact="true"
                                 :label="$currentSort === 'relevance' ? 'Relevance' : ($currentSort === 'popular' ? 'Most Popular' : ($currentSort === 'newest' ? 'Newest First' : 'Oldest First'))"
                                 :options="[
                                     'relevance' => 'Relevance',

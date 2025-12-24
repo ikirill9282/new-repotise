@@ -190,6 +190,15 @@ class Withdraw extends Component
             return;
         }
 
+        // VI.toast.9 (TЗ): Verification Needed for Withdrawal ⚠️
+        if (!(bool) ($user->verified ?? false)) {
+            $this->dispatch('toastError', [
+                'heading' => 'Verification Needed for Withdrawal ⚠️',
+                'message' => 'To withdraw funds, please complete your account verification first.',
+            ]);
+            return;
+        }
+
         // Validate 2FA if enabled
         if ($user->twofa) {
             $this->validateTwofa($user);

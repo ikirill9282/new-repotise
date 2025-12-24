@@ -279,12 +279,15 @@
                                     {{-- Phone Number (Optional) --}}
                                     <div class="form-group w-full" data-field="phone">
                                   <label>
-                                            <span class="label-name">Phone Number <span style="font-weight: normal; color: #666;">(Optional)</span></span>
+                                            <span class="label-name flex items-center gap-1">
+                                                <span>Phone Number</span>
+                                                <span class="font-normal text-[#666] whitespace-nowrap">(Optional)</span>
+                                            </span>
                                       <input 
                                           id="phone" 
                                           type="tel" 
                                           name="phone" 
-                                                placeholder="Your phone number (optional)"
+                                                placeholder="Your phone number"
                                           class="@error('phone') error @enderror"
                                           data-input="phone"
                                                 value="{{ old('phone', $user->options->phone ?? '') }}"
@@ -514,7 +517,7 @@
                                     {{-- Текст соглашения перед кнопкой --}}
                                     <div class="info" style="margin: 10px 0;">
                                         <span>
-                                            By clicking 'Continue', you certify that the information provided is accurate and truthful. This data will be used for account verification, tax form generation, and you are providing your digital signature for these purposes. You also agree to our <a href="{{ url('/policies') }}">Terms of Service</a>, <a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a>, and <a href="{{ url('/policies') }}">Other Terms</a>.
+                                            By clicking 'Continue', you certify that the information provided is accurate and truthful. This data will be used for account verification, tax form generation, and you are providing your digital signature for these purposes. You also agree to our <a href="{{ url('/policies/terms-and-conditions') }}">Terms of Service</a>, <a href="{{ url('/policies/privacy-policy') }}">Privacy Policy</a>, and <a href="{{ route('policies') }}">Other Terms</a>.
                                         </span>
                                     </div>
 
@@ -1087,6 +1090,36 @@
                         }
                     }
                 }
+
+                // Close calendar on outside click (AirDatepicker doesn't always do it by default
+                // when we force-open it on input focus/click).
+                if (input._birthdayOutsideClickHandler) {
+                    document.removeEventListener('click', input._birthdayOutsideClickHandler, true);
+                }
+                input._birthdayOutsideClickHandler = function(e) {
+                    try {
+                        const target = e.target;
+                        const calendarEl = birthdayPicker?.$datepicker || document.querySelector('.air-datepicker');
+                        const calendarIcon = document.getElementById('calendar-icon-' + birthdayInputId);
+
+                        // Ignore clicks on input or calendar icon (those open the picker)
+                        if (target === input || input.contains(target) || (calendarIcon && (target === calendarIcon || calendarIcon.contains(target)))) {
+                            return;
+                        }
+
+                        // Ignore clicks inside the datepicker itself
+                        if (calendarEl && calendarEl.contains(target)) {
+                            return;
+                        }
+
+                        if (birthdayPicker && typeof birthdayPicker.hide === 'function') {
+                            birthdayPicker.hide();
+                        }
+                    } catch (err) {
+                        // no-op
+                    }
+                };
+                document.addEventListener('click', input._birthdayOutsideClickHandler, true);
                 
                 const calendarIcon = document.getElementById('calendar-icon-' + birthdayInputId);
                 if (calendarIcon) {
@@ -1253,6 +1286,20 @@
     </script>
 
     <style>
+        /* Field error highlight (required by design) */
+        .verification-form__form input.error,
+        .verification-form__form textarea.error,
+        .verification-form__form select.error {
+            border-color: #dc3545 !important;
+        }
+
+        .verification-form__form input.error:focus,
+        .verification-form__form textarea.error:focus,
+        .verification-form__form select.error:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15);
+        }
+
         .verification-form__row {
             display: flex;
             gap: 30px;

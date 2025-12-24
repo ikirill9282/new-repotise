@@ -145,4 +145,16 @@
   .quill-editor .ql-editor {
     min-height: 400px !important;
   }
+  
+  /* Сохраняем все inline стили из Word - они будут применяться напрямую */
+  /* Quill будет сохранять все стили из атрибута style при вставке */
+  .quill-editor .ql-editor [style] {
+    /* Все стили из Word будут сохранены в атрибуте style и применятся автоматически */
+  }
+  
+  /* Убеждаемся, что параграфы сохраняют свои стили */
+  .quill-editor .ql-editor p[style],
+  .quill-editor .ql-editor div[style] {
+    /* Стили из атрибута style применяются автоматически */
+  }
 </style>

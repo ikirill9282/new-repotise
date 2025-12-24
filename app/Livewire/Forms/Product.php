@@ -117,7 +117,9 @@ class Product extends Component
         // Заполняем SEO описание только если оно пустое
         if (empty($this->fields['seo_text']) && !empty($value)) {
           // Убираем HTML теги и получаем чистый текст
-          $plainText = strip_tags($value);
+          // Убеждаемся что value - это строка, а не массив
+          $valueString = is_array($value) ? '' : (string)$value;
+          $plainText = strip_tags($valueString);
           $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
           $plainText = preg_replace('/\s+/', ' ', trim($plainText));
           $this->fields['seo_text'] = mb_substr($plainText, 0, 160);

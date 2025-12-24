@@ -1229,9 +1229,40 @@ aside .login svg {
   margin: 0 auto;
 }
 
+.empty-cart .top_group_fav {
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-cart .top_group_fav .left_text {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .placing_order .about_block .left_form {
   min-width: auto !important;
   width: 100%;
+}
+
+.jq-toast-single{
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.jq-toast-single h2{
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.jq-toast-single a{
+  font-size: 14px;
+}
+
+.close-jq-toast-single{
+  font-size: 18px;
+  line-height: 1;
 }
 
 .text_cost span {

@@ -14,6 +14,7 @@ class ProfileProduct extends Component
 {
 
   public $all_checked = false;
+  public array $selected = [];
 
   public int $status_id;
 
@@ -31,6 +32,54 @@ class ProfileProduct extends Component
 
     if (!empty($sorting)) {
       $this->sorting = $sorting;
+    }
+
+    $options = Auth::user()?->options;
+    $this->all_checked = (bool) ($options?->showcase_products_only_selected ?? false);
+
+    // store encrypted ids for UI consistency
+    $this->selected = Auth::user()
+      ->products()
+      ->where('show_on_creator_page', true)
+      ->pluck('id')
+      ->map(fn ($id) => Crypt::encrypt($id))
+      ->values()
+      ->all();
+  }
+
+  public function updatedAllChecked($value): void
+  {
+    $user = Auth::user();
+    if (!$user) return;
+
+    $user->options()->updateOrCreate(
+      ['user_id' => $user->id],
+      ['showcase_products_only_selected' => (bool) $value]
+    );
+  }
+
+  public function updatedSelected(): void
+  {
+    $user = Auth::user();
+    if (!$user) return;
+
+    $ids = collect($this->selected)
+      ->filter()
+      ->map(function ($encrypted) {
+        try {
+          return (int) Crypt::decrypt($encrypted);
+        } catch (\Throwable $e) {
+          return null;
+        }
+      })
+      ->filter()
+      ->values()
+      ->all();
+
+    // Reset all first, then set selected
+    $user->products()->update(['show_on_creator_page' => false]);
+    if (!empty($ids)) {
+      $user->products()->whereIn('id', $ids)->update(['show_on_creator_page' => true]);
     }
   }
 

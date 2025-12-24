@@ -24,6 +24,8 @@ class Funds extends Component
     public ?string $selectedPaymentMethod = null;
 
     public array $paymentMethods = [];
+    public ?string $setupIntentSecret = null;
+    public string $publishableKey = '';
 
     public float $processingPercent = 2.9;
     public float $processingFlat = 0.30;
@@ -34,8 +36,14 @@ class Funds extends Component
 
         $this->paymentMethods = $this->resolvePaymentMethods();
 
-        if (empty($this->selectedPaymentMethod) && !empty($this->paymentMethods)) {
-            $this->selectedPaymentMethod = $this->paymentMethods[0]['id'];
+        $this->publishableKey = stripe_key() ?? '';
+
+        // Default to "new card" to immediately show Stripe form (user can still pick saved one)
+        $this->selectedPaymentMethod = 'new';
+
+        $this->prepareSetupIntent();
+        if ($this->setupIntentSecret) {
+            $this->dispatch('setup-intent-updated', $this->setupIntentSecret);
         }
     }
 
@@ -84,6 +92,48 @@ class Funds extends Component
         return $methods;
     }
 
+    protected function prepareSetupIntent(): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            $this->setupIntentSecret = null;
+            return;
+        }
+
+        try {
+            if (empty($user->stripe_id)) {
+                $user->createOrGetStripeCustomer();
+            }
+
+            $params = [
+                'payment_method_types' => ['card'],
+            ];
+
+            if (!empty($user->stripe_id)) {
+                $params['customer'] = $user->stripe_id;
+            }
+
+            $intent = Cashier::stripe()->setupIntents->create($params);
+            $this->setupIntentSecret = $intent->client_secret;
+        } catch (\Throwable $exception) {
+            Log::warning('Unable to prepare setup intent for funds modal.', [
+                'user_id' => $user?->id,
+                'error' => $exception->getMessage(),
+            ]);
+            $this->setupIntentSecret = null;
+        }
+    }
+
+    public function updatedSelectedPaymentMethod($value): void
+    {
+        if ($value === 'new') {
+            $this->prepareSetupIntent();
+            if ($this->setupIntentSecret) {
+                $this->dispatch('setup-intent-updated', $this->setupIntentSecret);
+            }
+        }
+    }
+
     protected function processingFee(float $amount): float
     {
         if ($amount <= 0) {
@@ -123,7 +173,7 @@ class Funds extends Component
             return;
         }
 
-        // Validate data
+        // Validate amount early
         $this->validate([
             'amount' => ['required', 'numeric', 'min:1'],
             'selectedPaymentMethod' => ['required', 'string'],
@@ -132,6 +182,38 @@ class Funds extends Component
             'amount.min' => 'The amount must be at least $1.00.',
             'selectedPaymentMethod.required' => 'Please select a payment method.',
         ]);
+
+        // If user chose new card, confirmation happens in JS (Stripe Payment Element),
+        // then JS will call processWithPaymentMethod($paymentMethodId).
+        if ($this->selectedPaymentMethod === 'new') {
+            if (!$this->setupIntentSecret) {
+                $this->prepareSetupIntent();
+            }
+
+            if (!$this->setupIntentSecret) {
+                $this->dispatch('toastError', ['message' => 'Unable to initialize card form. Please try again later.']);
+                return;
+            }
+
+            $this->dispatch('funds-check-result', ['action' => 'create']);
+            return;
+        }
+
+        $this->processWithPaymentMethod($this->selectedPaymentMethod);
+    }
+
+    public function processWithPaymentMethod(?string $paymentMethodId): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            $this->dispatch('toastError', ['message' => 'You must be logged in to add funds.']);
+            return;
+        }
+
+        if (!$paymentMethodId) {
+            $this->dispatch('toastError', ['message' => 'Please select a payment method.']);
+            return;
+        }
 
         $summary = $this->buildSummary();
 
@@ -148,7 +230,7 @@ class Funds extends Component
                 'customer' => $user->stripe_id,
                 'amount' => (int) ($summary['total_charge'] * 100), // Convert to cents
                 'currency' => 'usd',
-                'payment_method' => $this->selectedPaymentMethod,
+                'payment_method' => $paymentMethodId,
                 'confirmation_method' => 'automatic',
                 'confirm' => true,
                 'return_url' => route('payment.success'),

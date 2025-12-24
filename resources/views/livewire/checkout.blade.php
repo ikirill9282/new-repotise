@@ -299,7 +299,7 @@
         </section>
     @else
       <div
-        class="container empty-container !pt-10 !pb-10 {{ $order?->products && $order->products->isNotEmpty() ? 'hidden' : '' }}">
+        class="container empty-container !pt-10 !pb-10 flex justify-center items-center {{ $order?->products && $order->products->isNotEmpty() ? 'hidden' : '' }}">
         @include('site.components.favorite.empty', [
           'text' => 'Cart',
           'class' => 'empty-cart',
@@ -311,7 +311,7 @@
 
 @script
   <script>
-      const stripe = Stripe('pk_test_51QyRYMAcKvFfYWUGHWNhmA3IueKw7pitQONcJire1VVLx4t36rfGx54OB78EFZj6kKaS12M6GmzsOofOzfSjApKS00B8mwb7tR');
+      const stripe = Stripe('{{ config('cashier.key') }}');
       const paymentErrorUrl = '{{ route('payment.error') }}';
       const redirectToPaymentError = (code = null, declineCode = null) => {
         try {
@@ -327,14 +327,25 @@
           window.location.href = paymentErrorUrl;
         }
       };
-      const clientSecret = '{{ $this->clientSecret }}';
+      let clientSecret = '{{ $this->clientSecret }}';
       let elements = null;
       let paymentElement = null;
+
+      // Сохраняем clientSecret в глобальной переменной для обновления
+      if (typeof window !== 'undefined') {
+        window.__stripeClientSecret = clientSecret;
+      }
 
       const mountStripePayment = () => {
         const paymentContainer = document.getElementById('payment');
         
-        if (!paymentContainer || !clientSecret) {
+        if (!paymentContainer || !clientSecret || clientSecret.trim() === '') {
+          console.warn('Cannot mount Stripe payment: missing clientSecret or container');
+          // Пытаемся пересоздать setup intent
+          if (clientSecret === '') {
+            console.log('Attempting to recreate setup intent...');
+            $wire.call('recreateSetupIntent');
+          }
           return;
         }
 
@@ -347,10 +358,27 @@
           if (!elements) {
             elements = stripe.elements({clientSecret});
             paymentElement = elements.create('payment');
+            
+            // Обработка ошибок загрузки элемента
+            paymentElement.on('loaderror', (event) => {
+              console.error('Stripe payment element load error:', event.error);
+              // Пытаемся пересоздать setup intent при ошибке 400
+              if (event.error && (event.error.code === 'resource_missing' || event.error.type === 'invalid_request_error')) {
+                console.log('Setup intent invalid, recreating...');
+                $wire.call('recreateSetupIntent');
+              } else if (event.error) {
+                console.error('Payment element error:', event.error);
+              }
+            });
           }
           paymentElement.mount('#payment');
         } catch (error) {
           console.error('Error mounting Stripe payment element:', error);
+          // Пытаемся пересоздать setup intent при ошибке
+          if (error.message && error.message.includes('setup_intent')) {
+            console.log('Setup intent error detected, recreating...');
+            $wire.call('recreateSetupIntent');
+          }
         }
       };
 
@@ -382,6 +410,40 @@
             }
           }
         });
+      });
+
+      // Обработка события пересоздания setup intent
+      $wire.on('setup-intent-recreated', (data) => {
+        const newClientSecret = data[0]?.clientSecret;
+        if (newClientSecret && newClientSecret.trim() !== '') {
+          // Обновляем clientSecret
+          clientSecret = newClientSecret;
+          const scriptTag = document.querySelector('script[data-client-secret]');
+          if (scriptTag) {
+            scriptTag.setAttribute('data-client-secret', newClientSecret);
+          }
+          
+          // Размонтируем старый элемент
+          if (paymentElement) {
+            try {
+              paymentElement.unmount();
+            } catch (e) {
+              console.warn('Error unmounting payment element:', e);
+            }
+            paymentElement = null;
+            elements = null;
+          }
+
+          // Обновляем глобальную переменную clientSecret
+          if (typeof window !== 'undefined') {
+            window.__stripeClientSecret = newClientSecret;
+          }
+
+          // Монтируем заново
+          setTimeout(() => {
+            mountStripePayment();
+          }, 200);
+        }
       });
 
       const btn = document.getElementById('submit-btn');
@@ -447,6 +509,11 @@
 
             if (response.action === 'create') {
               try {
+                // Проверяем валидность clientSecret
+                if (!clientSecret || clientSecret.trim() === '') {
+                  throw new Error('Payment form is not ready. Please refresh the page.');
+                }
+
                 // Убеждаемся, что elements инициализирован перед использованием
                 if (!elements && clientSecret) {
                   elements = stripe.elements({clientSecret});
@@ -480,11 +547,21 @@
                   return;
                 }
 
+                if (!setupIntent || !setupIntent.payment_method) {
+                  throw new Error('Failed to create payment method. Please try again.');
+                }
+
                 $wire.dispatch('makePayment', { pm_id: setupIntent.payment_method });
               } catch (setupError) {
                 console.error('Stripe setup confirmation failed', setupError);
                 toggleButtonLoading(false);
-                redirectToPaymentError(setupError?.code || null, setupError?.decline_code || null);
+                
+                // Если это ошибка валидации, показываем сообщение пользователю
+                if (setupError.message && setupError.message.includes('refresh')) {
+                  alert(setupError.message);
+                } else {
+                  redirectToPaymentError(setupError?.code || null, setupError?.decline_code || null);
+                }
               }
             } else {
               $wire.dispatch('makePayment', { pm_id: response.action });

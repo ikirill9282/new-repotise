@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class UserBackup extends Model
 {
@@ -26,6 +27,7 @@ class UserBackup extends Model
 
     protected static function makeCode(): string
     {
-      return substr(trim(preg_replace('/[^a-zA-Z0-9]/is', '', base64_encode(random_bytes(10))), '='), -6, 6);
+      // Use a longer alphanumeric code (12 chars) for better security.
+      return Str::random(12);
     }
 }

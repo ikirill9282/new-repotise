@@ -36,8 +36,9 @@
     @endphp
     
     @if($recaptchaSiteKey)
-    // reCAPTCHA v2 callback for password reset
-    window.onRecaptchaV2Load = function() {
+    // Register reCAPTCHA v2 renderer for password reset (do not overwrite global callback)
+    window.recaptchaCallbacks = window.recaptchaCallbacks || [];
+    window.recaptchaCallbacks.push(function () {
       Livewire.hook('morph.updated', ({ el, component }) => {
         if (component.showRecaptchaV2 && document.getElementById('recaptcha-v2-container-reset-password') && !document.getElementById('recaptcha-v2-widget-reset-password')) {
           grecaptcha.render('recaptcha-v2-container-reset-password', {
@@ -51,7 +52,7 @@
           });
         }
       });
-    };
+    });
     @endif
   </script>
   @endpush

@@ -1,18 +1,26 @@
 <div id="reviews">
   <div class="flex justify-between items-center mb-4">
     <div class="font-bold text-2xl">Reviews</div>
-    <div class="block">
-      <label class="text-gray" for="sorting-reviews">Sort By:</label>
-      <select
-        class="tg-select"
-        wire:model="sorting"
-        id="sorting-reviews"
-      >
-        <option value="newest">Newest First</option>
-        <option value="oldest">Oldest First</option>
-        <option value="rating_high">Highest Rating</option>
-        <option value="rating_low">Lowest Rating</option>
-      </select>
+    <div class="flex items-center gap-2">
+      <label class="text-gray">Sort By:</label>
+      @php
+        $reviewSortOptions = [
+          'newest' => 'Newest First',
+          'oldest' => 'Oldest First',
+          'rating_high' => 'Highest Rating',
+          'rating_low' => 'Lowest Rating',
+        ];
+      @endphp
+      <x-form.select
+        name="sorting-reviews"
+        :compact="true"
+        :tooltip="false"
+        labelClass="!text-black"
+        wire:model.live="sorting"
+        value="{{ $sorting ?? 'newest' }}"
+        :label="$reviewSortOptions[$sorting ?? 'newest'] ?? 'Newest First'"
+        :options="$reviewSortOptions"
+      />
     </div>
   </div>
 

@@ -1,4 +1,4 @@
-<div wire:poll.10s="resetNotifications" class="flex flex-col justify-start gap-2 items-stretch w-full">
+<div wire:poll.10s="resetNotifications" class="flex flex-col justify-start gap-2 items-stretch w-full text-base leading-snug">
   @if($this->notifications->isNotEmpty())
     @foreach ($this->notifications as $notify)
       <div class="w-full p-3 rounded-lg border flex justify-between items-center

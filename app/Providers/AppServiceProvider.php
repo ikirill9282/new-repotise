@@ -42,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
       
       // Configure Stripe from Integration model if available
       $this->configureStripeFromIntegration();
+      $this->configureMailFrom();
 
       // Register observers
       Article::observe(ArticleObserver::class);
@@ -140,6 +141,33 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.debug')) {
           Log::debug('Could not load Stripe config from Integration: ' . $e->getMessage());
         }
+      }
+    }
+
+    /**
+     * Ensure outgoing emails use the platform sender identity.
+     *
+     * This protects against misconfigured MAIL_FROM_* (e.g. a personal Gmail),
+     * which hurts deliverability and causes spam placement.
+     */
+    protected function configureMailFrom(): void
+    {
+      $desiredAddress = 'no-reply@trekguider.com';
+      $desiredName = 'TrekGuider';
+
+      $currentAddress = (string) config('mail.from.address', '');
+      $currentName = (string) config('mail.from.name', '');
+
+      $addressLooksWrong = $currentAddress === ''
+        || str_contains(strtolower($currentAddress), '@gmail.')
+        || str_contains(strtolower($currentAddress), '@googlemail.');
+
+      $nameLooksWrong = $currentName === ''
+        || str_contains(strtolower($currentName), 'insights');
+
+      if ($addressLooksWrong || $nameLooksWrong) {
+        Config::set('mail.from.address', $desiredAddress);
+        Config::set('mail.from.name', $desiredName);
       }
     }
     

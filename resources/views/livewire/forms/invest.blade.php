@@ -68,8 +68,9 @@
   @endphp
   
   @if($recaptchaSiteKey)
-  // reCAPTCHA v2 callback for invest form
-  window.onRecaptchaV2Load = function() {
+  // Register reCAPTCHA v2 renderer for invest form (do not overwrite global callback)
+  window.recaptchaCallbacks = window.recaptchaCallbacks || [];
+  window.recaptchaCallbacks.push(function () {
     Livewire.hook('morph.updated', ({ el, component }) => {
       if (document.getElementById('recaptcha-v2-container-invest') && !document.getElementById('recaptcha-v2-widget-invest')) {
         grecaptcha.render('recaptcha-v2-container-invest', {
@@ -83,7 +84,7 @@
         });
       }
     });
-  };
+  });
   @endif
 </script>
 @endpush

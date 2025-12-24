@@ -20,7 +20,7 @@ $news = \App\Models\Article::getLastNews(5);
                               <p>{{ $news_item->title }}</p>
                             </a>
                             <a href="{{ $news_item->makeFeedUrl() }}">
-                              <img class="!w-full" src="{{ $news_item->preview->image }}" alt="News image {{ $news_item->id }}">
+                              <img class="!w-full" src="{{ $news_item->preview?->image ?? '/storage/images/img_articles.png' }}" alt="News image {{ $news_item->id }}">
                             </a>
                         </div>
                       </div>

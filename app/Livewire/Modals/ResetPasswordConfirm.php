@@ -103,8 +103,8 @@ class ResetPasswordConfirm extends Component
 
     public function getResendExpire()
     {
-      if (Carbon::fromTimestamp($this->resend)->addMinutes(3)->isFuture()) {
-        return Carbon::fromTimestamp($this->resend)->addMinutes(3)->timestamp * 1000;
+      if (Carbon::fromTimestamp($this->resend)->addMinutes(1)->isFuture()) {
+        return Carbon::fromTimestamp($this->resend)->addMinutes(1)->timestamp * 1000;
       }
       $this->resend = null;
       return null;
@@ -198,6 +198,11 @@ class ResetPasswordConfirm extends Component
         'email' => $user->email,
       ]);
 
+      // I.toast.6 (TЗ): Password Updated! 🔒
+      $this->dispatch('toastSuccess', [
+        'message' => 'Your password has been successfully changed.',
+        'heading' => 'Password Updated! 🔒',
+      ]);
       $this->dispatch('openModal', 'reset-password-success');
     }
 

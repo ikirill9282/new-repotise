@@ -33,17 +33,18 @@
         @endforeach
       </div>
       @if($this->sortable && !empty($this->sortingOptions))
-        <div class="sm:ml-auto">
-          <label class="text-gray" for="table-sorting-select">Sort By:</label>
-          <select
-            class="tg-select"
+        <div class="sm:ml-auto flex items-center gap-2">
+          <label class="text-gray">Sort By:</label>
+          <x-form.select
+            name="table-sorting-select"
+            :compact="true"
+            :tooltip="false"
+            labelClass="!text-black"
             wire:model.live="sorting"
-            id="table-sorting-select"
-            >
-            @foreach($this->sortingOptions as $value => $label)
-              <option value="{{ $value }}">{{ $label }}</option>
-            @endforeach
-          </select>
+            value="{{ $this->sorting }}"
+            :label="$this->sortingOptions[$this->sorting] ?? (collect($this->sortingOptions)->first() ?? 'Select')"
+            :options="$this->sortingOptions"
+          />
         </div>
       @endif
     </div>

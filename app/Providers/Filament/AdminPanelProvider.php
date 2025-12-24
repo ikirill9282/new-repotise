@@ -22,17 +22,39 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\Facades\Vite;
+use Filament\Support\Facades\FilamentView;
+use Illuminate\Contracts\View\View;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function boot(): void
     {
-      FilamentAsset::register([
-        Css::make('site', asset('/assets/css/site.css')),
-        Css::make('site-tw', Vite::useHotFile('hot')
-            ->asset('resources/css/app.css','build'),
-        )
-      ]);
+      // Temporarily disabled to check if it's causing the issue
+      // Register CSS fix for content overlay issue
+      // Using Vite to compile the CSS file
+      // FilamentAsset::register([
+      //   Css::make('filament-overlay-fix', Vite::asset('resources/css/filament-overlay-fix.css')),
+      // ]);
+      
+      // Add global styles via renderHook in head
+      // FilamentView::registerRenderHook(
+      //   'panels::head.end',
+      //   fn (): View => view('filament.hooks.content-visibility-fix')
+      // );
+      
+      // Also add styles in body start for immediate application
+      // FilamentView::registerRenderHook(
+      //   'panels::body.start',
+      //   fn (): View => view('filament.hooks.content-visibility-fix')
+      // );
+      
+      // Temporarily disabled to check if custom CSS is hiding widgets
+      // FilamentAsset::register([
+      //   Css::make('site', asset('/assets/css/site.css')),
+      //   Css::make('site-tw', Vite::useHotFile('hot')
+      //       ->asset('resources/css/app.css','build'),
+      //   )
+      // ]);
       
       // Filament::registerStyles([
       //     'https://unpkg.com/tippy.js@6/dist/tippy.css',

@@ -23,11 +23,14 @@
     load(query = '') {
       axios.get('/api/data/{{ $source }}', { params: { q: query } })
         .then(response => {
-          this.options = response.data.length 
+          this.options = response.data && response.data.length 
             ? response.data
             : this.getEmptyOptions();
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          console.error('Error loading {{ $source }}:', error);
+          this.options = this.getEmptyOptions();
+        });
     },
     pushVal(val) {
       // Обрабатываем вставку нескольких тегов через запятую
@@ -192,7 +195,7 @@
       ];
     },
     isEmptyOptions() {
-      return !this.options.filter(elem => elem.key !== 'empty').lenght;
+      return !this.options.filter(elem => elem.key !== 'empty').length;
     },
     setVal(val) {
       this.$refs.value.value = val;
@@ -202,6 +205,12 @@
 
   x-init="() => {
     load();
+    // Убеждаемся, что данные загружены перед показом списка
+    setTimeout(() => {
+      if (options.length === 0) {
+        load();
+      }
+    }, 100);
     $watch('selected', value => {
       const val = value.map(elem => elem.key).join(',');
       setVal(val);
@@ -223,6 +232,7 @@
       <input 
         x-ref="input"
         x-on:focus="showList()"
+        x-on:click="showList()"
         x-on:input="(evt) => {
           const value = evt.target.value;
           // Если введена запятая, добавляем тег до запятой

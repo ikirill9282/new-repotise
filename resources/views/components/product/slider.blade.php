@@ -71,7 +71,7 @@
                   {{ $cart->inCart($product?->id) ? 'View Cart' : print_var('cart_button_text', $variables ?? []) ?? 'Add to cart' }}
                 </x-btn>
             </div>
-            <div class="text-gray text-nowrap overflow-hidden text-ellipsis">
+            <div class="text-gray text-nowrap overflow-hidden text-ellipsis min-h-[1.5rem]">
               <a 
                 class="transition !text-inherit hover:!text-active" 
                 href="{{ $product->makeUrl() }}"
@@ -79,7 +79,7 @@
                 {{ \Illuminate\Support\Str::limit($product->title, 50, '...') }}
               </a>
             </div>
-            <div class="flex justify-start items-center gap-2">
+            <div class="flex justify-start items-center gap-2 min-h-[1.5rem]">
                 <div class="">{{ currency($product->getPrice()) }}</div>
                 <div class="text-gray line-through">{{ currency($product->getPriceWithoutDiscount()) }}</div>
             </div>

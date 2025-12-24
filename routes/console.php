@@ -41,6 +41,12 @@ use Stripe\Price;
 Schedule::command('app:check-mailgun-log')->everyFifteenMinutes();
 Schedule::command('app:clear-expires-images')->hourlyAt(5);
 Schedule::command('queue-monitor:stale')->daily();
+// III.email.6 (TЗ): Card expiring soon reminder (subscriptions)
+Schedule::command('app:notify-expiring-subscription-cards')->dailyAt('09:00');
+// V.email.4 (TЗ): Unclaimed gift reminder after X days
+Schedule::command('app:send-gift-reminders')->dailyAt('10:00');
+// VI.email.4 (TЗ): Reminder after reaching earnings threshold
+Schedule::command('app:remind-payout-verification-threshold')->dailyAt('11:00');
 
 Artisan::command('tt', function(Request $request) {
   // foreach (Order::all() as $order) {

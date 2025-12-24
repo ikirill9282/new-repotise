@@ -86,7 +86,8 @@ class DeleteAccount extends Component
         }
 
         SessionExpire::set('delete_account_email', $user->email, Carbon::now()->addHour());
-        SessionExpire::set('delete_account_code', $code, Carbon::now()->addMinutes(3));
+        // Allow requesting a new deletion code after 1 minute
+        SessionExpire::set('delete_account_code', $code, Carbon::now()->addMinutes(1));
 
         $this->syncResendTimer();
 

@@ -10,41 +10,55 @@
           <div class="flex justify-start items-start sm:items-center !gap-4 2xl:!gap-8 flex-col sm:flex-row">
             <div class="block">
               <label class="text-gray" for="sales-analytics-status">Payment Status:</label>
-              <select
-                class="tg-select"
+              @php
+                $paymentStatusOptions = ['' => 'All Statuses'] + ($statuses ?? []);
+              @endphp
+              <x-form.select
+                name="sales-analytics-status"
+                :compact="true"
+                :tooltip="false"
+                labelClass="!text-black"
                 wire:model.live="paymentStatus"
-                id="sales-analytics-status"
-                >
-                <option value="">All Statuses</option>
-                @foreach($statuses as $value => $label)
-                  <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
-              </select>
+                value="{{ $paymentStatus ?? '' }}"
+                :label="$paymentStatusOptions[$paymentStatus ?? ''] ?? 'All Statuses'"
+                :options="$paymentStatusOptions"
+              />
             </div>
             <div class="block">
               <label class="text-gray" for="sales-analytics-product">Product:</label>
-              <select 
-                class="tg-select"
+              @php
+                $productFilterOptions = ['' => 'All Products'] + collect($productOptions ?? [])->pluck('title', 'id')->toArray();
+              @endphp
+              <x-form.select
+                name="sales-analytics-product"
+                :compact="true"
+                :tooltip="false"
+                labelClass="!text-black"
                 wire:model.live="productFilter"
-                id="sales-analytics-product"
-                >
-                <option value="">All Products</option>
-                @foreach($productOptions as $product)
-                  <option value="{{ $product->id }}">{{ $product->title }}</option>
-                @endforeach
-              </select>
+                value="{{ $productFilter ?? '' }}"
+                :label="$productFilterOptions[$productFilter ?? ''] ?? 'All Products'"
+                :options="$productFilterOptions"
+              />
             </div>
             <div class="block">
               <label class="text-gray" for="sales-analytics-order-type">Order Type:</label>
-              <select
-                class="tg-select"
+              @php
+                $orderTypeOptions = [
+                  '' => 'All Order Types',
+                  'one_time' => 'One-time Purchase',
+                  'subscription' => 'Subscription',
+                ];
+              @endphp
+              <x-form.select
+                name="sales-analytics-order-type"
+                :compact="true"
+                :tooltip="false"
+                labelClass="!text-black"
                 wire:model.live="orderType"
-                id="sales-analytics-order-type"
-                >
-                <option value="">All Order Types</option>
-                <option value="one_time">One-time Purchase</option>
-                <option value="subscription">Subscription</option>
-              </select>
+                value="{{ $orderType ?? '' }}"
+                :label="$orderTypeOptions[$orderType ?? ''] ?? 'All Order Types'"
+                :options="$orderTypeOptions"
+              />
             </div>
           </div>
         </div>

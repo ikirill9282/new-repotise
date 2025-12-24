@@ -72,6 +72,7 @@ class DeliveryGift implements ShouldQueue, ShouldBeUnique
 
       // Письмо получателю → письмо №3
       $recipientUser = User::where('email', $gift->recipient_email)->first();
+      $isNewRecipient = false;
       if (!$recipientUser) {
         // Создаем пользователя для получателя, но без пароля (установит сам)
         $recipientUser = User::create([
@@ -79,8 +80,9 @@ class DeliveryGift implements ShouldQueue, ShouldBeUnique
           'username' => preg_replace("/^(.*?)@.*$/is", "$1", $gift->recipient_email),
           'password' => User::makePassword(), // Временный пароль, нужно будет установить свой
         ]);
+        $isNewRecipient = true;
       }
 
-      Mail::to($gift->recipient_email)->send(new GiftRecipient($recipientUser, $this->order, $gift));
+      Mail::to($gift->recipient_email)->send(new GiftRecipient($recipientUser, $this->order, $gift, $isNewRecipient));
     }
 }

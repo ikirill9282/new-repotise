@@ -4,6 +4,7 @@ namespace App\Livewire\Modals;
 
 use App\Mail\DonationReceived;
 use App\Mail\DonationSent;
+use App\Models\UserNotification;
 use App\Models\Payments;
 use App\Models\RevenueShare;
 use App\Models\User;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Subscription;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Stripe\Exception\ApiErrorException;
@@ -370,6 +372,67 @@ class Donate extends Component
                 $this->refreshPaymentMethods($paymentMethodId);
             }
 
+            // IV: recurring donation (monthly support) uses Stripe Subscription, not one-time PaymentIntent
+            if ($this->monthlySupport) {
+                $subscription = $this->createRecurringDonationSubscription($donor, (string) $paymentMethodId);
+
+                if (!$subscription) {
+                    $this->showDonationError('Unable to process donation. Please try another payment method.', 'processing_error');
+                    return;
+                }
+
+                // IV.email.2 (TЗ): recurring donation set up (donor)
+                try {
+                    $stripeSub = $subscription->asStripeSubscription();
+                    $next = !empty($stripeSub->current_period_end)
+                        ? \Illuminate\Support\Carbon::createFromTimestamp((int) $stripeSub->current_period_end)->timezone(config('app.timezone'))->format('m.d.Y')
+                        : null;
+
+                    Mail::to($donor->email)->send(new DonationSent(
+                        donor: $donor,
+                        seller: $this->seller,
+                        amount: (float) $this->amount,
+                        monthlySupport: true,
+                        nextPaymentDateLabel: $next,
+                        donationDateLabel: null,
+                    ));
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to send recurring donation setup email.', [
+                        'donor_id' => $donor->id,
+                        'seller_id' => $this->seller->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                // IV.toast.7 (TЗ): New Recurring Supporter! 🌟 (seller)
+                try {
+                    $toastPayload = json_encode([
+                        'heading' => 'New Recurring Supporter! 🌟',
+                        'message' => 'Awesome! Someone has started a recurring donation to support you.',
+                        'icon' => 'success',
+                    ]);
+
+                    UserNotification::create([
+                        'user_id' => $this->seller->id,
+                        'type' => 'success',
+                        'message' => $toastPayload,
+                        'show' => 1,
+                        'closable' => 1,
+                        'group' => 'toast',
+                    ]);
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+
+                $this->dispatch('toastSuccess', ['message' => 'Thank you for supporting this creator!']);
+                $this->dispatch('openModal', 'donate-sub-accept', [
+                    'amount' => (float) $this->amount,
+                    'seller_name' => $this->seller->name ?? $this->seller->username ?? 'Creator',
+                ]);
+                $this->resetDonationForm();
+                return;
+            }
+
             $chargeAmount = $this->calculateChargeAmount($this->amount, $this->coverFees);
 
             if ($chargeAmount <= 0) {
@@ -535,6 +598,101 @@ class Donate extends Component
         // Note: donation-processing-ended is dispatched by showDonationError or finalizeDonation
     }
 
+    protected function createRecurringDonationSubscription(User $donor, string $paymentMethodId): ?Subscription
+    {
+        if ($this->unavailable || !$this->seller) {
+            return null;
+        }
+
+        if (empty($donor->stripe_id)) {
+            $donor->createOrGetStripeCustomer();
+        }
+
+        $amount = round(max(0, (float) $this->amount), 2);
+        $amountCents = (int) round($amount * 100);
+
+        $productId = $this->getOrCreateDonationStripeProductId($this->seller);
+        $priceId = $this->getOrCreateDonationStripeMonthlyPriceId($this->seller, $productId, $amountCents, $this->currency);
+
+        $subName = "donation_monthly_{$this->seller->id}_{$amountCents}";
+
+        $metadata = [
+            'type' => 'donation_recurring',
+            'seller_id' => (string) $this->seller->id,
+            'donor_id' => (string) $donor->id,
+            'cover_fees' => $this->coverFees ? '1' : '0',
+            'anonymous' => $this->anonymous ? '1' : '0',
+            'donation_amount' => (string) $amount,
+            'donor_email' => (string) $donor->email,
+            'donor_name' => (string) ($donor->name ?? $this->guest['fullname'] ?? ''),
+        ];
+
+        if (!empty($this->message)) {
+            $metadata['message'] = Str::limit(strip_tags($this->message), 500);
+        }
+
+        return $donor->newSubscription($subName, $priceId)->create($paymentMethodId, [
+            'metadata' => $metadata,
+        ]);
+    }
+
+    protected function getOrCreateDonationStripeProductId(User $seller): string
+    {
+        $settings = (array) ($seller->options?->dashboard_settings ?? []);
+        $donationSettings = (array) ($settings['donations'] ?? []);
+
+        $productId = (string) ($donationSettings['stripe_product_id'] ?? '');
+        if ($productId !== '') {
+            return $productId;
+        }
+
+        $stripeProduct = Cashier::stripe()->products->create([
+            'name' => 'Recurring Donations for ' . ($seller->username ?? $seller->getName()),
+            'metadata' => [
+                'type' => 'donation_recurring_product',
+                'seller_id' => (string) $seller->id,
+            ],
+        ]);
+
+        $donationSettings['stripe_product_id'] = $stripeProduct->id;
+        $settings['donations'] = $donationSettings;
+        $seller->options()->updateOrCreate(['user_id' => $seller->id], ['dashboard_settings' => $settings]);
+
+        return $stripeProduct->id;
+    }
+
+    protected function getOrCreateDonationStripeMonthlyPriceId(User $seller, string $productId, int $amountCents, string $currency): string
+    {
+        $settings = (array) ($seller->options?->dashboard_settings ?? []);
+        $donationSettings = (array) ($settings['donations'] ?? []);
+        $prices = (array) ($donationSettings['monthly_prices'] ?? []);
+
+        $key = (string) $amountCents;
+        $existing = (string) ($prices[$key] ?? '');
+        if ($existing !== '') {
+            return $existing;
+        }
+
+        $price = Cashier::stripe()->prices->create([
+            'product' => $productId,
+            'unit_amount' => $amountCents,
+            'currency' => strtolower($currency),
+            'recurring' => ['interval' => 'month'],
+            'metadata' => [
+                'type' => 'donation_recurring_price',
+                'seller_id' => (string) $seller->id,
+                'amount_cents' => (string) $amountCents,
+            ],
+        ]);
+
+        $prices[$key] = $price->id;
+        $donationSettings['monthly_prices'] = $prices;
+        $settings['donations'] = $donationSettings;
+        $seller->options()->updateOrCreate(['user_id' => $seller->id], ['dashboard_settings' => $settings]);
+
+        return $price->id;
+    }
+
     protected function finalizeDonation(PaymentIntent $paymentIntent): void
     {
         Log::info('Donation: finalizeDonation called', [
@@ -636,6 +794,26 @@ class Donate extends Component
             'service_amount' => $platformFee,
         ]);
 
+        // IV.toast.6 (TЗ): New Donation! 💰 (seller)
+        try {
+            $toastPayload = json_encode([
+                'heading' => 'New Donation! 💰',
+                'message' => "You've received a $" . number_format($donationAmount, 2) . " donation! Thank your supporter!",
+                'icon' => 'success',
+            ]);
+
+            UserNotification::create([
+                'user_id' => $this->seller->id,
+                'type' => 'success',
+                'message' => $toastPayload,
+                'show' => 1,
+                'closable' => 1,
+                'group' => 'toast',
+            ]);
+        } catch (\Throwable $e) {
+            // ignore
+        }
+
         // Send email notification to seller
         try {
             $donorName = $anonymous ? null : ($this->donor?->getName() ?? Arr::get($metadata, 'donor_name'));
@@ -665,6 +843,8 @@ class Donate extends Component
                         seller: $this->seller,
                         amount: $donationAmount,
                         monthlySupport: $monthlySupport,
+                        nextPaymentDateLabel: null,
+                        donationDateLabel: now()->timezone(config('app.timezone'))->format('m.d.Y'),
                     )
                 );
             } catch (\Throwable $exception) {

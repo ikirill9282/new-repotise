@@ -28,6 +28,10 @@ class Product extends Model
 {
   use HasAuthor, HasGallery, Searchable, HasFactory, HasStatus, HasMessages, HasReport, SoftDeletes;
 
+  protected $casts = [
+    'show_on_creator_page' => 'boolean',
+  ];
+
   protected static function boot()
   {
     parent::boot();
@@ -232,11 +236,16 @@ class Product extends Model
     return $this->price - $this->sale_price;
   }
 
-  public function getPriceWithoutDiscount()
+  public function getPriceWithoutDiscount(): float
   {
-    if ($this->getPrice() == $this->price) return null;
-
-    return $this->price;
+    // Если цена без скидки равна текущей цене, возвращаем текущую цену
+    $price = $this->price ?? 0.0;
+    
+    // Убеждаемся, что возвращаем float, даже если price был null или другим типом
+    $result = (float) $price;
+    
+    // Дополнительная проверка на случай, если приведение типа не сработало
+    return is_numeric($result) ? $result : 0.0;
   }
 
   public function getText(): string

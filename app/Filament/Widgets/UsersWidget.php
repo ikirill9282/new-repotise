@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Filament\Resources\UserResource;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UsersWidget extends BaseWidget
 {
@@ -18,7 +19,13 @@ class UsersWidget extends BaseWidget
 
     public function mount(): void
     {
+        // #region agent log
+        Log::info('DEBUG: UsersWidget mount() entry', ['hypothesisId' => 'H']);
+        // #endregion
         $this->mountHasDashboardDateRange();
+        // #region agent log
+        Log::info('DEBUG: UsersWidget mount() exit', ['hypothesisId' => 'H']);
+        // #endregion
     }
 
     protected function getColumns(): int
@@ -28,6 +35,9 @@ class UsersWidget extends BaseWidget
 
     protected function getStats(): array
     {
+        // #region agent log
+        Log::info('DEBUG: UsersWidget getStats() entry', ['hypothesisId' => 'H']);
+        // #endregion
         // ВАЖНО: Используем trigger для принудительного обновления
         $trigger = $this->dateRangeUpdateTrigger ?? 0;
         // Принудительно читаем из session чтобы получить актуальные данные
@@ -68,6 +78,9 @@ class UsersWidget extends BaseWidget
             ->count();
         $newUsersChange = $this->calculateChange($newUsers, $prevNewUsers);
 
+        // #region agent log
+        Log::info('DEBUG: UsersWidget getStats() return', ['hypothesisId' => 'H', 'activeUsers' => $activeUsers, 'newUsers' => $newUsers]);
+        // #endregion
         return [
             Stat::make('Active Users', number_format($activeUsers))
                 ->description('Active in period')

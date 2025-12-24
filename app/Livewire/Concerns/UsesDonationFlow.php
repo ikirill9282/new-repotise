@@ -500,5 +500,71 @@ trait UsesDonationFlow
         $this->amount = 10.0;
         $this->coverFees = false;
         $this->anonymous = false;
-        $this->monthlySupport = false; 
+        $this->monthlySupport = false;
+    }
 
+    protected function ensureDonorAccount(): ?User
+    {
+        if ($this->donor) {
+            return $this->donor;
+        }
+
+        if (empty($this->guest['email']) || empty($this->guest['fullname'])) {
+            return null;
+        }
+
+        $donor = User::where('email', $this->guest['email'])->first();
+
+        if (!$donor) {
+            $donor = User::create([
+                'name' => $this->guest['fullname'],
+                'email' => $this->guest['email'],
+                'username' => str()->slug($this->guest['fullname']) . '-' . rand(1000, 9999),
+                'password' => bcrypt(str()->random(32)),
+            ]);
+        }
+
+        return $donor;
+    }
+
+    protected function attachPaymentMethodToCustomer(User $customer, string $paymentMethodId): void
+    {
+        try {
+            $customer->addPaymentMethod($paymentMethodId);
+        } catch (\Throwable $e) {
+            Log::warning('Failed to attach payment method to customer', [
+                'user_id' => $customer->id,
+                'payment_method_id' => $paymentMethodId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    protected function shouldUseNewPaymentMethod(?string $selected): bool
+    {
+        return $selected === 'new' || empty($selected);
+    }
+
+    protected function prepareSetupIntent(): void
+    {
+        if (!$this->donor) {
+            $this->setupIntentSecret = null;
+            return;
+        }
+
+        try {
+            $setupIntent = Cashier::stripe()->setupIntents->create([
+                'customer' => $this->donor->stripe_id,
+                'usage' => 'off_session',
+            ]);
+
+            $this->setupIntentSecret = $setupIntent->client_secret;
+        } catch (\Throwable $e) {
+            Log::warning('Failed to create setup intent for donation', [
+                'user_id' => $this->donor->id,
+                'error' => $e->getMessage(),
+            ]);
+            $this->setupIntentSecret = null;
+        }
+    }
+}

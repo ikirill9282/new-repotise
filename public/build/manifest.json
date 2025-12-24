@@ -1,16 +1,21 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DN8JmKUp.css",
+    "file": "assets/app-B4mrjbEJ.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/css/filament-overlay-fix.css": {
+    "file": "assets/filament-overlay-fix--JYD5rg7.css",
+    "src": "resources/css/filament-overlay-fix.css",
+    "isEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-C2cqdIWD.js",
+    "file": "assets/app-BlymvUwO.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-CKs0HGk3.css"
+      "assets/app-C10UD36N.css"
     ]
   }
 }

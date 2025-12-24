@@ -6,32 +6,45 @@
         <div class="flex justify-start items-start sm:items-center !gap-4 2xl:!gap-8 flex-col sm:flex-row">
           <div class="block">
             <label class="text-gray mb-1 block" for="payout-status-filter">Payout Status:</label>
-            <select
-              id="payout-status-filter"
+            @php
+              $payoutStatusOptions = [
+                'all' => 'All Statuses',
+                \App\Models\Payout::STATUS_PROCESSING => 'Processing',
+                \App\Models\Payout::STATUS_IN_TRANSIT => 'In Transit',
+                \App\Models\Payout::STATUS_PAID => 'Paid',
+                \App\Models\Payout::STATUS_FAILED => 'Failed',
+                \App\Models\Payout::STATUS_CANCELED => 'Canceled',
+              ];
+              $payoutStatusValue = $statusFilter ?? 'all';
+            @endphp
+            <x-form.select
+              name="payout-status-filter"
+              :compact="true"
+              :tooltip="false"
+              labelClass="!text-black"
               wire:model.live="statusFilter"
-              class="tg-select"
-            >
-              <option value="all">All Statuses</option>
-              <option value="{{ \App\Models\Payout::STATUS_PROCESSING }}">Processing</option>
-              <option value="{{ \App\Models\Payout::STATUS_IN_TRANSIT }}">In Transit</option>
-              <option value="{{ \App\Models\Payout::STATUS_PAID }}">Paid</option>
-              <option value="{{ \App\Models\Payout::STATUS_FAILED }}">Failed</option>
-              <option value="{{ \App\Models\Payout::STATUS_CANCELED }}">Canceled</option>
-            </select>
+              value="{{ $payoutStatusValue }}"
+              :label="$payoutStatusOptions[$payoutStatusValue] ?? 'All Statuses'"
+              :options="$payoutStatusOptions"
+            />
           </div>
           
           <div class="block">
             <label class="text-gray mb-1 block" for="payout-method-filter">Payout Method:</label>
-            <select
-              id="payout-method-filter"
+            @php
+              $payoutMethodOptions = ['all' => 'All Methods'] + collect($payoutMethods ?? [])->pluck('label', 'id')->toArray();
+              $payoutMethodValue = $methodFilter ?? 'all';
+            @endphp
+            <x-form.select
+              name="payout-method-filter"
+              :compact="true"
+              :tooltip="false"
+              labelClass="!text-black"
               wire:model.live="methodFilter"
-              class="tg-select"
-            >
-              <option value="all">All Methods</option>
-              @foreach($payoutMethods as $method)
-                <option value="{{ $method['id'] }}">{{ $method['label'] }}</option>
-              @endforeach
-            </select>
+              value="{{ $payoutMethodValue }}"
+              :label="$payoutMethodOptions[$payoutMethodValue] ?? 'All Methods'"
+              :options="$payoutMethodOptions"
+            />
           </div>
         </div>
       </div>

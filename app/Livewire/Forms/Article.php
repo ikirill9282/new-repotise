@@ -157,6 +157,9 @@ class Article extends Component
 
     public function submit()
     {
+      // Keep previous UX: when SEO fields are empty, auto-fill them from title/content.
+      $this->autoFillSeoFields();
+
       $data = $this->fields;
       $data['status_id'] = isset($data['status_id']) ? $data['status_id'] : 3;
       $data['text'] = ($data['text'] == '<h3><br></h3>' || $data['text'] == '<p><br></p>')

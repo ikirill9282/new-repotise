@@ -7,7 +7,12 @@
 
           <p>{{ print_var('page_subtitle', $variables) }}</p>
           <div class="bottom_to_calatog">
-              <a href="{{ url(print_var('page_catalog_button_link', $variables)) }}" class="explore_ad">
+              @php
+                  $link = print_var('page_catalog_button_link', $variables);
+                  $link = is_string($link) ? $link : (is_object($link) && method_exists($link, '__toString') ? (string)$link : '/products');
+                  $link = str_starts_with($link, 'http') || str_starts_with($link, '/') ? $link : url($link);
+              @endphp
+              <a href="{{ $link }}" class="explore_ad">
                 {!! print_var('page_catalog_button_text', $variables) !!}
               </a>
               @if(auth()->check())

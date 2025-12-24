@@ -72,10 +72,7 @@ class Checkout extends Component
         return $this->paymentResult('success', $success_payment->stripe_id);
       }
 
-      $setupIntent = Cashier::stripe()->setupIntents->create([
-        'payment_method_types' => ['card'],
-      ]);
-      $this->clientSecret = $setupIntent->client_secret;
+      $this->createSetupIntent();
     }
 
     public function applyPromocode(): void
@@ -92,17 +89,33 @@ class Checkout extends Component
 
       if (!$discount) {
         $this->addError('promocode', 'Invalid promo code.');
+        // II.toast.5 (TЗ): Promo Code Not Working?
+        $this->dispatch('toastError', [
+          'message' => "Hmm, that promo code didn't work.",
+          'heading' => 'Promo Code Not Working?',
+        ]);
         return;
       }
 
       if (!$discount->isAvailable($order)) {
         $this->addError('promocode', 'This promo code is not available for your order.');
+        // II.toast.5 (TЗ): Promo Code Not Working?
+        $this->dispatch('toastError', [
+          'message' => "Hmm, that promo code didn't work.",
+          'heading' => 'Promo Code Not Working?',
+        ]);
         return;
       }
 
       $order->applyDiscount($discount);
       $this->updatePaymentIntent();
       $this->resetErrorBag('promocode');
+
+      // II.toast.4 (TЗ): Promo Code Applied! 🎉
+      $this->dispatch('toastSuccess', [
+        'message' => 'Success! Your promo code has been applied.',
+        'heading' => 'Promo Code Applied! 🎉',
+      ]);
     }
 
     public function removePromocode(): void
@@ -555,5 +568,48 @@ class Checkout extends Component
     return $order->order_products->contains(function ($orderProduct) use ($user) {
       return $orderProduct->product && $orderProduct->product->user_id === $user->id;
     });
+  }
+
+  protected function createSetupIntent(): void
+  {
+    try {
+      $params = [
+        'payment_method_types' => ['card'],
+      ];
+
+      // Если пользователь авторизован и имеет Stripe customer, добавляем его
+      if (Auth::check() && Auth::user()->stripe_id) {
+        $params['customer'] = Auth::user()->stripe_id;
+      }
+
+      $setupIntent = Cashier::stripe()->setupIntents->create($params);
+      $this->clientSecret = $setupIntent->client_secret;
+    } catch (\Stripe\Exception\InvalidRequestException $e) {
+      Log::error('Failed to create Stripe setup intent - Invalid Request', [
+        'order_id' => $this->getOrder()?->id ?? null,
+        'error' => $e->getMessage(),
+        'stripe_error' => $e->getStripeCode(),
+      ]);
+      $this->clientSecret = '';
+    } catch (\Stripe\Exception\AuthenticationException $e) {
+      Log::error('Failed to create Stripe setup intent - Authentication Error', [
+        'order_id' => $this->getOrder()?->id ?? null,
+        'error' => $e->getMessage(),
+      ]);
+      $this->clientSecret = '';
+    } catch (\Exception $e) {
+      Log::error('Failed to create Stripe setup intent', [
+        'order_id' => $this->getOrder()?->id ?? null,
+        'error' => $e->getMessage(),
+        'error_type' => get_class($e),
+      ]);
+      $this->clientSecret = '';
+    }
+  }
+
+  public function recreateSetupIntent(): void
+  {
+    $this->createSetupIntent();
+    $this->dispatch('setup-intent-recreated', ['clientSecret' => $this->clientSecret]);
   }
 }

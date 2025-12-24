@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /var/www/html/app/Mail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../_css/bootstrap.min.css?v=11.0.9" rel="stylesheet" type="text/css">
+  <link href="../_css/nv.d3.min.css?v=11.0.9" rel="stylesheet" type="text/css">
+  <link href="../_css/style.css?v=11.0.9" rel="stylesheet" type="text/css">
+  <link href="../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../index.html">/var/www/html/app</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Mail</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AccountDeletionCode.php.html#13">App\Mail\AccountDeletionCode</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CardExpiringSoon.php.html#12">App\Mail\CardExpiringSoon</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ConfirmRegitster.php.html#14">App\Mail\ConfirmRegitster</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationReceived.php.html#13">App\Mail\DonationReceived</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationSent.php.html#13">App\Mail\DonationSent</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangeVerification.php.html#11">App\Mail\EmailChangeVerification</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedNew.php.html#12">App\Mail\EmailChangedNew</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedOld.php.html#12">App\Mail\EmailChangedOld</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Gift.php.html#15">App\Mail\Gift</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerGuest.php.html#16">App\Mail\GiftBuyerGuest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerRegistered.php.html#16">App\Mail\GiftBuyerRegistered</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftClaimed.php.html#16">App\Mail\GiftClaimed</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftRecipient.php.html#16">App\Mail\GiftRecipient</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftReminderRecipient.php.html#13">App\Mail\GiftReminderRecipient</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InviteByPurchase.php.html#15">App\Mail\InviteByPurchase</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="IpBlockedNotification.php.html#12">App\Mail\IpBlockedNotification</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderConfirmed.php.html#13">App\Mail\OrderConfirmed</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderPaymentIssue.php.html#13">App\Mail\OrderPaymentIssue</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Password.php.html#14">App\Mail\Password</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutIssue.php.html#12">App\Mail\PayoutIssue</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutMethodConfirmationCode.php.html#12">App\Mail\PayoutMethodConfirmationCode</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutOnItsWay.php.html#12">App\Mail\PayoutOnItsWay</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutSetupActionNeeded.php.html#12">App\Mail\PayoutSetupActionNeeded</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationApproved.php.html#12">App\Mail\PayoutVerificationApproved</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationIssue.php.html#12">App\Mail\PayoutVerificationIssue</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationThresholdReminder.php.html#12">App\Mail\PayoutVerificationThresholdReminder</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsPaused.php.html#12">App\Mail\PayoutsPaused</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsResumed.php.html#12">App\Mail\PayoutsResumed</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Promocode.php.html#15">App\Mail\Promocode</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationCanceled.php.html#12">App\Mail\RecurringDonationCanceled</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentIssue.php.html#12">App\Mail\RecurringDonationPaymentIssue</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentReceipt.php.html#12">App\Mail\RecurringDonationPaymentReceipt</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ResetCode.php.html#14">App\Mail\ResetCode</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionActive.php.html#13">App\Mail\SubscriptionActive</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionCanceled.php.html#13">App\Mail\SubscriptionCanceled</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionExpired.php.html#13">App\Mail\SubscriptionExpired</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentIssue.php.html#13">App\Mail\SubscriptionPaymentIssue</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentReceipt.php.html#13">App\Mail\SubscriptionPaymentReceipt</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalIssue.php.html#12">App\Mail\WithdrawalIssue</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalProcessing.php.html#12">App\Mail\WithdrawalProcessing</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="OrderPaymentIssue.php.html#13">App\Mail\OrderPaymentIssue</a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="DonationSent.php.html#13">App\Mail\DonationSent</a></td><td class="text-right">30</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AccountDeletionCode.php.html#22"><abbr title="App\Mail\AccountDeletionCode::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AccountDeletionCode.php.html#32"><abbr title="App\Mail\AccountDeletionCode::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AccountDeletionCode.php.html#42"><abbr title="App\Mail\AccountDeletionCode::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AccountDeletionCode.php.html#54"><abbr title="App\Mail\AccountDeletionCode::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CardExpiringSoon.php.html#16"><abbr title="App\Mail\CardExpiringSoon::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CardExpiringSoon.php.html#22"><abbr title="App\Mail\CardExpiringSoon::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CardExpiringSoon.php.html#29"><abbr title="App\Mail\CardExpiringSoon::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CardExpiringSoon.php.html#36"><abbr title="App\Mail\CardExpiringSoon::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ConfirmRegitster.php.html#23"><abbr title="App\Mail\ConfirmRegitster::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ConfirmRegitster.php.html#34"><abbr title="App\Mail\ConfirmRegitster::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ConfirmRegitster.php.html#44"><abbr title="App\Mail\ConfirmRegitster::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ConfirmRegitster.php.html#56"><abbr title="App\Mail\ConfirmRegitster::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationReceived.php.html#22"><abbr title="App\Mail\DonationReceived::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationReceived.php.html#35"><abbr title="App\Mail\DonationReceived::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationReceived.php.html#45"><abbr title="App\Mail\DonationReceived::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationReceived.php.html#57"><abbr title="App\Mail\DonationReceived::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationSent.php.html#22"><abbr title="App\Mail\DonationSent::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationSent.php.html#36"><abbr title="App\Mail\DonationSent::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationSent.php.html#48"><abbr title="App\Mail\DonationSent::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="DonationSent.php.html#60"><abbr title="App\Mail\DonationSent::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangeVerification.php.html#17"><abbr title="App\Mail\EmailChangeVerification::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangeVerification.php.html#24"><abbr title="App\Mail\EmailChangeVerification::build">build</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedNew.php.html#16"><abbr title="App\Mail\EmailChangedNew::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedNew.php.html#20"><abbr title="App\Mail\EmailChangedNew::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedNew.php.html#27"><abbr title="App\Mail\EmailChangedNew::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedNew.php.html#34"><abbr title="App\Mail\EmailChangedNew::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedOld.php.html#16"><abbr title="App\Mail\EmailChangedOld::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedOld.php.html#21"><abbr title="App\Mail\EmailChangedOld::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedOld.php.html#28"><abbr title="App\Mail\EmailChangedOld::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailChangedOld.php.html#35"><abbr title="App\Mail\EmailChangedOld::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Gift.php.html#23"><abbr title="App\Mail\Gift::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Gift.php.html#35"><abbr title="App\Mail\Gift::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Gift.php.html#45"><abbr title="App\Mail\Gift::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Gift.php.html#57"><abbr title="App\Mail\Gift::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerGuest.php.html#25"><abbr title="App\Mail\GiftBuyerGuest::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerGuest.php.html#37"><abbr title="App\Mail\GiftBuyerGuest::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerGuest.php.html#51"><abbr title="App\Mail\GiftBuyerGuest::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerGuest.php.html#63"><abbr title="App\Mail\GiftBuyerGuest::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerRegistered.php.html#25"><abbr title="App\Mail\GiftBuyerRegistered::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerRegistered.php.html#37"><abbr title="App\Mail\GiftBuyerRegistered::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerRegistered.php.html#51"><abbr title="App\Mail\GiftBuyerRegistered::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftBuyerRegistered.php.html#63"><abbr title="App\Mail\GiftBuyerRegistered::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftClaimed.php.html#25"><abbr title="App\Mail\GiftClaimed::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftClaimed.php.html#37"><abbr title="App\Mail\GiftClaimed::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftClaimed.php.html#51"><abbr title="App\Mail\GiftClaimed::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftClaimed.php.html#63"><abbr title="App\Mail\GiftClaimed::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftRecipient.php.html#25"><abbr title="App\Mail\GiftRecipient::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftRecipient.php.html#38"><abbr title="App\Mail\GiftRecipient::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftRecipient.php.html#50"><abbr title="App\Mail\GiftRecipient::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftRecipient.php.html#62"><abbr title="App\Mail\GiftRecipient::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftReminderRecipient.php.html#17"><abbr title="App\Mail\GiftReminderRecipient::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftReminderRecipient.php.html#22"><abbr title="App\Mail\GiftReminderRecipient::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftReminderRecipient.php.html#30"><abbr title="App\Mail\GiftReminderRecipient::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GiftReminderRecipient.php.html#37"><abbr title="App\Mail\GiftReminderRecipient::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InviteByPurchase.php.html#24"><abbr title="App\Mail\InviteByPurchase::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InviteByPurchase.php.html#32"><abbr title="App\Mail\InviteByPurchase::build">build</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InviteByPurchase.php.html#45"><abbr title="App\Mail\InviteByPurchase::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InviteByPurchase.php.html#55"><abbr title="App\Mail\InviteByPurchase::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InviteByPurchase.php.html#67"><abbr title="App\Mail\InviteByPurchase::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="IpBlockedNotification.php.html#19"><abbr title="App\Mail\IpBlockedNotification::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="IpBlockedNotification.php.html#28"><abbr title="App\Mail\IpBlockedNotification::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="IpBlockedNotification.php.html#38"><abbr title="App\Mail\IpBlockedNotification::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="IpBlockedNotification.php.html#55"><abbr title="App\Mail\IpBlockedNotification::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderConfirmed.php.html#17"><abbr title="App\Mail\OrderConfirmed::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderConfirmed.php.html#22"><abbr title="App\Mail\OrderConfirmed::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderConfirmed.php.html#31"><abbr title="App\Mail\OrderConfirmed::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderConfirmed.php.html#38"><abbr title="App\Mail\OrderConfirmed::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderPaymentIssue.php.html#17"><abbr title="App\Mail\OrderPaymentIssue::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderPaymentIssue.php.html#23"><abbr title="App\Mail\OrderPaymentIssue::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderPaymentIssue.php.html#36"><abbr title="App\Mail\OrderPaymentIssue::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="OrderPaymentIssue.php.html#43"><abbr title="App\Mail\OrderPaymentIssue::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Password.php.html#23"><abbr title="App\Mail\Password::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Password.php.html#34"><abbr title="App\Mail\Password::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Password.php.html#44"><abbr title="App\Mail\Password::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Password.php.html#56"><abbr title="App\Mail\Password::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutIssue.php.html#16"><abbr title="App\Mail\PayoutIssue::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutIssue.php.html#22"><abbr title="App\Mail\PayoutIssue::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutIssue.php.html#29"><abbr title="App\Mail\PayoutIssue::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutIssue.php.html#36"><abbr title="App\Mail\PayoutIssue::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutMethodConfirmationCode.php.html#16"><abbr title="App\Mail\PayoutMethodConfirmationCode::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutMethodConfirmationCode.php.html#21"><abbr title="App\Mail\PayoutMethodConfirmationCode::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutMethodConfirmationCode.php.html#28"><abbr title="App\Mail\PayoutMethodConfirmationCode::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutMethodConfirmationCode.php.html#35"><abbr title="App\Mail\PayoutMethodConfirmationCode::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutOnItsWay.php.html#16"><abbr title="App\Mail\PayoutOnItsWay::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutOnItsWay.php.html#22"><abbr title="App\Mail\PayoutOnItsWay::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutOnItsWay.php.html#29"><abbr title="App\Mail\PayoutOnItsWay::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutOnItsWay.php.html#36"><abbr title="App\Mail\PayoutOnItsWay::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutSetupActionNeeded.php.html#16"><abbr title="App\Mail\PayoutSetupActionNeeded::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutSetupActionNeeded.php.html#23"><abbr title="App\Mail\PayoutSetupActionNeeded::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutSetupActionNeeded.php.html#30"><abbr title="App\Mail\PayoutSetupActionNeeded::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutSetupActionNeeded.php.html#37"><abbr title="App\Mail\PayoutSetupActionNeeded::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationApproved.php.html#16"><abbr title="App\Mail\PayoutVerificationApproved::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationApproved.php.html#21"><abbr title="App\Mail\PayoutVerificationApproved::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationApproved.php.html#28"><abbr title="App\Mail\PayoutVerificationApproved::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationApproved.php.html#35"><abbr title="App\Mail\PayoutVerificationApproved::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationIssue.php.html#16"><abbr title="App\Mail\PayoutVerificationIssue::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationIssue.php.html#21"><abbr title="App\Mail\PayoutVerificationIssue::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationIssue.php.html#28"><abbr title="App\Mail\PayoutVerificationIssue::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationIssue.php.html#35"><abbr title="App\Mail\PayoutVerificationIssue::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationThresholdReminder.php.html#16"><abbr title="App\Mail\PayoutVerificationThresholdReminder::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationThresholdReminder.php.html#22"><abbr title="App\Mail\PayoutVerificationThresholdReminder::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationThresholdReminder.php.html#29"><abbr title="App\Mail\PayoutVerificationThresholdReminder::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutVerificationThresholdReminder.php.html#36"><abbr title="App\Mail\PayoutVerificationThresholdReminder::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsPaused.php.html#16"><abbr title="App\Mail\PayoutsPaused::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsPaused.php.html#20"><abbr title="App\Mail\PayoutsPaused::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsPaused.php.html#27"><abbr title="App\Mail\PayoutsPaused::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsPaused.php.html#34"><abbr title="App\Mail\PayoutsPaused::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsResumed.php.html#16"><abbr title="App\Mail\PayoutsResumed::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsResumed.php.html#20"><abbr title="App\Mail\PayoutsResumed::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsResumed.php.html#27"><abbr title="App\Mail\PayoutsResumed::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PayoutsResumed.php.html#34"><abbr title="App\Mail\PayoutsResumed::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Promocode.php.html#24"><abbr title="App\Mail\Promocode::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Promocode.php.html#34"><abbr title="App\Mail\Promocode::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Promocode.php.html#44"><abbr title="App\Mail\Promocode::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Promocode.php.html#56"><abbr title="App\Mail\Promocode::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationCanceled.php.html#16"><abbr title="App\Mail\RecurringDonationCanceled::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationCanceled.php.html#21"><abbr title="App\Mail\RecurringDonationCanceled::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationCanceled.php.html#28"><abbr title="App\Mail\RecurringDonationCanceled::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationCanceled.php.html#35"><abbr title="App\Mail\RecurringDonationCanceled::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentIssue.php.html#16"><abbr title="App\Mail\RecurringDonationPaymentIssue::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentIssue.php.html#21"><abbr title="App\Mail\RecurringDonationPaymentIssue::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentIssue.php.html#28"><abbr title="App\Mail\RecurringDonationPaymentIssue::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentIssue.php.html#35"><abbr title="App\Mail\RecurringDonationPaymentIssue::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentReceipt.php.html#16"><abbr title="App\Mail\RecurringDonationPaymentReceipt::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentReceipt.php.html#24"><abbr title="App\Mail\RecurringDonationPaymentReceipt::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentReceipt.php.html#31"><abbr title="App\Mail\RecurringDonationPaymentReceipt::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RecurringDonationPaymentReceipt.php.html#38"><abbr title="App\Mail\RecurringDonationPaymentReceipt::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ResetCode.php.html#23"><abbr title="App\Mail\ResetCode::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ResetCode.php.html#34"><abbr title="App\Mail\ResetCode::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ResetCode.php.html#44"><abbr title="App\Mail\ResetCode::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ResetCode.php.html#56"><abbr title="App\Mail\ResetCode::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionActive.php.html#17"><abbr title="App\Mail\SubscriptionActive::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionActive.php.html#25"><abbr title="App\Mail\SubscriptionActive::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionActive.php.html#32"><abbr title="App\Mail\SubscriptionActive::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionActive.php.html#39"><abbr title="App\Mail\SubscriptionActive::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionCanceled.php.html#17"><abbr title="App\Mail\SubscriptionCanceled::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionCanceled.php.html#23"><abbr title="App\Mail\SubscriptionCanceled::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionCanceled.php.html#30"><abbr title="App\Mail\SubscriptionCanceled::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionCanceled.php.html#37"><abbr title="App\Mail\SubscriptionCanceled::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionExpired.php.html#17"><abbr title="App\Mail\SubscriptionExpired::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionExpired.php.html#23"><abbr title="App\Mail\SubscriptionExpired::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionExpired.php.html#30"><abbr title="App\Mail\SubscriptionExpired::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionExpired.php.html#37"><abbr title="App\Mail\SubscriptionExpired::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentIssue.php.html#17"><abbr title="App\Mail\SubscriptionPaymentIssue::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentIssue.php.html#22"><abbr title="App\Mail\SubscriptionPaymentIssue::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentIssue.php.html#29"><abbr title="App\Mail\SubscriptionPaymentIssue::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentIssue.php.html#36"><abbr title="App\Mail\SubscriptionPaymentIssue::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentReceipt.php.html#17"><abbr title="App\Mail\SubscriptionPaymentReceipt::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentReceipt.php.html#25"><abbr title="App\Mail\SubscriptionPaymentReceipt::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentReceipt.php.html#32"><abbr title="App\Mail\SubscriptionPaymentReceipt::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SubscriptionPaymentReceipt.php.html#39"><abbr title="App\Mail\SubscriptionPaymentReceipt::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalIssue.php.html#16"><abbr title="App\Mail\WithdrawalIssue::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalIssue.php.html#22"><abbr title="App\Mail\WithdrawalIssue::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalIssue.php.html#29"><abbr title="App\Mail\WithdrawalIssue::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalIssue.php.html#36"><abbr title="App\Mail\WithdrawalIssue::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalProcessing.php.html#16"><abbr title="App\Mail\WithdrawalProcessing::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalProcessing.php.html#22"><abbr title="App\Mail\WithdrawalProcessing::envelope">envelope</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalProcessing.php.html#29"><abbr title="App\Mail\WithdrawalProcessing::content">content</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WithdrawalProcessing.php.html#36"><abbr title="App\Mail\WithdrawalProcessing::attachments">attachments</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="OrderPaymentIssue.php.html#23"><abbr title="App\Mail\OrderPaymentIssue::envelope">envelope</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="DonationSent.php.html#36"><abbr title="App\Mail\DonationSent::envelope">envelope</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 11.0.9</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.16</a> and <a href="https://phpunit.de/">PHPUnit 11.5.21</a> at Wed Dec 24 11:27:36 UTC 2025.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../_js/jquery.min.js?v=11.0.9" type="text/javascript"></script>
+  <script src="../_js/d3.min.js?v=11.0.9" type="text/javascript"></script>
+  <script src="../_js/nv.d3.min.js?v=11.0.9" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([40,0,0,0,0,0,0,0,0,0,0,0], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([159,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,4,"<a href=\"AccountDeletionCode.php.html#13\">App\\Mail\\AccountDeletionCode<\/a>"],[0,4,"<a href=\"CardExpiringSoon.php.html#12\">App\\Mail\\CardExpiringSoon<\/a>"],[0,4,"<a href=\"ConfirmRegitster.php.html#14\">App\\Mail\\ConfirmRegitster<\/a>"],[0,4,"<a href=\"DonationReceived.php.html#13\">App\\Mail\\DonationReceived<\/a>"],[0,5,"<a href=\"DonationSent.php.html#13\">App\\Mail\\DonationSent<\/a>"],[0,2,"<a href=\"EmailChangeVerification.php.html#11\">App\\Mail\\EmailChangeVerification<\/a>"],[0,4,"<a href=\"EmailChangedNew.php.html#12\">App\\Mail\\EmailChangedNew<\/a>"],[0,4,"<a href=\"EmailChangedOld.php.html#12\">App\\Mail\\EmailChangedOld<\/a>"],[0,4,"<a href=\"Gift.php.html#15\">App\\Mail\\Gift<\/a>"],[0,4,"<a href=\"GiftBuyerGuest.php.html#16\">App\\Mail\\GiftBuyerGuest<\/a>"],[0,4,"<a href=\"GiftBuyerRegistered.php.html#16\">App\\Mail\\GiftBuyerRegistered<\/a>"],[0,4,"<a href=\"GiftClaimed.php.html#16\">App\\Mail\\GiftClaimed<\/a>"],[0,4,"<a href=\"GiftRecipient.php.html#16\">App\\Mail\\GiftRecipient<\/a>"],[0,4,"<a href=\"GiftReminderRecipient.php.html#13\">App\\Mail\\GiftReminderRecipient<\/a>"],[0,5,"<a href=\"InviteByPurchase.php.html#15\">App\\Mail\\InviteByPurchase<\/a>"],[0,4,"<a href=\"IpBlockedNotification.php.html#12\">App\\Mail\\IpBlockedNotification<\/a>"],[0,4,"<a href=\"OrderConfirmed.php.html#13\">App\\Mail\\OrderConfirmed<\/a>"],[0,6,"<a href=\"OrderPaymentIssue.php.html#13\">App\\Mail\\OrderPaymentIssue<\/a>"],[0,4,"<a href=\"Password.php.html#14\">App\\Mail\\Password<\/a>"],[0,4,"<a href=\"PayoutIssue.php.html#12\">App\\Mail\\PayoutIssue<\/a>"],[0,4,"<a href=\"PayoutMethodConfirmationCode.php.html#12\">App\\Mail\\PayoutMethodConfirmationCode<\/a>"],[0,4,"<a href=\"PayoutOnItsWay.php.html#12\">App\\Mail\\PayoutOnItsWay<\/a>"],[0,4,"<a href=\"PayoutSetupActionNeeded.php.html#12\">App\\Mail\\PayoutSetupActionNeeded<\/a>"],[0,4,"<a href=\"PayoutVerificationApproved.php.html#12\">App\\Mail\\PayoutVerificationApproved<\/a>"],[0,4,"<a href=\"PayoutVerificationIssue.php.html#12\">App\\Mail\\PayoutVerificationIssue<\/a>"],[0,4,"<a href=\"PayoutVerificationThresholdReminder.php.html#12\">App\\Mail\\PayoutVerificationThresholdReminder<\/a>"],[0,4,"<a href=\"PayoutsPaused.php.html#12\">App\\Mail\\PayoutsPaused<\/a>"],[0,4,"<a href=\"PayoutsResumed.php.html#12\">App\\Mail\\PayoutsResumed<\/a>"],[0,4,"<a href=\"Promocode.php.html#15\">App\\Mail\\Promocode<\/a>"],[0,4,"<a href=\"RecurringDonationCanceled.php.html#12\">App\\Mail\\RecurringDonationCanceled<\/a>"],[0,4,"<a href=\"RecurringDonationPaymentIssue.php.html#12\">App\\Mail\\RecurringDonationPaymentIssue<\/a>"],[0,4,"<a href=\"RecurringDonationPaymentReceipt.php.html#12\">App\\Mail\\RecurringDonationPaymentReceipt<\/a>"],[0,4,"<a href=\"ResetCode.php.html#14\">App\\Mail\\ResetCode<\/a>"],[0,4,"<a href=\"SubscriptionActive.php.html#13\">App\\Mail\\SubscriptionActive<\/a>"],[0,4,"<a href=\"SubscriptionCanceled.php.html#13\">App\\Mail\\SubscriptionCanceled<\/a>"],[0,4,"<a href=\"SubscriptionExpired.php.html#13\">App\\Mail\\SubscriptionExpired<\/a>"],[0,4,"<a href=\"SubscriptionPaymentIssue.php.html#13\">App\\Mail\\SubscriptionPaymentIssue<\/a>"],[0,4,"<a href=\"SubscriptionPaymentReceipt.php.html#13\">App\\Mail\\SubscriptionPaymentReceipt<\/a>"],[0,4,"<a href=\"WithdrawalIssue.php.html#12\">App\\Mail\\WithdrawalIssue<\/a>"],[0,4,"<a href=\"WithdrawalProcessing.php.html#12\">App\\Mail\\WithdrawalProcessing<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"AccountDeletionCode.php.html#22\">App\\Mail\\AccountDeletionCode::__construct<\/a>"],[0,1,"<a href=\"AccountDeletionCode.php.html#32\">App\\Mail\\AccountDeletionCode::envelope<\/a>"],[0,1,"<a href=\"AccountDeletionCode.php.html#42\">App\\Mail\\AccountDeletionCode::content<\/a>"],[0,1,"<a href=\"AccountDeletionCode.php.html#54\">App\\Mail\\AccountDeletionCode::attachments<\/a>"],[0,1,"<a href=\"CardExpiringSoon.php.html#16\">App\\Mail\\CardExpiringSoon::__construct<\/a>"],[0,1,"<a href=\"CardExpiringSoon.php.html#22\">App\\Mail\\CardExpiringSoon::envelope<\/a>"],[0,1,"<a href=\"CardExpiringSoon.php.html#29\">App\\Mail\\CardExpiringSoon::content<\/a>"],[0,1,"<a href=\"CardExpiringSoon.php.html#36\">App\\Mail\\CardExpiringSoon::attachments<\/a>"],[0,1,"<a href=\"ConfirmRegitster.php.html#23\">App\\Mail\\ConfirmRegitster::__construct<\/a>"],[0,1,"<a href=\"ConfirmRegitster.php.html#34\">App\\Mail\\ConfirmRegitster::envelope<\/a>"],[0,1,"<a href=\"ConfirmRegitster.php.html#44\">App\\Mail\\ConfirmRegitster::content<\/a>"],[0,1,"<a href=\"ConfirmRegitster.php.html#56\">App\\Mail\\ConfirmRegitster::attachments<\/a>"],[0,1,"<a href=\"DonationReceived.php.html#22\">App\\Mail\\DonationReceived::__construct<\/a>"],[0,1,"<a href=\"DonationReceived.php.html#35\">App\\Mail\\DonationReceived::envelope<\/a>"],[0,1,"<a href=\"DonationReceived.php.html#45\">App\\Mail\\DonationReceived::content<\/a>"],[0,1,"<a href=\"DonationReceived.php.html#57\">App\\Mail\\DonationReceived::attachments<\/a>"],[0,1,"<a href=\"DonationSent.php.html#22\">App\\Mail\\DonationSent::__construct<\/a>"],[0,2,"<a href=\"DonationSent.php.html#36\">App\\Mail\\DonationSent::envelope<\/a>"],[0,1,"<a href=\"DonationSent.php.html#48\">App\\Mail\\DonationSent::content<\/a>"],[0,1,"<a href=\"DonationSent.php.html#60\">App\\Mail\\DonationSent::attachments<\/a>"],[0,1,"<a href=\"EmailChangeVerification.php.html#17\">App\\Mail\\EmailChangeVerification::__construct<\/a>"],[0,1,"<a href=\"EmailChangeVerification.php.html#24\">App\\Mail\\EmailChangeVerification::build<\/a>"],[0,1,"<a href=\"EmailChangedNew.php.html#16\">App\\Mail\\EmailChangedNew::__construct<\/a>"],[0,1,"<a href=\"EmailChangedNew.php.html#20\">App\\Mail\\EmailChangedNew::envelope<\/a>"],[0,1,"<a href=\"EmailChangedNew.php.html#27\">App\\Mail\\EmailChangedNew::content<\/a>"],[0,1,"<a href=\"EmailChangedNew.php.html#34\">App\\Mail\\EmailChangedNew::attachments<\/a>"],[0,1,"<a href=\"EmailChangedOld.php.html#16\">App\\Mail\\EmailChangedOld::__construct<\/a>"],[0,1,"<a href=\"EmailChangedOld.php.html#21\">App\\Mail\\EmailChangedOld::envelope<\/a>"],[0,1,"<a href=\"EmailChangedOld.php.html#28\">App\\Mail\\EmailChangedOld::content<\/a>"],[0,1,"<a href=\"EmailChangedOld.php.html#35\">App\\Mail\\EmailChangedOld::attachments<\/a>"],[0,1,"<a href=\"Gift.php.html#23\">App\\Mail\\Gift::__construct<\/a>"],[0,1,"<a href=\"Gift.php.html#35\">App\\Mail\\Gift::envelope<\/a>"],[0,1,"<a href=\"Gift.php.html#45\">App\\Mail\\Gift::content<\/a>"],[0,1,"<a href=\"Gift.php.html#57\">App\\Mail\\Gift::attachments<\/a>"],[0,1,"<a href=\"GiftBuyerGuest.php.html#25\">App\\Mail\\GiftBuyerGuest::__construct<\/a>"],[0,1,"<a href=\"GiftBuyerGuest.php.html#37\">App\\Mail\\GiftBuyerGuest::envelope<\/a>"],[0,1,"<a href=\"GiftBuyerGuest.php.html#51\">App\\Mail\\GiftBuyerGuest::content<\/a>"],[0,1,"<a href=\"GiftBuyerGuest.php.html#63\">App\\Mail\\GiftBuyerGuest::attachments<\/a>"],[0,1,"<a href=\"GiftBuyerRegistered.php.html#25\">App\\Mail\\GiftBuyerRegistered::__construct<\/a>"],[0,1,"<a href=\"GiftBuyerRegistered.php.html#37\">App\\Mail\\GiftBuyerRegistered::envelope<\/a>"],[0,1,"<a href=\"GiftBuyerRegistered.php.html#51\">App\\Mail\\GiftBuyerRegistered::content<\/a>"],[0,1,"<a href=\"GiftBuyerRegistered.php.html#63\">App\\Mail\\GiftBuyerRegistered::attachments<\/a>"],[0,1,"<a href=\"GiftClaimed.php.html#25\">App\\Mail\\GiftClaimed::__construct<\/a>"],[0,1,"<a href=\"GiftClaimed.php.html#37\">App\\Mail\\GiftClaimed::envelope<\/a>"],[0,1,"<a href=\"GiftClaimed.php.html#51\">App\\Mail\\GiftClaimed::content<\/a>"],[0,1,"<a href=\"GiftClaimed.php.html#63\">App\\Mail\\GiftClaimed::attachments<\/a>"],[0,1,"<a href=\"GiftRecipient.php.html#25\">App\\Mail\\GiftRecipient::__construct<\/a>"],[0,1,"<a href=\"GiftRecipient.php.html#38\">App\\Mail\\GiftRecipient::envelope<\/a>"],[0,1,"<a href=\"GiftRecipient.php.html#50\">App\\Mail\\GiftRecipient::content<\/a>"],[0,1,"<a href=\"GiftRecipient.php.html#62\">App\\Mail\\GiftRecipient::attachments<\/a>"],[0,1,"<a href=\"GiftReminderRecipient.php.html#17\">App\\Mail\\GiftReminderRecipient::__construct<\/a>"],[0,1,"<a href=\"GiftReminderRecipient.php.html#22\">App\\Mail\\GiftReminderRecipient::envelope<\/a>"],[0,1,"<a href=\"GiftReminderRecipient.php.html#30\">App\\Mail\\GiftReminderRecipient::content<\/a>"],[0,1,"<a href=\"GiftReminderRecipient.php.html#37\">App\\Mail\\GiftReminderRecipient::attachments<\/a>"],[0,1,"<a href=\"InviteByPurchase.php.html#24\">App\\Mail\\InviteByPurchase::__construct<\/a>"],[0,1,"<a href=\"InviteByPurchase.php.html#32\">App\\Mail\\InviteByPurchase::build<\/a>"],[0,1,"<a href=\"InviteByPurchase.php.html#45\">App\\Mail\\InviteByPurchase::envelope<\/a>"],[0,1,"<a href=\"InviteByPurchase.php.html#55\">App\\Mail\\InviteByPurchase::content<\/a>"],[0,1,"<a href=\"InviteByPurchase.php.html#67\">App\\Mail\\InviteByPurchase::attachments<\/a>"],[0,1,"<a href=\"IpBlockedNotification.php.html#19\">App\\Mail\\IpBlockedNotification::__construct<\/a>"],[0,1,"<a href=\"IpBlockedNotification.php.html#28\">App\\Mail\\IpBlockedNotification::envelope<\/a>"],[0,1,"<a href=\"IpBlockedNotification.php.html#38\">App\\Mail\\IpBlockedNotification::content<\/a>"],[0,1,"<a href=\"IpBlockedNotification.php.html#55\">App\\Mail\\IpBlockedNotification::attachments<\/a>"],[0,1,"<a href=\"OrderConfirmed.php.html#17\">App\\Mail\\OrderConfirmed::__construct<\/a>"],[0,1,"<a href=\"OrderConfirmed.php.html#22\">App\\Mail\\OrderConfirmed::envelope<\/a>"],[0,1,"<a href=\"OrderConfirmed.php.html#31\">App\\Mail\\OrderConfirmed::content<\/a>"],[0,1,"<a href=\"OrderConfirmed.php.html#38\">App\\Mail\\OrderConfirmed::attachments<\/a>"],[0,1,"<a href=\"OrderPaymentIssue.php.html#17\">App\\Mail\\OrderPaymentIssue::__construct<\/a>"],[0,3,"<a href=\"OrderPaymentIssue.php.html#23\">App\\Mail\\OrderPaymentIssue::envelope<\/a>"],[0,1,"<a href=\"OrderPaymentIssue.php.html#36\">App\\Mail\\OrderPaymentIssue::content<\/a>"],[0,1,"<a href=\"OrderPaymentIssue.php.html#43\">App\\Mail\\OrderPaymentIssue::attachments<\/a>"],[0,1,"<a href=\"Password.php.html#23\">App\\Mail\\Password::__construct<\/a>"],[0,1,"<a href=\"Password.php.html#34\">App\\Mail\\Password::envelope<\/a>"],[0,1,"<a href=\"Password.php.html#44\">App\\Mail\\Password::content<\/a>"],[0,1,"<a href=\"Password.php.html#56\">App\\Mail\\Password::attachments<\/a>"],[0,1,"<a href=\"PayoutIssue.php.html#16\">App\\Mail\\PayoutIssue::__construct<\/a>"],[0,1,"<a href=\"PayoutIssue.php.html#22\">App\\Mail\\PayoutIssue::envelope<\/a>"],[0,1,"<a href=\"PayoutIssue.php.html#29\">App\\Mail\\PayoutIssue::content<\/a>"],[0,1,"<a href=\"PayoutIssue.php.html#36\">App\\Mail\\PayoutIssue::attachments<\/a>"],[0,1,"<a href=\"PayoutMethodConfirmationCode.php.html#16\">App\\Mail\\PayoutMethodConfirmationCode::__construct<\/a>"],[0,1,"<a href=\"PayoutMethodConfirmationCode.php.html#21\">App\\Mail\\PayoutMethodConfirmationCode::envelope<\/a>"],[0,1,"<a href=\"PayoutMethodConfirmationCode.php.html#28\">App\\Mail\\PayoutMethodConfirmationCode::content<\/a>"],[0,1,"<a href=\"PayoutMethodConfirmationCode.php.html#35\">App\\Mail\\PayoutMethodConfirmationCode::attachments<\/a>"],[0,1,"<a href=\"PayoutOnItsWay.php.html#16\">App\\Mail\\PayoutOnItsWay::__construct<\/a>"],[0,1,"<a href=\"PayoutOnItsWay.php.html#22\">App\\Mail\\PayoutOnItsWay::envelope<\/a>"],[0,1,"<a href=\"PayoutOnItsWay.php.html#29\">App\\Mail\\PayoutOnItsWay::content<\/a>"],[0,1,"<a href=\"PayoutOnItsWay.php.html#36\">App\\Mail\\PayoutOnItsWay::attachments<\/a>"],[0,1,"<a href=\"PayoutSetupActionNeeded.php.html#16\">App\\Mail\\PayoutSetupActionNeeded::__construct<\/a>"],[0,1,"<a href=\"PayoutSetupActionNeeded.php.html#23\">App\\Mail\\PayoutSetupActionNeeded::envelope<\/a>"],[0,1,"<a href=\"PayoutSetupActionNeeded.php.html#30\">App\\Mail\\PayoutSetupActionNeeded::content<\/a>"],[0,1,"<a href=\"PayoutSetupActionNeeded.php.html#37\">App\\Mail\\PayoutSetupActionNeeded::attachments<\/a>"],[0,1,"<a href=\"PayoutVerificationApproved.php.html#16\">App\\Mail\\PayoutVerificationApproved::__construct<\/a>"],[0,1,"<a href=\"PayoutVerificationApproved.php.html#21\">App\\Mail\\PayoutVerificationApproved::envelope<\/a>"],[0,1,"<a href=\"PayoutVerificationApproved.php.html#28\">App\\Mail\\PayoutVerificationApproved::content<\/a>"],[0,1,"<a href=\"PayoutVerificationApproved.php.html#35\">App\\Mail\\PayoutVerificationApproved::attachments<\/a>"],[0,1,"<a href=\"PayoutVerificationIssue.php.html#16\">App\\Mail\\PayoutVerificationIssue::__construct<\/a>"],[0,1,"<a href=\"PayoutVerificationIssue.php.html#21\">App\\Mail\\PayoutVerificationIssue::envelope<\/a>"],[0,1,"<a href=\"PayoutVerificationIssue.php.html#28\">App\\Mail\\PayoutVerificationIssue::content<\/a>"],[0,1,"<a href=\"PayoutVerificationIssue.php.html#35\">App\\Mail\\PayoutVerificationIssue::attachments<\/a>"],[0,1,"<a href=\"PayoutVerificationThresholdReminder.php.html#16\">App\\Mail\\PayoutVerificationThresholdReminder::__construct<\/a>"],[0,1,"<a href=\"PayoutVerificationThresholdReminder.php.html#22\">App\\Mail\\PayoutVerificationThresholdReminder::envelope<\/a>"],[0,1,"<a href=\"PayoutVerificationThresholdReminder.php.html#29\">App\\Mail\\PayoutVerificationThresholdReminder::content<\/a>"],[0,1,"<a href=\"PayoutVerificationThresholdReminder.php.html#36\">App\\Mail\\PayoutVerificationThresholdReminder::attachments<\/a>"],[0,1,"<a href=\"PayoutsPaused.php.html#16\">App\\Mail\\PayoutsPaused::__construct<\/a>"],[0,1,"<a href=\"PayoutsPaused.php.html#20\">App\\Mail\\PayoutsPaused::envelope<\/a>"],[0,1,"<a href=\"PayoutsPaused.php.html#27\">App\\Mail\\PayoutsPaused::content<\/a>"],[0,1,"<a href=\"PayoutsPaused.php.html#34\">App\\Mail\\PayoutsPaused::attachments<\/a>"],[0,1,"<a href=\"PayoutsResumed.php.html#16\">App\\Mail\\PayoutsResumed::__construct<\/a>"],[0,1,"<a href=\"PayoutsResumed.php.html#20\">App\\Mail\\PayoutsResumed::envelope<\/a>"],[0,1,"<a href=\"PayoutsResumed.php.html#27\">App\\Mail\\PayoutsResumed::content<\/a>"],[0,1,"<a href=\"PayoutsResumed.php.html#34\">App\\Mail\\PayoutsResumed::attachments<\/a>"],[0,1,"<a href=\"Promocode.php.html#24\">App\\Mail\\Promocode::__construct<\/a>"],[0,1,"<a href=\"Promocode.php.html#34\">App\\Mail\\Promocode::envelope<\/a>"],[0,1,"<a href=\"Promocode.php.html#44\">App\\Mail\\Promocode::content<\/a>"],[0,1,"<a href=\"Promocode.php.html#56\">App\\Mail\\Promocode::attachments<\/a>"],[0,1,"<a href=\"RecurringDonationCanceled.php.html#16\">App\\Mail\\RecurringDonationCanceled::__construct<\/a>"],[0,1,"<a href=\"RecurringDonationCanceled.php.html#21\">App\\Mail\\RecurringDonationCanceled::envelope<\/a>"],[0,1,"<a href=\"RecurringDonationCanceled.php.html#28\">App\\Mail\\RecurringDonationCanceled::content<\/a>"],[0,1,"<a href=\"RecurringDonationCanceled.php.html#35\">App\\Mail\\RecurringDonationCanceled::attachments<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentIssue.php.html#16\">App\\Mail\\RecurringDonationPaymentIssue::__construct<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentIssue.php.html#21\">App\\Mail\\RecurringDonationPaymentIssue::envelope<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentIssue.php.html#28\">App\\Mail\\RecurringDonationPaymentIssue::content<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentIssue.php.html#35\">App\\Mail\\RecurringDonationPaymentIssue::attachments<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentReceipt.php.html#16\">App\\Mail\\RecurringDonationPaymentReceipt::__construct<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentReceipt.php.html#24\">App\\Mail\\RecurringDonationPaymentReceipt::envelope<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentReceipt.php.html#31\">App\\Mail\\RecurringDonationPaymentReceipt::content<\/a>"],[0,1,"<a href=\"RecurringDonationPaymentReceipt.php.html#38\">App\\Mail\\RecurringDonationPaymentReceipt::attachments<\/a>"],[0,1,"<a href=\"ResetCode.php.html#23\">App\\Mail\\ResetCode::__construct<\/a>"],[0,1,"<a href=\"ResetCode.php.html#34\">App\\Mail\\ResetCode::envelope<\/a>"],[0,1,"<a href=\"ResetCode.php.html#44\">App\\Mail\\ResetCode::content<\/a>"],[0,1,"<a href=\"ResetCode.php.html#56\">App\\Mail\\ResetCode::attachments<\/a>"],[0,1,"<a href=\"SubscriptionActive.php.html#17\">App\\Mail\\SubscriptionActive::__construct<\/a>"],[0,1,"<a href=\"SubscriptionActive.php.html#25\">App\\Mail\\SubscriptionActive::envelope<\/a>"],[0,1,"<a href=\"SubscriptionActive.php.html#32\">App\\Mail\\SubscriptionActive::content<\/a>"],[0,1,"<a href=\"SubscriptionActive.php.html#39\">App\\Mail\\SubscriptionActive::attachments<\/a>"],[0,1,"<a href=\"SubscriptionCanceled.php.html#17\">App\\Mail\\SubscriptionCanceled::__construct<\/a>"],[0,1,"<a href=\"SubscriptionCanceled.php.html#23\">App\\Mail\\SubscriptionCanceled::envelope<\/a>"],[0,1,"<a href=\"SubscriptionCanceled.php.html#30\">App\\Mail\\SubscriptionCanceled::content<\/a>"],[0,1,"<a href=\"SubscriptionCanceled.php.html#37\">App\\Mail\\SubscriptionCanceled::attachments<\/a>"],[0,1,"<a href=\"SubscriptionExpired.php.html#17\">App\\Mail\\SubscriptionExpired::__construct<\/a>"],[0,1,"<a href=\"SubscriptionExpired.php.html#23\">App\\Mail\\SubscriptionExpired::envelope<\/a>"],[0,1,"<a href=\"SubscriptionExpired.php.html#30\">App\\Mail\\SubscriptionExpired::content<\/a>"],[0,1,"<a href=\"SubscriptionExpired.php.html#37\">App\\Mail\\SubscriptionExpired::attachments<\/a>"],[0,1,"<a href=\"SubscriptionPaymentIssue.php.html#17\">App\\Mail\\SubscriptionPaymentIssue::__construct<\/a>"],[0,1,"<a href=\"SubscriptionPaymentIssue.php.html#22\">App\\Mail\\SubscriptionPaymentIssue::envelope<\/a>"],[0,1,"<a href=\"SubscriptionPaymentIssue.php.html#29\">App\\Mail\\SubscriptionPaymentIssue::content<\/a>"],[0,1,"<a href=\"SubscriptionPaymentIssue.php.html#36\">App\\Mail\\SubscriptionPaymentIssue::attachments<\/a>"],[0,1,"<a href=\"SubscriptionPaymentReceipt.php.html#17\">App\\Mail\\SubscriptionPaymentReceipt::__construct<\/a>"],[0,1,"<a href=\"SubscriptionPaymentReceipt.php.html#25\">App\\Mail\\SubscriptionPaymentReceipt::envelope<\/a>"],[0,1,"<a href=\"SubscriptionPaymentReceipt.php.html#32\">App\\Mail\\SubscriptionPaymentReceipt::content<\/a>"],[0,1,"<a href=\"SubscriptionPaymentReceipt.php.html#39\">App\\Mail\\SubscriptionPaymentReceipt::attachments<\/a>"],[0,1,"<a href=\"WithdrawalIssue.php.html#16\">App\\Mail\\WithdrawalIssue::__construct<\/a>"],[0,1,"<a href=\"WithdrawalIssue.php.html#22\">App\\Mail\\WithdrawalIssue::envelope<\/a>"],[0,1,"<a href=\"WithdrawalIssue.php.html#29\">App\\Mail\\WithdrawalIssue::content<\/a>"],[0,1,"<a href=\"WithdrawalIssue.php.html#36\">App\\Mail\\WithdrawalIssue::attachments<\/a>"],[0,1,"<a href=\"WithdrawalProcessing.php.html#16\">App\\Mail\\WithdrawalProcessing::__construct<\/a>"],[0,1,"<a href=\"WithdrawalProcessing.php.html#22\">App\\Mail\\WithdrawalProcessing::envelope<\/a>"],[0,1,"<a href=\"WithdrawalProcessing.php.html#29\">App\\Mail\\WithdrawalProcessing::content<\/a>"],[0,1,"<a href=\"WithdrawalProcessing.php.html#36\">App\\Mail\\WithdrawalProcessing::attachments<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

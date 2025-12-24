@@ -23,28 +23,21 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between !gap-4 !mb-10">
                   <x-title tag="h3" class="!font-normal !mb-0">Travel Insights</x-title>
                   <div class="flex items-center gap-2">
-                    <label for="insights-sort" class="text-gray text-sm">Sort by:</label>
-                    <select
-                      class="tg-select"
-                      id="insights-sort"
-                      x-data="{}"
-                      x-on:change="(evt) => {
-                        const url = new URL(window.location.href);
-                        const params = new URLSearchParams(url.search);
-                        if (evt.target.value === 'rating') {
-                          params.delete('sort');
-                        } else {
-                          params.set('sort', evt.target.value);
-                        }
-                        url.search = params.toString();
-                        window.location.href = url.toString();
-                      }"
-                    >
-                      <option value="rating" {{ $currentSort === 'rating' ? 'selected' : '' }}>Top Rated</option>
-                      <option value="popular" {{ $currentSort === 'popular' ? 'selected' : '' }}>Most Popular</option>
-                      <option value="newest" {{ $currentSort === 'newest' ? 'selected' : '' }}>Newest First</option>
-                      <option value="oldest" {{ $currentSort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                    </select>
+                    <label class="text-gray text-sm">Sort by:</label>
+                    <x-form.select
+                      name="insights-sort"
+                      :compact="true"
+                      :tooltip="false"
+                      labelClass="!text-black"
+                      value="{{ $currentSort }}"
+                      :label="$currentSort === 'rating' ? 'Top Rated' : ($currentSort === 'popular' ? 'Most Popular' : ($currentSort === 'newest' ? 'Newest First' : 'Oldest First'))"
+                      :options="[
+                        'rating' => 'Top Rated',
+                        'popular' => 'Most Popular',
+                        'newest' => 'Newest First',
+                        'oldest' => 'Oldest First',
+                      ]"
+                    />
                   </div>
                 </div>
                 
@@ -63,7 +56,12 @@
                             <span>{{ \Illuminate\Support\Carbon::parse($item->created_at)->format('d.m.Y') }}</span>
                             <div class="name_author">
                               <a class="group w-full flex items-center justify-start gap-2" href="{{ $item->author->makeProfileUrl() }}">
-                                <img src="{{ url($item->author->avatar) }}" alt="Avatar {{ $item->author->name }}">
+                                @php
+                                  $avatar = $item->author->avatar ?? null;
+                                  $avatarUrl = is_string($avatar) ? $avatar : (is_object($avatar) && method_exists($avatar, '__toString') ? (string)$avatar : '/storage/images/default_avatar.png');
+                                  $avatarUrl = str_starts_with($avatarUrl, 'http') || str_starts_with($avatarUrl, '/') ? $avatarUrl : url($avatarUrl);
+                                @endphp
+                                <img src="{{ $avatarUrl }}" alt="Avatar {{ $item->author->name }}">
                                 <p class="group-hover:!text-black transition">{{$item->author->profile }}</p>
                               </a>
                             </div>
@@ -101,6 +99,43 @@
   </section>
 @push('js')
     <script src="{{ asset('assets/js/insights.js') }}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[name="insights-sort"]');
+        if (!input) return;
+
+        const currentSort = '{{ $currentSort ?? "rating" }}';
+        input.value = currentSort;
+
+        // Sync Alpine select label once, then listen for user changes.
+        setTimeout(() => {
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+
+          setTimeout(() => {
+            let timeoutId;
+            let lastValue = input.value;
+            input.addEventListener('input', function () {
+              if (this.value === lastValue) return;
+              lastValue = this.value;
+
+              clearTimeout(timeoutId);
+              timeoutId = setTimeout(() => {
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+                const value = this.value;
+                if (value === 'rating') {
+                  params.delete('sort');
+                } else {
+                  params.set('sort', value);
+                }
+                url.search = params.toString();
+                window.location.href = url.toString();
+              }, 150);
+            });
+          }, 150);
+        }, 80);
+      });
+    </script>
 @endpush
 
 @endsection

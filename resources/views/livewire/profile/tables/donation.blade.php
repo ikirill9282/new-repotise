@@ -70,7 +70,7 @@
     @endif
 
     <div class="text-right mt-4">
-      <x-btn href="{{ route('profile.sales') }}#donation-analytics" outlined class="!border-active hover:!border-second !w-auto !px-12">
+      <x-btn href="{{ route('profile.sales', ['table' => 'donation-analytics']) }}" outlined class="!border-active hover:!border-second !w-auto !px-12">
         View All Donations
       </x-btn>
     </div>

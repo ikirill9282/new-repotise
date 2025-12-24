@@ -12,6 +12,9 @@
   'tooltipModal' => false,
   'tooltipText' => null,
   'value' => null,
+  // When true, the control shrinks to content (useful for "Sort by" UI),
+  // and the arrow stays next to the text instead of being pushed to the far right.
+  'compact' => false,
 ])
 <div 
   x-data="{
@@ -48,19 +51,25 @@
     setVal(val, label) {
       this.value = val;
       this.label = label;
-      this.$refs.placeholder.classList.add('!text-black');
+      if (this.$refs.placeholder && this.$refs.placeholder.classList) {
+        this.$refs.placeholder.classList.add('!text-black');
+      }
       
       const event = new Event('input', {
         bubbles: true,
         cancellable: true,
       });
 
-      this.$refs.input.value = this.value;
-      this.$refs.input.dispatchEvent(event);
+      if (this.$refs.input) {
+        this.$refs.input.value = this.value;
+        this.$refs.input.dispatchEvent(event);
+      }
     }
   }"
   x-init="() => {
     const initValue = () => {
+      if (!$refs.input) return;
+      
       const val = $refs.input.value ?? '';
       if (val) {
         const lab = $refs.dropdownContent?.querySelector(`div[data-key='${val}']`)?.innerHTML.trim();
@@ -69,7 +78,9 @@
         }
       } else if (label) {
         // Если есть начальный label, но нет значения, устанавливаем label
-        $refs.placeholder.classList.add('!text-black');
+        if ($refs.placeholder && $refs.placeholder.classList) {
+          $refs.placeholder.classList.add('!text-black');
+        }
       }
     };
     
@@ -112,7 +123,7 @@
     }
   }"
   @click.outside="close()"
-  class="w-full group text-sm sm:text-base"
+  class="{{ $compact ? 'inline-block' : 'w-full' }} group text-sm sm:text-base"
 >
   <input x-ref="input" type="hidden" name="{{ $name }}" value="{{ isset($value) ? $value : '' }}" {{ $attributes }}>
 
@@ -120,17 +131,28 @@
     <label class="text-sm sm:text-base text-gray mb-1.5" for="{{ $name }}">{{ $title }}</label>
   @endif
 
-  <div class="w-full !p-3 rounded bg-light @error($name) border !border-red-500 @enderror">
+  <div 
+    class="{{ $compact ? 'w-fit px-3 py-0' : 'w-full !p-3' }} rounded bg-light @error($name) border !border-red-500 @enderror"
+    x-data="{compact: {{ $compact ? 'true' : 'false' }}}"
+  >
     <div 
       x-ref="placeholder"
       x-on:click="toggle()" 
-      class="transition flex justify-between items-center relative !pr-6 
+      class="transition flex {{ $compact ? 'justify-start items-baseline gap-2' : 'justify-end items-center' }} relative {{ $compact ? '' : 'pr-6' }}
             hover:cursor-pointer hover:text-black
             {{ $attributes->get('labelClass') }}
             "
       >
-      <span x-html="label" x-bind:class="value === null ? '!text-gray' : ''">{{ $label }}</span>
-      <span class="transition group-has-[.opened]:rotate-180">
+      <span 
+        x-html="label" 
+        x-bind:class="value === null ? '!text-gray' : ''"
+        class="{{ $compact ? 'leading-tight' : 'mr-auto' }}"
+        x-ref="textSpan"
+      >{{ $label }}</span>
+      <span 
+        class="transition group-has-[.opened]:rotate-180 flex-shrink-0 {{ $compact ? 'self-baseline' : '' }}"
+        x-ref="arrowSpan"
+      >
         @include('icons.arrow_down', ['width' => 18, 'height' => 18])
       </span>
 			@if($tooltip && filled($tooltipText))

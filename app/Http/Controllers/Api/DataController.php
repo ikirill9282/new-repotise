@@ -205,7 +205,11 @@ class DataController extends Controller
               ->orWhere('slug', 'like', "%{$valid['q']}%")
           );
       })
-      ->where('status_id', '!=', Status::DELETED)
+      // Include tags with NULL status_id (legacy rows), exclude only explicitly deleted
+      ->where(function ($query) {
+        $query->whereNull('status_id')
+          ->orWhere('status_id', '!=', Status::DELETED);
+      })
       // ->ddRawSql()
       ->get()
       ->map(function($item) {
@@ -218,7 +222,15 @@ class DataController extends Controller
 
   public function types(Request $request)
   {
-    $valid = $request->validate(['q' => 'sometimes|nullable|string']);
+    $valid = $request->validate([
+      'q' => 'sometimes|nullable|string',
+      'singular' => 'sometimes|nullable|string',
+    ]);
+    
+    // Преобразуем строку "true"/"false" в boolean
+    if (isset($valid['singular'])) {
+      $valid['singular'] = filter_var($valid['singular'], FILTER_VALIDATE_BOOLEAN);
+    }
 
     return Type::query()
       ->when(
@@ -227,10 +239,17 @@ class DataController extends Controller
           ->orWhere('slug', 'like', "%{$valid['q']}%")
       )
       ->get()
-      ->map(function($item) {
+      ->map(function($item) use ($valid) {
+        $label = $item->title;
+        
+        // Если запрошено единственное число, преобразуем название
+        if (!empty($valid['singular']) && $valid['singular']) {
+          $label = $item->getSingularTitle();
+        }
+        
         return [
           'key' => $item->slug,
-          'label' => $item->title,
+          'label' => $label,
         ];
       });
   }

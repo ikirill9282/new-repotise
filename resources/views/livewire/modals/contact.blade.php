@@ -39,7 +39,8 @@
   
   @if($recaptchaSiteKey)
   // reCAPTCHA v2 callback for contact modal
-  window.onRecaptchaV2Load = function() {
+  window.recaptchaCallbacks = window.recaptchaCallbacks || [];
+  window.recaptchaCallbacks.push(function () {
     Livewire.hook('morph.updated', ({ el, component }) => {
       if (document.getElementById('recaptcha-v2-container-contact-modal') && !document.getElementById('recaptcha-v2-widget-contact-modal')) {
         grecaptcha.render('recaptcha-v2-container-contact-modal', {
@@ -53,7 +54,7 @@
         });
       }
     });
-  };
+  });
   
   // Show contacts after successful verification
   Livewire.on('toastSuccess', (message) => {

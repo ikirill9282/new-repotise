@@ -18,7 +18,8 @@ class CreateAdminUser extends Command
     protected $signature = 'admin:create-user 
                             {email : Email address for admin user}
                             {--password= : Password (if not provided, will be generated)}
-                            {--name=Admin : Name for admin user}';
+                            {--name=Admin : Name for admin user}
+                            {--force : Automatically assign roles without confirmation}';
 
     /**
      * The console command description.
@@ -42,7 +43,7 @@ class CreateAdminUser extends Command
         if ($user) {
             $this->warn("User with email {$email} already exists (ID: {$user->id})");
             
-            if (!$this->confirm('Do you want to assign admin roles to this user?')) {
+            if (!$this->option('force') && !$this->confirm('Do you want to assign admin roles to this user?')) {
                 return Command::FAILURE;
             }
         } else {

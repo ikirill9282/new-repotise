@@ -10,7 +10,7 @@ while($models->count() < $max) {
       <div class="swiper mySwiperRecomend">
           <div class="swiper-wrapper">
               @foreach($models as $model)
-              <div class="swiper-slide">                
+              <div class="swiper-slide !h-auto">                
                   @include("site.components.cards.$card", [
                     'model' => $model,
                     'variables' => $variables,

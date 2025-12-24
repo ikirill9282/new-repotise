@@ -65,31 +65,26 @@
     </script>
     @endif
     
-    {{-- reCAPTCHA disabled --}}
-    {{-- @php
+    @php
       $recaptchaSiteKey = config('services.recaptcha.site_key');
     @endphp
     @if($recaptchaSiteKey)
-    <!-- Google reCAPTCHA -->
+    <!-- Google reCAPTCHA v2 (explicit render) -->
     <script>
-      // Global reCAPTCHA callback registry
+      // Global reCAPTCHA callback registry (supports multiple widgets across pages/modals)
       window.recaptchaCallbacks = window.recaptchaCallbacks || [];
-      window.onRecaptchaV2Load = function() {
-        // Call all registered callbacks
-        window.recaptchaCallbacks.forEach(function(callback) {
+      window.onRecaptchaV2Load = function () {
+        (window.recaptchaCallbacks || []).forEach(function (callback) {
           try {
-            if (typeof callback === 'function') {
-              callback();
-            }
+            if (typeof callback === 'function') callback();
           } catch (e) {
             console.error('reCAPTCHA callback error:', e);
           }
         });
       };
     </script>
-    <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
     <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaV2Load&render=explicit" async defer></script>
-    @endif --}}
+    @endif
 </head>
 
 <body class="text-dark">
@@ -134,6 +129,91 @@
     @stack('js')
 
     @yield('js')
+
+    {{-- Controller-driven toasts (for non-Livewire redirects) --}}
+    @if(session()->has('toast_success') || session()->has('toast_error'))
+      <script>
+        (function () {
+          const success = @js(session('toast_success'));
+          const error = @js(session('toast_error'));
+
+          function normalizeToast(value, fallbackHeading) {
+            if (!value) return null;
+            if (typeof value === 'string') {
+              return { message: value, heading: fallbackHeading };
+            }
+            if (typeof value === 'object') {
+              return {
+                message: value.message || value.text || '',
+                heading: value.heading || fallbackHeading,
+              };
+            }
+            return null;
+          }
+
+          const successToast = normalizeToast(success, 'Success');
+          const errorToast = normalizeToast(error, 'Error');
+
+          if (successToast && successToast.message) {
+            $.toast({
+              text: successToast.message,
+              icon: 'success',
+              heading: successToast.heading,
+              position: 'top-right',
+              hideAfter: 5000,
+            });
+          }
+
+          if (errorToast && errorToast.message) {
+            $.toast({
+              text: errorToast.message,
+              icon: 'error',
+              heading: errorToast.heading,
+              position: 'top-right',
+              hideAfter: 5000,
+            });
+          }
+        })();
+      </script>
+    @endif
+
+    {{-- Deferred toast notifications (stored in DB for authenticated users) --}}
+    @auth
+      @php
+        $toastNotify = \App\Models\UserNotification::query()
+          ->where('user_id', auth()->id())
+          ->where('show', 1)
+          ->where('group', 'toast')
+          ->orderByDesc('id')
+          ->first();
+
+        $toastPayload = null;
+        if ($toastNotify && is_string($toastNotify->message) && $toastNotify->message !== '') {
+          $decoded = json_decode($toastNotify->message, true);
+          if (is_array($decoded)) {
+            $toastPayload = $decoded;
+          }
+        }
+
+        if ($toastNotify) {
+          $toastNotify->update(['show' => 0]);
+        }
+      @endphp
+
+      @if(!empty($toastPayload['message']))
+        <script>
+          (function () {
+            $.toast({
+              text: @js($toastPayload['message']),
+              icon: @js($toastPayload['icon'] ?? 'success'),
+              heading: @js($toastPayload['heading'] ?? (($toastPayload['icon'] ?? 'success') === 'error' ? 'Error' : 'Success')),
+              position: 'top-right',
+              hideAfter: 5000,
+            });
+          })();
+        </script>
+      @endif
+    @endauth
 </body>
 
 </html>

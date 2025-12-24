@@ -37,6 +37,9 @@ class DatabaseSeeder extends Seeder
         PolicySeeder::class,
 
         MeilisearchSeeder::class,
+        
+        // Раскомментируйте следующую строку для заполнения сайта реалистичными данными
+        // RealisticDataSeeder::class,
       ]);
     }
 }

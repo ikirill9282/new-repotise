@@ -26,7 +26,8 @@ return [
         'default' => [
             'HTML.Doctype'             => 'HTML 4.01 Transitional',
             'HTML.Allowed'             => 'div,b,strong[class],i,em,u,h1[class],h2[class],h3[class],h4[class],h5[class],a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
-            'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align',
+            // Allow basic typography + spacing so pasted Word/Docs content keeps paragraph gaps safely.
+            'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align,line-height,margin,margin-top,margin-right,margin-bottom,margin-left',
             'AutoFormat.AutoParagraph' => false,
             'AutoFormat.RemoveEmpty'   => false, // Отключаем удаление пустых элементов, чтобы сохранить структуру
         ],

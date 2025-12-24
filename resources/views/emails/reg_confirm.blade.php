@@ -14,13 +14,12 @@
           Just one more step to get started: please confirm your email address by clicking the button below:
       </p>
       <a href="{{ $user->getVerifyUrl($seller) ?? '' }}" style="display: inline-block; padding: 15px 20px; background: #FC7361; color: #fff; text-decoration: none; border-radius: 4px;">
-            Confirm Registration
+            Verify Your Email Address
         </a>
       <p>
           Didn't sign up for TrekGuider? No worries, you can safely ignore this email.
           Adventure awaits,
           The TrekGuider Crew
       </p>
-      <p>If you did not register on our site, please ignore this email.</p>
   </div>
 @endsection

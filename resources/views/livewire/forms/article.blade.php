@@ -96,11 +96,10 @@
         <x-btn wire:click.prevent="submit" class="sm:!w-auto sm:!px-28">Publish Now</x-btn>
       </div>
     @elseif($step == 1)
-      {{-- STEP 1: CONTENT --}}
+      {{-- CREATE MODE: One-page form (matches design) --}}
       <h2 class="!font-bold !text-xl !mb-10">Create New Article</h2>
       <div class="flex flex-col justify-start items-stretch !mb-10">
         <div class="flex flex-col justify-start items-stretch !gap-6">
-          
           <div class="">
             <x-form.input-counter 
               wire:model="fields.title" 
@@ -131,7 +130,6 @@
       {{-- BANNER --}}
       <h2 class="!font-bold !text-xl !mb-10">Featured Image</h2>
       <div class="banner-block relative !mb-10">
-        
         <div wire:loading class="absolute w-full h-full bg-light/50 z-150">
           <x-loader width="60" height="60" />
         </div>
@@ -161,13 +159,7 @@
         @enderror
       </div>
 
-      {{-- BUTTONS STEP 1 --}}
-      <div class="flex justify-start items-stretch !gap-2 sm:!gap-4 flex-wrap sm:!flex-nowrap">
-        <x-btn wire:click.prevent="draft" class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" outlined>Save as Draft</x-btn>
-        <x-btn wire:click.prevent="nextStep" class="!max-w-none sm:!max-w-sm">Save & Continue</x-btn>
-      </div>
-    @else
-      {{-- STEP 2: SEO SETTINGS --}}
+      {{-- SEO SETTINGS --}}
       <h2 class="!font-bold !text-xl !mb-10">SEO Settings (Optional)</h2>
       <div class="flex flex-col justify-start items-stretch !gap-6 !mb-10">
         <x-form.input-counter 
@@ -190,9 +182,8 @@
       ></x-form.textarea-counter>
     </div>
 
-      {{-- BUTTONS STEP 2 --}}
+      {{-- BUTTONS CREATE MODE --}}
       <div class="flex justify-start items-stretch !gap-2 sm:!gap-4 flex-wrap sm:!flex-nowrap">
-        <x-btn wire:click.prevent="prevStep" class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" gray>Back</x-btn>
         <x-btn wire:click.prevent="draft" class="shrink-0 sm:!w-auto !m-0 sm:!px-10 md:!px-12 !max-w-[calc(50%_-_0.25rem)] sm:max-w-none" outlined>Save as Draft</x-btn>
         <x-btn wire:click.prevent="submit" class="sm:!w-auto sm:!px-28">Publish Now</x-btn>
     </div>

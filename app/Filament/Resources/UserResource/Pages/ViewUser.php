@@ -27,6 +27,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PayoutsPaused;
+use App\Mail\PayoutsResumed;
 
 class ViewUser extends ViewRecord
 {
@@ -236,6 +239,52 @@ class ViewUser extends ViewRecord
           Notification::make()
             ->title('Commission updated')
             ->success()
+            ->send();
+        }),
+
+      Actions\Action::make('pause_payouts')
+        ->label('Pause Payouts')
+        ->color('danger')
+        ->requiresConfirmation()
+        ->visible(fn ($record) => $record->hasRole('creator', 'refered-seller'))
+        ->action(function ($record) {
+          $settings = (array) ($record->options?->dashboard_settings ?? []);
+          $settings['payouts_paused'] = true;
+          $record->options()->updateOrCreate(['user_id' => $record->id], ['dashboard_settings' => $settings]);
+
+          try {
+            Mail::to($record->email)->send(new PayoutsPaused($record));
+          } catch (\Throwable $e) {
+            // ignore
+          }
+
+          Notification::make()
+            ->success()
+            ->title('Payouts paused')
+            ->body('Seller payouts have been paused and notified by email.')
+            ->send();
+        }),
+
+      Actions\Action::make('resume_payouts')
+        ->label('Resume Payouts')
+        ->color('success')
+        ->requiresConfirmation()
+        ->visible(fn ($record) => $record->hasRole('creator', 'refered-seller'))
+        ->action(function ($record) {
+          $settings = (array) ($record->options?->dashboard_settings ?? []);
+          $settings['payouts_paused'] = false;
+          $record->options()->updateOrCreate(['user_id' => $record->id], ['dashboard_settings' => $settings]);
+
+          try {
+            Mail::to($record->email)->send(new PayoutsResumed($record));
+          } catch (\Throwable $e) {
+            // ignore
+          }
+
+          Notification::make()
+            ->success()
+            ->title('Payouts resumed')
+            ->body('Seller payouts have been resumed and notified by email.')
             ->send();
         }),
     ];

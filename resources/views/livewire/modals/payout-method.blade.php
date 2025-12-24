@@ -10,14 +10,22 @@
   </div>
 
   <div class="flex justify-start items-end gap-3 mb-5">
-    <x-form.input label="Email Verification Code" placeholder="Enter 6-digit code" class="grow" data-input="integer"></x-form.input>
-    <x-btn outlined class="!w-auto text-nowrap py-3">Resend Code</x-btn>
+    <x-form.input
+      label="Email Verification Code"
+      placeholder="Enter 6-digit code"
+      class="grow"
+      data-input="integer"
+      wire:model.defer="code"
+    />
+    <x-btn outlined class="!w-auto text-nowrap py-3" wire:click.prevent="sendCode">
+      Resend Code
+    </x-btn>
   </div>
 
 
   {{-- BUTTONS --}}
   <div class="flex justify-center items-center gap-3">
     <x-btn class="!text-sm sm:!text-base !w-auto sm:!px-12" wire:click.prevent="$dispatch('closeModal')" outlined>Cancel</x-btn>
-    <x-btn class="!text-sm sm:!text-base !grow">Enable 2FA</x-btn>
+    <x-btn class="!text-sm sm:!text-base !grow" wire:click.prevent="confirm">Continue</x-btn>
   </div>
 </div>

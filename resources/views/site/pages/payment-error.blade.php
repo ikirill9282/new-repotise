@@ -9,6 +9,16 @@
     'code' => null,
   ];
 
+  $errorTitleRaw = $errorInfo['title'] ?? print_var('page_header', $variables);
+  $errorCode = $errorInfo['code'] ?? null;
+  $errorTitle = $errorTitleRaw;
+
+  // If title looks like "Card declined (generic)" — move "(generic)" into a separate block.
+  if (empty($errorCode) && is_string($errorTitleRaw) && preg_match('/^(.*)\s+\(([^)]+)\)\s*$/', $errorTitleRaw, $m)) {
+    $errorTitle = trim($m[1]);
+    $errorCode = trim($m[2]);
+  }
+
   $currencyCode = data_get($summary, 'currency', 'USD');
   $formatCurrency = function ($value) use ($currencyCode) {
     if (is_null($value)) {
@@ -41,8 +51,14 @@
                 <div class="text_left">
                     @include('site.components.heading', [
                       'variables' => $variables->filter(fn($item) => str_contains($item->name, 'page')),
-                      'header_text' => $errorInfo['title'] ?? print_var('page_header', $variables),
+                      'header_text' => $errorTitle,
                     ])
+                    @if(!empty($errorCode))
+                      <div class="payment_error_code">
+                        <span class="label">Error code</span>
+                        <span class="code">{{ $errorCode }}</span>
+                      </div>
+                    @endif
                     <p>{{ $errorInfo['message'] ?? print_var('page_subtitle', $variables) }}</p>
                     @if(!empty($errorInfo['push']))
                       <span>{{ $errorInfo['push'] }}</span>

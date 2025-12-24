@@ -71,8 +71,6 @@ class Settings extends Component
     public bool $showPaymentForm = false;
     public ?string $paymentSetupSecret = null;
     public string $stripePublishableKey = '';
-    public array $returnPolicies = [];
-    public ?int $selectedReturnPolicy = null;
 
     public bool $isSeller = false;
 
@@ -93,15 +91,20 @@ class Settings extends Component
 
         $this->user->loadMissing('roles');
 
-        $this->loadReturnPolicies();
         $this->refreshState();
 
         if (session()->has('email_change_success')) {
-            $this->dispatch('toastSuccess', ['message' => session()->pull('email_change_success')]);
+            $this->dispatch('toastSuccess', [
+              'message' => session()->pull('email_change_success'),
+              'heading' => 'Email Updated!',
+            ]);
         }
 
         if (session()->has('email_change_error')) {
-            $this->dispatch('toastError', ['message' => session()->pull('email_change_error')]);
+            $this->dispatch('toastError', [
+              'message' => session()->pull('email_change_error'),
+              'heading' => 'Email Updated!',
+            ]);
         }
 
         $this->stripePublishableKey = stripe_key() ?? '';
@@ -111,6 +114,13 @@ class Settings extends Component
     {
         if ($propertyName === 'avatar') {
             $this->uploadAvatar();
+            return;
+        }
+
+        if (str_starts_with($propertyName, 'notifications.')) {
+            $key = (string) str_replace('notifications.', '', $propertyName);
+            $value = (bool) ($this->notifications[$key] ?? false);
+            $this->persistNotificationSetting($key, $value);
             return;
         }
 
@@ -170,7 +180,6 @@ class Settings extends Component
                 'full_name' => $this->profile['full_name'] ?: null,
                 'preferred_payment_method' => $this->selectedPaymentMethod,
                 'preferred_payout_method' => $this->selectedPayoutMethod,
-                'return_policy_id' => $this->selectedReturnPolicy,
                 'creator_visible' => $this->preferences['creator_visible'],
                 'show_donate' => $this->preferences['show_donate'],
                 'show_products' => $this->preferences['show_products'],
@@ -211,7 +220,9 @@ class Settings extends Component
     protected function refreshState(): void
     {
         $this->user->refresh()->loadMissing('roles');
-        $this->options = $this->user->options()->firstOrCreate([]);
+        $this->options = $this->user->options()->firstOrCreate([], [
+            'notification_settings' => $this->defaultNotificationSettings(),
+        ]);
 
         $this->isSeller = $this->user->hasAnyRole(['creator', 'seller']);
 
@@ -230,11 +241,9 @@ class Settings extends Component
             'show_insights' => $this->options->show_insights ?? true,
         ];
 
-        $defaultNotifications = array_fill_keys(array_keys($this->notificationLabels), false);
+        $defaultNotifications = $this->defaultNotificationSettings();
         $storedNotifications = $this->options->notification_settings ?? [];
         $this->notifications = array_merge($defaultNotifications, $storedNotifications);
-
-        $this->selectedReturnPolicy = $this->options->return_policy_id;
 
         $this->loadPaymentData();
 
@@ -401,19 +410,6 @@ class Settings extends Component
         })->all();
     }
 
-    protected function loadReturnPolicies(): void
-    {
-        $this->returnPolicies = Policies::query()
-            ->select('id', 'title')
-            ->orderBy('title')
-            ->get()
-            ->map(fn($policy) => [
-                'id' => $policy->id,
-                'title' => $policy->title,
-            ])
-            ->toArray();
-    }
-
     protected function validateProfile(): void
     {
         $this->validate([
@@ -449,7 +445,6 @@ class Settings extends Component
             'preferences.show_donate' => ['boolean'],
             'preferences.show_products' => ['boolean'],
             'preferences.show_insights' => ['boolean'],
-            'selectedReturnPolicy' => ['nullable', 'integer', Rule::exists('policies', 'id')],
             'selectedPaymentMethod' => ['nullable', 'string'],
             'selectedPayoutMethod' => ['nullable', 'string'],
         ]);
@@ -520,6 +515,44 @@ class Settings extends Component
     {
         $this->refreshState();
         $this->setTwofaToggle(false);
+    }
+
+    protected function defaultNotificationSettings(): array
+    {
+        return array_fill_keys(array_keys($this->notificationLabels), true);
+    }
+
+    protected function persistNotificationSetting(string $key, bool $value): void
+    {
+        if (!array_key_exists($key, $this->notificationLabels)) {
+            return;
+        }
+
+        try {
+            if (!$this->options) {
+                $this->options = $this->user->options()->firstOrCreate([], [
+                    'notification_settings' => $this->defaultNotificationSettings(),
+                ]);
+            }
+
+            $current = $this->options->notification_settings ?? $this->defaultNotificationSettings();
+            $current[$key] = $value;
+
+            $this->options->notification_settings = $current;
+            $this->options->save();
+        } catch (\Throwable $e) {
+            Log::error('Failed to persist notification toggle.', [
+                'user_id' => $this->user->id ?? null,
+                'key' => $key,
+                'value' => $value,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Revert UI state to stored value if save fails
+            $stored = ($this->options?->notification_settings ?? $this->defaultNotificationSettings());
+            $this->notifications[$key] = (bool) ($stored[$key] ?? true);
+            $this->dispatch('toastError', ['message' => 'Unable to save notification setting. Please try again.']);
+        }
     }
 
     public function uploadAvatar(): void

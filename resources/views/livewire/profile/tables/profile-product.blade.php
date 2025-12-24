@@ -17,9 +17,15 @@
           @foreach($products as $product)
             <div class="grid grid-cols-[2rem_10rem_minmax(16rem,100%)_minmax(0,5rem)] md:grid-cols-[2rem_12rem_minmax(0,100%)_minmax(0,16rem)] items-center !gap-4 !mb-4 last:!mb-0 max-w-full">
               <div class="">
+                @php
+                  $encryptedId = \Illuminate\Support\Facades\Crypt::encrypt($product->id);
+                @endphp
                 <x-form.checkbox 
                   label=""
-                  :id="\Illuminate\Support\Facades\Crypt::encrypt($product->id)"
+                  id="{{ $encryptedId }}"
+                  wire:model="selected"
+                  value="{{ $encryptedId }}"
+                  @disabled(!$all_checked)
                 />
               </div>
               <div class="rounded-lg overflow-hidden h-24 md:h-30">

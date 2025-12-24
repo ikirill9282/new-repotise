@@ -16,10 +16,12 @@ class Gift extends Model
         'token',
         'status',
         'claimed_at',
+        'reminder_sent_at',
     ];
 
     protected $casts = [
         'claimed_at' => 'datetime',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public const STATUS_CREATED = 'created';

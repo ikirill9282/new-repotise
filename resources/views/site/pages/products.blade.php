@@ -351,6 +351,7 @@
                             <div style="min-width: 150px;">
                                 <x-form.select 
                                     name="products-sort"
+                                    :compact="true"
                                     :label="$currentSort === 'price_high' ? 'Price: High to Low' : ($currentSort === 'price_low' ? 'Price: Low to High' : ($currentSort === 'rating' ? 'Top Rated' : ($currentSort === 'popular' ? 'Most Popular' : ($currentSort === 'newest' ? 'Newest First' : 'Oldest First'))))"
                                     :options="[
                                         'price_high' => 'Price: High to Low',

@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Models\UserOptions;
 use App\Models\EmailChange;
 use App\Models\UserVerify;
+use App\Mail\EmailChangedNew;
+use App\Mail\EmailChangedOld;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +25,7 @@ use App\Models\Order;
 use App\Models\OrderProducts;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Mail;
 
 class CabinetController extends Controller
 {
@@ -66,7 +69,7 @@ class CabinetController extends Controller
       'street2' => 'sometimes|nullable|string',
       'city' => 'required|string',
       'state' => 'required|string',
-      'zip' => 'required|string',
+      'zip' => 'required|string|regex:/^[0-9]+$/',
       'country' => 'required|string',
       'birthday' => 'required|string',
       'tax_id' => 'required|string',
@@ -83,7 +86,8 @@ class CabinetController extends Controller
       'street.required' => 'Please enter a valid Address.',
       'city.required' => 'Please enter a valid Address.',
       'state.required' => 'Please enter a valid Address.',
-      'zip.required' => 'Please enter a valid Address.',
+      'zip.required' => 'Please enter a valid ZIP/Postal Code.',
+      'zip.regex' => 'ZIP/Postal Code must contain only numbers.',
       'country.required' => 'Please enter a valid Address.',
       'birthday.required' => 'Please enter a valid Date of Birth.',
       'tax_id.required' => 'Please enter a valid Tax ID or Passport/ID Number.',
@@ -96,6 +100,12 @@ class CabinetController extends Controller
     ]);
 
     if (isset($valid['phone'])) $valid['phone'] = preg_replace('/[^0-9]+/is', '', $valid['phone']);
+    
+    // Очистка и преобразование zip в integer (только цифры)
+    if (isset($valid['zip'])) {
+      $zip = preg_replace('/[^0-9]+/is', '', $valid['zip']);
+      $valid['zip'] = !empty($zip) ? (int) $zip : null;
+    }
 
     // Обработка социальных сетей
     $socialNetworks = [
@@ -300,6 +310,15 @@ class CabinetController extends Controller
     
     if (!$user) {
       return redirect('/unknown');
+    }
+
+    // If the authenticated creator opens their own public profile, show creator page (with sidebar menu)
+    // instead of showing the public-facing creator page.
+    $authUser = Auth::user();
+    if ($authUser && $authUser->id === $user->id && $authUser->hasRole('creator')) {
+      return view('site.pages.profile-creator', [
+        'user_id' => Crypt::encrypt($user->id),
+      ]);
     }
 
     return view('site.pages.profile', [
@@ -507,11 +526,26 @@ class CabinetController extends Controller
       return redirect()->route('profile.settings');
     }
 
+    $oldEmail = $user->email;
     $user->email = $emailChange->new_email;
     $user->email_verified_at = Carbon::now();
     $user->save();
 
     $emailChange->delete();
+
+    // Notify both new and old email addresses (security)
+    try {
+      Mail::to($user->email)->send(new EmailChangedNew($user));
+      Mail::to($oldEmail)->send(new EmailChangedOld($user, $user->email));
+    } catch (\Throwable $e) {
+      Log::warning('Failed to send email change notifications.', [
+        'user_id' => $user->id,
+        'old_email' => $oldEmail,
+        'new_email' => $user->email,
+        'error' => $e->getMessage(),
+      ]);
+      // We still consider the email change successful even if notifications fail.
+    }
 
     session()->flash('email_change_success', 'Your email address has been updated.');
 

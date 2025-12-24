@@ -1,5 +1,5 @@
 <div>
-    <div class="font-bold text-2xl mb-2">Introducing Creator+</div>
+    <div class="font-bold text-3xl mb-2 tracking-tight">Introducing Creator+</div>
     <div class="text-base text-gray mb-6">The professional toolkit to help you earn more and grow faster. Coming soon.</div>
     
     <div class="space-y-4 mb-6">

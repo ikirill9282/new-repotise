@@ -6545,7 +6545,38 @@ textarea {
   gap: 0;
 }
 .success_pay_block .about_block .failed_pay .text_left h2 {
-  margin-bottom: 40px;
+  margin-bottom: 12px;
+}
+.success_pay_block .about_block .failed_pay .text_left .payment_error_code {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 0 auto 20px auto;
+  border-radius: 8px;
+  border: 1px solid rgba(42, 41, 46, 0.12);
+  background: var(--bg, #F9F9F9);
+}
+.success_pay_block .about_block .failed_pay .text_left .payment_error_code .label {
+  color: var(--gray, #A4A0A0);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.success_pay_block .about_block .failed_pay .text_left .payment_error_code .code {
+  color: var(--black, #212121);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(42, 41, 46, 0.10);
 }
 .success_pay_block .about_block .failed_pay .text_left p {
   margin-bottom: 20px;

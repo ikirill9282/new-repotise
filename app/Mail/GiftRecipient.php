@@ -26,6 +26,7 @@ class GiftRecipient extends Mailable
         public User $recipient,
         public Order $order,
         public Gift $gift,
+        public bool $isNewRecipient = false,
     )
     {
         $this->trigger = Action::GIFT_RECIPIENT;
@@ -36,8 +37,10 @@ class GiftRecipient extends Mailable
      */
     public function envelope(): Envelope
     {
+        $gifter = $this->order->buyer?->getName() ?? 'Someone';
+
         return new Envelope(
-            subject: 'Surprise! ' . ($this->order->buyer->getName() ?? 'Someone') . ' Sent You a Gift…',
+            subject: 'Surprise! ' . $gifter . ' Sent You a Gift on TrekGuider!',
         );
     }
 

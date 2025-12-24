@@ -25,6 +25,23 @@ class Analytics extends Component
 
     public string $period = '30';
 
+    public function mount(): void
+    {
+        // Allow deep-linking from dashboard buttons (e.g. "?table=donation-analytics").
+        $requested = request()->query('table');
+        $allowed = [
+            'sales-analytics',
+            'product-analytics',
+            'article-analytics',
+            'donation-analytics',
+            'payout-analytics',
+        ];
+
+        if (is_string($requested) && in_array($requested, $allowed, true)) {
+            $this->activeTable = $requested;
+        }
+    }
+
     #[On('tableChanged')]
     public function onTableChanged(string $name)
     {

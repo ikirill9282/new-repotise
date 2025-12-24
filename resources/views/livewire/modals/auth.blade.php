@@ -7,17 +7,10 @@
     {{-- STEP 1 --}}
     @if($this->step == 1)
 
-      <div class="!mb-6">
-        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email" :tooltipModal="true"></x-form.input>
-      </div>
-
-    {{-- STEP 2 --}}
-    @elseif ($this->step == 2)
-
       <div class="">
-        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email" :tooltipModal="true" autocomplete="one-time-code"></x-form.input>
+        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email" :tooltipModal="true" autocomplete="email"></x-form.input>
       </div>
-      
+
       <div x-data="{ type: 'password' }" class="">
         <x-form.input wire:model="form.password" name="password" x-bind:type="type" placeholder="Password" :tooltip="false" autocomplete="current-password">
           <x-slot name="icon">
@@ -27,16 +20,41 @@
           </x-slot>
         </x-form.input>
       </div>
-      
-      @if($this->getUser()?->twofa)
-        <div class="!mb-3">
-          <x-form.input wire:model="form.2fa" name="2fa" placeholder="Authenticator App Code" />
-        </div>
 
-        <div class="">
-          <x-form.checkbox wire:model="form.backup" label="Use Backup Code" />
-        </div>
-      @endif
+    {{-- STEP 2 --}}
+    @elseif ($this->step == 2)
+
+      <div class="text-sm text-gray text-center !-mt-1">
+        Enter the 6-digit code from your authenticator app.
+      </div>
+
+      <div class="">
+        <x-form.input
+          wire:model="form.code"
+          name="code"
+          placeholder="{{ ($this->form['use_backup'] ?? false) ? 'Recovery code' : 'Authentication Code' }}"
+          autocomplete="one-time-code"
+          inputmode="{{ ($this->form['use_backup'] ?? false) ? 'text' : 'numeric' }}"
+        />
+      </div>
+
+      <div class="flex flex-col items-center gap-2">
+        <button
+          type="button"
+          class="text-sm text-active hover:underline"
+          wire:click="$toggle('form.use_backup')"
+        >
+          {{ ($this->form['use_backup'] ?? false) ? 'Use 2FA code' : 'Use backup code' }}
+        </button>
+
+        <button
+          type="button"
+          class="text-sm text-gray hover:underline"
+          wire:click="backToLogin"
+        >
+          ← Back to login
+        </button>
+      </div>
       
       {{-- reCAPTCHA disabled --}}
       {{-- @if($this->showRecaptchaV2)
@@ -51,7 +69,9 @@
 
     <div class="flex justify-between items-center !gap-2">
       <x-btn wire:click.prevent="$dispatch('closeModal')" class="basis-1/3" gray>Cancel</x-btn>
-      <x-btn type="button" wire:click.prevent="attempt" class="basis-2/3" id="login-submit-btn" wire:target="attempt">Continue</x-btn>
+      <x-btn type="submit" class="basis-2/3" id="login-submit-btn" wire:target="attempt">
+        {{ $this->step == 2 ? 'Verify & Sign In' : 'Sign In' }}
+      </x-btn>
     </div>
 
     <div class="flex items-center justify-center">

@@ -3,16 +3,16 @@
   <div class="flex justify-between items-center mb-4">
     <div class="text-lg">Balance & Payouts</div>
     <div class="flex justify-end items-center gap-2">
-      <label for="balances-date" class="text-gray">Time Period:</label>
-      <select 
-        class="tg-select"
+      <label class="text-gray">Time Period:</label>
+      <x-form.select
+        name="balances-period"
+        :compact="true"
+        :tooltip="false"
+        labelClass="!text-black"
         wire:model.live="period"
-        id="balances-date"
-      >
-        @foreach($periodOptions ?? [] as $value => $label)
-          <option value="{{ $value }}">{{ $label }}</option>
-        @endforeach
-      </select>
+        :label="($periodOptions[$period] ?? null) ?? (collect($periodOptions ?? [])->first() ?? 'Select')"
+        :options="$periodOptions ?? []"
+      />
     </div>
   </div>
 

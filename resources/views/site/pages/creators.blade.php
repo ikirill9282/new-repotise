@@ -19,7 +19,7 @@
             <x-search action="{{ route('creators') }}" data-source="creators" placeholder="Search creators by name, topic, or channel...">
                 @if(isset($tags) && !empty($tags))
                     <div div class="name_tags">
-                        @foreach ($tags as $tag)
+                        @foreach ($tags->take(5) as $tag)
                             <a href="{{ route('creators') . '?creator=' . urlencode($tag['title']) . '' }}">{{ $tag['title'] }}</a>
                         @endforeach
                     </div>
@@ -416,6 +416,7 @@
                       <div style="min-width: 150px;">
                         <x-form.select 
                           name="creators-sort"
+                          :compact="true"
                           :label="$currentSort === 'name_asc' ? 'Name (A-Z)' : ($currentSort === 'name_desc' ? 'Name (Z-A)' : ($currentSort === 'channel_asc' ? 'Channel (A-Z)' : ($currentSort === 'channel_desc' ? 'Channel (Z-A)' : 'Followers (High to Low)')))"
                           :options="[
                             'name_asc' => 'Name (A-Z)',
@@ -441,7 +442,12 @@
                                 'is_following' => auth()->check() ? $creator->hasFollower(auth()->id()) : false,
                               ])
                               <x-link href="{{ $creator->makeProfileUrl() }}" class="rounded overflow-hidden !leading-0 !border-none !block" style="height: 273px;">
-                                <img class="object-cover w-full h-full" src="{{ $creator->avatar }}" alt="" />
+                                @php
+                                    $avatar = $creator->avatar;
+                                    $avatarUrl = is_string($avatar) ? $avatar : (is_object($avatar) && method_exists($avatar, '__toString') ? (string)$avatar : '/storage/images/default_avatar.png');
+                                    $avatarUrl = str_starts_with($avatarUrl, 'http') || str_starts_with($avatarUrl, '/') ? $avatarUrl : url($avatarUrl);
+                                @endphp
+                                <img class="object-cover w-full h-full" src="{{ $avatarUrl }}" alt="{{ $creator->getName() }}" />
                               </x-link>
 
                               <x-link href="{{ $creator->makeProfileUrl() }}" class="flex justify-start items-center !gap-2 !border-0 group-has-[a]/card:!text-black">

@@ -83,11 +83,15 @@ class Edit extends Component
 
     protected function hydrateForm(): void
     {
-        $options = $this->user->options()->firstOrCreate([]);
+        $isSeller = $this->user->hasRole('creator') || $this->user->hasRole('seller');
+        $options = $this->user->options()->firstOrCreate([], [
+            // Default ON for sellers/creators (applies only when options are created)
+            'collaboration' => $isSeller,
+        ]);
 
         $this->full_name = $options->full_name ?? $this->user->name ?? '';
         $this->description = $options->description ?? '';
-        $this->collaboration = (bool) ($options->collaboration ?? false);
+        $this->collaboration = (bool) ($options->collaboration ?? $isSeller);
         $this->country_id = $options->country_id;
         $this->contact = $options->contact;
         $this->contact2 = $options->contact2;

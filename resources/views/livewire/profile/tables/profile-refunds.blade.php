@@ -1,17 +1,25 @@
 <div id="refunds">
   <div class="flex justify-between items-center mb-4">
     <div class="font-bold text-2xl">Refunds</div>
-    <div class="block">
-      <label class="text-gray" for="sorting-refunds">Sort By:</label>
-      <select
-        class="tg-select"
-        wire:model="sorting"
-        id="sorting-refunds"
-      >
-        <option value="newest">Newest First</option>
-        <option value="oldest">Oldest First</option>
-        <option value="status">Status</option>
-      </select>
+    <div class="flex items-center gap-2">
+      <label class="text-gray">Sort By:</label>
+      @php
+        $refundSortOptions = [
+          'newest' => 'Newest First',
+          'oldest' => 'Oldest First',
+          'status' => 'Status',
+        ];
+      @endphp
+      <x-form.select
+        name="sorting-refunds"
+        :compact="true"
+        :tooltip="false"
+        labelClass="!text-black"
+        wire:model.live="sorting"
+        value="{{ $sorting ?? 'newest' }}"
+        :label="$refundSortOptions[$sorting ?? 'newest'] ?? 'Newest First'"
+        :options="$refundSortOptions"
+      />
     </div>
   </div>
 

@@ -9,7 +9,11 @@ use App\Models\UserNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
+use App\Mail\PayoutSetupActionNeeded;
+use App\Mail\PayoutVerificationApproved;
+use App\Mail\PayoutVerificationIssue;
 
 class CheckStripeVerification implements ShouldQueue
 {
@@ -45,6 +49,59 @@ class CheckStripeVerification implements ShouldQueue
             'group' => 'stripe_verification',
             'closable' => 0,
           ]);
+
+          // VI.email.1 (TЗ): Action Needed: Set Up Your Payout Information
+          $emailKey = 'email_stripe_verification_requires_input';
+          if (!$this->user->notifications()->where('group', $emailKey)->exists()) {
+            try {
+              $actionUrl = $this->user->makeStripeVerificationUrl() ?? $this->user->makeProfileVerificationUrl();
+              Mail::to($this->user->email)->send(new PayoutSetupActionNeeded(
+                user: $this->user,
+                requirements: [],
+                dueDateLabel: null,
+                actionUrl: $actionUrl,
+              ));
+              $this->user->notifications()->create([
+                'type' => 'info',
+                'group' => $emailKey,
+                'message' => json_encode(['sent_at' => now()->toDateTimeString()]),
+                'show' => 0,
+                'closable' => 0,
+              ]);
+            } catch (\Throwable $e) {
+              Log::warning('Failed to send payout setup action needed email', [
+                'user_id' => $this->user->id,
+                'error' => $e->getMessage(),
+              ]);
+            }
+          }
+
+          // VI.email.3 (TЗ): Important: Action Required for account verification issue
+          if (!empty($verify_session->last_error)) {
+            $issueKey = 'email_stripe_verification_issue';
+            if (!$this->user->notifications()->where('group', $issueKey)->exists()) {
+              try {
+                $actionUrl = $this->user->makeStripeVerificationUrl() ?? $this->user->makeProfileVerificationUrl();
+                Mail::to($this->user->email)->send(new PayoutVerificationIssue(
+                  user: $this->user,
+                  actionUrl: $actionUrl,
+                ));
+                $this->user->notifications()->create([
+                  'type' => 'info',
+                  'group' => $issueKey,
+                  'message' => json_encode(['sent_at' => now()->toDateTimeString()]),
+                  'show' => 0,
+                  'closable' => 0,
+                ]);
+              } catch (\Throwable $e) {
+                Log::warning('Failed to send payout verification issue email', [
+                  'user_id' => $this->user->id,
+                  'error' => $e->getMessage(),
+                ]);
+              }
+            }
+          }
+
           Log::info("User {$this->user->username} requires input for verification.", [
             'user' => $this->user,
             'verify' => $verify,
@@ -82,6 +139,29 @@ class CheckStripeVerification implements ShouldQueue
             'type' => 'success',
             'message' => "Verification success! Your account is now verified.",
           ]);
+
+          // VI.email.2 (TЗ): You're Verified! Your TrekGuider Account is Ready for Payouts!
+          $emailKey = 'email_stripe_verification_verified';
+          if (!$this->user->notifications()->where('group', $emailKey)->exists()) {
+            try {
+              Mail::to($this->user->email)->send(new PayoutVerificationApproved(
+                user: $this->user,
+                dashboardUrl: route('profile.dashboard'),
+              ));
+              $this->user->notifications()->create([
+                'type' => 'info',
+                'group' => $emailKey,
+                'message' => json_encode(['sent_at' => now()->toDateTimeString()]),
+                'show' => 0,
+                'closable' => 0,
+              ]);
+            } catch (\Throwable $e) {
+              Log::warning('Failed to send payout verification approved email', [
+                'user_id' => $this->user->id,
+                'error' => $e->getMessage(),
+              ]);
+            }
+          }
           
           History::userVerified($this->user);
           $verify->delete();

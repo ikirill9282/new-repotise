@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\PaymentIntents;
 use App\Jobs\CancelPaymentIntents;
 use App\Mail\InviteByPurchase;
+use App\Mail\OrderPaymentIssue;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use App\Jobs\ProcessOrder;
@@ -27,6 +28,7 @@ use App\Models\Product;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Mail\SubscriptionActive;
 
 
 class PaymentController extends Controller
@@ -240,6 +242,39 @@ class PaymentController extends Controller
     $errorPayload = $this->resolveStripeErrorPayload($request, $paymentIntent);
     $context = $this->resolvePaymentContext($request, $paymentIntent, $errorPayload);
 
+    // II.email.2 (TЗ): Payment issue email (best-effort, avoid spamming via session flag)
+    try {
+      $order = null;
+      $paymentIntentId = $request->query('payment_intent');
+
+      if ($paymentIntentId) {
+        $paymentModel = Payments::with('paymentable')->where('stripe_id', $paymentIntentId)->first();
+        if ($paymentModel && $paymentModel->paymentable instanceof Order) {
+          $order = $paymentModel->paymentable;
+        }
+      }
+
+      $buyer = Auth::user();
+
+      if ($order && !$buyer) {
+        $buyer = $order->buyer ?? $order->user;
+      }
+
+      if ($buyer && $buyer->email && $paymentIntentId) {
+        $sessionKey = 'payment_issue_email_sent_' . $paymentIntentId;
+        if (!Session::get($sessionKey)) {
+          $checkoutHash = $order ? CustomEncrypt::generateUrlHash(['id' => $order->id]) : null;
+          Mail::to($buyer->email)->send(new OrderPaymentIssue($buyer, $order, $checkoutHash));
+          Session::put($sessionKey, true);
+        }
+      }
+    } catch (\Throwable $e) {
+      Log::warning('Failed to send payment issue email', [
+        'payment_intent' => $request->query('payment_intent'),
+        'error' => $e->getMessage(),
+      ]);
+    }
+
     return view('site.pages.payment-error', [
       'page' => Page::where('slug', 'payment-error')->with('config')->first(),
       'error' => $errorPayload,
@@ -300,6 +335,38 @@ class PaymentController extends Controller
     $periodLabel = $this->resolveSubscriptionPeriod($subscription);
 
     $subscription->loadMissing('user');
+
+    // III.email.1 (TЗ): Subscription active (buyer)
+    try {
+      if ($product && $subscription->user) {
+        $subprice = $product->subprice;
+        $periodKey = $subscription->type && str_starts_with($subscription->type, 'plan_')
+          ? (explode('_', $subscription->type)[1] ?? null)
+          : null;
+
+        $periodKey = $periodKey ?: (is_string($periodLabel) ? strtolower($periodLabel) : null);
+        $periodKey = in_array($periodKey, ['month', 'quarter', 'year'], true) ? $periodKey : null;
+
+        $price = $periodKey && $subprice ? $subprice->getPeriodPrice($periodKey) : null;
+        $priceLabel = $price !== null ? ('$' . number_format((float) $price, 2)) : '$0.00';
+
+        $nextBillingDate = $this->resolveNextBillingDate($subscription);
+        $nextBillingDateLabel = $nextBillingDate ? $nextBillingDate->format('m.d.Y') : null;
+
+        Mail::to($subscription->user->email)->send(new SubscriptionActive(
+          $subscription->user,
+          $product,
+          $periodLabel ?: 'month',
+          $priceLabel,
+          $nextBillingDateLabel,
+        ));
+      }
+    } catch (\Throwable $e) {
+      Log::warning('Failed to send subscription active email', [
+        'subscription_id' => $subscription->id,
+        'error' => $e->getMessage(),
+      ]);
+    }
 
     return view('site.pages.subscription-success', [
       'page' => Page::where('slug', 'payment-success')->with('config')->first(),

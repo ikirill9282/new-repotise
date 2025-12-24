@@ -34,7 +34,7 @@ class ConfirmRegitster extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirm Regitstration',
+            subject: "Welcome to TrekGuider! Let's Confirm Your Email",
         );
     }
 

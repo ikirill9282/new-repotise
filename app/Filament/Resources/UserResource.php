@@ -50,18 +50,16 @@ class UserResource extends Resource
   {
     $query = parent::getEloquentQuery()
       ->withoutGlobalScopes([SoftDeletingScope::class])
-      ->with('roles');
+      ->with(['roles' => function($q) {
+        $q->select('id', 'name', 'title');
+      }]);
     
     // Check if system_users filter is active via request
     // Filament stores toggle filter state in tableFilters parameter
     $tableFilters = request()->get('tableFilters', []);
     if (!isset($tableFilters['system_users']) || !$tableFilters['system_users']) {
       // By default, exclude system users
-      // Also include users with ID 0 (if they exist) even if they have system role
-      $query->where(function($q) {
-        $q->whereDoesntHave('roles', fn($subq) => $subq->where('name', 'system'))
-          ->orWhere('id', 0);
-      });
+      $query->whereDoesntHave('roles', fn($subq) => $subq->where('name', 'system'));
     }
     // If filter is active, don't exclude system users (show all)
     

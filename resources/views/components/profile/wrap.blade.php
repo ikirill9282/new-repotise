@@ -23,10 +23,14 @@
 @endpush
 
 @php
+    $creatorPageUrl = auth()->user()->hasRole('creator')
+        ? auth()->user()->makeProfileUrl()
+        : route('profile.purchases');
+
     $routes = auth()->user()->hasRole('creator')
         ? [
             'profile.dashboard' => ['url' => route('profile.dashboard'), 'icon' => 'dashboard', 'label' => 'Dashboard'],
-            'profile' => ['url' => route('profile'), 'icon' => 'monitor', 'label' => 'Creator Page'],
+            'profile' => ['url' => $creatorPageUrl, 'icon' => 'monitor', 'label' => 'Creator Page'],
             'profile.products' => ['url' => route('profile.products'), 'icon' => 'pic', 'label' => 'My Products'],
             'profile.articles' => ['url' => route('profile.articles'), 'icon' => 'document', 'label' => 'My Articles'],
             'profile.reviews' => ['url' => route('profile.reviews'), 'icon' => 'stari', 'label' => 'Reviews & Refunds'],

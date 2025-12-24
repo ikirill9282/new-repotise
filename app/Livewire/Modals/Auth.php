@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Carbon;
@@ -24,8 +25,8 @@ class Auth extends Component
 	public array $form = [
 		'email' => null,
 		'password' => null,
-		'2fa' => null,
-		'backup' => null,
+		'code' => null,
+		'use_backup' => false,
 		'recaptcha_token' => null,
 	];
 
@@ -47,54 +48,12 @@ class Auth extends Component
 		return app(IpRateLimitService::class);
 	}
 
-	public function prepareEmail()
-	{
-		$validator = Validator::make(
-			$this->form,
-			[
-				'email' => 'required|email',
-			],
-			[
-				'email.required' => 'Please enter your email address.',
-				'email.email' => 'Please enter a valid email address.',
-			]
-		);
-
-		if ($validator->fails()) {
-			throw new ValidationException($validator);
-		}
-
-		$valid = $validator->validated();
-		$user = User::firstWhere('email', $valid['email']);
-
-		if (!$user) {
-			$this->resetValidation();
-			$this->dispatch('openModal', 'register', ['email' => $valid['email']]);
-			return;
-		}
-
-		$this->user_id = Crypt::encrypt($user->id);
-		$this->step = 2;
-
-		// reCAPTCHA disabled
-		// Check if we need to show reCAPTCHA v2 when moving to step 2
-		// $ipAddress = request()->ip();
-		// $rateLimitService = $this->getRateLimitService();
-		// $failedAttempts = $rateLimitService->getRemainingAttempts($ipAddress, 'login', 10, 60);
-		// $this->showRecaptchaV2 = (10 - $failedAttempts) >= 3;
-		$this->showRecaptchaV2 = false;
-	}
-
 	public function attempt()
 	{
 		Log::info('Auth::attempt called', [
 			'step' => $this->step,
 			'email' => $this->form['email'] ?? null,
 		]);
-
-		if ($this->step == 1) {
-			return $this->prepareEmail();
-		}
 
 		$ipAddress = request()->ip();
 		$rateLimitService = $this->getRateLimitService();
@@ -115,24 +74,34 @@ class Auth extends Component
 		// }
 		$this->showRecaptchaV2 = false;
 
-		$validator = Validator::make(
-			$this->form,
-			[
-				'email' => 'required|email|exists:users,email',
-				'password' => 'required|string',
-				'2fa' => 'sometimes|nullable|string',
-				'backup' => 'sometimes|nullable|boolean',
-				// reCAPTCHA disabled
-				// 'recaptcha_token' => $this->showRecaptchaV2 ? 'required|string' : 'sometimes|nullable|string',
-			],
-			[
-				'email.required' => 'Please enter your email address.',
-				'email.email' => 'Please enter a valid email address.',
-				'email.exists' => 'Account with this email was not found.',
-				'password.required' => 'Please enter your password.',
-				// 'recaptcha_token.required' => 'Please complete the reCAPTCHA verification.',
-			]
-		);
+		if ($this->step == 1) {
+			$validator = Validator::make(
+				$this->form,
+				[
+					'email' => 'required|email',
+					'password' => 'required|string',
+					// reCAPTCHA disabled
+					// 'recaptcha_token' => $this->showRecaptchaV2 ? 'required|string' : 'sometimes|nullable|string',
+				],
+				[
+					'email.required' => 'Please enter your email address.',
+					'email.email' => 'Please enter a valid email address.',
+					'password.required' => 'Please enter your password.',
+				]
+			);
+		} else {
+			$validator = Validator::make(
+				$this->form,
+				[
+					'code' => ['required', 'string', 'regex:/^(?:[0-9]{6}|[A-Za-z0-9]{6}|[A-Za-z0-9]{8,15})$/'],
+					'use_backup' => 'sometimes|boolean',
+				],
+				[
+					'code.required' => 'Please enter the authentication code.',
+					'code.regex' => 'Invalid code format.',
+				]
+			);
+		}
 
 		if ($validator->fails()) {
 			throw new ValidationException($validator);
@@ -164,7 +133,18 @@ class Auth extends Component
 		// 	}
 		// }
 
-		$user = $this->getUser()?->fresh();
+		$user = null;
+		if ($this->step == 1) {
+			$user = User::firstWhere('email', $valid['email'])?->fresh();
+
+			if (!$user) {
+				$this->resetValidation();
+				$this->dispatch('openModal', 'register', ['email' => $valid['email']]);
+				return;
+			}
+		} else {
+			$user = $this->getUser()?->fresh();
+		}
 
 		if ($user && !$user->active && $this->canRestoreFromDeletion($user)) {
 			$user->forceFill([
@@ -174,6 +154,12 @@ class Auth extends Component
 			])->save();
 
 			$user->refresh();
+
+			// I.toast.8 (TЗ): Account Deletion Canceled 👍
+			$this->dispatch('toastSuccess', [
+				'message' => 'Your account deletion request has been canceled. Welcome back!',
+				'heading' => 'Account Deletion Canceled 👍',
+			]);
 		}
 
 		if (!$user || !$user->active) {
@@ -182,21 +168,54 @@ class Auth extends Component
 			throw new ValidationException($validator);
 		}
 
-		if ($user->twofa) {
-			$this->verifyTwofa($user, $validator, $valid);
+		if ($this->step == 1) {
+			// Validate credentials first (no 2FA field on this screen).
+			if (!Hash::check((string) $valid['password'], (string) $user->password)) {
+				$rateLimitService->recordAttempt($ipAddress, 'login', false, $user->id);
+				$validator->errors()->add('email', 'Invalid email or password. Please try again.');
+				throw new ValidationException($validator);
+			}
+
+			// If 2FA is enabled - go to second screen, ask for code/backup code.
+			if ($user->twofa) {
+				$this->user_id = Crypt::encrypt($user->id);
+				$this->step = 2;
+				$this->form['code'] = null;
+				$this->form['use_backup'] = false;
+				return;
+			}
+
+			// No 2FA: proceed with normal login.
+			if (AuthFacade::attempt(['email' => $valid['email'], 'password' => $valid['password']], true)) {
+				$rateLimitService->recordAttempt($ipAddress, 'login', true, $user->id);
+				Session::regenerate(true);
+				$url = str_ireplace('&modal=auth', '', url()->previous());
+				$url = str_ireplace('?modal=auth', '', $url);
+				return redirect($url);
+			}
+
+			$rateLimitService->recordAttempt($ipAddress, 'login', false, $user->id);
+			$validator->errors()->add('email', 'Invalid email or password. Please try again.');
+			throw new ValidationException($validator);
 		}
 
-		if (AuthFacade::attempt(['email' => $valid['email'], 'password' => $valid['password']], true)) {
-			$rateLimitService->recordAttempt($ipAddress, 'login', true, $user->id);
-			Session::regenerate(true);
-			$url = str_ireplace('&modal=auth', '', url()->previous());
-			$url = str_ireplace('?modal=auth', '', $url);
-			return redirect($url);
+		// Step 2: verify 2FA or backup code then log in.
+		if (!$user->twofa) {
+			$this->step = 1;
+			$this->user_id = null;
+			$validator->errors()->add('email', 'Two-factor authentication is not enabled for this account.');
+			throw new ValidationException($validator);
 		}
 
-		$rateLimitService->recordAttempt($ipAddress, 'login', false, $user->id);
-		$validator->errors()->add('email', 'Invalid email or password. Please try again.');
-		throw new ValidationException($validator);
+		$this->verifyTwofa($user, $validator, $valid);
+
+		AuthFacade::login($user, true);
+		$rateLimitService->recordAttempt($ipAddress, 'login', true, $user->id);
+		Session::regenerate(true);
+
+		$url = str_ireplace('&modal=auth', '', url()->previous());
+		$url = str_ireplace('?modal=auth', '', $url);
+		return redirect($url);
 	}
 
 	public function googleAuth()
@@ -238,21 +257,30 @@ class Auth extends Component
 		return Carbon::parse($user->deletion_scheduled_for)->isFuture();
 	}
 
+	public function backToLogin(): void
+	{
+		$this->step = 1;
+		$this->user_id = null;
+		$this->form['code'] = null;
+		$this->form['use_backup'] = false;
+		$this->resetValidation();
+	}
+
 	protected function verifyTwofa(User $user, $validator, array $valid): void
 	{
-		$code = isset($valid['2fa']) ? trim((string) $valid['2fa']) : '';
-		$useBackup = (bool) ($valid['backup'] ?? false);
+		$code = isset($valid['code']) ? trim((string) $valid['code']) : '';
+		$useBackup = (bool) ($valid['use_backup'] ?? false);
 
 		if ($useBackup) {
 			if ($code === '') {
-				$validator->errors()->add('2fa', 'Please enter your backup code.');
+				$validator->errors()->add('code', 'Please enter your backup code.');
 				throw new ValidationException($validator);
 			}
 
 			$backup = $user->backup()->where('code', $code)->first();
 
 			if (!$backup) {
-				$validator->errors()->add('2fa', 'Invalid backup code.');
+				$validator->errors()->add('code', 'Invalid backup code.');
 				throw new ValidationException($validator);
 			}
 
@@ -262,24 +290,24 @@ class Auth extends Component
 		}
 
 		if ($code === '') {
-			$validator->errors()->add('2fa', 'Enter the code from your authenticator app.');
+			$validator->errors()->add('code', 'Enter the code from your authenticator app.');
 			throw new ValidationException($validator);
 		}
 
 		if (empty($user->google2fa_secret)) {
-			$validator->errors()->add('2fa', 'Two-factor authentication is not configured. Please contact support.');
+			$validator->errors()->add('code', 'Two-factor authentication is not configured. Please contact support.');
 			throw new ValidationException($validator);
 		}
 
 		try {
 			$secret = Crypt::decryptString($user->google2fa_secret);
 		} catch (\Throwable $e) {
-			$validator->errors()->add('2fa', 'Unable to verify the authentication code. Please try again later.');
+			$validator->errors()->add('code', 'Unable to verify the authentication code. Please try again later.');
 			throw new ValidationException($validator);
 		}
 
 		if (!Google2FA::verifyKey($secret, preg_replace('/\s+/', '', $code), 4)) {
-			$validator->errors()->add('2fa', 'Invalid authenticator app code.');
+			$validator->errors()->add('code', 'Invalid authenticator app code.');
 			throw new ValidationException($validator);
 		}
 	}

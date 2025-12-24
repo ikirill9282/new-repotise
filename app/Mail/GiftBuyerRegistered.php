@@ -36,8 +36,12 @@ class GiftBuyerRegistered extends Mailable
      */
     public function envelope(): Envelope
     {
+        $productName = $this->order->order_products->first()?->product?->title
+            ?? $this->order->products->first()?->title
+            ?? 'Your Gift';
+
         return new Envelope(
-            subject: 'You Just Gifted Some Adventure…',
+            subject: 'You Just Gifted Some Adventure! ("' . $productName . '" Sent!)',
         );
     }
 

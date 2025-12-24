@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('user_options', function (Blueprint $table) {
+            if (Schema::hasColumn('user_options', 'showcase_products_only_selected')) {
+                return;
+            }
+
+            $table->boolean('showcase_products_only_selected')
+                ->default(false)
+                ->after('show_products');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('user_options', function (Blueprint $table) {
+            if (!Schema::hasColumn('user_options', 'showcase_products_only_selected')) {
+                return;
+            }
+
+            $table->dropColumn('showcase_products_only_selected');
+        });
+    }
+};
+

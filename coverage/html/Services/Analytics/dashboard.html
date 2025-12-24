@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /var/www/html/app/Services/Analytics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=11.0.9" rel="stylesheet" type="text/css">
+  <link href="../../_css/nv.d3.min.css?v=11.0.9" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=11.0.9" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">/var/www/html/app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Services</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Analytics</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="ContentPerformanceService.php.html#10">App\Services\Analytics\ContentPerformanceService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#17">App\Services\Analytics\GA4Service</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#11">App\Services\Analytics\SalesRevenueService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#10">App\Services\Analytics\StripeAnalyticsService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#8">App\Services\Analytics\TrafficEngagementService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#10">App\Services\Analytics\UserActivityService</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="GA4Service.php.html#17">App\Services\Analytics\GA4Service</a></td><td class="text-right">1406</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#8">App\Services\Analytics\TrafficEngagementService</a></td><td class="text-right">992</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#10">App\Services\Analytics\StripeAnalyticsService</a></td><td class="text-right">420</td></tr>
+       <tr><td><a href="UserActivityService.php.html#10">App\Services\Analytics\UserActivityService</a></td><td class="text-right">380</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#11">App\Services\Analytics\SalesRevenueService</a></td><td class="text-right">182</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#10">App\Services\Analytics\ContentPerformanceService</a></td><td class="text-right">156</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="ContentPerformanceService.php.html#14"><abbr title="App\Services\Analytics\ContentPerformanceService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#23"><abbr title="App\Services\Analytics\ContentPerformanceService::getTotalContentViews">getTotalContentViews</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#33"><abbr title="App\Services\Analytics\ContentPerformanceService::getUniqueContentViews">getUniqueContentViews</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#41"><abbr title="App\Services\Analytics\ContentPerformanceService::getAvgTimeOnContent">getAvgTimeOnContent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#49"><abbr title="App\Services\Analytics\ContentPerformanceService::getNewContentPublished">getNewContentPublished</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#55"><abbr title="App\Services\Analytics\ContentPerformanceService::getTotalApprovedComments">getTotalApprovedComments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#63"><abbr title="App\Services\Analytics\ContentPerformanceService::getCommentEngagementRate">getCommentEngagementRate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#75"><abbr title="App\Services\Analytics\ContentPerformanceService::getTopPerformingContent">getTopPerformingContent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#104"><abbr title="App\Services\Analytics\ContentPerformanceService::getAuthorStatistics">getAuthorStatistics</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#22"><abbr title="App\Services\Analytics\GA4Service::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#44"><abbr title="App\Services\Analytics\GA4Service::getClient">getClient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#49"><abbr title="App\Services\Analytics\GA4Service::getPropertyId">getPropertyId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#63"><abbr title="App\Services\Analytics\GA4Service::runReport">runReport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#164"><abbr title="App\Services\Analytics\GA4Service::getSessions">getSessions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#177"><abbr title="App\Services\Analytics\GA4Service::getTotalUsers">getTotalUsers</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#190"><abbr title="App\Services\Analytics\GA4Service::getScreenPageViews">getScreenPageViews</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#203"><abbr title="App\Services\Analytics\GA4Service::getAverageSessionDuration">getAverageSessionDuration</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#217"><abbr title="App\Services\Analytics\GA4Service::getBounceRate">getBounceRate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#230"><abbr title="App\Services\Analytics\GA4Service::getVisitsTrend">getVisitsTrend</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#250"><abbr title="App\Services\Analytics\GA4Service::getTrafficSources">getTrafficSources</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#274"><abbr title="App\Services\Analytics\GA4Service::getLandingPages">getLandingPages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#296"><abbr title="App\Services\Analytics\GA4Service::getTopContent">getTopContent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#318"><abbr title="App\Services\Analytics\GA4Service::getLocationData">getLocationData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#339"><abbr title="App\Services\Analytics\GA4Service::getContentViews">getContentViews</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GA4Service.php.html#362"><abbr title="App\Services\Analytics\GA4Service::formatDuration">formatDuration</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#13"><abbr title="App\Services\Analytics\SalesRevenueService::getTotalGMV">getTotalGMV</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#27"><abbr title="App\Services\Analytics\SalesRevenueService::getNetPlatformRevenue">getNetPlatformRevenue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#38"><abbr title="App\Services\Analytics\SalesRevenueService::getProductSalesGMV">getProductSalesGMV</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#45"><abbr title="App\Services\Analytics\SalesRevenueService::getSubscriptionGMV">getSubscriptionGMV</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#53"><abbr title="App\Services\Analytics\SalesRevenueService::getDonationGMV">getDonationGMV</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#60"><abbr title="App\Services\Analytics\SalesRevenueService::getTotalOrders">getTotalOrders</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#67"><abbr title="App\Services\Analytics\SalesRevenueService::getAOV">getAOV</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#79"><abbr title="App\Services\Analytics\SalesRevenueService::getReferralRevenue">getReferralRevenue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#90"><abbr title="App\Services\Analytics\SalesRevenueService::getRevenueTrendData">getRevenueTrendData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#116"><abbr title="App\Services\Analytics\SalesRevenueService::getPreviousPeriodValue">getPreviousPeriodValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#12"><abbr title="App\Services\Analytics\StripeAnalyticsService::getActiveSellersCount">getActiveSellersCount</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#37"><abbr title="App\Services\Analytics\StripeAnalyticsService::getPendingVerificationCount">getPendingVerificationCount</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#60"><abbr title="App\Services\Analytics\StripeAnalyticsService::getPayoutsData">getPayoutsData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#91"><abbr title="App\Services\Analytics\StripeAnalyticsService::getConnectedAccountsCount">getConnectedAccountsCount</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#105"><abbr title="App\Services\Analytics\StripeAnalyticsService::getAccountStatus">getAccountStatus</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#12"><abbr title="App\Services\Analytics\TrafficEngagementService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#39"><abbr title="App\Services\Analytics\TrafficEngagementService::hasWorkingGA4">hasWorkingGA4</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#57"><abbr title="App\Services\Analytics\TrafficEngagementService::getTotalVisits">getTotalVisits</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#69"><abbr title="App\Services\Analytics\TrafficEngagementService::getUniqueVisitors">getUniqueVisitors</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#83"><abbr title="App\Services\Analytics\TrafficEngagementService::getPageviews">getPageviews</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#97"><abbr title="App\Services\Analytics\TrafficEngagementService::getAvgSessionDuration">getAvgSessionDuration</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#108"><abbr title="App\Services\Analytics\TrafficEngagementService::getBounceRate">getBounceRate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#117"><abbr title="App\Services\Analytics\TrafficEngagementService::getVisitsTrendData">getVisitsTrendData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#142"><abbr title="App\Services\Analytics\TrafficEngagementService::getTrafficSources">getTrafficSources</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#151"><abbr title="App\Services\Analytics\TrafficEngagementService::getLandingPages">getLandingPages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#160"><abbr title="App\Services\Analytics\TrafficEngagementService::getTopContent">getTopContent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#207"><abbr title="App\Services\Analytics\TrafficEngagementService::getLocationData">getLocationData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#237"><abbr title="App\Services\Analytics\TrafficEngagementService::getPreviousPeriodValue">getPreviousPeriodValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#12"><abbr title="App\Services\Analytics\UserActivityService::getTotalActiveUsers">getTotalActiveUsers</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#25"><abbr title="App\Services\Analytics\UserActivityService::getNewRegistrations">getNewRegistrations</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#36"><abbr title="App\Services\Analytics\UserActivityService::getTotalBuyers">getTotalBuyers</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#45"><abbr title="App\Services\Analytics\UserActivityService::getTotalActiveSellers">getTotalActiveSellers</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#71"><abbr title="App\Services\Analytics\UserActivityService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#80"><abbr title="App\Services\Analytics\UserActivityService::getStripeActiveSellers">getStripeActiveSellers</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#90"><abbr title="App\Services\Analytics\UserActivityService::getSellersPendingVerification">getSellersPendingVerification</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#98"><abbr title="App\Services\Analytics\UserActivityService::getUserRetentionRate">getUserRetentionRate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#133"><abbr title="App\Services\Analytics\UserActivityService::getRegistrationTrendData">getRegistrationTrendData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UserActivityService.php.html#155"><abbr title="App\Services\Analytics\UserActivityService::getTopSellers">getTopSellers</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="GA4Service.php.html#63"><abbr title="App\Services\Analytics\GA4Service::runReport">runReport</abbr></a></td><td class="text-right">156</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#37"><abbr title="App\Services\Analytics\StripeAnalyticsService::getPendingVerificationCount">getPendingVerificationCount</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#12"><abbr title="App\Services\Analytics\TrafficEngagementService::__construct">__construct</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="GA4Service.php.html#22"><abbr title="App\Services\Analytics\GA4Service::__construct">__construct</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#12"><abbr title="App\Services\Analytics\StripeAnalyticsService::getActiveSellersCount">getActiveSellersCount</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="GA4Service.php.html#339"><abbr title="App\Services\Analytics\GA4Service::getContentViews">getContentViews</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#60"><abbr title="App\Services\Analytics\StripeAnalyticsService::getPayoutsData">getPayoutsData</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="GA4Service.php.html#49"><abbr title="App\Services\Analytics\GA4Service::getPropertyId">getPropertyId</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#90"><abbr title="App\Services\Analytics\SalesRevenueService::getRevenueTrendData">getRevenueTrendData</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#39"><abbr title="App\Services\Analytics\TrafficEngagementService::hasWorkingGA4">hasWorkingGA4</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#207"><abbr title="App\Services\Analytics\TrafficEngagementService::getLocationData">getLocationData</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="UserActivityService.php.html#155"><abbr title="App\Services\Analytics\UserActivityService::getTopSellers">getTopSellers</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#14"><abbr title="App\Services\Analytics\ContentPerformanceService::__construct">__construct</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#23"><abbr title="App\Services\Analytics\ContentPerformanceService::getTotalContentViews">getTotalContentViews</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="ContentPerformanceService.php.html#63"><abbr title="App\Services\Analytics\ContentPerformanceService::getCommentEngagementRate">getCommentEngagementRate</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="GA4Service.php.html#362"><abbr title="App\Services\Analytics\GA4Service::formatDuration">formatDuration</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="SalesRevenueService.php.html#67"><abbr title="App\Services\Analytics\SalesRevenueService::getAOV">getAOV</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#91"><abbr title="App\Services\Analytics\StripeAnalyticsService::getConnectedAccountsCount">getConnectedAccountsCount</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="StripeAnalyticsService.php.html#105"><abbr title="App\Services\Analytics\StripeAnalyticsService::getAccountStatus">getAccountStatus</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#57"><abbr title="App\Services\Analytics\TrafficEngagementService::getTotalVisits">getTotalVisits</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#69"><abbr title="App\Services\Analytics\TrafficEngagementService::getUniqueVisitors">getUniqueVisitors</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#83"><abbr title="App\Services\Analytics\TrafficEngagementService::getPageviews">getPageviews</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#97"><abbr title="App\Services\Analytics\TrafficEngagementService::getAvgSessionDuration">getAvgSessionDuration</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#108"><abbr title="App\Services\Analytics\TrafficEngagementService::getBounceRate">getBounceRate</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#117"><abbr title="App\Services\Analytics\TrafficEngagementService::getVisitsTrendData">getVisitsTrendData</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#142"><abbr title="App\Services\Analytics\TrafficEngagementService::getTrafficSources">getTrafficSources</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#151"><abbr title="App\Services\Analytics\TrafficEngagementService::getLandingPages">getLandingPages</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="TrafficEngagementService.php.html#160"><abbr title="App\Services\Analytics\TrafficEngagementService::getTopContent">getTopContent</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="UserActivityService.php.html#25"><abbr title="App\Services\Analytics\UserActivityService::getNewRegistrations">getNewRegistrations</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="UserActivityService.php.html#45"><abbr title="App\Services\Analytics\UserActivityService::getTotalActiveSellers">getTotalActiveSellers</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="UserActivityService.php.html#71"><abbr title="App\Services\Analytics\UserActivityService::__construct">__construct</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="UserActivityService.php.html#80"><abbr title="App\Services\Analytics\UserActivityService::getStripeActiveSellers">getStripeActiveSellers</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="UserActivityService.php.html#90"><abbr title="App\Services\Analytics\UserActivityService::getSellersPendingVerification">getSellersPendingVerification</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="UserActivityService.php.html#98"><abbr title="App\Services\Analytics\UserActivityService::getUserRetentionRate">getUserRetentionRate</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="UserActivityService.php.html#133"><abbr title="App\Services\Analytics\UserActivityService::getRegistrationTrendData">getRegistrationTrendData</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 11.0.9</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.16</a> and <a href="https://phpunit.de/">PHPUnit 11.5.21</a> at Wed Dec 24 11:27:36 UTC 2025.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/jquery.min.js?v=11.0.9" type="text/javascript"></script>
+  <script src="../../_js/d3.min.js?v=11.0.9" type="text/javascript"></script>
+  <script src="../../_js/nv.d3.min.js?v=11.0.9" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([6,0,0,0,0,0,0,0,0,0,0,0], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([63,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,12,"<a href=\"ContentPerformanceService.php.html#10\">App\\Services\\Analytics\\ContentPerformanceService<\/a>"],[0,37,"<a href=\"GA4Service.php.html#17\">App\\Services\\Analytics\\GA4Service<\/a>"],[0,13,"<a href=\"SalesRevenueService.php.html#11\">App\\Services\\Analytics\\SalesRevenueService<\/a>"],[0,20,"<a href=\"StripeAnalyticsService.php.html#10\">App\\Services\\Analytics\\StripeAnalyticsService<\/a>"],[0,31,"<a href=\"TrafficEngagementService.php.html#8\">App\\Services\\Analytics\\TrafficEngagementService<\/a>"],[0,19,"<a href=\"UserActivityService.php.html#10\">App\\Services\\Analytics\\UserActivityService<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,2,"<a href=\"ContentPerformanceService.php.html#14\">App\\Services\\Analytics\\ContentPerformanceService::__construct<\/a>"],[0,2,"<a href=\"ContentPerformanceService.php.html#23\">App\\Services\\Analytics\\ContentPerformanceService::getTotalContentViews<\/a>"],[0,1,"<a href=\"ContentPerformanceService.php.html#33\">App\\Services\\Analytics\\ContentPerformanceService::getUniqueContentViews<\/a>"],[0,1,"<a href=\"ContentPerformanceService.php.html#41\">App\\Services\\Analytics\\ContentPerformanceService::getAvgTimeOnContent<\/a>"],[0,1,"<a href=\"ContentPerformanceService.php.html#49\">App\\Services\\Analytics\\ContentPerformanceService::getNewContentPublished<\/a>"],[0,1,"<a href=\"ContentPerformanceService.php.html#55\">App\\Services\\Analytics\\ContentPerformanceService::getTotalApprovedComments<\/a>"],[0,2,"<a href=\"ContentPerformanceService.php.html#63\">App\\Services\\Analytics\\ContentPerformanceService::getCommentEngagementRate<\/a>"],[0,1,"<a href=\"ContentPerformanceService.php.html#75\">App\\Services\\Analytics\\ContentPerformanceService::getTopPerformingContent<\/a>"],[0,1,"<a href=\"ContentPerformanceService.php.html#104\">App\\Services\\Analytics\\ContentPerformanceService::getAuthorStatistics<\/a>"],[0,5,"<a href=\"GA4Service.php.html#22\">App\\Services\\Analytics\\GA4Service::__construct<\/a>"],[0,1,"<a href=\"GA4Service.php.html#44\">App\\Services\\Analytics\\GA4Service::getClient<\/a>"],[0,3,"<a href=\"GA4Service.php.html#49\">App\\Services\\Analytics\\GA4Service::getPropertyId<\/a>"],[0,12,"<a href=\"GA4Service.php.html#63\">App\\Services\\Analytics\\GA4Service::runReport<\/a>"],[0,1,"<a href=\"GA4Service.php.html#164\">App\\Services\\Analytics\\GA4Service::getSessions<\/a>"],[0,1,"<a href=\"GA4Service.php.html#177\">App\\Services\\Analytics\\GA4Service::getTotalUsers<\/a>"],[0,1,"<a href=\"GA4Service.php.html#190\">App\\Services\\Analytics\\GA4Service::getScreenPageViews<\/a>"],[0,1,"<a href=\"GA4Service.php.html#203\">App\\Services\\Analytics\\GA4Service::getAverageSessionDuration<\/a>"],[0,1,"<a href=\"GA4Service.php.html#217\">App\\Services\\Analytics\\GA4Service::getBounceRate<\/a>"],[0,1,"<a href=\"GA4Service.php.html#230\">App\\Services\\Analytics\\GA4Service::getVisitsTrend<\/a>"],[0,1,"<a href=\"GA4Service.php.html#250\">App\\Services\\Analytics\\GA4Service::getTrafficSources<\/a>"],[0,1,"<a href=\"GA4Service.php.html#274\">App\\Services\\Analytics\\GA4Service::getLandingPages<\/a>"],[0,1,"<a href=\"GA4Service.php.html#296\">App\\Services\\Analytics\\GA4Service::getTopContent<\/a>"],[0,1,"<a href=\"GA4Service.php.html#318\">App\\Services\\Analytics\\GA4Service::getLocationData<\/a>"],[0,4,"<a href=\"GA4Service.php.html#339\">App\\Services\\Analytics\\GA4Service::getContentViews<\/a>"],[0,2,"<a href=\"GA4Service.php.html#362\">App\\Services\\Analytics\\GA4Service::formatDuration<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#13\">App\\Services\\Analytics\\SalesRevenueService::getTotalGMV<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#27\">App\\Services\\Analytics\\SalesRevenueService::getNetPlatformRevenue<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#38\">App\\Services\\Analytics\\SalesRevenueService::getProductSalesGMV<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#45\">App\\Services\\Analytics\\SalesRevenueService::getSubscriptionGMV<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#53\">App\\Services\\Analytics\\SalesRevenueService::getDonationGMV<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#60\">App\\Services\\Analytics\\SalesRevenueService::getTotalOrders<\/a>"],[0,2,"<a href=\"SalesRevenueService.php.html#67\">App\\Services\\Analytics\\SalesRevenueService::getAOV<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#79\">App\\Services\\Analytics\\SalesRevenueService::getReferralRevenue<\/a>"],[0,3,"<a href=\"SalesRevenueService.php.html#90\">App\\Services\\Analytics\\SalesRevenueService::getRevenueTrendData<\/a>"],[0,1,"<a href=\"SalesRevenueService.php.html#116\">App\\Services\\Analytics\\SalesRevenueService::getPreviousPeriodValue<\/a>"],[0,5,"<a href=\"StripeAnalyticsService.php.html#12\">App\\Services\\Analytics\\StripeAnalyticsService::getActiveSellersCount<\/a>"],[0,7,"<a href=\"StripeAnalyticsService.php.html#37\">App\\Services\\Analytics\\StripeAnalyticsService::getPendingVerificationCount<\/a>"],[0,4,"<a href=\"StripeAnalyticsService.php.html#60\">App\\Services\\Analytics\\StripeAnalyticsService::getPayoutsData<\/a>"],[0,2,"<a href=\"StripeAnalyticsService.php.html#91\">App\\Services\\Analytics\\StripeAnalyticsService::getConnectedAccountsCount<\/a>"],[0,2,"<a href=\"StripeAnalyticsService.php.html#105\">App\\Services\\Analytics\\StripeAnalyticsService::getAccountStatus<\/a>"],[0,6,"<a href=\"TrafficEngagementService.php.html#12\">App\\Services\\Analytics\\TrafficEngagementService::__construct<\/a>"],[0,3,"<a href=\"TrafficEngagementService.php.html#39\">App\\Services\\Analytics\\TrafficEngagementService::hasWorkingGA4<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#57\">App\\Services\\Analytics\\TrafficEngagementService::getTotalVisits<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#69\">App\\Services\\Analytics\\TrafficEngagementService::getUniqueVisitors<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#83\">App\\Services\\Analytics\\TrafficEngagementService::getPageviews<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#97\">App\\Services\\Analytics\\TrafficEngagementService::getAvgSessionDuration<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#108\">App\\Services\\Analytics\\TrafficEngagementService::getBounceRate<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#117\">App\\Services\\Analytics\\TrafficEngagementService::getVisitsTrendData<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#142\">App\\Services\\Analytics\\TrafficEngagementService::getTrafficSources<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#151\">App\\Services\\Analytics\\TrafficEngagementService::getLandingPages<\/a>"],[0,2,"<a href=\"TrafficEngagementService.php.html#160\">App\\Services\\Analytics\\TrafficEngagementService::getTopContent<\/a>"],[0,3,"<a href=\"TrafficEngagementService.php.html#207\">App\\Services\\Analytics\\TrafficEngagementService::getLocationData<\/a>"],[0,1,"<a href=\"TrafficEngagementService.php.html#237\">App\\Services\\Analytics\\TrafficEngagementService::getPreviousPeriodValue<\/a>"],[0,1,"<a href=\"UserActivityService.php.html#12\">App\\Services\\Analytics\\UserActivityService::getTotalActiveUsers<\/a>"],[0,2,"<a href=\"UserActivityService.php.html#25\">App\\Services\\Analytics\\UserActivityService::getNewRegistrations<\/a>"],[0,1,"<a href=\"UserActivityService.php.html#36\">App\\Services\\Analytics\\UserActivityService::getTotalBuyers<\/a>"],[0,2,"<a href=\"UserActivityService.php.html#45\">App\\Services\\Analytics\\UserActivityService::getTotalActiveSellers<\/a>"],[0,2,"<a href=\"UserActivityService.php.html#71\">App\\Services\\Analytics\\UserActivityService::__construct<\/a>"],[0,2,"<a href=\"UserActivityService.php.html#80\">App\\Services\\Analytics\\UserActivityService::getStripeActiveSellers<\/a>"],[0,2,"<a href=\"UserActivityService.php.html#90\">App\\Services\\Analytics\\UserActivityService::getSellersPendingVerification<\/a>"],[0,2,"<a href=\"UserActivityService.php.html#98\">App\\Services\\Analytics\\UserActivityService::getUserRetentionRate<\/a>"],[0,2,"<a href=\"UserActivityService.php.html#133\">App\\Services\\Analytics\\UserActivityService::getRegistrationTrendData<\/a>"],[0,3,"<a href=\"UserActivityService.php.html#155\">App\\Services\\Analytics\\UserActivityService::getTopSellers<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

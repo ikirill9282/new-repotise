@@ -1,0 +1,164 @@
+/* Исправление проблемы перекрывания контента в Filament админке */
+
+/* Основной контент должен быть виден и не перекрываться */
+.fi-main {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    background-color: transparent !important;
+}
+
+/* Контент страницы */
+.fi-page {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    min-height: auto !important;
+    background-color: transparent !important;
+}
+
+/* Контейнер контента страницы */
+.fi-page-content {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    min-height: auto !important;
+    background-color: transparent !important;
+}
+
+/* Убеждаемся, что sidebar не перекрывает контент */
+.fi-sidebar {
+    z-index: 10 !important;
+}
+
+/* Убеждаемся, что topbar не перекрывает контент */
+.fi-topbar {
+    z-index: 20 !important;
+}
+
+/* Все виджеты должны быть видимы */
+.fi-wi-widget,
+.fi-wi,
+.fi-page-header-widgets,
+.fi-wi-stats-overview-widget,
+.fi-wi-chart,
+.fi-section {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Убеждаемся, что контент dashboard виден */
+.fi-main > * {
+    position: relative !important;
+    z-index: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Исправление для модальных окон и dropdown */
+.fi-modal,
+.fi-dropdown {
+    z-index: 9999 !important;
+}
+
+/* Убеждаемся, что overlay не перекрывает контент постоянно */
+.fi-modal-overlay {
+    z-index: 9998 !important;
+    display: none !important;
+}
+
+/* Убираем перекрытие для таблиц и форм */
+.fi-ta,
+.fi-form {
+    position: relative !important;
+    z-index: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Убеждаемся, что все карточки видны */
+.fi-card {
+    position: relative !important;
+    z-index: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Исправление для секций */
+.fi-section-content-ctn {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Исправление для всех контейнеров контента */
+.fi-body,
+.fi-content,
+.fi-wrapper,
+.fi-main-content,
+.fi-page-wrapper,
+.fi-content-wrapper {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    min-height: auto !important;
+    background-color: transparent !important;
+}
+
+/* Убираем черный фон, который может перекрывать контент */
+body.fi-body,
+html {
+    background-color: transparent !important;
+}
+
+/* Убеждаемся, что все элементы внутри main видны */
+.fi-main * {
+    color: inherit !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Исправление для панелей Filament */
+.fi-panels {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+}
+
+/* Исправление для layout */
+.fi-layout {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+

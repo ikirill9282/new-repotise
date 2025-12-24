@@ -10,6 +10,7 @@ use App\Enums\Order as EnumsOrder;
 use App\Filament\Resources\TransactionResource;
 use App\Filament\Pages\Analytics\SalesRevenue;
 use App\Filament\Pages\CommissionsSettings;
+use Illuminate\Support\Facades\Log;
 
 class KeyMetricsWidget extends BaseWidget
 {
@@ -21,7 +22,19 @@ class KeyMetricsWidget extends BaseWidget
 
     public function mount(): void
     {
-        $this->mountHasDashboardDateRange();
+        // #region agent log
+        Log::info('DEBUG: KeyMetricsWidget mount() entry', ['hypothesisId' => 'E']);
+        // #endregion
+        try {
+            $this->mountHasDashboardDateRange();
+            // #region agent log
+            Log::info('DEBUG: KeyMetricsWidget mount() success', ['hypothesisId' => 'E']);
+            // #endregion
+        } catch (\Exception $e) {
+            // #region agent log
+            Log::error('DEBUG: KeyMetricsWidget mount() error', ['hypothesisId' => 'E', 'error' => $e->getMessage()]);
+            // #endregion
+        }
     }
 
     protected function getColumns(): int
@@ -31,16 +44,28 @@ class KeyMetricsWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        // ВАЖНО: Используем trigger для принудительного обновления - это заставляет Livewire пересчитать метод
-        // Читаем свойство явно чтобы создать зависимость
-        $trigger = $this->dateRangeUpdateTrigger ?? 0;
-        // Принудительно читаем из session чтобы получить актуальные данные
-        $this->dashboardStartDate = session('dashboard_start_date');
-        $this->dashboardEndDate = session('dashboard_end_date');
-        
-        // Читаем даты из session каждый раз при вызове метода
-        $startDate = $this->getStartDate();
-        $endDate = $this->getEndDate();
+        // #region agent log
+        Log::info('DEBUG: KeyMetricsWidget getStats() entry', ['hypothesisId' => 'A']);
+        // #endregion
+        try {
+            // ВАЖНО: Используем trigger для принудительного обновления - это заставляет Livewire пересчитать метод
+            // Читаем свойство явно чтобы создать зависимость
+            $trigger = $this->dateRangeUpdateTrigger ?? 0;
+            // Принудительно читаем из session чтобы получить актуальные данные
+            $this->dashboardStartDate = session('dashboard_start_date');
+            $this->dashboardEndDate = session('dashboard_end_date');
+            
+            // #region agent log
+            Log::info('DEBUG: session data read', ['hypothesisId' => 'F', 'startDate' => $this->dashboardStartDate, 'endDate' => $this->dashboardEndDate]);
+            // #endregion
+            
+            // Читаем даты из session каждый раз при вызове метода
+            $startDate = $this->getStartDate();
+            $endDate = $this->getEndDate();
+            
+            // #region agent log
+            Log::info('DEBUG: dates calculated', ['hypothesisId' => 'A', 'startDate' => $startDate->format('Y-m-d'), 'endDate' => $endDate->format('Y-m-d')]);
+            // #endregion
 
         // GMV (Gross Merchandise Volume)
         $orders = Order::query()
@@ -76,7 +101,7 @@ class KeyMetricsWidget extends BaseWidget
         $prevNewSubscriptions = 0;
         $newSubscriptionsChange = $this->calculateChange($newSubscriptions, $prevNewSubscriptions);
 
-        return [
+        $stats = [
             Stat::make('GMV', '$' . number_format($gmv, 2))
                 ->description($gmvChange !== null 
                     ? ($gmvChange >= 0 ? '+' : '') . number_format($gmvChange, 1) . '% vs previous period'
@@ -117,6 +142,16 @@ class KeyMetricsWidget extends BaseWidget
                 ->icon('heroicon-o-arrow-path')
                 ->url(\App\Filament\Pages\Analytics\SalesRevenue::getUrl()),
         ];
+        // #region agent log
+        Log::info('DEBUG: getStats() return', ['hypothesisId' => 'A', 'statsCount' => count($stats)]);
+        // #endregion
+        return $stats;
+        } catch (\Exception $e) {
+            // #region agent log
+            Log::error('DEBUG: getStats() error', ['hypothesisId' => 'A', 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // #endregion
+            throw $e;
+        }
     }
 }
 

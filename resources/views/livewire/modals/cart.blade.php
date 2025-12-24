@@ -26,7 +26,8 @@
       scrollbar-color: #FC7361 #f1f1f1;
   }
   .cart-modal .item .img_products {
-      width: 153px;
+      width: 100%;
+      max-width: 160px;
       height: 160px;
       display: flex;
       justify-content: center;
@@ -66,7 +67,7 @@
       font-size: 16px !important;
   }
   .cart-modal .cart-modal-title {
-      width: 153px;
+      width: 100%;
       text-align: center;
       margin: 0;
   }
@@ -77,7 +78,8 @@
   }
   @media (min-width: 768px) {
       .cart-modal .item .img_products {
-          width: 153px;
+          width: 100%;
+          max-width: 160px;
           height: 160px;
           padding: 0;
       }

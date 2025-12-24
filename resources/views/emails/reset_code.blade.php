@@ -8,12 +8,16 @@
 
   <div style="padding: 20px;">
       <h2 style="margin-top: 20px;">Your TrekGuider Password Reset Code</h2>
-      <p>We received a request to reset the password for your TrekGuider account.
-          Here's your code to set a new password:
+      <p>
+        Hi {{ $user->getName() }},
+        <br><br>
+        We received a request to reset the password for your TrekGuider account.
+        <br>
+        Here's your code to set a new password:
       </p>
-      <a href="{{ $url ?? '' }}" style="display: inline-block; padding: 15px 20px; background: #FC7361; color: #fff; text-decoration: none; border-radius: 4px;">
-        {{ $user->getResetCode() }}  
-      </a>
+      <div style="display: inline-block; padding: 15px 20px; background: #FC7361; color: #fff; text-decoration: none; border-radius: 4px; font-size: 20px; letter-spacing: 2px;">
+        {{ $code }}
+      </div>
       <p>
           This code will expire in 1 hour for your security.
           If you didn't request this, you can safely ignore this email. If you have any security concerns, please reach out to our support team.
@@ -21,6 +25,5 @@
           Best,
           The TrekGuider Team
       </p>
-      <p>If you did not register on our site, please ignore this email.</p>
   </div>
 @endsection

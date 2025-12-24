@@ -28,3 +28,32 @@
         </div>
     </x-profile.wrap>
 @endsection
+
+@push('js')
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const orderProductId = params.get('open_order_product_id');
+      const orderId = params.get('open_order_id');
+
+      if (!orderProductId || !orderId) return;
+
+      function tryOpen() {
+        if (!window.Livewire || typeof window.Livewire.dispatch !== 'function') return false;
+        window.Livewire.dispatch('openModal', { modalName: 'product', args: { order_product_id: orderProductId, order_id: orderId } });
+        return true;
+      }
+
+      if (tryOpen()) return;
+
+      // Livewire может загрузиться чуть позже на тяжелых страницах
+      let attempts = 0;
+      const timer = setInterval(() => {
+        attempts++;
+        if (tryOpen() || attempts >= 20) {
+          clearInterval(timer);
+        }
+      }, 250);
+    })();
+  </script>
+@endpush

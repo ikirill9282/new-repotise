@@ -1,4 +1,18 @@
 <div>
+    @push('css')
+      <style>
+        .creatorPage .product-slider .swiper-button-next, 
+        .creatorPage .product-slider .swiper-button-prev {
+            top: 25% !important;
+            transform: translateY(-50%) !important;
+            margin-top: 0 !important;
+        }
+
+        .creatorPage .product-slider .swiper-button-prev {
+            transform: translateY(53%) rotate(1deg) !important;
+        }
+      </style>
+    @endpush
     @php
       $user = \App\Models\User::find(\Illuminate\Support\Facades\Crypt::decrypt($this->user_id));
       $options = $user?->options;
@@ -46,6 +60,20 @@
                           <div class="">
                               <div class="flex items-center gap-2 sm:mb-2 lg:mb-3">
                                   <p class="">{{ $user->getName() }}</p>
+                                  @php
+                                    $profileShareId = 'profile-share-' . $user->id;
+                                    $profileShareUrl = $user->makeProfileUrl();
+                                  @endphp
+                                  <a
+                                    href="{{ $profileShareUrl }}"
+                                    class="copyToClipboard inline-flex items-center justify-center rounded-md p-1 text-gray hover:!text-black hover:bg-light transition"
+                                    data-target="{{ $profileShareId }}"
+                                    title="Share profile"
+                                    aria-label="Share profile"
+                                  >
+                                    @include('icons.copy')
+                                    <input data-copyId="{{ $profileShareId }}" type="hidden" value="{{ $profileShareUrl }}">
+                                  </a>
                                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                                       xmlns="http://www.w3.org/2000/svg">
                                       <path
@@ -60,10 +88,12 @@
                     <span class="text-gray">Open for Collaboration:</span>
                                   <span>{{ $collaborationOpen ? 'Yes' : 'No' }}</span>
                               </p>
-                              <p class="">
-                                  <span class="text-gray">Country:</span>
-                                  <span>{{ $user->country }}</span>
-                              </p>
+                              @if(!empty($user->country))
+                                <p class="">
+                                    <span class="text-gray">Country:</span>
+                                    <span>{{ $user->country }}</span>
+                                </p>
+                              @endif
                           </div>
                       </div>
                       <div class="creatorPage__content-infoBlok-list">
@@ -99,7 +129,16 @@
                     @if($user->products()->exists())
                       <div class="">
                         <x-product.slider 
-                          :products="$user->products()->where('status_id', \App\Enums\Status::ACTIVE)->whereNotNull('published_at')->latest()->limit(6)->get()"
+                          :products="$user->products()
+                            ->where('status_id', \App\Enums\Status::ACTIVE)
+                            ->whereNotNull('published_at')
+                            ->when(
+                              (bool) ($user->options?->showcase_products_only_selected ?? false),
+                              fn ($q) => $q->where('show_on_creator_page', true)
+                            )
+                            ->orderByDesc(\Illuminate\Support\Facades\DB::raw('COALESCE(published_at, created_at, updated_at)'))
+                            ->limit(6)
+                            ->get()"
                           id="profile-product-slider"
                         ></x-product.slider>
                       </div>
@@ -152,7 +191,7 @@
                                     @if(auth()->user()?->id == $article->author->id)
                                       <x-btn href="{{ $article->makeEditUrl() }}" class="!flex items-center sm:!text-sm !w-auto gap-2 !px-4 !py-1 !ml-3">
                                         <span>@include('icons.edit')</span>
-                                        <span>Edit Insights</span>
+                                        <span>Edit Insight</span>
                                       </x-btn>
                                     @else
                                       @if(!$user->hasFollower(auth()->user()?->id))

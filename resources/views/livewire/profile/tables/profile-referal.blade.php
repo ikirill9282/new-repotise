@@ -1,19 +1,21 @@
 <div>
     <div class="bg-light rounded-lg px-3 py-2.5 mb-5">
-      <div class="flex flex-col !gap-2 lg:!gap-0 lg:flex-row">
-        <div class="mr-auto">Referral Program Summary</div>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center !gap-2 lg:!gap-4 text-sm justify-between lg:justify-start">
-          <div class="flex justify-start items-start gap-2">
-            <div class="text-gray">Total Referrals:</div>
-            <div class="text-nowrap">{{ number_format($summary['total_referrals']) }}</div>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="mr-auto font-medium">Referral Program Summary</div>
+        <div class="w-full sm:w-auto">
+          <div class="grid grid-cols-3 border border-gray/20 rounded-lg overflow-hidden bg-white text-sm">
+            <div class="px-3 py-2">
+              <div class="text-[11px] text-gray leading-4">Total Referrals</div>
+              <div class="font-medium">{{ number_format($summary['total_referrals']) }}</div>
+            </div>
+            <div class="px-3 py-2 border-l border-gray/15">
+              <div class="text-[11px] text-gray leading-4">Active Referrals</div>
+              <div class="font-medium">{{ number_format($summary['active_referrals']) }}</div>
           </div>
-          <div class="flex justify-start items-start gap-2">
-            <div class="text-gray">Active Referrals:</div>
-            <div class="text-nowrap">{{ number_format($summary['active_referrals']) }}</div>
+            <div class="px-3 py-2 border-l border-gray/15">
+              <div class="text-[11px] text-gray leading-4">Commission Earned</div>
+              <div class="font-medium">{{ currency($summary['referral_income']) }}</div>
           </div>
-          <div class="flex justify-start items-start gap-2">
-            <div class="text-gray">Commission Earned:</div>
-            <div class="text-nowrap">{{ currency($summary['referral_income']) }}</div>
           </div>
         </div>
       </div>

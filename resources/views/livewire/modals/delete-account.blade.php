@@ -24,30 +24,27 @@
       <x-form.input
         type="password"
         class="mb-1"
+        name="current_password"
         label="Current Password"
         placeholder="Enter your current password"
         wire:model.defer="current_password"
         autocomplete="current-password"
       ></x-form.input>
-      @error('current_password')
-        <p class="text-xs text-error mt-1">{{ $message }}</p>
-      @enderror
     </div>
 
     <div>
-      <div class="flex items-end justify-between gap-3 flex-col sm:flex-row">
-        <div class="w-full">
+      <div class="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div class="w-full min-w-0">
           <x-form.input
             label="Email Verification Code"
             placeholder="Enter 6-digit code from email"
+            name="verification_code"
             data-input="integer"
             wire:model.defer="verification_code"
             inputmode="numeric"
+            autocomplete="one-time-code"
             class="mb-2"
           ></x-form.input>
-          @error('verification_code')
-            <p class="text-xs text-error mt-1">{{ $message }}</p>
-          @enderror
         </div>
 
         <x-btn

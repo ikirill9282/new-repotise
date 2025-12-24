@@ -36,8 +36,12 @@ class GiftClaimed extends Mailable
      */
     public function envelope(): Envelope
     {
+        $productName = $this->order->order_products->first()?->product?->title
+            ?? $this->order->products->first()?->title
+            ?? 'Your Gift';
+
         return new Envelope(
-            subject: 'Great News! Your Gift… Has Been Claimed!',
+            subject: 'Great News! Your Gift of "' . $productName . '" Has Been Claimed!',
         );
     }
 

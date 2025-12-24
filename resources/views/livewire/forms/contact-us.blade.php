@@ -94,8 +94,9 @@
   @endphp
   
   @if($recaptchaSiteKey)
-  // reCAPTCHA v2 callback for contact form
-  window.onRecaptchaV2Load = function() {
+  // Register reCAPTCHA v2 renderer for contact form (do not overwrite global callback)
+  window.recaptchaCallbacks = window.recaptchaCallbacks || [];
+  window.recaptchaCallbacks.push(function () {
     Livewire.hook('morph.updated', ({ el, component }) => {
       if (document.getElementById('recaptcha-v2-container-contact') && !document.getElementById('recaptcha-v2-widget-contact')) {
         grecaptcha.render('recaptcha-v2-container-contact', {
@@ -109,7 +110,7 @@
         });
       }
     });
-  };
+  });
   @endif
 </script>
 @endpush

@@ -15,6 +15,9 @@ class Modals extends Component
     public $isVisible = false;
     public $inited = false;
     public $args = [];
+    // Keep last modal during close animation to prevent "empty popup" flashes
+    public ?string $closingModal = null;
+    public array $closingArgs = [];
 
     public $oneTime = [
       'report', 
@@ -144,6 +147,20 @@ class Modals extends Component
     public function closeModal()
     {
         $modalToClose = $this->modal;
+
+        // Preserve current modal content for the duration of the close animation,
+        // even if something clears $this->modal during the Livewire update cycle.
+        // Set closingModal BEFORE clearing modal to prevent empty popup flash
+        // Only set closingModal if there's actually a modal to close
+        if ($modalToClose) {
+            $this->closingModal = $modalToClose;
+            $this->closingArgs = is_array($this->args) ? $this->args : [];
+        } else {
+            // If there's no modal to close, clear closingModal immediately
+            // This ensures the container is hidden right away
+            $this->closingModal = null;
+            $this->closingArgs = [];
+        }
         
         // Если закрывается модальное окно delete-product-accept, отправляем событие для обновления списка продуктов
         if ($modalToClose === 'delete-product-accept') {
@@ -157,6 +174,7 @@ class Modals extends Component
             $this->previousIsVisible = false;
         }
         
+        // Set isVisible to false, but DON'T clear modal yet - let finalizeClose() do it after animation
         $this->isVisible = false;
         $this->dispatch('modal-closing-clean-url');
         $this->dispatch('modalClosing');
@@ -188,7 +206,14 @@ class Modals extends Component
 
     public function finalizeClose()
     {
-        $this->modal = false;
+        // After the close animation ends, fully reset modal state.
+        // Clear closingModal first, then modal, to prevent empty popup flash
+        $this->closingModal = null;
+        $this->closingArgs = [];
+        $this->isVisible = false;
+        $this->modal = null;
+        $this->args = [];
+        $this->inited = false;
     }
 
     public function moveCheckout()
@@ -290,7 +315,10 @@ class Modals extends Component
         'delete-article-accept',
       ])) return '!max-w-2xl';
       
-      if (in_array($this->modal, ['funds', 'contact', 'payment-method'])) return '!max-w-xl';
+      // Funds modal is wider to fit payment + summary blocks
+      if (in_array($this->modal, ['funds'])) return '!max-w-3xl';
+      
+      if (in_array($this->modal, ['contact', 'payment-method'])) return '!max-w-xl';
 
       if (in_array($this->modal, ['payout-details'])) return '!max-w-3xl';
 

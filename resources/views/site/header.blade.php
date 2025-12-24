@@ -45,10 +45,14 @@
                     </a>
                 @else
                     @php
+                        $creatorPageUrl = auth()->user()->hasRole('creator')
+                            ? auth()->user()->makeProfileUrl()
+                            : route('profile.purchases');
+
                         $baseMenu = auth()->user()->hasRole('creator')
                             ? [
                                 ['route' => 'profile.dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard'],
-                                ['route' => 'profile', 'icon' => 'monitor', 'label' => 'Creator Page'],
+                                ['url' => $creatorPageUrl, 'icon' => 'monitor', 'label' => 'Creator Page'],
                                 ['route' => 'profile.products', 'icon' => 'pic', 'label' => 'My Products'],
                                 ['route' => 'profile.articles', 'icon' => 'document', 'label' => 'My Articles'],
                                 ['route' => 'profile.reviews', 'icon' => 'stari', 'label' => 'Reviews & Refunds'],
@@ -65,14 +69,14 @@
 
                         $profileMenu = array_map(function ($item) {
                             return [
-                                'url' => route($item['route']),
+                                'url' => $item['url'] ?? route($item['route']),
                                 'icon' => $item['icon'],
                                 'label' => $item['label'],
                             ];
                         }, $baseMenu);
                     @endphp
                     <div class="profile-dropdown group">
-                        <a href="{{ route('profile') }}" class="profile">
+                        <a href="{{ auth()->user()->hasRole('creator') ? auth()->user()->makeProfileUrl() : route('profile.purchases') }}" class="profile">
                             <img src="{{ auth()->user()?->avatar }}" alt="avatar"
                                 class="profile_img">
                             <div class="right_text">

@@ -10,16 +10,19 @@
           <div class="flex justify-start items-start sm:items-center !gap-4 2xl:!gap-8 flex-col sm:flex-row">
             <div class="block">
               <label class="text-gray" for="donation-analytics-type">Donation Type:</label>
-              <select
-                class="tg-select"
+              @php
+                $donationTypeOptions = ['' => 'All Types'] + ($donationTypes ?? []);
+              @endphp
+              <x-form.select
+                name="donation-analytics-type"
+                :compact="true"
+                :tooltip="false"
+                labelClass="!text-black"
                 wire:model.live="donationType"
-                id="donation-analytics-type"
-                >
-                <option value="">All Types</option>
-                @foreach($donationTypes as $value => $label)
-                  <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
-              </select>
+                value="{{ $donationType ?? '' }}"
+                :label="$donationTypeOptions[$donationType ?? ''] ?? 'All Types'"
+                :options="$donationTypeOptions"
+              />
             </div>
           </div>
         </div>

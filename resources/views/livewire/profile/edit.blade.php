@@ -208,7 +208,7 @@
 
 
                 <aside class="flex flex-col gap-4 order-1 md:!order-2 
-                  top-[80px] rightt-0 col-span-1 bg-white !p-2 sm:!p-4 rounded">
+                  top-[80px] rightt-0 col-span-1 bg-white !p-2 sm:!p-4 rounded relative z-10 pointer-events-auto">
 
                     @if(auth()->user()?->id == $user->id && auth()->user()?->hasRole('creator'))
                       <div class="flex flex-col gap-2">

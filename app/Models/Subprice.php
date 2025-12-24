@@ -151,12 +151,22 @@ class Subprice extends Model
 
   public function getPrice(): float
   {
-    return $this->product->getPrice();
+    if (!$this->product) {
+      return 0.0;
+    }
+    
+    $price = $this->product->getPrice();
+    return $price !== null ? (float) $price : 0.0;
   }
 
   public function getPriceWithoutDiscount(): float
   {
-    return $this->product->getPriceWithoutDiscount();
+    if (!$this->product) {
+      return 0.0;
+    }
+    
+    $price = $this->product->getPriceWithoutDiscount();
+    return $price !== null ? (float) $price : 0.0;
   }
 
   public function subtractPercent($number, $percent): float

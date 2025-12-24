@@ -498,6 +498,19 @@ const FavoriteButtons = function() {
       const hash = button.data('item');
       const key = button.data('key');
 
+      const resolveFavoriteTitle = (el) => {
+        const $el = $(el);
+        const explicit = ($el.data('title') || $el.attr('data-title') || '').toString().trim();
+        if (explicit) return explicit;
+
+        const item = $el.closest('.item');
+        const fromLink = item.find('h4 a').first().text().trim();
+        if (fromLink) return fromLink;
+
+        const anyTitle = item.find('[data-product-title], .product-title, .title').first().text().trim();
+        return anyTitle || 'This item';
+      };
+
       button.on('click', function(evt) {
         evt.preventDefault();
       
@@ -513,6 +526,16 @@ const FavoriteButtons = function() {
             if (response.value) {
               $(this).addClass('favorite-active');
               $(".favorite-button[data-key='"+ key +"']").addClass('favorite-active');
+
+              // II.toast.3 (TЗ): Added to Favorites! ❤️
+              const title = resolveFavoriteTitle(this);
+              $.toast({
+                text: `${title} is now in your favorites.`,
+                icon: 'success',
+                heading: 'Added to Favorites! ❤️',
+                position: 'top-right',
+                hideAfter: 5000,
+              });
             } else {
               $(this).removeClass('favorite-active');
               $(".favorite-button[data-key='"+ key +"']").removeClass('favorite-active');
@@ -702,13 +725,17 @@ const ReviewForms = function () {
                   form.eq(0).get(0).reset();
                 }
                 
-                const name = formData.reply ? 'reply' : (form.data('type') == 'review' ? 'review' : 'comment');
-                $.toast({
-                  text: `Your ${name} has been received and is now awaiting moderation.`,
-                  icon: 'success',
-                  heading: 'Success',
-                  position: 'top-right',
-                })
+                // Reviews can be confirmed immediately (user expects a notification),
+                // but comments/replies are only public after moderator approval.
+                // So we avoid showing a misleading "success" toast for comments.
+                if (form.data('type') == 'review') {
+                  $.toast({
+                    text: `Your review has been received and is now awaiting moderation.`,
+                    icon: 'success',
+                    heading: 'Success',
+                    position: 'top-right',
+                  })
+                }
                   // form[0].reset();
                   // form.find('input[name="rating"]').val(null).trigger('change');
                   // form.find('.stars').find('span').removeClass('active');
@@ -1385,6 +1412,40 @@ $(document).ready(function() {
         });
 
       });
+
+      // Handle "Page Expired" (419) for Livewire requests.
+      // Prevents the native confirm modal + underlying 419 page overlay ("double modal" effect).
+      try {
+        let reloadingFrom419 = false;
+
+        // Livewire v3 request lifecycle hook
+        Livewire.hook('request', ({ fail }) => {
+          fail(({ status, preventDefault }) => {
+            if (status !== 419 || reloadingFrom419) return;
+
+            reloadingFrom419 = true;
+            if (typeof preventDefault === 'function') preventDefault();
+
+            // Best-effort cleanup of our modal overlay before reload
+            try { document.body.classList.remove('overflow-hidden'); } catch (e) {}
+            try { document.querySelector('.cartMayBe')?.classList.add('hidden'); } catch (e) {}
+
+            window.location.reload();
+          });
+        });
+
+        // Back-compat / safety: some Livewire builds still emit v2-style hooks
+        Livewire.hook('message.failed', (message, component) => {
+          const status = message?.response?.status;
+          if (status !== 419 || reloadingFrom419) return;
+          reloadingFrom419 = true;
+          try { document.body.classList.remove('overflow-hidden'); } catch (e) {}
+          try { document.querySelector('.cartMayBe')?.classList.add('hidden'); } catch (e) {}
+          window.location.reload();
+        });
+      } catch (e) {
+        // no-op
+      }
     } else {
       // If Livewire is not loaded yet, wait for it
       document.addEventListener('livewire:init', setupLivewireHooks, { once: true });
@@ -1451,10 +1512,11 @@ $(document).ready(function() {
     if (window.Livewire && window.Livewire.on) {
       Livewire.on('toastSuccess', params => {
         const message = params[0]?.message;
+        const heading = params[0]?.heading || 'Success';
         $.toast({
           text: message,
           icon: 'success',
-          heading: 'Success',
+          heading: heading,
           position: 'top-right',
           hideAfter: 5000,
         });
@@ -1462,10 +1524,11 @@ $(document).ready(function() {
 
       Livewire.on('toastError', params => {
         const message = params[0]?.message;
+        const heading = params[0]?.heading || 'Error';
         $.toast({
           text: message,
           icon: 'error',
-          heading: 'Error',
+          heading: heading,
           position: 'top-right',
           hideAfter: 5000,
         });

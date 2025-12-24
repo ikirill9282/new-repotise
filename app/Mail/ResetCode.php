@@ -21,7 +21,8 @@ class ResetCode extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-      public User $user
+      public User $user,
+      public int $code,
     )
     {
       $this->trigger = Action::RESET_PASSWORD;
@@ -33,7 +34,7 @@ class ResetCode extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reset Code',
+            subject: 'Your TrekGuider Password Reset Code',
         );
     }
 

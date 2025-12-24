@@ -148,7 +148,7 @@
         </section>
     @else
       <div
-        class="container empty-container !pt-10 !pb-10 {{ $product ? 'hidden' : '' }}">
+        class="container empty-container !pt-10 !pb-10 flex justify-center items-center {{ $product ? 'hidden' : '' }}">
         @include('site.components.favorite.empty', [
           'text' => 'Cart',
           'class' => 'empty-cart',

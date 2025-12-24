@@ -13,6 +13,11 @@ class MeilisearchSeeder extends Seeder
      */
     public function run(): void
     {
-        Artisan::call('rl_index');
+        try {
+            Artisan::call('rl_index');
+        } catch (\Exception $e) {
+            // Skip Meilisearch indexing if Meilisearch is not available
+            $this->command->warn('Meilisearch is not available. Skipping index creation.');
+        }
     }
 }

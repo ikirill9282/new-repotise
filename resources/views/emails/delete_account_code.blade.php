@@ -6,22 +6,23 @@
   </div>
 
   <div style="padding: 20px;">
-      <h2 style="margin-top: 20px;">Confirm Your Account Deletion Request</h2>
+      <h2 style="margin-top: 20px;">Your TrekGuider Account Deletion Code</h2>
       <p>
-          You recently requested to delete your TrekGuider account.
-          To confirm this request, enter the verification code below within the next 60 minutes.
+          Hi {{ $user->getName() }},
+          <br><br>
+          We've received your request to delete your TrekGuider account. To confirm this action, please use the following code:
       </p>
       <div style="display: inline-block; padding: 15px 20px; background: #FC7361; color: #fff; text-decoration: none; border-radius: 4px; font-size: 20px; letter-spacing: 2px;">
         {{ $code }}
       </div>
       <p style="margin-top: 20px;">
-          Once confirmed, your account will be deactivated immediately and permanently deleted after 30 days unless you log back in to cancel the request.
+          Once you confirm with this code, your account and all associated data will be scheduled for permanent deletion in 30 days. You can cancel this deletion by simply logging back into your account anytime within these 30 days.
       </p>
       <p>
-          If you did not initiate this request, please ignore this email or contact our support team right away.
+          If you didn't request this, or if you've changed your mind and don't want to use this code, please ignore this email. If you have security concerns, contact our support team immediately.
       </p>
       <p style="margin-top: 10px;">
-          Stay safe,<br>
+          Best,<br>
           The TrekGuider Team
       </p>
   </div>

@@ -72,7 +72,7 @@
     </div>
   </div>
 @else
-  <div class="item flex flex-col {{ isset($class) ? $class : '' }}">
+  <div class="item flex flex-col gap-2 {{ isset($class) ? $class : '' }}">
     <div class="img_products relative" x-data="{}">
 				<a href="{{ $model->makeUrl() }}" class="block">
         <img 
@@ -119,14 +119,14 @@
           </a>
         @endif
     </div>
-    <h3 class="text-nowrap overflow-hidden text-ellipsis">
+    <h3 class="text-nowrap overflow-hidden text-ellipsis min-h-[1.5rem]">
       <a class="transition !text-inherit hover:!text-black" href="{{ $model->makeUrl() }}">{{ \Illuminate\Support\Str::limit($model->title, 50, '...') }}</a>
     </h3>
-    <div class="cost">
+    <div class="cost min-h-[1.5rem]">
       <p>{{ currency($model->getPrice()) }}</p>
       <span>{{ currency($model->getPriceWithoutDiscount()) }}</span>
     </div>
-    <div class="inf_cards flex flex-wrap">
+    <div class="inf_cards flex flex-wrap gap-1 min-h-[1.5rem]">
         {{-- TYPES --}}
         @foreach ($model->types->shuffle()->slice(0, 3) as $type)
           <a class="text-nowrap" href="{{ route('products', ['type' => $type->slug]) }}">{{ $type->title }}</a>
@@ -143,7 +143,7 @@
         @endforeach
 				
     </div>
-    <div class="stars_block !mt-auto">
+    <div class="stars_block !mt-auto min-h-[1.5rem]">
         <div class="stars">
           @foreach ($model->prepareRatingImages() as $image)
             <span><img src="{{ $image }}" alt="Star"></span>
