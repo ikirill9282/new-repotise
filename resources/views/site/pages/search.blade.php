@@ -79,8 +79,16 @@
                                                   </a>
                                                 </h3>
                                                 <div class="profile">
-                                                    <img class="rounded-full object-cover" src="{{ print_key('avatar', $item['author']) }}"
-                                                        alt="Avatar {{ print_key('profile', $item['author']) }}">
+                                                    @php
+                                                        $avatarUrl = print_key('avatar', $item['author'] ?? []);
+                                                        if ($avatarUrl === 'null' || empty($avatarUrl)) {
+                                                            $avatarUrl = url('/storage/images/default_avatar.png');
+                                                        } elseif (!str_starts_with($avatarUrl, 'http://') && !str_starts_with($avatarUrl, 'https://')) {
+                                                            $avatarUrl = url($avatarUrl);
+                                                        }
+                                                    @endphp
+                                                    <img class="rounded-full object-cover" src="{{ $avatarUrl }}"
+                                                        alt="Avatar {{ print_key('profile', $item['author'] ?? []) }}">
                                                     @php
                                                         $authorUsername = print_key('slug', $item['author'] ?? []) ?? print_key('username', $item['author'] ?? []);
                                                         $authorProfileUrl = $authorUsername ? url('/profile/@' . $authorUsername) : '#';
@@ -209,8 +217,16 @@
                                                     {{ strip_tags(print_key('short', $item)) }}
                                                 </div>
                                                 <div class="profile">
+                                                    @php
+                                                        $avatarUrl = print_key('avatar', $item['author'] ?? []);
+                                                        if ($avatarUrl === 'null' || empty($avatarUrl)) {
+                                                            $avatarUrl = url('/storage/images/default_avatar.png');
+                                                        } elseif (!str_starts_with($avatarUrl, 'http://') && !str_starts_with($avatarUrl, 'https://')) {
+                                                            $avatarUrl = url($avatarUrl);
+                                                        }
+                                                    @endphp
                                                     <img class="rounded-full object-cover"
-                                                        src="{{ url(print_key('avatar', $item['author'] ?? [])) }}" alt="Avatar">
+                                                        src="{{ $avatarUrl }}" alt="Avatar">
                                                     @php
                                                         $authorUsername = print_key('slug', $item['author'] ?? []) ?? print_key('username', $item['author'] ?? []);
                                                         $authorProfileUrl = $authorUsername ? url('/profile/@' . $authorUsername) : '#';
@@ -320,21 +336,40 @@
             const currentSort = '{{ $currentSort ?? "relevance" }}';
             searchSortInput.value = currentSort;
             
-            // Ждем инициализации Alpine.js компонента
-            setTimeout(() => {
-                const event = new Event('input', { bubbles: true });
-                searchSortInput.dispatchEvent(event);
-            }, 100);
+            // Сохраняем предыдущее значение для проверки изменений
+            let previousValue = currentSort;
+            let isInitialized = false;
 
             // Обработчик изменения значения в скрытом input
             let timeoutId;
             searchSortInput.addEventListener('input', function() {
+                // Пропускаем первое событие при инициализации
+                if (!isInitialized) {
+                    isInitialized = true;
+                    return;
+                }
+                
+                const value = this.value;
+                
+                // Проверяем, изменилось ли значение
+                if (value === previousValue) {
+                    return;
+                }
+                
+                previousValue = value;
+                
                 // Дебаунс для предотвращения множественных переходов
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(() => {
                     const url = new URL(window.location.href);
                     const params = url.searchParams;
-                    const value = this.value;
+                    
+                    // Проверяем, нужно ли менять URL
+                    const currentUrlSort = params.get('sort') || 'relevance';
+                    if (value === currentUrlSort) {
+                        return; // URL уже соответствует значению
+                    }
+                    
                     if (value === 'relevance') {
                         params.delete('sort');
                     } else {
@@ -344,6 +379,11 @@
                     window.location.href = url.toString();
                 }, 100);
             });
+            
+            // Помечаем как инициализированное после небольшой задержки
+            setTimeout(() => {
+                isInitialized = true;
+            }, 200);
         });
     </script>
 @endpush

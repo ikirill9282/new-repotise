@@ -150,20 +150,38 @@
                 const currentValue = input.value || defaultValue;
                 input.value = currentValue;
                 
-                // Ждем инициализации Alpine.js компонента
-                setTimeout(() => {
-                    const event = new Event('input', { bubbles: true });
-                    input.dispatchEvent(event);
-                }, 100);
+                // Сохраняем предыдущее значение для проверки изменений
+                let previousValue = currentValue;
+                let isInitialized = false;
 
                 // Обработчик изменения значения
                 let timeoutId;
                 input.addEventListener('input', function() {
+                    // Пропускаем первое событие при инициализации
+                    if (!isInitialized) {
+                        isInitialized = true;
+                        return;
+                    }
+                    
+                    const value = this.value;
+                    
+                    // Проверяем, изменилось ли значение
+                    if (value === previousValue) {
+                        return;
+                    }
+                    
+                    previousValue = value;
+                    
                     clearTimeout(timeoutId);
                     timeoutId = setTimeout(() => {
                         const url = new URL(window.location.href);
                         const params = url.searchParams;
-                        const value = this.value;
+                        
+                        // Проверяем, нужно ли менять URL
+                        const currentUrlValue = params.get(param) || defaultValue;
+                        if (value === currentUrlValue) {
+                            return; // URL уже соответствует значению
+                        }
 
                         if (value === defaultValue) {
                             params.delete(param);
@@ -175,6 +193,11 @@
                         window.location.href = url.toString();
                     }, 100);
                 });
+                
+                // Помечаем как инициализированное после небольшой задержки
+                setTimeout(() => {
+                    isInitialized = true;
+                }, 200);
             };
 
             handleSortChange('favorites-products-sort', 'products_sort', 'rating');

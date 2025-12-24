@@ -29,6 +29,19 @@
             margin-left: 282.5px !important;
             width: calc(100% - 282.5px) !important;
             max-width: calc(100% - 282.5px) !important;
+            overflow: visible !important;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+        }
+        
+        .fi-page,
+        .fi-page-content,
+        .fi-page-content > * {
+            overflow: visible !important;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+            position: relative !important;
+            z-index: 1 !important;
         }
         
         /* Убеждаемся, что sidebar не перекрывает контент */
@@ -41,6 +54,13 @@
         .fi-page-content {
             position: relative !important;
             z-index: 1 !important;
+        }
+        
+        /* КРИТИЧНО: Исправляем opacity: 0 на родительском контейнере main */
+        .fi-main-ctn {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
         }
         
         /* Принудительно устанавливаем черный цвет для всего текста */
@@ -287,11 +307,78 @@
                 mainElement.style.setProperty('max-width', `calc(100% - ${sidebarWidth}px)`, 'important');
                 mainElement.style.setProperty('margin-right', '0', 'important');
                 
+                // Убираем padding-left, который может сдвигать контент
+                const computedPadding = window.getComputedStyle(mainElement).paddingLeft;
+                if (parseFloat(computedPadding) > 0) {
+                    console.log('Removing padding-left:', computedPadding);
+                    mainElement.style.setProperty('padding-left', '0', 'important');
+                }
+                
                 // Проверяем результат
                 const mainRect = mainElement.getBoundingClientRect();
                 console.log('Main rect after fix:', mainRect);
                 console.log('Main computed margin-left:', window.getComputedStyle(mainElement).marginLeft);
                 console.log('Main computed width:', window.getComputedStyle(mainElement).width);
+                console.log('Main computed padding-left:', window.getComputedStyle(mainElement).paddingLeft);
+                
+                // Убеждаемся, что внутренний контент виден
+                const mainContent = mainElement.querySelector('.fi-page, [wire\\:id]');
+                if (mainContent) {
+                    const contentRect = mainContent.getBoundingClientRect();
+                    const contentComputed = window.getComputedStyle(mainContent);
+                    console.log('Main content rect:', contentRect);
+                    console.log('Main content left:', contentRect.left, 'Should be >=', sidebarWidth);
+                    
+                    // Принудительно устанавливаем видимость и overflow
+                    mainContent.style.setProperty('overflow', 'visible', 'important');
+                    mainContent.style.setProperty('overflow-x', 'visible', 'important');
+                    mainContent.style.setProperty('overflow-y', 'visible', 'important');
+                    mainContent.style.setProperty('position', 'relative', 'important');
+                    mainContent.style.setProperty('z-index', '1', 'important');
+                    mainContent.style.setProperty('display', 'block', 'important');
+                    mainContent.style.setProperty('visibility', 'visible', 'important');
+                    mainContent.style.setProperty('opacity', '1', 'important');
+                    
+                    // Если контент находится слишком далеко справа, сдвигаем его
+                    if (contentRect.left > sidebarWidth + 50) {
+                        console.log('Content is too far right, adjusting...');
+                        mainContent.style.setProperty('margin-left', '0', 'important');
+                        mainContent.style.setProperty('padding-left', '0', 'important');
+                        mainContent.style.setProperty('left', '0', 'important');
+                    }
+                    
+                    // Проверяем все родительские элементы на overflow: hidden
+                    let parent = mainContent.parentElement;
+                    let level = 0;
+                    while (parent && parent !== document.body && level < 10) {
+                        const parentComputed = window.getComputedStyle(parent);
+                        if (parentComputed.overflow === 'hidden' || 
+                            parentComputed.overflowX === 'hidden' || 
+                            parentComputed.overflowY === 'hidden') {
+                            console.log('Found parent with overflow hidden:', parent.className, 'Level:', level);
+                            parent.style.setProperty('overflow', 'visible', 'important');
+                            parent.style.setProperty('overflow-x', 'visible', 'important');
+                            parent.style.setProperty('overflow-y', 'visible', 'important');
+                        }
+                        parent = parent.parentElement;
+                        level++;
+                    }
+                }
+            }
+            
+            // КРИТИЧНО: Исправляем opacity: 0 на родительском контейнере main
+            const mainCtn = document.querySelector('.fi-main-ctn');
+            if (mainCtn) {
+                const mainCtnComputed = window.getComputedStyle(mainCtn);
+                console.log('Main container opacity:', mainCtnComputed.opacity, 'Visibility:', mainCtnComputed.visibility);
+                if (mainCtnComputed.opacity === '0' || mainCtnComputed.visibility === 'hidden') {
+                    console.log('FIXING: Main container has opacity 0 or visibility hidden!');
+                    mainCtn.style.setProperty('opacity', '1', 'important');
+                    mainCtn.style.setProperty('visibility', 'visible', 'important');
+                    mainCtn.style.setProperty('display', 'block', 'important');
+                    // Убираем класс opacity-0, если он есть
+                    mainCtn.classList.remove('opacity-0');
+                }
             }
             
             // Проверяем layout структуру
@@ -319,16 +406,34 @@
             });
         }
         
-        // Выполняем сразу и после загрузки - несколько раз для надежности
-        forceShowContent();
-        setTimeout(forceShowContent, 50);
-        setTimeout(forceShowContent, 100);
-        setTimeout(forceShowContent, 200);
-        setTimeout(forceShowContent, 500);
-        setTimeout(forceShowContent, 1000);
+        // Выполняем сразу и после загрузки - с защитой от множественных вызовов
+        let forceShowContentCalled = false;
+        const callForceShowContent = () => {
+            if (!forceShowContentCalled) {
+                forceShowContentCalled = true;
+                forceShowContent();
+                // Разрешаем повторный вызов через 2 секунды
+                setTimeout(() => { forceShowContentCalled = false; }, 2000);
+            }
+        };
+        
+        callForceShowContent();
+        setTimeout(callForceShowContent, 100);
+        setTimeout(callForceShowContent, 500);
         
         // Также используем MutationObserver для отслеживания появления новых overlay
+        // С защитой от бесконечных циклов
+        let observerActive = true;
+        let lastObserverAction = 0;
+        const OBSERVER_THROTTLE = 500; // Минимум 500мс между действиями observer
+        
         const observer = new MutationObserver(function(mutations) {
+            const now = Date.now();
+            if (!observerActive || (now - lastObserverAction) < OBSERVER_THROTTLE) {
+                return;
+            }
+            
+            let hasOverlay = false;
             mutations.forEach(function(mutation) {
                 mutation.addedNodes.forEach(function(node) {
                     if (node.nodeType === 1) { // Element node
@@ -339,6 +444,10 @@
                             node.classList.contains('fi-modal-overlay') ||
                             (typeof classStr === 'string' && classStr.includes('overlay'))
                         )) {
+                            hasOverlay = true;
+                            lastObserverAction = now;
+                            observerActive = false; // Временно отключаем observer
+                            
                             console.log('New overlay detected, hiding it:', node);
                             node.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; z-index: -1 !important;';
                             node.removeAttribute('x-show');
@@ -347,10 +456,18 @@
                             // Удаляем элемент, если это overlay
                             if (node.classList.contains('fi-modal-close-overlay')) {
                                 try {
-                                    setTimeout(() => node.remove(), 0);
+                                    setTimeout(() => {
+                                        node.remove();
+                                        // Включаем observer обратно после небольшой задержки
+                                        setTimeout(() => { observerActive = true; }, 100);
+                                    }, 0);
                                 } catch(e) {
                                     console.log('Could not remove overlay:', e);
+                                    observerActive = true;
                                 }
+                            } else {
+                                // Включаем observer обратно
+                                setTimeout(() => { observerActive = true; }, 100);
                             }
                         }
                     }
@@ -363,10 +480,22 @@
             subtree: true
         });
         
-        // Также при обновлении Livewire
+        // Также при обновлении Livewire (с защитой от бесконечных циклов)
         if (window.Livewire) {
+            let isUpdating = false;
+            let lastUpdateTime = 0;
+            const UPDATE_THROTTLE = 1000; // Минимум 1 секунда между обновлениями
+            
             Livewire.hook('morph.updated', () => {
-                setTimeout(forceShowContent, 100);
+                const now = Date.now();
+                if (!isUpdating && (now - lastUpdateTime) > UPDATE_THROTTLE) {
+                    isUpdating = true;
+                    lastUpdateTime = now;
+                    setTimeout(() => {
+                        forceShowContent();
+                        isUpdating = false;
+                    }, 100);
+                }
             });
         }
     </script>

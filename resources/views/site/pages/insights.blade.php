@@ -108,32 +108,54 @@
         input.value = currentSort;
 
         // Sync Alpine select label once, then listen for user changes.
-        setTimeout(() => {
-          input.dispatchEvent(new Event('input', { bubbles: true }));
+        let timeoutId;
+        let lastValue = input.value;
+        let isInitialized = false;
+        
+        // Проверяем текущее значение в URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentUrlSort = urlParams.get('sort') || 'rating';
+        if (input.value !== currentUrlSort) {
+            input.value = currentUrlSort;
+            lastValue = currentUrlSort;
+        }
+        
+        input.addEventListener('input', function () {
+          // Пропускаем события при инициализации
+          if (!isInitialized) {
+            isInitialized = true;
+            return;
+          }
+          
+          if (this.value === lastValue) return;
+          lastValue = this.value;
 
-          setTimeout(() => {
-            let timeoutId;
-            let lastValue = input.value;
-            input.addEventListener('input', function () {
-              if (this.value === lastValue) return;
-              lastValue = this.value;
-
-              clearTimeout(timeoutId);
-              timeoutId = setTimeout(() => {
-                const url = new URL(window.location.href);
-                const params = url.searchParams;
-                const value = this.value;
-                if (value === 'rating') {
-                  params.delete('sort');
-                } else {
-                  params.set('sort', value);
-                }
-                url.search = params.toString();
-                window.location.href = url.toString();
-              }, 150);
-            });
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            const url = new URL(window.location.href);
+            const params = url.searchParams;
+            const value = this.value;
+            
+            // Проверяем, нужно ли менять URL
+            const currentUrlSort = params.get('sort') || 'rating';
+            if (value === currentUrlSort) {
+              return; // URL уже соответствует значению
+            }
+            
+            if (value === 'rating') {
+              params.delete('sort');
+            } else {
+              params.set('sort', value);
+            }
+            url.search = params.toString();
+            window.location.href = url.toString();
           }, 150);
-        }, 80);
+        });
+        
+        // Помечаем как инициализированное после небольшой задержки
+        setTimeout(() => {
+          isInitialized = true;
+        }, 200);
       });
     </script>
 @endpush

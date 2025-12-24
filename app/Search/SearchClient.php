@@ -22,7 +22,20 @@ class SearchClient
 
   protected static function getClient(): Client
   {
-    return new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
+    $host = env('MEILISEARCH_HOST') ?: config('scout.meilisearch.host', 'http://localhost:7700');
+    $key = env('MEILISEARCH_KEY') ?: config('scout.meilisearch.key', '');
+    
+    // Ensure host is not null
+    if (empty($host)) {
+      $host = 'http://localhost:7700';
+    }
+    
+    // Key can be empty string, but not null
+    if ($key === null) {
+      $key = '';
+    }
+    
+    return new Client($host, $key);
   }
   /**
    * Mutliple Search for a query in Meilisearch
@@ -315,9 +328,15 @@ class SearchClient
         'created_at' => $product->created_at?->toIso8601String(),
         'author' => $product->user ? [
           'profile' => $product->user->profile,
-          'avatar' => $product->user->avatar,
+          'avatar' => $product->user->getAvatarUrl() ?: url('/storage/images/default_avatar.png'),
           'slug' => $product->user->username,
-        ] : null,
+          'username' => $product->user->username,
+        ] : [
+          'profile' => null,
+          'avatar' => url('/storage/images/default_avatar.png'),
+          'slug' => null,
+          'username' => null,
+        ],
         'price' => $product->price,
         'old_price' => $product->sale_price,
         'preview' => $product->preview?->image,
@@ -347,9 +366,15 @@ class SearchClient
         'subtitle' => null,
         'author' => $article->user ? [
           'profile' => $article->user->profile,
-          'avatar' => $article->user->avatar,
+          'avatar' => $article->user->getAvatarUrl() ?: url('/storage/images/default_avatar.png'),
           'slug' => $article->user->username,
-        ] : null,
+          'username' => $article->user->username,
+        ] : [
+          'profile' => null,
+          'avatar' => url('/storage/images/default_avatar.png'),
+          'slug' => null,
+          'username' => null,
+        ],
         'preview' => $article->preview?->image,
         'short' => $article->short(),
         'created_at' => $article->created_at?->toIso8601String(),

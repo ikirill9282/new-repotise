@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class ProfileProduct extends Component
 {
@@ -38,9 +39,14 @@ class ProfileProduct extends Component
     $this->all_checked = (bool) ($options?->showcase_products_only_selected ?? false);
 
     // store encrypted ids for UI consistency
-    $this->selected = Auth::user()
-      ->products()
-      ->where('show_on_creator_page', true)
+    $query = Auth::user()->products();
+    
+    // Check if column exists before using it
+    if (Schema::hasColumn('products', 'show_on_creator_page')) {
+      $query = $query->where('show_on_creator_page', true);
+    }
+    
+    $this->selected = $query
       ->pluck('id')
       ->map(fn ($id) => Crypt::encrypt($id))
       ->values()
@@ -77,9 +83,12 @@ class ProfileProduct extends Component
       ->all();
 
     // Reset all first, then set selected
-    $user->products()->update(['show_on_creator_page' => false]);
-    if (!empty($ids)) {
-      $user->products()->whereIn('id', $ids)->update(['show_on_creator_page' => true]);
+    // Check if column exists before using it
+    if (Schema::hasColumn('products', 'show_on_creator_page')) {
+      $user->products()->update(['show_on_creator_page' => false]);
+      if (!empty($ids)) {
+        $user->products()->whereIn('id', $ids)->update(['show_on_creator_page' => true]);
+      }
     }
   }
 
