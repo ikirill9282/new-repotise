@@ -138,7 +138,7 @@
     <div 
       x-ref="placeholder"
       x-on:click="toggle()" 
-      class="transition flex {{ $compact ? 'justify-start items-baseline gap-2' : 'justify-end items-center' }} relative {{ $compact ? '' : 'pr-6' }}
+      class="transition flex {{ $compact ? 'justify-start items-baseline gap-2' : 'justify-between items-center' }} relative {{ $compact ? '' : 'pr-6' }}
             hover:cursor-pointer hover:text-black
             {{ $attributes->get('labelClass') }}
             "
@@ -146,7 +146,7 @@
       <span 
         x-html="label" 
         x-bind:class="value === null ? '!text-gray' : ''"
-        class="{{ $compact ? 'leading-tight' : 'mr-auto' }}"
+        class="{{ $compact ? 'leading-tight' : '' }}"
         x-ref="textSpan"
       >{{ $label }}</span>
       <span 

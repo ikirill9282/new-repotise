@@ -221,6 +221,7 @@ window.createBirthdayDatePicker = createBirthdayDatePicker;
 window.objectToQueryString = objectToQueryString;
 
 function makeQuill(editor) {
+    
     {
         const image = editor.getAttribute('data-image') === "true" ? ["link", "image"] : ["link"];
         
@@ -510,6 +511,7 @@ function makeQuill(editor) {
         const wrap = editor.closest(".text-editor");
         const input = wrap?.querySelector(`#${id}`);
         
+        
         // Функция для обновления счетчика символов
         const updateCharCounter = () => {
             try {
@@ -543,7 +545,7 @@ function makeQuill(editor) {
         // Флаг для предотвращения загрузки контента после вставки
         let isPasting = false;
         let pasteTimeout = null;
-        
+
         // Функция для обновления значения input
         // Флаг для предотвращения циклов обновления
         let isUpdating = false;
@@ -609,8 +611,13 @@ function makeQuill(editor) {
             updateCharCounter();
         };
 
+        // Флаг для отслеживания, был ли контент загружен при инициализации
+        let initialContentLoaded = false;
+
         // Простая функция для загрузки контента в Quill (только один раз при инициализации)
         const loadContentIntoQuill = () => {
+          // КРИТИЧЕСКИ ВАЖНО: НИ ПРИ КАКИХ УСЛОВИЯХ не перезаписываем контент, если пользователь уже работал с редактором
+          
           // Не загружаем контент, если идет процесс вставки
           if (isPasting) {
             return;
@@ -618,26 +625,31 @@ function makeQuill(editor) {
           
           let content = input?.value || '';
           
-          if (!content) {
-            return; // Не загружаем пустой контент и не проверяем повторно
-          }
-          
-          // Проверяем, не изменился ли контент в редакторе (чтобы не перезаписывать только что вставленный текст)
+          // Проверяем текущий контент в редакторе
           const currentContent = quill.root.innerHTML;
-          if (currentContent && currentContent.trim() !== '' && currentContent !== '<p><br></p>') {
-            // Если в редакторе уже есть контент, не перезаписываем его, если он отличается от input
-            if (currentContent !== content && content.trim() !== '') {
-              // Контент в редакторе отличается - возможно, пользователь только что вставил текст
-              // Не перезаписываем, если прошло меньше 2 секунд с момента последнего изменения
-              const timeSinceLastUpdate = Date.now() - lastUpdateTime;
-              if (timeSinceLastUpdate < 2000) {
-                return; // Не перезаписываем недавно вставленный контент
-              }
+          const hasUserContent = currentContent && currentContent.trim() !== '' && currentContent !== '<p><br></p>';
+          
+          // ВАЖНО: Если в редакторе уже есть контент (даже минимальный),
+          // НИ ПРИ КАКИХ УСЛОВИЯХ не перезаписываем его
+          // Это защищает от потери текста при любых обновлениях Livewire
+          if (hasUserContent) {
+            // Контент в редакторе уже есть - НИКОГДА не перезаписываем
+            // Синхронизируем обратно в input, чтобы сохранить актуальное значение
+            if (input && input.value !== currentContent) {
+              input.value = currentContent;
+              // Триггерим событие для Livewire
+              const inputEvent = new Event("input", { bubbles: true, cancelable: true });
+              input.dispatchEvent(inputEvent);
             }
+            return; // НЕ ПЕРЕЗАПИСЫВАЕМ контент пользователя
           }
           
-          // Загружаем контент напрямую через innerHTML только один раз
+          // Загружаем контент ТОЛЬКО если редактор полностью пустой (нет контента пользователя)
+          // И только при первой инициализации
+          if (!initialContentLoaded && content) {
           quill.root.innerHTML = content;
+            initialContentLoaded = true;
+          }
           
           // Применяем стили к спискам только один раз при загрузке
           const editorElement = quill.root;
@@ -672,15 +684,343 @@ function makeQuill(editor) {
         // Используем флаг, чтобы не загружать контент, если идет процесс вставки
         let contentLoaded = false;
         const initLoadContent = () => {
+            // Загружаем контент ТОЛЬКО один раз при первой инициализации
             if (!contentLoaded && !isPasting) {
                 loadContentIntoQuill();
                 contentLoaded = true;
-            } else if (isPasting) {
-                // Если идет вставка, откладываем загрузку
-                setTimeout(initLoadContent, 500);
             }
+            // Больше НЕ загружаем контент автоматически после этого
         };
         setTimeout(initLoadContent, 100);
+        
+        // КРИТИЧЕСКАЯ ЗАЩИТА: Сохраняем контент перед ЛЮБЫМ обновлением Livewire
+        // и восстанавливаем его, если он был потерян
+        if (window.Livewire) {
+            Livewire.hook('morph', ({ el, component, skip }) => {
+                // Сохраняем контент перед ЛЮБЫМ обновлением
+                const currentContent = quill.root.innerHTML;
+                if (currentContent && currentContent.trim() !== '' && currentContent !== '<p><br></p>') {
+                    // Сохраняем контент во временное хранилище с timestamp
+                    sessionStorage.setItem(`quill-content-${id}`, currentContent);
+                    sessionStorage.setItem(`quill-content-time-${id}`, Date.now().toString());
+                }
+            });
+            
+            // Восстанавливаем контент после обновления, если он был потерян
+            Livewire.hook('morphed', ({ component }) => {
+                const savedContent = sessionStorage.getItem(`quill-content-${id}`);
+                if (savedContent) {
+                    const currentContent = quill.root.innerHTML;
+                    // Если редактор стал пустым или содержит только пустой параграф,
+                    // восстанавливаем сохраненный контент
+                    if (!currentContent || currentContent.trim() === '' || currentContent === '<p><br></p>') {
+                        quill.root.innerHTML = savedContent;
+                        // Обновляем input
+                        if (input) {
+                            input.value = savedContent;
+                            // Триггерим событие для Livewire
+                            const inputEvent = new Event("input", { bubbles: true, cancelable: true });
+                            input.dispatchEvent(inputEvent);
+                        }
+                    }
+                    // Удаляем сохраненный контент после восстановления
+                    sessionStorage.removeItem(`quill-content-${id}`);
+                    sessionStorage.removeItem(`quill-content-time-${id}`);
+                }
+            });
+        }
+        
+        // Синхронизируем значение из Quill в input перед отправкой формы
+        // Это гарантирует, что последние изменения будут отправлены на сервер
+        const syncBeforeSubmit = () => {
+            if (quill && input) {
+                const currentContent = quill.root.innerHTML;
+                if (currentContent && currentContent.trim() !== '' && currentContent !== '<p><br></p>') {
+                    // Отменяем любые ожидающие обновления
+                    if (textChangeTimeout) {
+                        clearTimeout(textChangeTimeout);
+                        textChangeTimeout = null;
+                    }
+                    
+                    // Синхронизируем немедленно перед отправкой
+                    isUpdating = true;
+                    
+                    // Обновляем input значение
+                    input.value = currentContent;
+                    
+                    // Триггерим событие для Livewire (синхронно)
+                    const inputEvent = new Event("input", {
+                        bubbles: true,
+                        cancelable: true,
+                    });
+                    input.dispatchEvent(inputEvent);
+                    
+                    // Также триггерим change событие для надежности
+                    const changeEvent = new Event("change", {
+                        bubbles: true,
+                        cancelable: true,
+                    });
+                    input.dispatchEvent(changeEvent);
+                    
+                    // КРИТИЧЕСКИ ВАЖНО: Обновляем через Livewire напрямую, если доступно
+                    if (window.Livewire && input.hasAttribute('wire:model')) {
+                        const wireModel = input.getAttribute('wire:model');
+                        if (wireModel) {
+                            // Находим компонент Livewire
+                            const wireId = input.closest('[wire\\:id]')?.getAttribute('wire:id');
+                            if (wireId) {
+                                const component = Livewire.find(wireId);
+                                if (component) {
+                                    try {
+                                        // Устанавливаем значение напрямую в компонент (синхронно)
+                                        if (component.set) {
+                                            component.set(wireModel, currentContent);
+                                        }
+                                        // Также обновляем через $wire, если доступно
+                                        if (component.$wire && component.$wire.set) {
+                                            component.$wire.set(wireModel, currentContent);
+                                        }
+                                        // Также обновляем через $wire.$get, если доступно
+                                        if (component.$wire && component.$wire.$get) {
+                                            const currentValue = component.$wire.$get(wireModel);
+                                            if (currentValue !== currentContent) {
+                                                component.$wire.$set(wireModel, currentContent);
+                                            }
+                                        }
+                                        // КРИТИЧЕСКИ ВАЖНО: Также обновляем напрямую в snapshot компонента
+                                        if (component.$wire && component.$wire._x_model) {
+                                            // Обновляем через Alpine.js модель, если доступно
+                                            try {
+                                                component.$wire._x_model.set(wireModel, currentContent);
+                                            } catch (e) {
+                                                // Игнорируем ошибки
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.log('Error setting Livewire value:', e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Принудительно обновляем значение в DOM для надежности
+                    if (input.value !== currentContent) {
+                        input.value = currentContent;
+                    }
+                    
+                    // Снимаем флаг после небольшой задержки
+                    setTimeout(() => {
+                        isUpdating = false;
+                    }, 100);
+                    
+                    // Возвращаем true для индикации успешной синхронизации
+                    return true;
+                } else {
+                }
+            } else {
+            }
+            return false;
+        };
+        
+        // Перехватываем отправку формы и синхронизируем значение
+        const form = editor.closest('form');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                syncBeforeSubmit();
+            });
+        }
+        
+        // КРИТИЧЕСКИ ВАЖНО: Перехватываем Livewire запросы перед отправкой
+        // Используем несколько hooks для надежности
+        if (window.Livewire) {
+            
+            // Hook 1: Перехватываем перед отправкой сообщения
+            Livewire.hook('message', ({ component, message, respond, succeed, fail }) => {
+                // Проверяем, содержит ли запрос метод submit или draft
+                // Проверяем несколько возможных структур запроса
+                const update = message.updateQueue || [];
+                const effects = message.effects || {};
+                const calls = effects.calls || [];
+                
+                // Проверяем в updateQueue
+                const hasSubmitOrDraftInQueue = update.some(item => 
+                    item.type === 'callMethod' && 
+                    item.payload && 
+                    (item.payload.method === 'submit' || item.payload.method === 'draft')
+                );
+                
+                // Проверяем в effects.calls
+                const hasSubmitOrDraftInCalls = calls.some(call => 
+                    call && (call.method === 'submit' || call.method === 'draft')
+                );
+                
+                // Также проверяем в самом message, если есть fingerprint
+                let hasSubmitOrDraftInFingerprint = false;
+                if (message.fingerprint && message.fingerprint.memo) {
+                    const memo = message.fingerprint.memo;
+                    // Проверяем, есть ли вызов метода в memo
+                    if (memo.method && (memo.method === 'submit' || memo.method === 'draft')) {
+                        hasSubmitOrDraftInFingerprint = true;
+                    }
+                }
+                
+                const hasSubmitOrDraft = hasSubmitOrDraftInQueue || hasSubmitOrDraftInCalls || hasSubmitOrDraftInFingerprint;
+                
+                if (hasSubmitOrDraft) {
+                    // КРИТИЧЕСКИ ВАЖНО: Синхронизируем значение ПЕРЕД отправкой запроса
+                    const synced = syncBeforeSubmit();
+                    
+                    // КРИТИЧЕСКИ ВАЖНО: Обновляем значение в payload запроса ПЕРЕД отправкой
+                    // Это гарантирует, что актуальное значение из Quill будет отправлено на сервер
+                    if (quill && input) {
+                        const currentContent = quill.root.innerHTML;
+                        
+                        // Напрямую обновляем значение в payload запроса
+                        // Ищем все обновления свойств и обновляем fields.text
+                        let updatedCount = 0;
+                        update.forEach(item => {
+                            if (item.type === 'syncInput' && item.payload && item.payload.name === 'fields.text') {
+                                const oldValue = item.payload.value;
+                                // КРИТИЧЕСКИ ВАЖНО: Обновляем значение из Quill редактора
+                                item.payload.value = currentContent;
+                                updatedCount++;
+                            }
+                        });
+                        
+                        // Также обновляем в самом сообщении, если есть
+                        if (message.fingerprint && message.fingerprint.memo) {
+                            const memo = message.fingerprint.memo;
+                            if (memo.data && memo.data.fields && memo.data.fields.text !== undefined) {
+                                const oldMemoValue = memo.data.fields.text;
+                                // КРИТИЧЕСКИ ВАЖНО: Обновляем значение в memo
+                                memo.data.fields.text = currentContent;
+                            }
+                        }
+                        
+                        // Если не нашли syncInput для fields.text, добавляем его вручную
+                        if (updatedCount === 0 && currentContent && currentContent.trim() !== '' && currentContent !== '<p><br></p>') {
+                            // Добавляем syncInput в updateQueue
+                            update.push({
+                                type: 'syncInput',
+                                payload: {
+                                    name: 'fields.text',
+                                    value: currentContent
+                                }
+                            });
+                        }
+                    }
+                    
+                    // Ждем, чтобы Livewire успел получить обновленное значение
+                    // Используем микро-задержку для синхронизации
+                    return new Promise((resolve) => {
+                        // Даем время на обновление input и Livewire
+                        // Используем несколько кадров для надежности
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                setTimeout(() => {
+                                    resolve(respond());
+                                }, 100);
+                            });
+                        });
+                    });
+                }
+                
+                return respond();
+            });
+        }
+        
+        // КРИТИЧЕСКИ ВАЖНО: Перехватываем клики по кнопкам сохранения
+        // Ищем кнопку по тексту и по всем элементам вверх по DOM дереву
+        document.addEventListener('click', (e) => {
+            const target = e.target;
+            let button = null;
+            let wireClickValue = null;
+            
+            // Ищем кнопку вверх по DOM дереву (до 10 уровней)
+            let element = target;
+            for (let i = 0; i < 10 && element; i++) {
+                // Проверяем все возможные варианты атрибутов wire:click
+                wireClickValue = element.getAttribute('wire:click') || 
+                                element.getAttribute('wire-click') ||
+                                element.getAttribute('data-wire-click');
+                
+                if (wireClickValue) {
+                    button = element;
+                    break;
+                }
+                
+                // Также проверяем по тексту кнопки
+                const text = element.textContent?.trim() || '';
+                if ((text.includes('Save as Draft') || text.includes('Save & Continue') || text.includes('Publish')) && 
+                    (element.tagName === 'BUTTON' || element.closest('button'))) {
+                    button = element.tagName === 'BUTTON' ? element : element.closest('button');
+                    // Ищем wire:click в найденной кнопке
+                    if (button) {
+                        wireClickValue = button.getAttribute('wire:click') || 
+                                        button.getAttribute('wire-click') ||
+                                        button.getAttribute('data-wire-click');
+                    }
+                    break;
+                }
+                
+                element = element.parentElement;
+            }
+            
+            // Проверяем, содержит ли wire:click метод submit или draft
+            const isSubmitOrDraft = wireClickValue && (
+                wireClickValue === 'submit' || 
+                wireClickValue === 'draft' ||
+                wireClickValue.includes('submit') || 
+                wireClickValue.includes('draft')
+            );
+            
+            
+            if (isSubmitOrDraft) {
+                // КРИТИЧЕСКИ ВАЖНО: Синхронизируем ПЕРЕД отправкой запроса
+                syncBeforeSubmit();
+                
+                // Также обновляем через Livewire напрямую, если доступно
+                if (window.Livewire && input && input.hasAttribute('wire:model')) {
+                    const wireModel = input.getAttribute('wire:model');
+                    if (wireModel) {
+                        const wireId = input.closest('[wire\\:id]')?.getAttribute('wire:id');
+                        if (wireId) {
+                            const component = Livewire.find(wireId);
+                            if (component && quill) {
+                                const currentContent = quill.root.innerHTML;
+                                try {
+                                    if (component.$wire && component.$wire.set) {
+                                        component.$wire.set(wireModel, currentContent);
+                                    }
+                                } catch (e) {
+                                    // Игнорируем ошибки
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }, true); // Используем capture phase для раннего перехвата ДО Livewire
+        
+        // КРИТИЧЕСКИ ВАЖНО: Перехватываем все Livewire запросы через fetch/XHR
+        // Это более надежный способ перехвата, чем через hooks
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            const url = args[0];
+            // Проверяем, является ли это запрос к Livewire
+            if (typeof url === 'string' && (url.includes('/livewire/') || url.includes('/livewire/message'))) {
+                // Синхронизируем значение перед отправкой запроса
+                if (quill && input) {
+                    const currentContent = quill.root.innerHTML;
+                    if (currentContent && currentContent.trim() !== '' && currentContent !== '<p><br></p>') {
+                        syncBeforeSubmit();
+                    }
+                }
+            }
+            return originalFetch.apply(this, args);
+        };
         
         // Обновляем счетчик при каждом изменении текста
         quill.on('text-change', () => {
@@ -981,7 +1321,9 @@ function makeQuill(editor) {
 }
 const builded_editors = [];
 window.addEventListener("DOMContentLoaded", function () {
+    
     const editors = document.querySelectorAll(".quill-editor");
+    
     editors.forEach((editor) => {
       if (!builded_editors.includes(editor)) {
         makeQuill(editor);
@@ -991,7 +1333,9 @@ window.addEventListener("DOMContentLoaded", function () {
 
     // Setup Livewire hook when available
     function setupLivewireQuillHook() {
+      
       if (window.Livewire && window.Livewire.hook) {
+        
         Livewire.hook("morphed", () => {
           const editors = document.querySelectorAll(".quill-editor");
           editors.forEach((editor) => {

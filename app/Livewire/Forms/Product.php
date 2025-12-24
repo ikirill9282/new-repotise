@@ -234,7 +234,6 @@ class Product extends Component
       $data['text'] = ($data['text'] == '<h3><br></h3>' || $data['text'] == '<p><br></p>') 
         ? '' : 
         $this->processText($data['text'] ?? '');
-      
       // Логируем текст после processText
       Log::info('Product text after processText', [
         'length' => strlen($data['text']),
