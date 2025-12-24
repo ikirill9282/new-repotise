@@ -540,6 +540,10 @@ function makeQuill(editor) {
             }
         };
 
+        // Флаг для предотвращения загрузки контента после вставки
+        let isPasting = false;
+        let pasteTimeout = null;
+        
         // Функция для обновления значения input
         // Флаг для предотвращения циклов обновления
         let isUpdating = false;
@@ -607,10 +611,29 @@ function makeQuill(editor) {
 
         // Простая функция для загрузки контента в Quill (только один раз при инициализации)
         const loadContentIntoQuill = () => {
+          // Не загружаем контент, если идет процесс вставки
+          if (isPasting) {
+            return;
+          }
+          
           let content = input?.value || '';
           
           if (!content) {
             return; // Не загружаем пустой контент и не проверяем повторно
+          }
+          
+          // Проверяем, не изменился ли контент в редакторе (чтобы не перезаписывать только что вставленный текст)
+          const currentContent = quill.root.innerHTML;
+          if (currentContent && currentContent.trim() !== '' && currentContent !== '<p><br></p>') {
+            // Если в редакторе уже есть контент, не перезаписываем его, если он отличается от input
+            if (currentContent !== content && content.trim() !== '') {
+              // Контент в редакторе отличается - возможно, пользователь только что вставил текст
+              // Не перезаписываем, если прошло меньше 2 секунд с момента последнего изменения
+              const timeSinceLastUpdate = Date.now() - lastUpdateTime;
+              if (timeSinceLastUpdate < 2000) {
+                return; // Не перезаписываем недавно вставленный контент
+              }
+            }
           }
           
           // Загружаем контент напрямую через innerHTML только один раз
@@ -646,7 +669,18 @@ function makeQuill(editor) {
         };
         
         // Загружаем контент только один раз после инициализации Quill
-        setTimeout(loadContentIntoQuill, 100);
+        // Используем флаг, чтобы не загружать контент, если идет процесс вставки
+        let contentLoaded = false;
+        const initLoadContent = () => {
+            if (!contentLoaded && !isPasting) {
+                loadContentIntoQuill();
+                contentLoaded = true;
+            } else if (isPasting) {
+                // Если идет вставка, откладываем загрузку
+                setTimeout(initLoadContent, 500);
+            }
+        };
+        setTimeout(initLoadContent, 100);
         
         // Обновляем счетчик при каждом изменении текста
         quill.on('text-change', () => {
@@ -696,6 +730,14 @@ function makeQuill(editor) {
         
         // Обработчик для вставки через paste - сохраняем все стили 1:1 из Word
         editor.addEventListener('paste', function(e) {
+            // Устанавливаем флаг вставки
+            isPasting = true;
+            
+            // Очищаем предыдущий таймер, если есть
+            if (pasteTimeout) {
+                clearTimeout(pasteTimeout);
+            }
+            
             // Получаем данные из буфера обмена
             const clipboardData = e.clipboardData || window.clipboardData;
             const htmlData = clipboardData.getData('text/html');
@@ -887,6 +929,11 @@ function makeQuill(editor) {
             setTimeout(() => {
                         const newLength = quill.getLength();
                         quill.setSelection(newLength - 1);
+                        
+                        // Снимаем флаг вставки через 2 секунды после вставки
+                        pasteTimeout = setTimeout(() => {
+                            isPasting = false;
+                        }, 2000);
                     }, 10);
                 } else {
                     // Если нет выделения, вставляем в конец
@@ -897,6 +944,14 @@ function makeQuill(editor) {
                     // Временно отключаем обновление
                     isUpdating = true;
                     quill.root.innerHTML = cleanEditorHTML + cleanPastedHTML;
+                    
+                    // Снимаем флаг вставки через 2 секунды после вставки
+                    if (pasteTimeout) {
+                        clearTimeout(pasteTimeout);
+                    }
+                    pasteTimeout = setTimeout(() => {
+                        isPasting = false;
+                    }, 2000);
                     
                     setTimeout(() => {
                         if (isUpdating) {

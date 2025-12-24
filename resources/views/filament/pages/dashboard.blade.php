@@ -79,275 +79,46 @@
     </style>
     
     <script>
-        console.log('Dashboard script loaded');
-        console.log('Main element:', document.querySelector('.fi-main'));
-        console.log('Page element:', document.querySelector('.fi-page'));
-        console.log('Body:', document.body);
-        
-        // Force show main content
+        // Исправление видимости контента в Filament
         function forceShowContent() {
-            const main = document.querySelector('.fi-main');
-            if (main) {
-                const computed = window.getComputedStyle(main);
-                console.log('Main computed styles:', {
-                    display: computed.display,
-                    visibility: computed.visibility,
-                    opacity: computed.opacity,
-                    backgroundColor: computed.backgroundColor,
-                    color: computed.color,
-                    zIndex: computed.zIndex
-                });
-                
-                main.style.cssText = `
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    z-index: 10000 !important;
-                    position: relative !important;
-                    background-color: #ffffff !important;
-                    color: #000000 !important;
-                    min-height: 100vh !important;
-                `;
-                console.log('Main element fixed');
-            }
-            
-            const page = document.querySelector('.fi-page');
-            if (page) {
-                const computed = window.getComputedStyle(page);
-                console.log('Page computed styles:', {
-                    display: computed.display,
-                    visibility: computed.visibility,
-                    opacity: computed.opacity,
-                    backgroundColor: computed.backgroundColor,
-                    color: computed.color
-                });
-                
-                page.style.cssText = `
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    z-index: 9999 !important;
-                    position: relative !important;
-                    background-color: #ffffff !important;
-                    color: #000000 !important;
-                `;
-                console.log('Page element fixed');
-            }
-            
-            // Проверяем и убираем все overlay - это критично!
-            // Особенно важно скрыть fi-modal-close-overlay с z-index 40
-            const overlays = document.querySelectorAll('.fi-modal-close-overlay, .fi-modal-overlay, [class*="overlay"], [class*="backdrop"]');
+            // Скрываем все overlay элементы
+            const overlays = document.querySelectorAll('.fi-modal-close-overlay, .fi-sidebar-close-overlay, .fi-modal-overlay');
             overlays.forEach(overlay => {
-                const computed = window.getComputedStyle(overlay);
-                const zIndex = parseInt(computed.zIndex) || 0;
-                // Скрываем все overlay, особенно с высоким z-index
-                if (zIndex >= 30 || overlay.classList.contains('fi-modal-close-overlay')) {
-                    console.log('Hiding overlay:', overlay.className, 'Display:', computed.display, 'Z-index:', zIndex);
-                    overlay.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; z-index: -1 !important;';
-                    // Также удаляем Alpine.js атрибуты, которые могут их показывать
-                    overlay.removeAttribute('x-show');
-                    overlay.removeAttribute('x-transition');
-                    overlay.setAttribute('aria-hidden', 'true');
-                    // Удаляем элемент из DOM, если это возможно
-                    if (overlay.parentNode && overlay.classList.contains('fi-modal-close-overlay')) {
-                        try {
-                            overlay.remove();
-                        } catch(e) {
-                            console.log('Could not remove overlay:', e);
-                        }
-                    }
-                }
+                overlay.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; z-index: -1 !important;';
+                overlay.removeAttribute('x-show');
+                overlay.removeAttribute('x-transition');
+                overlay.setAttribute('aria-hidden', 'true');
             });
             
-            // Также проверяем родительские элементы с модальными окнами
-            const modalContainers = document.querySelectorAll('[class*="modal"], [class*="Modal"]');
-            modalContainers.forEach(container => {
-                const computed = window.getComputedStyle(container);
-                if (computed.display !== 'none' && computed.zIndex > 100) {
-                    console.log('Found modal container:', container.className, 'Display:', computed.display);
-                    // Не скрываем сами модальные окна, только overlay
-                }
-            });
-            
-            // Убеждаемся, что все дочерние элементы видны
-            const allChildren = document.querySelectorAll('.fi-main *, .fi-page *');
-            console.log('Total children found:', allChildren.length);
-            let hiddenCount = 0;
-            allChildren.forEach((child, index) => {
-                const computed = window.getComputedStyle(child);
-                if (computed.display === 'none' || computed.visibility === 'hidden' || computed.opacity === '0') {
-                    hiddenCount++;
-                    if (index < 10) { // Логируем первые 10 скрытых элементов
-                        console.log('Hidden child found:', child.tagName, child.className, {
-                            display: computed.display,
-                            visibility: computed.visibility,
-                            opacity: computed.opacity
-                        });
-                    }
-                    child.style.display = 'block';
-                    child.style.visibility = 'visible';
-                    child.style.opacity = '1';
-                }
-            });
-            console.log('Hidden children fixed:', hiddenCount);
-            
-            // Проверяем, есть ли вообще контент внутри
-            const mainContent = document.querySelector('.fi-main > *');
-            const pageContent = document.querySelector('.fi-page > *');
-            console.log('Main has content:', !!mainContent, mainContent);
-            console.log('Page has content:', !!pageContent, pageContent);
-            
-            // Детальная диагностика внутренних элементов
-            if (mainContent) {
-                const mainContentRect = mainContent.getBoundingClientRect();
-                const mainContentComputed = window.getComputedStyle(mainContent);
-                console.log('Main content rect:', mainContentRect);
-                console.log('Main content display:', mainContentComputed.display);
-                console.log('Main content visibility:', mainContentComputed.visibility);
-                console.log('Main content opacity:', mainContentComputed.opacity);
-                console.log('Main content height:', mainContentComputed.height);
-                console.log('Main content min-height:', mainContentComputed.minHeight);
-                console.log('Main content innerHTML length:', mainContent.innerHTML.length);
-                
-                // Проверяем все дочерние элементы
-                const allChildren = mainContent.querySelectorAll('*');
-                console.log('Total children in main content:', allChildren.length);
-                let visibleChildren = 0;
-                let hiddenChildren = 0;
-                allChildren.forEach((child, index) => {
-                    const childRect = child.getBoundingClientRect();
-                    const childComputed = window.getComputedStyle(child);
-                    if (childRect.width > 0 && childRect.height > 0 && 
-                        childComputed.display !== 'none' && 
-                        childComputed.visibility !== 'hidden' &&
-                        childComputed.opacity !== '0') {
-                        visibleChildren++;
-                    } else {
-                        hiddenChildren++;
-                        if (index < 10) {
-                            console.log('Hidden child:', child.tagName, child.className, 'Display:', childComputed.display, 'Visibility:', childComputed.visibility, 'Opacity:', childComputed.opacity, 'Rect:', childRect);
-                        }
-                    }
-                });
-                console.log('Visible children:', visibleChildren, 'Hidden children:', hiddenChildren);
-            }
-            
-            // Принудительно устанавливаем цвета для всего контента
-            const allTextElements = document.querySelectorAll('.fi-main *, .fi-page *');
-            let whiteTextCount = 0;
-            allTextElements.forEach((el, index) => {
-                const computed = window.getComputedStyle(el);
-                // Если цвет белый или очень светлый, меняем на черный
-                if (computed.color === 'rgb(255, 255, 255)' || 
-                    computed.color === 'rgba(255, 255, 255, 1)' ||
-                    computed.color.includes('255, 255, 255')) {
-                    whiteTextCount++;
-                    if (index < 20) { // Логируем первые 20
-                        console.log('White text found:', el.tagName, el.className, 'Color:', computed.color);
-                    }
-                    el.style.color = '#000000';
-                    el.style.setProperty('color', '#000000', 'important');
-                }
-                // Если фон прозрачный или белый, устанавливаем белый
-                if (computed.backgroundColor === 'rgba(0, 0, 0, 0)' || 
-                    computed.backgroundColor === 'transparent') {
-                    el.style.backgroundColor = '#ffffff';
-                    el.style.setProperty('background-color', '#ffffff', 'important');
-                }
-            });
-            console.log('White text elements fixed:', whiteTextCount);
-            
-            // Также принудительно устанавливаем цвет для всех текстовых элементов
-            const textTags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'a', 'label', 'td', 'th'];
-            textTags.forEach(tag => {
-                const elements = document.querySelectorAll(`.fi-main ${tag}, .fi-page ${tag}`);
-                elements.forEach(el => {
-                    const computed = window.getComputedStyle(el);
-                    if (computed.color === 'rgb(255, 255, 255)' || computed.color.includes('255, 255, 255')) {
-                        el.style.setProperty('color', '#000000', 'important');
-                    }
-                });
-            });
-            
-            // Также проверяем body фон - это критично!
+            // Устанавливаем белый фон для body
             const body = document.body;
             if (body) {
-                const bodyComputed = window.getComputedStyle(body);
-                console.log('Body background:', bodyComputed.backgroundColor);
-                // Принудительно устанавливаем белый фон для body
                 body.style.backgroundColor = '#ffffff';
                 body.style.background = '#ffffff';
             }
             
-            // Проверяем, не перекрывает ли sidebar контент
+            // Исправляем позицию main относительно sidebar
             const sidebar = document.querySelector('.fi-sidebar');
-            if (sidebar) {
-                const sidebarComputed = window.getComputedStyle(sidebar);
-                const sidebarRect = sidebar.getBoundingClientRect();
-                console.log('Sidebar z-index:', sidebarComputed.zIndex, 'Position:', sidebarComputed.position, 'Rect:', sidebarRect);
-                // Убеждаемся, что sidebar не перекрывает контент
-                sidebar.style.zIndex = '0';
-                sidebar.style.position = 'fixed';
-            }
-            
-            // Проверяем позицию main относительно sidebar
             const mainElement = document.querySelector('.fi-main');
+            
             if (mainElement && sidebar) {
-                // Убираем класс mx-auto, который может мешать
                 mainElement.classList.remove('mx-auto');
                 
-                const sidebarRect = sidebar.getBoundingClientRect();
-                const sidebarWidth = sidebarRect.width;
+                const sidebarWidth = sidebar.getBoundingClientRect().width;
                 
-                console.log('Sidebar width:', sidebarWidth);
-                
-                // Принудительно устанавливаем margin-left и ширину
                 mainElement.style.setProperty('margin-left', sidebarWidth + 'px', 'important');
                 mainElement.style.setProperty('width', `calc(100% - ${sidebarWidth}px)`, 'important');
                 mainElement.style.setProperty('max-width', `calc(100% - ${sidebarWidth}px)`, 'important');
-                mainElement.style.setProperty('margin-right', '0', 'important');
+                mainElement.style.setProperty('padding-left', '0', 'important');
                 
-                // Убираем padding-left, который может сдвигать контент
-                const computedPadding = window.getComputedStyle(mainElement).paddingLeft;
-                if (parseFloat(computedPadding) > 0) {
-                    console.log('Removing padding-left:', computedPadding);
-                    mainElement.style.setProperty('padding-left', '0', 'important');
-                }
-                
-                // Проверяем результат
-                const mainRect = mainElement.getBoundingClientRect();
-                console.log('Main rect after fix:', mainRect);
-                console.log('Main computed margin-left:', window.getComputedStyle(mainElement).marginLeft);
-                console.log('Main computed width:', window.getComputedStyle(mainElement).width);
-                console.log('Main computed padding-left:', window.getComputedStyle(mainElement).paddingLeft);
-                
-                // Убеждаемся, что внутренний контент виден
+                // Исправляем overflow на родительских элементах
                 const mainContent = mainElement.querySelector('.fi-page, [wire\\:id]');
                 if (mainContent) {
-                    const contentRect = mainContent.getBoundingClientRect();
-                    const contentComputed = window.getComputedStyle(mainContent);
-                    console.log('Main content rect:', contentRect);
-                    console.log('Main content left:', contentRect.left, 'Should be >=', sidebarWidth);
-                    
-                    // Принудительно устанавливаем видимость и overflow
                     mainContent.style.setProperty('overflow', 'visible', 'important');
                     mainContent.style.setProperty('overflow-x', 'visible', 'important');
                     mainContent.style.setProperty('overflow-y', 'visible', 'important');
-                    mainContent.style.setProperty('position', 'relative', 'important');
-                    mainContent.style.setProperty('z-index', '1', 'important');
-                    mainContent.style.setProperty('display', 'block', 'important');
-                    mainContent.style.setProperty('visibility', 'visible', 'important');
-                    mainContent.style.setProperty('opacity', '1', 'important');
                     
-                    // Если контент находится слишком далеко справа, сдвигаем его
-                    if (contentRect.left > sidebarWidth + 50) {
-                        console.log('Content is too far right, adjusting...');
-                        mainContent.style.setProperty('margin-left', '0', 'important');
-                        mainContent.style.setProperty('padding-left', '0', 'important');
-                        mainContent.style.setProperty('left', '0', 'important');
-                    }
-                    
-                    // Проверяем все родительские элементы на overflow: hidden
+                    // Проверяем родительские элементы на overflow: hidden
                     let parent = mainContent.parentElement;
                     let level = 0;
                     while (parent && parent !== document.body && level < 10) {
@@ -355,7 +126,6 @@
                         if (parentComputed.overflow === 'hidden' || 
                             parentComputed.overflowX === 'hidden' || 
                             parentComputed.overflowY === 'hidden') {
-                            console.log('Found parent with overflow hidden:', parent.className, 'Level:', level);
                             parent.style.setProperty('overflow', 'visible', 'important');
                             parent.style.setProperty('overflow-x', 'visible', 'important');
                             parent.style.setProperty('overflow-y', 'visible', 'important');
@@ -370,49 +140,28 @@
             const mainCtn = document.querySelector('.fi-main-ctn');
             if (mainCtn) {
                 const mainCtnComputed = window.getComputedStyle(mainCtn);
-                console.log('Main container opacity:', mainCtnComputed.opacity, 'Visibility:', mainCtnComputed.visibility);
                 if (mainCtnComputed.opacity === '0' || mainCtnComputed.visibility === 'hidden') {
-                    console.log('FIXING: Main container has opacity 0 or visibility hidden!');
                     mainCtn.style.setProperty('opacity', '1', 'important');
                     mainCtn.style.setProperty('visibility', 'visible', 'important');
                     mainCtn.style.setProperty('display', 'block', 'important');
-                    // Убираем класс opacity-0, если он есть
                     mainCtn.classList.remove('opacity-0');
                 }
             }
             
-            // Проверяем layout структуру
+            // Исправляем layout структуру
             const layout = document.querySelector('.fi-layout');
             if (layout) {
-                const layoutComputed = window.getComputedStyle(layout);
-                console.log('Layout display:', layoutComputed.display, 'Position:', layoutComputed.position);
                 layout.style.display = 'flex';
                 layout.style.flexDirection = 'row';
             }
-            
-            // Проверяем, есть ли элемент, который перекрывает весь экран
-            const allFixedElements = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
-            allFixedElements.forEach(el => {
-                const computed = window.getComputedStyle(el);
-                if (computed.position === 'fixed' && computed.zIndex > 10000 && 
-                    !el.classList.contains('fi-topbar') && 
-                    !el.classList.contains('fi-sidebar')) {
-                    const rect = el.getBoundingClientRect();
-                    if (rect.width > window.innerWidth * 0.9 && rect.height > window.innerHeight * 0.9) {
-                        console.log('Found large fixed element covering screen:', el, 'Z-index:', computed.zIndex);
-                        el.style.display = 'none';
-                    }
-                }
-            });
         }
         
-        // Выполняем сразу и после загрузки - с защитой от множественных вызовов
+        // Выполняем с защитой от множественных вызовов
         let forceShowContentCalled = false;
         const callForceShowContent = () => {
             if (!forceShowContentCalled) {
                 forceShowContentCalled = true;
                 forceShowContent();
-                // Разрешаем повторный вызов через 2 секунды
                 setTimeout(() => { forceShowContentCalled = false; }, 2000);
             }
         };
@@ -421,11 +170,10 @@
         setTimeout(callForceShowContent, 100);
         setTimeout(callForceShowContent, 500);
         
-        // Также используем MutationObserver для отслеживания появления новых overlay
-        // С защитой от бесконечных циклов
+        // MutationObserver для отслеживания новых overlay
         let observerActive = true;
         let lastObserverAction = 0;
-        const OBSERVER_THROTTLE = 500; // Минимум 500мс между действиями observer
+        const OBSERVER_THROTTLE = 500;
         
         const observer = new MutationObserver(function(mutations) {
             const now = Date.now();
@@ -433,43 +181,36 @@
                 return;
             }
             
-            let hasOverlay = false;
             mutations.forEach(function(mutation) {
                 mutation.addedNodes.forEach(function(node) {
-                    if (node.nodeType === 1) { // Element node
-                        const className = node.className || '';
-                        const classStr = typeof className === 'string' ? className : (className.baseVal || '');
-                        if (node.classList && (
-                            node.classList.contains('fi-modal-close-overlay') ||
-                            node.classList.contains('fi-modal-overlay') ||
-                            (typeof classStr === 'string' && classStr.includes('overlay'))
-                        )) {
-                            hasOverlay = true;
-                            lastObserverAction = now;
-                            observerActive = false; // Временно отключаем observer
-                            
-                            console.log('New overlay detected, hiding it:', node);
+                    if (node.nodeType === 1 && node.classList && (
+                        node.classList.contains('fi-modal-close-overlay') ||
+                        node.classList.contains('fi-sidebar-close-overlay') ||
+                        node.classList.contains('fi-modal-overlay') ||
+                        node.classList.contains('fi-main-ctn')
+                    )) {
+                        lastObserverAction = now;
+                        observerActive = false;
+                        
+                        if (node.classList.contains('fi-main-ctn')) {
+                            node.style.setProperty('opacity', '1', 'important');
+                            node.classList.remove('opacity-0');
+                        } else {
                             node.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; z-index: -1 !important;';
                             node.removeAttribute('x-show');
                             node.removeAttribute('x-transition');
                             node.setAttribute('aria-hidden', 'true');
-                            // Удаляем элемент, если это overlay
+                            
                             if (node.classList.contains('fi-modal-close-overlay')) {
-                                try {
-                                    setTimeout(() => {
-                                        node.remove();
-                                        // Включаем observer обратно после небольшой задержки
-                                        setTimeout(() => { observerActive = true; }, 100);
-                                    }, 0);
-                                } catch(e) {
-                                    console.log('Could not remove overlay:', e);
-                                    observerActive = true;
-                                }
-                            } else {
-                                // Включаем observer обратно
-                                setTimeout(() => { observerActive = true; }, 100);
+                                setTimeout(() => {
+                                    node.remove();
+                                    setTimeout(() => { observerActive = true; }, 100);
+                                }, 0);
+                                return;
                             }
                         }
+                        
+                        setTimeout(() => { observerActive = true; }, 100);
                     }
                 });
             });
@@ -480,11 +221,11 @@
             subtree: true
         });
         
-        // Также при обновлении Livewire (с защитой от бесконечных циклов)
+        // Обновление при изменении Livewire
         if (window.Livewire) {
             let isUpdating = false;
             let lastUpdateTime = 0;
-            const UPDATE_THROTTLE = 1000; // Минимум 1 секунда между обновлениями
+            const UPDATE_THROTTLE = 1000;
             
             Livewire.hook('morph.updated', () => {
                 const now = Date.now();
