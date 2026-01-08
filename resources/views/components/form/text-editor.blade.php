@@ -128,6 +128,7 @@
     margin: 2px 0 !important; /* Уменьшено с 8px до 2px для более компактных списков */   
     padding-left: 5px !important;
   }
+	
   
   /* Увеличиваем расстояние между абзацами */
   .quill-editor .ql-editor p {

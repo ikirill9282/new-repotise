@@ -3536,7 +3536,7 @@ header .search_group input[name="q"]::placeholder {
 .text-editor .quill-editor .ql-editor li {
   display: list-item !important;
   list-style-position: outside !important;
-  margin: 8px 0 !important;
+  margin: 2px 0 !important;
   padding-left: 5px !important;
   line-height: 1.6 !important;
 }
@@ -3598,7 +3598,7 @@ header .search_group input[name="q"]::placeholder {
 .user-custom-text li {
   display: list-item !important;
   list-style-position: outside !important;
-  margin: 8px 0 !important;
+  margin: 2px 0 !important;
   padding-left: 5px !important;
   line-height: 1.6 !important;
   color: var(--black, #212121) !important;
