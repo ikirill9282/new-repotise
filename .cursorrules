@@ -1,0 +1,210 @@
+# Инструкции для AI ассистента - TrekGuider Platform
+
+## 🎯 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА
+
+### 1. ВСЕГДА используй PlatformCore
+**При ЛЮБОМ упоминании страницы, модального окна или API:**
+- "страница X" → `PlatformCore::getPage('x')`
+- "модальное окно Y" → `PlatformCore::getModal('y')`
+- "API endpoint Z" → `PlatformCore::getApi('z')`
+- "компонент A" → `PlatformCore::getComponent('category', 'a')`
+
+**Перед любыми изменениями:**
+1. Найди через PlatformCore
+2. Покажи найденную информацию
+3. Затем приступай к изменениям
+
+### 2. Структура проекта
+- **Контроллеры**: `app/Http/Controllers/`
+- **Livewire**: `app/Livewire/`
+- **Views**: `resources/views/`
+- **Компоненты**: `resources/views/components/`
+- **Модели**: `app/Models/`
+- **API**: `app/Http/Controllers/Api/`
+
+## 📋 ПОЛНЫЙ СПИСОК СТРАНИЦ
+
+### Публичные страницы:
+- `home` - Главная (/)
+- `products` - Каталог продуктов (/products)
+- `product` - Страница продукта (/products/{product})
+- `creators` - Каталог создателей (/creators)
+- `insights` - Статьи (/insights)
+- `insights.news` - Новости (/insights/news)
+- `feed` - Просмотр статьи (/insights/{article})
+- `search` - Поиск (/search)
+- `favorites` - Избранное (/favorites) [auth]
+- `help-center` - Центр помощи (/help-center)
+- `policies` - Все политики (/policies-all)
+- `sellers` - Продавцы (/sellers)
+- `referal` - Реферальная программа (/referal)
+- `gift` - Подарок (/gift/{token})
+- `investments` - Инвестиции (/investments)
+
+### Оплата:
+- `checkout` - Оформление заказа (/payment/checkout)
+- `checkout.subscription` - Оформление подписки (/payment/checkout-subscription)
+- `payment.success` - Успешная оплата (/payment/success)
+- `payment.error` - Ошибка оплаты (/payment/error)
+- `subscription.success` - Успешная подписка (/payment/subscription-success)
+
+### Профиль пользователя [все требуют auth]:
+- `profile` - Профиль создателя (/profile)
+- `profile.edit` - Редактирование профиля (/profile/edit)
+- `profile.dashboard` - Дашборд (/profile/dashboard)
+- `profile.products` - Мои продукты (/profile/products)
+- `profile.products.create` - Создание продукта (/profile/products/create)
+- `profile.products.create.media` - Загрузка медиа (/profile/products/create/media)
+- `profile.articles` - Мои статьи (/profile/articles)
+- `profile.articles.create` - Создание статьи (/profile/articles/create)
+- `profile.purchases` - Мои покупки (/profile/purchases)
+- `profile.sales` - Мои продажи (/profile/sales)
+- `profile.reviews` - Отзывы (/profile/reviews)
+- `profile.settings` - Настройки (/profile/settings)
+- `profile.referal` - Реферальная программа (/profile/referal)
+- `profile.verify` - Верификация (/profile/verify)
+
+### Публичный профиль:
+- `view.profile` - Публичный профиль (/profile/@{slug})
+
+### Авторизация:
+- `auth.signin` - Вход (POST /auth/signin)
+- `auth.signout` - Выход (/auth/signout)
+- `auth.email.verify` - Подтверждение email (/auth/email/verify)
+- `auth.google.callback` - Google OAuth (/auth/google/callback)
+- `auth.facebook.callback` - Facebook OAuth (/auth/facebook/callback)
+- `auth.x.callback` - X OAuth (/auth/x/callback)
+
+## 🪟 МОДАЛЬНЫЕ ОКНА
+
+Все модальные окна доступны через `PlatformCore::getModal()`:
+- `auth` - Авторизация
+- `register` - Регистрация
+- `cart` - Корзина
+- `product` - Модальное окно продукта
+- `payment-method` - Способ оплаты
+- `payout-method` - Способ вывода
+- `donate` - Донат
+- `withdraw` - Вывод средств
+- `funds` - Пополнение баланса
+- `change-email` - Смена email
+- `reset-password` - Сброс пароля
+- `twofa` - 2FA
+- `delete-account` - Удаление аккаунта
+- `delete-product` - Удаление продукта
+- `delete-article` - Удаление статьи
+- `refund` - Возврат средств
+- `order` - Детали заказа
+- `message` - Сообщение
+- `contact` - Контактная форма
+- `report` - Жалоба
+
+## 🔌 API ENDPOINTS
+
+Все API доступны через `PlatformCore::getApi()`:
+
+### Поиск:
+- `search` - GET /api/search
+
+### Данные:
+- `data.feed` - GET /api/data/feed/{id}
+- `data.tags` - GET /api/data/tags
+- `data.types` - GET /api/data/types
+- `data.locations` - GET /api/data/locations
+- `data.categories` - GET /api/data/categories
+- `data.messages` - POST /api/data/messages
+- `data.favorite-author` - POST /api/data/favorite-author
+- `data.upload-image` - POST /api/data/upload-image [auth]
+
+### Корзина:
+- `cart.push` - POST /api/cart/push
+- `cart.count` - POST /api/cart/count
+- `cart.remove` - POST /api/cart/remove
+- `cart.promocode` - POST /api/cart/promocode
+
+### Обратная связь [auth]:
+- `feedback.views` - GET /api/feedback/views
+- `feedback.likes` - POST /api/feedback/likes
+- `feedback.comment` - POST /api/feedback/comment
+- `feedback.review` - POST /api/feedback/review
+- `feedback.favorite` - POST /api/feedback/favorite
+- `feedback.follow` - POST /api/feedback/follow
+
+### Оплата:
+- `payment.confirm` - POST /api/payment/confirm
+
+## 🧩 КОМПОНЕНТЫ
+
+### Формы (components.form.*):
+- `input` - Текстовое поле
+- `textarea` - Многострочное поле
+- `select` - Выпадающий список
+- `checkbox` - Чекбокс
+- `file` - Загрузка файла
+- `files` - Загрузка нескольких файлов
+- `text-editor` - Редактор текста (Quill)
+- `datepicker` - Выбор даты
+- `toggle` - Переключатель
+- `chips` - Теги/чипсы
+- `payment-method` - Способ оплаты
+
+### UI (components.*):
+- `btn` - Кнопка
+- `link` - Ссылка
+- `card` - Карточка
+- `loader` - Индикатор загрузки
+- `empty` - Пустое состояние
+- `tooltip` - Подсказка
+- `accordion` - Аккордеон
+- `breadcrumbs` - Хлебные крошки
+
+## 📝 СТИЛЬ КОДА
+
+### Laravel конвенции:
+- Eloquent для работы с БД
+- Form Requests для валидации
+- Services для бизнес-логики
+- Jobs для фоновых задач
+
+### Blade:
+- `@props` для пропсов
+- Alpine.js для интерактивности
+- Livewire для динамического контента
+
+### Livewire:
+- `#[On('event')]` для слушателей
+- `wire:model` для биндинга
+- `wire:loading` для индикаторов
+
+## 🛠️ ЧАСТЫЕ ЗАДАЧИ
+
+### Добавление страницы:
+1. Роут в `routes/web.php`
+2. Метод в контроллере
+3. View в `resources/views/site/pages/`
+4. **ОБЯЗАТЕЛЬНО** добавить в `PlatformCore::$pages`
+
+### Добавление модального окна:
+1. Класс в `app/Livewire/Modals/`
+2. View в `resources/views/livewire/modals/`
+3. Добавить в `PlatformCore::$modals`
+
+### Добавление API:
+1. Роут в `routes/api.php`
+2. Метод в `app/Http/Controllers/Api/`
+3. Добавить в `PlatformCore::$api`
+
+## ⚠️ ВАЖНО
+
+- Всегда проверяй авторизацию через `auth()` middleware
+- Валидируй все пользовательские данные
+- Используй `with()` для eager loading
+- Используй индексы в БД
+
+## 📊 СТРУКТУРА ОТВЕТА
+
+1. **Найди** → PlatformCore
+2. **Покажи** → что нашел
+3. **Объясни** → что будешь делать
+4. **Сделай** → внеси изменения
+5. **Проверь** → упомяни что проверить
