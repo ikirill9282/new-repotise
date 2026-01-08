@@ -125,13 +125,13 @@
   .quill-editor .ql-editor li {
     display: list-item !important;
     list-style-position: outside !important;
-    margin: 8px 0 !important; /* Уменьшено с 8px до 2px для более компактных списков */
+    margin: 2px 0 !important; /* Уменьшено с 8px до 2px для более компактных списков */
     padding-left: 5px !important;
   }
   
   /* Увеличиваем расстояние между абзацами */
   .quill-editor .ql-editor p {
-    margin: 20px 0 !important; /* Больше пространства между параграфами */
+    margin: 15px 0 !important; /* Больше пространства между параграфами */
     line-height: 1.6 !important;
   }
   
