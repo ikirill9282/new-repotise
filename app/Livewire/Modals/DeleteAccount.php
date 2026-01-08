@@ -66,6 +66,11 @@ class DeleteAccount extends Component
         $code = $this->generateCode();
 
         try {
+            // Убеждаемся, что пользователь загружен полностью
+            if (!$user || !$user->id) {
+                throw new \Exception('User is not authenticated or invalid.');
+            }
+
             $user->verify()->updateOrCreate(
                 ['type' => 'account_delete'],
                 [
@@ -73,12 +78,30 @@ class DeleteAccount extends Component
                     'created_at' => Carbon::now()->timestamp,
                 ]
             );
-            $user->load('verify');
+            
+            // Перезагружаем пользователя с отношениями
+            $user->refresh();
+            $user->load('verify', 'options');
+            
+            // Проверяем, что email существует
+            if (empty($user->email)) {
+                throw new \Exception('User email is not set.');
+            }
+
+            // Используем send() вместо queue() для немедленной отправки
+            // Если нужна очередь, убедитесь что воркер запущен: php artisan queue:work
             Mail::to($user->email)->send(new AccountDeletionCode($user, $code));
+            
+            Log::info('Account deletion verification code sent successfully', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
         } catch (\Throwable $e) {
             Log::error('Failed to send account deletion verification code.', [
                 'user_id' => $user->id ?? null,
+                'user_email' => $user->email ?? null,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             $this->dispatch('toastError', ['message' => 'Unable to send verification code right now. Please try again later.']);

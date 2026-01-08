@@ -1,5 +1,11 @@
 @php
-$productsIds = $variables->get('products_ids')?->value ?? [];
+$productsIds = [];
+if ($variables && $variables instanceof \Illuminate\Support\Collection && $variables->has('products_ids')) {
+  $productsIds = $variables->get('products_ids')?->value ?? [];
+  if (!is_array($productsIds)) {
+    $productsIds = [];
+  }
+}
 $products = \App\Models\Product::getTrendingProducts(limit: 10, includes: $productsIds);
 @endphp
 

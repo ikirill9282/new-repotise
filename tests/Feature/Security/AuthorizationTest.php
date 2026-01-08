@@ -20,14 +20,23 @@ class AuthorizationTest extends TestCase
         $response = $this->get('/profile/products/create');
         $response->assertRedirect('/');
 
-        $response = $this->get('/profile/orders');
+        // /profile/orders doesn't exist, test /profile/purchases instead
+        $response = $this->get('/profile/purchases');
         $response->assertRedirect('/');
     }
 
     public function test_user_can_access_own_profile(): void
     {
         $user = $this->createUserWithoutEvents();
-
+        
+        // Users without 'creator' role are redirected to purchases
+        $response = $this->actingAs($user)->get('/profile');
+        $response->assertRedirect(route('profile.purchases'));
+        
+        // Assign creator role to access profile page
+        $creatorRole = Role::firstOrCreate(['name' => 'creator']);
+        $user->assignRole($creatorRole);
+        
         $response = $this->actingAs($user)->get('/profile');
         $response->assertStatus(200);
     }

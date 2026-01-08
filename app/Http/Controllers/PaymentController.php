@@ -275,8 +275,10 @@ class PaymentController extends Controller
       ]);
     }
 
+    $page = Page::where('slug', 'payment-error')->with('config')->first();
+    
     return view('site.pages.payment-error', [
-      'page' => Page::where('slug', 'payment-error')->with('config')->first(),
+      'page' => $page ?? (object)['variables' => null],
       'error' => $errorPayload,
       'cart' => $context['cart'],
       'summary' => $context['summary'],

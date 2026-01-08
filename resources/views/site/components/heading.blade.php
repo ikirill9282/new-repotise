@@ -1,8 +1,20 @@
 @php
 // $heading = (isset($variables) && isset($title)) ? $variables->firstWhere(fn($var) => str_contains($var, "{$title}_heading"))?->name : null;
 // $header = (isset($variables) && isset($title)) ? $variables->firstWhere(fn($var) => str_contains($var, "{$title}_header"))?->name : null;
-$heading = (isset($variables)) ? $variables->where(fn($item) => str_contains($item->name, 'heading'))->first()?->value : null;
-$header = (isset($variables)) ? $variables->where(fn($item) => str_contains($item->name, 'header'))->first()?->value : null;
+$heading = null;
+$header = null;
+
+if (isset($variables) && $variables instanceof \Illuminate\Support\Collection && !$variables->isEmpty()) {
+  $headingItem = $variables->filter(function($item) {
+    return isset($item->name) && str_contains($item->name, 'heading');
+  })->first();
+  $heading = $headingItem?->value ?? null;
+  
+  $headerItem = $variables->filter(function($item) {
+    return isset($item->name) && str_contains($item->name, 'header');
+  })->first();
+  $header = $headerItem?->value ?? null;
+}
 
 @endphp
 

@@ -1,12 +1,31 @@
 @extends('layouts.site')
 
 @section('content')
-  @include('site.sections.home', ['variables' => $page->config->where(fn($record) => str_starts_with( $record->name, 'page'))->keyBy('name') ?? []])
-  @include('site.sections.main_article', ['variables' => $page->config->where(fn($record) => str_starts_with( $record->name, 'main_article'))->keyBy('name') ?? []])
-  @include('site.sections.insights', ['variables' => $page->config->where(fn($record) => str_starts_with( $record->name, 'insights'))->keyBy('name') ?? []])
+  @php
+    $config = $page->config ?? collect();
+    
+    // Безопасная фильтрация с проверкой на null
+    $filterConfig = function($prefix) use ($config) {
+      if ($config->isEmpty()) {
+        return collect();
+      }
+      return $config->filter(function($record) use ($prefix) {
+        return isset($record->name) && str_starts_with($record->name, $prefix);
+      })->keyBy('name');
+    };
+    
+    $pageVars = $filterConfig('page');
+    $mainArticleVars = $filterConfig('main_article');
+    $insightsVars = $filterConfig('insights');
+    $newsVars = $filterConfig('news');
+    $productsVars = $filterConfig('products');
+    $authorsVars = $filterConfig('authors');
+  @endphp
   
-  @include('site.sections.news', ['variables' => $page->config->where(fn($record) => str_starts_with( $record->name, 'news'))->keyBy('name') ?? []])
-
-  @include('site.sections.products', ['variables' => $page->config->where(fn($record) => str_starts_with( $record->name, 'products'))->keyBy('name') ?? []])
-  @include('site.sections.authors', ['variables' => $page->config->where(fn($record) => str_starts_with( $record->name, 'authors'))->keyBy('name') ?? []])
+  @include('site.sections.home', ['variables' => $pageVars])
+  @include('site.sections.main_article', ['variables' => $mainArticleVars])
+  @include('site.sections.insights', ['variables' => $insightsVars])
+  @include('site.sections.news', ['variables' => $newsVars])
+  @include('site.sections.products', ['variables' => $productsVars])
+  @include('site.sections.authors', ['variables' => $authorsVars])
 @endsection

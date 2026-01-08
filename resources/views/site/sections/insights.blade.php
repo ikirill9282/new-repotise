@@ -1,9 +1,21 @@
 @php
   // dd($variables);
-    $articles = $variables->firstWhere('name', 'insights_article_ids')->value;
-    $articles = \App\Models\Article::whereIn('id', $articles)->with('author')->get();
-    while ($articles->count() < 3) {
-        $articles = $articles->collect()->merge($articles)->slice(0, 3);
+    $articleIds = [];
+    if ($variables && $variables instanceof \Illuminate\Support\Collection) {
+      $articleItem = $variables->firstWhere('name', 'insights_article_ids');
+      $articleIds = $articleItem?->value ?? [];
+      if (!is_array($articleIds)) {
+        $articleIds = [];
+      }
+    }
+    $articles = !empty($articleIds) ? \App\Models\Article::whereIn('id', $articleIds)->with('author')->get() : collect();
+    
+    // Безопасное дублирование элементов, если их меньше 3
+    if ($articles->count() > 0 && $articles->count() < 3) {
+      $originalCount = $articles->count();
+      $needed = 3 - $originalCount;
+      $duplicates = $articles->take($needed);
+      $articles = $articles->merge($duplicates);
     }
 @endphp
 

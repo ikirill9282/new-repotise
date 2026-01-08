@@ -47,10 +47,17 @@ class Product extends Model
       // PURIFY
       $model->title = Purifier::clean($model->title);
       $textBeforePurifier = $model->text;
-      $model->text = Purifier::clean($model->text);
       
-      // Логируем текст после очистки Purifier
-      Log::info('Product text after Purifier (creating)', [
+      // Используем Purifier с конфигурацией product_text для сохранения форматирования
+      // Это позволит сохранить HTML теги и стили из Word
+      if (!empty($model->text)) {
+        $model->text = Purifier::clean($model->text, 'product_text');
+        // Дополнительная нормализация через processText (если нужно)
+        // Но не удаляем HTML, а только нормализуем
+      }
+      
+      // Логируем текст после очистки
+      Log::info('Product text after cleaning (creating)', [
         'length_before' => strlen($textBeforePurifier ?? ''),
         'length_after' => strlen($model->text ?? ''),
         'preview' => substr($model->text ?? '', 0, 500),
@@ -96,18 +103,19 @@ class Product extends Model
       
       if ($model->isDirty('text')) {
         $textBeforePurifier = $model->text;
-        $model->text = Purifier::clean($model->text);
+        // Используем Purifier с конфигурацией product_text для сохранения форматирования
+        if (!empty($model->text)) {
+          $model->text = Purifier::clean($model->text, 'product_text');
+        }
         
-        // Логируем текст после очистки Purifier
-        Log::info('Product text after Purifier (updating)', [
+        // Логируем текст после очистки
+        Log::info('Product text after cleaning (updating)', [
           'id' => $model->id,
           'length_before' => strlen($textBeforePurifier),
           'length_after' => strlen($model->text),
           'preview' => substr($model->text, 0, 500),
           'full_text' => $model->text
         ]);
-      } else {
-        $model->text = Purifier::clean($model->text);
       }
       
       $model->seo_title = Purifier::clean($model->seo_title);
@@ -236,16 +244,11 @@ class Product extends Model
     return $this->price - $this->sale_price;
   }
 
-  public function getPriceWithoutDiscount(): float
+  public function getPriceWithoutDiscount()
   {
-    // Если цена без скидки равна текущей цене, возвращаем текущую цену
-    $price = $this->price ?? 0.0;
-    
-    // Убеждаемся, что возвращаем float, даже если price был null или другим типом
-    $result = (float) $price;
-    
-    // Дополнительная проверка на случай, если приведение типа не сработало
-    return is_numeric($result) ? $result : 0.0;
+    if ($this->getPrice() == $this->price) return null;
+
+    return $this->price;
   }
 
   public function getText(): string

@@ -118,6 +118,17 @@ class Modals extends Component
     #[On('openModalAfterClose')]
     public function openModalAfterClose($modalName, $args = [])
     {
+      // Обработка случая, когда передается массив вместо отдельных параметров
+      if (is_array($modalName)) {
+        $args = $modalName[1] ?? [];
+        $modalName = $modalName[0] ?? null;
+      }
+      
+      // Убеждаемся, что modalName - это строка
+      if (!is_string($modalName)) {
+        return;
+      }
+      
       // Этот метод будет вызван через JavaScript после закрытия предыдущего модального окна
       // Убеждаемся, что предыдущее модальное окно полностью закрыто
       if ($this->isVisible && $this->modal !== $modalName) {
@@ -127,7 +138,7 @@ class Modals extends Component
       }
       
       // Открываем новое модальное окно
-      $this->openModal($modalName, $args);
+      $this->openModal($modalName, is_array($args) ? $args : []);
     }
 
     // Support for old modal events
@@ -224,8 +235,16 @@ class Modals extends Component
             return;
         }
 
+        // Require authentication for checkout
+        $userId = Auth::id();
+        if (!$userId) {
+            session()->flash('error', 'Please log in to proceed with checkout.');
+            return redirect()->route('signin');
+        }
+
         $order = Order::preparing($cart);
-        $order->user_id = Auth::id() ?? 0;
+        $order->user_id = $userId;
+        $order->buyer_user_id = $userId;
         $order = $order->savePrepared();
 
         $cart->flushCart();

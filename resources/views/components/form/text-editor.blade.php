@@ -157,4 +157,16 @@
   .quill-editor .ql-editor div[style] {
     /* Стили из атрибута style применяются автоматически */
   }
+  
+  /* Поддержка отступов из Word */
+  .quill-editor .ql-editor p[style*="text-indent"],
+  .quill-editor .ql-editor p[style*="margin-left"],
+  .quill-editor .ql-editor p[style*="padding-left"] {
+    /* Отступы из Word сохраняются через style атрибут */
+  }
+  
+  /* Поддержка разных размеров шрифта */
+  .quill-editor .ql-editor [style*="font-size"] {
+    /* Размеры шрифта сохраняются */
+  }
 </style>

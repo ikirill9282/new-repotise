@@ -15,7 +15,7 @@ class SiteControllerTest extends TestCase
 
     public function test_home_page_loads(): void
     {
-        Page::factory()->create(['slug' => 'home']);
+        Page::firstOrCreate(['slug' => 'home'], ['title' => 'Home']);
 
         $response = $this->get('/');
 
@@ -39,7 +39,8 @@ class SiteControllerTest extends TestCase
             'published_at' => now(),
         ]);
 
-        $response = $this->get("/products/{$product->slug}");
+        // Product page requires pid parameter
+        $response = $this->get("/products/{$product->slug}?pid={$product->pid}");
 
         $response->assertStatus(200);
     }

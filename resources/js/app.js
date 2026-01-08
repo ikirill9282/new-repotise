@@ -287,7 +287,7 @@ function makeQuill(editor) {
                     // Сохраняем форматирование при вставке из Word
                     matchVisual: false,
                     // Включаем обработку HTML из Word - сохраняем все форматирование
-                    matchers: [],
+                    // Quill будет использовать наши кастомные matchers для обработки вставки
                 },
             },
             placeholder: editor.getAttribute("data-placeholder") ?? "",
@@ -361,10 +361,19 @@ function makeQuill(editor) {
                     attrs.underline = true;
                 }
                 
-                // Размер шрифта
-                const fontSizeMatch = style.match(/font-size:\s*([\d.]+)px/i);
+                // Размер шрифта (поддержка разных единиц измерения)
+                const fontSizeMatch = style.match(/font-size:\s*([\d.]+)(px|pt|em)/i);
                 if (fontSizeMatch) {
-                    const size = parseFloat(fontSizeMatch[1]);
+                    let size = parseFloat(fontSizeMatch[1]);
+                    const unit = fontSizeMatch[2].toLowerCase();
+                    
+                    // Конвертируем в px для сравнения
+                    if (unit === 'pt') {
+                        size = size * 1.33; // 1pt ≈ 1.33px
+                    } else if (unit === 'em') {
+                        size = size * 16; // Предполагаем базовый размер 16px
+                    }
+                    
                     if (size < 12) {
                         attrs.size = 'small';
                     } else if (size > 16) {
@@ -379,6 +388,18 @@ function makeQuill(editor) {
                     if (['left', 'center', 'right', 'justify'].includes(align)) {
                         attrs.align = align;
                     }
+                }
+                
+                // Отступы (text-indent, margin-left, padding-left) - сохраняем через style
+                // Quill не поддерживает отступы напрямую, поэтому сохраняем их в HTML
+                const textIndentMatch = style.match(/text-indent:\s*([\d.]+)(px|pt|em|cm)/i);
+                const marginLeftMatch = style.match(/margin-left:\s*([\d.]+)(px|pt|em|cm)/i);
+                const paddingLeftMatch = style.match(/padding-left:\s*([\d.]+)(px|pt|em|cm)/i);
+                
+                // Если есть отступ, сохраняем его в style атрибуте (будет обработан Purifier)
+                if (textIndentMatch || marginLeftMatch || paddingLeftMatch) {
+                    // Сохраняем style для последующей обработки
+                    // Quill сохранит его в HTML
                 }
             }
             
@@ -431,11 +452,35 @@ function makeQuill(editor) {
             return delta;
         });
         
-        // Обрабатываем параграфы и div'ы - сохраняем выравнивание и размер
+        // Обрабатываем параграфы и div'ы - сохраняем выравнивание, размер и отступы
         quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
             const tagName = node.tagName ? node.tagName.toLowerCase() : '';
             
             if (tagName === 'p' || tagName === 'div') {
+                // Удаляем пустые параграфы (только <br> или пробелы)
+                const innerHTML = node.innerHTML || '';
+                const textContent = node.textContent || '';
+                
+                // Если параграф содержит только <br>, пробелы или пустой - пропускаем его
+                if (textContent.trim() === '' || innerHTML.match(/^(\s*<br\s*\/?>\s*)+$/i)) {
+                    return new Delta(); // Возвращаем пустую дельту
+                }
+                
+                // Агрессивная очистка множественных <br> внутри параграфа
+                // Удаляем только множественные <br> (2 и более подряд) внутри параграфа
+                // НЕ удаляем одиночные <br> и НЕ трогаем структуру
+                if (innerHTML.match(/<br\s*\/?>/gi)) {
+                    let cleanedHTML = innerHTML;
+                    
+                    // ТОЛЬКО удаляем множественные <br> (2 и более подряд) - заменяем на один
+                    cleanedHTML = cleanedHTML.replace(/(<br\s*\/?>){2,}/gi, '<br>');
+                    
+                    // Обновляем innerHTML для дальнейшей обработки
+                    if (cleanedHTML !== innerHTML) {
+                        node.innerHTML = cleanedHTML;
+                    }
+                }
+                
                 const attrs = {};
                 const style = node.getAttribute('style') || '';
                 const computedStyle = window.getComputedStyle ? window.getComputedStyle(node) : null;
@@ -449,21 +494,36 @@ function makeQuill(editor) {
                     attrs.align = textAlign;
                 }
                 
-                // Обрабатываем размер шрифта
+                // Обрабатываем размер шрифта (поддержка разных единиц)
                 let fontSize = node.style?.fontSize || 
                               (computedStyle ? computedStyle.fontSize : null) ||
-                              (style.match(/font-size:\s*([^;]+)/i)?.[1]?.trim());
+                              (style.match(/font-size:\s*([\d.]+)(px|pt|em)/i)?.[0]);
                 
                 if (fontSize) {
-                    const sizeValue = parseFloat(fontSize);
-                    if (!isNaN(sizeValue)) {
-                        if (sizeValue < 12) {
-                            attrs.size = 'small';
-                        } else if (sizeValue > 16) {
-                            attrs.size = 'large';
+                    const fontSizeMatch = fontSize.match(/([\d.]+)(px|pt|em)/i);
+                    if (fontSizeMatch) {
+                        let sizeValue = parseFloat(fontSizeMatch[1]);
+                        const unit = fontSizeMatch[2].toLowerCase();
+                        
+                        // Конвертируем в px
+                        if (unit === 'pt') {
+                            sizeValue = sizeValue * 1.33;
+                        } else if (unit === 'em') {
+                            sizeValue = sizeValue * 16;
+                        }
+                        
+                        if (!isNaN(sizeValue)) {
+                            if (sizeValue < 12) {
+                                attrs.size = 'small';
+                            } else if (sizeValue > 16) {
+                                attrs.size = 'large';
+                            }
                         }
                     }
                 }
+                
+                // Отступы сохраняются автоматически через style атрибут в HTML
+                // Quill сохранит их при преобразовании в HTML
                 
                 // Применяем атрибуты к дельте только если есть контент
                 if (Object.keys(attrs).length > 0 && delta.length() > 0) {
@@ -474,38 +534,9 @@ function makeQuill(editor) {
             return delta;
         });
         
-        // Обрабатываем вложенные элементы форматирования (например, strong внутри em)
-        // Quill автоматически обрабатывает вложенные элементы, но нужно убедиться, что они применяются правильно
-        quill.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
-            // Обрабатываем текстовые узлы для сохранения форматирования родительских элементов
-            let parent = node.parentNode;
-            const attrs = {};
-            
-            while (parent && parent.nodeType === Node.ELEMENT_NODE) {
-                const tagName = parent.tagName ? parent.tagName.toLowerCase() : '';
-                const style = parent.getAttribute('style') || '';
-                
-                // Проверяем форматирование родительских элементов
-                if (tagName === 'strong' || tagName === 'b' || style.match(/font-weight:\s*(bold|700|800|900)/i)) {
-                    attrs.bold = true;
-                }
-                if (tagName === 'em' || tagName === 'i' || style.match(/font-style:\s*italic/i)) {
-                    attrs.italic = true;
-                }
-                if (tagName === 'u' || style.match(/text-decoration:\s*underline/i)) {
-                    attrs.underline = true;
-                }
-                
-                parent = parent.parentNode;
-            }
-            
-            // Применяем атрибуты к дельте
-            if (Object.keys(attrs).length > 0 && delta.length() > 0) {
-                delta = delta.compose(new Delta().retain(delta.length(), attrs));
-            }
-            
-            return delta;
-        });
+        // УБРАН TEXT_NODE matcher - Quill автоматически обрабатывает вложенные элементы
+        // через ELEMENT_NODE matchers, поэтому дополнительная обработка не нужна
+        // и может привести к неправильному применению форматирования ко всей строке
 
         const id = editor.getAttribute("data-model");
         const wrap = editor.closest(".text-editor");
@@ -545,6 +576,51 @@ function makeQuill(editor) {
         // Флаг для предотвращения загрузки контента после вставки
         let isPasting = false;
         let pasteTimeout = null;
+        
+        // Обработчик события paste - НЕ перехватываем, позволяем Quill обработать через matchers
+        // Отмечаем начало вставки для последующей очистки <br>
+        quill.root.addEventListener('paste', () => {
+            isPasting = true;
+        }, true);
+        
+        // Очищаем множественные <br> ПОСЛЕ того, как Quill обработает контент через matchers
+        quill.on('text-change', (delta, oldDelta, source) => {
+            // Очищаем <br> только после вставки пользователем
+            if (source === 'user' && isPasting) {
+                // Очищаем предыдущий таймаут
+                if (pasteTimeout) {
+                    clearTimeout(pasteTimeout);
+                }
+                
+                // Очищаем множественные <br> после того, как Quill обработал контент
+                pasteTimeout = setTimeout(() => {
+                    isPasting = false;
+                    
+                    // Очистка только множественных <br> (2 и более подряд) внутри параграфов
+                    // Используем прямое манипулирование DOM, чтобы не потерять форматирование
+                    const paragraphs = quill.root.querySelectorAll('p, div');
+                    let hasChanges = false;
+                    
+                    paragraphs.forEach(p => {
+                        let innerHTML = p.innerHTML;
+                        const originalHTML = innerHTML;
+                        
+                        // Удаляем множественные <br> (2 и более подряд) - заменяем на один
+                        innerHTML = innerHTML.replace(/(<br\s*\/?>){2,}/gi, '<br>');
+                        
+                        if (innerHTML !== originalHTML) {
+                            p.innerHTML = innerHTML;
+                            hasChanges = true;
+                        }
+                    });
+                    
+                    // Если были изменения, обновляем input
+                    if (hasChanges) {
+                        updateInput();
+                    }
+                }, 150);
+            }
+        });
 
         // Функция для обновления значения input
         // Флаг для предотвращения циклов обновления
@@ -1068,253 +1144,9 @@ function makeQuill(editor) {
         //     // Отключено для предотвращения циклов при вставке
         // });
         
-        // Обработчик для вставки через paste - сохраняем все стили 1:1 из Word
-        editor.addEventListener('paste', function(e) {
-            // Устанавливаем флаг вставки
-            isPasting = true;
-            
-            // Очищаем предыдущий таймер, если есть
-            if (pasteTimeout) {
-                clearTimeout(pasteTimeout);
-            }
-            
-            // Получаем данные из буфера обмена
-            const clipboardData = e.clipboardData || window.clipboardData;
-            const htmlData = clipboardData.getData('text/html');
-            const textData = clipboardData.getData('text/plain');
-            // Если есть HTML данные (из Word), обрабатываем их с сохранением всех стилей
-            if (htmlData) {
-                e.preventDefault(); // Отменяем стандартную обработку
-                
-                // Создаем временный элемент для парсинга HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlData;
-                
-                // Функция для очистки небезопасных элементов, но сохранения всех стилей
-                const cleanAndPreserveStyles = (element) => {
-                    // Разрешенные теги
-                    const allowedTags = ['p', 'div', 'span', 'strong', 'b', 'em', 'i', 'u', 'a', 
-                                       'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br'];
-                    
-                    // Разрешенные атрибуты
-                    const allowedAttributes = ['href', 'style', 'class'];
-                    
-                    // Обрабатываем все элементы
-                    const allElements = element.querySelectorAll('*');
-                    allElements.forEach(el => {
-                        const tagName = el.tagName.toLowerCase();
-                        
-                        // Удаляем неразрешенные теги, но сохраняем их содержимое
-                        if (!allowedTags.includes(tagName)) {
-                            const parent = el.parentNode;
-                            while (el.firstChild) {
-                                parent.insertBefore(el.firstChild, el);
-                            }
-                            parent.removeChild(el);
-                            return;
-                        }
-                        
-                        // Очищаем неразрешенные атрибуты
-                        Array.from(el.attributes).forEach(attr => {
-                            if (!allowedAttributes.includes(attr.name.toLowerCase())) {
-                                el.removeAttribute(attr.name);
-                            }
-                        });
-                        
-                        // Сохраняем все стили из атрибута style - очищаем только опасные
-                        const style = el.getAttribute('style') || '';
-                        if (style) {
-                            // Очищаем только опасные стили (javascript:, expression и т.д.)
-                            // Но сохраняем ВСЕ остальные стили, включая отступы и интервалы
-                            let safeStyle = style
-                                .replace(/javascript:/gi, '')
-                                .replace(/expression\(/gi, '')
-                                .replace(/on\w+\s*=/gi, '')
-                                .replace(/url\s*\(\s*['"]?\s*javascript:/gi, 'url('); // Очищаем javascript в url()
-                            
-                            // Нормализуем line-height: ограничиваем разумными значениями (1.2-1.6)
-                            safeStyle = safeStyle.replace(/line-height:\s*([\d.]+)(pt|px|em|rem|%)?/gi, (match, value, unit) => {
-                                const numValue = parseFloat(value);
-                                if (!isNaN(numValue)) {
-                                    if (numValue > 1.6) {
-                                        return 'line-height: 1.6'; // Максимум 1.6
-                                    } else if (numValue < 1.2) {
-                                        return 'line-height: 1.2'; // Минимум 1.2
-                                    }
-                                    // Оставляем как есть, если в пределах 1.2-1.6, но убираем единицы измерения для числовых значений
-                                    if (!unit || unit === '') {
-                                        return `line-height: ${numValue}`;
-                                    }
-                                }
-                                return match; // Оставляем как есть, если не удалось распарсить
-                            });
-                            
-                            el.setAttribute('style', safeStyle);
-                        }
-                        
-                        // Для элементов без inline стилей сохраняем computed стили
-                        // Это важно для элементов, у которых стили заданы через классы в Word
-                        if (!el.getAttribute('style') && window.getComputedStyle) {
-                            const computed = window.getComputedStyle(el);
-                            const importantStyles = [];
-                            
-                            // Сохраняем ВСЕ важные стили: отступы, интервалы, выравнивание, размеры
-                            const styleProps = [
-                                'margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right',
-                                'padding', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right',
-                                'line-height', 'text-indent', 'text-align', 'font-size', 'font-weight',
-                                'font-style', 'text-decoration', 'color', 'background-color',
-                                'letter-spacing', 'word-spacing', 'text-transform', 'white-space'
-                            ];
-                            
-                            styleProps.forEach(prop => {
-                                let value = computed.getPropertyValue(prop);
-                                
-                                // Нормализуем line-height: ограничиваем разумными значениями (1.2-1.6)
-                                if (prop === 'line-height' && value) {
-                                    const numValue = parseFloat(value);
-                                    if (!isNaN(numValue)) {
-                                        if (numValue > 1.6) {
-                                            value = '1.6';
-                                        } else if (numValue < 1.2) {
-                                            value = '1.2';
-                                        } else {
-                                            value = numValue.toString();
-                                        }
-                                    }
-                                }
-                                
-                                // Сохраняем все значения, кроме дефолтных
-                                if (value && 
-                                    value !== 'normal' && 
-                                    value !== 'none' && 
-                                    value !== '0px' && 
-                                    value !== '0' && 
-                                    value !== 'rgba(0, 0, 0, 0)' && 
-                                    value !== 'transparent' &&
-                                    value !== 'auto') {
-                                    importantStyles.push(`${prop}: ${value}`);
-                                }
-                            });
-                            
-                            if (importantStyles.length > 0) {
-                                el.setAttribute('style', importantStyles.join('; '));
-                            }
-                        }
-                    });
-                    
-                    return element;
-                };
-                
-                // Очищаем и сохраняем стили
-                cleanAndPreserveStyles(tempDiv);
-                
-                // Получаем HTML со всеми сохраненными стилями
-                const cleanedHTML = tempDiv.innerHTML;
-                
-                // Вставляем HTML напрямую в DOM редактора, минуя Quill's Delta преобразование
-                // Это сохранит все inline стили 1:1
-                const range = quill.getSelection(true);
-                const currentHTML = quill.root.innerHTML;
-                
-                if (range) {
-                    // Удаляем выделенный текст, если есть
-                    if (range.length > 0) {
-                        quill.deleteText(range.index, range.length);
-                    }
-                    
-                    // Получаем HTML до и после точки вставки напрямую из DOM
-                    // Это сохранит все существующие стили
-                    const beforeHTML = quill.root.innerHTML.substring(0, quill.root.innerHTML.length);
-                    const textBefore = quill.getText(0, range.index);
-                    const textAfter = quill.getText(range.index, quill.getLength() - 1);
-                    
-                    // Находим позицию вставки в HTML
-                    // Простой подход: вставляем новый HTML в конец существующего
-                    // Но лучше: находим узел в DOM и вставляем туда
-                    const editorHTML = quill.root.innerHTML;
-                    
-                    // Если редактор пустой или почти пустой, просто заменяем содержимое
-                    if (editorHTML.trim() === '' || editorHTML.trim() === '<p><br></p>') {
-                        // Убираем все <p><br></p> из начала вставляемого HTML
-                        const cleanPastedHTML = cleanedHTML.replace(/^(<p><br><\/p>\s*)+/, '');
-                        quill.root.innerHTML = cleanPastedHTML;
-                    } else {
-                        // Вставляем новый HTML в конец
-                        // Убираем последний <p><br></p> если он есть
-                        const cleanEditorHTML = editorHTML.replace(/(<p><br><\/p>\s*)+$/, '');
-                        // Убираем все <p><br></p> из начала вставляемого HTML
-                        const cleanPastedHTML = cleanedHTML.replace(/^(<p><br><\/p>\s*)+/, '');
-                        quill.root.innerHTML = cleanEditorHTML + cleanPastedHTML;
-                    }
-                    
-                    // НЕ вызываем quill.update() - это может перезаписать стили
-                    // Вместо этого просто обновляем input
-                    
-                    // Временно отключаем обновление, чтобы избежать циклов с обработчиками событий Quill
-                    isUpdating = true;
-                    
-                    // Обновляем input сразу, но только один раз
-            setTimeout(() => {
-                        if (isUpdating) {
-                updateInput();
-                            // Снимаем флаг после обновления
-                            setTimeout(() => {
-                                isUpdating = false;
-                            }, 200);
-                        }
-                    }, 100);
-                    
-                    // Устанавливаем курсор в конец
-            setTimeout(() => {
-                        const newLength = quill.getLength();
-                        quill.setSelection(newLength - 1);
-                        
-                        // Снимаем флаг вставки через 2 секунды после вставки
-                        pasteTimeout = setTimeout(() => {
-                            isPasting = false;
-                        }, 2000);
-                    }, 10);
-                } else {
-                    // Если нет выделения, вставляем в конец
-                    const cleanEditorHTML = currentHTML.replace(/(<p><br><\/p>\s*)+$/, '');
-                    // Убираем все <p><br></p> из начала вставляемого HTML
-                    const cleanPastedHTML = cleanedHTML.replace(/^(<p><br><\/p>\s*)+/, '');
-                    
-                    // Временно отключаем обновление
-                    isUpdating = true;
-                    quill.root.innerHTML = cleanEditorHTML + cleanPastedHTML;
-                    
-                    // Снимаем флаг вставки через 2 секунды после вставки
-                    if (pasteTimeout) {
-                        clearTimeout(pasteTimeout);
-                    }
-                    pasteTimeout = setTimeout(() => {
-                        isPasting = false;
-                    }, 2000);
-                    
-                    setTimeout(() => {
-                        if (isUpdating) {
-                            updateInput();
-                            setTimeout(() => {
-                                isUpdating = false;
-                            }, 200);
-                        }
-                    }, 100);
-                }
-                
-                // Обновляем input один раз после вставки
-                setTimeout(() => {
-                    if (!isUpdating) {
-                        updateInput();
-                    }
-                }, 100);
-                
-                return;
-            }
-            
-            // Если нет HTML, используем стандартную обработку Quill
-        }, true); // Используем capture phase для перехвата до обработки Quill
+        // Обработчик для вставки через paste - ОТКЛЮЧЕН
+        // Используем только обработчик на quill.root (строка 595), чтобы Quill's matchers
+        // правильно обрабатывали вложенное форматирование (жирный текст внутри параграфа)
 
         return quill;
     }

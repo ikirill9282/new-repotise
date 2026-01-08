@@ -386,15 +386,20 @@ class Article extends Model
   public static function getLastNews(int|string $maximum_models = 4)
   {
     $last_news = static::query()
-      ->whereHas('author', fn($query) => $query->where('id', 0))
+      ->whereNotNull('published_at')
       ->when(($maximum_models != '*'), fn($query) => $query->limit($maximum_models))
+      ->orderByDesc('published_at')
       ->orderByDesc('id')
       // ->ddRawSql()
       ->get();
     
     
-    while ($last_news->count() > 0 && $last_news->count() < $maximum_models) {
-      $last_news = $last_news->collect()->merge($last_news)->slice(0, $maximum_models);
+    // Безопасное дублирование элементов, если их меньше требуемого
+    if ($last_news->count() > 0 && $last_news->count() < $maximum_models && $maximum_models != '*') {
+      $originalCount = $last_news->count();
+      $needed = $maximum_models - $originalCount;
+      $duplicates = $last_news->take($needed);
+      $last_news = $last_news->merge($duplicates);
     }
 
     return $last_news;

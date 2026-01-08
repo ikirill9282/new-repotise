@@ -102,8 +102,10 @@ class User extends Authenticatable implements HasName, FilamentUser
             Log::warning('Failed to create Stripe customer for user ' . $model->id . ': ' . $e->getMessage());
           }
         }
+        $firstLevel = \App\Models\Level::first();
         $model->options()->create([
           'description' => null,
+          'level_id' => $firstLevel?->id ?? null,
           // Email notifications: enabled by default for new users.
           'notification_settings' => [
             'product_updates' => true,

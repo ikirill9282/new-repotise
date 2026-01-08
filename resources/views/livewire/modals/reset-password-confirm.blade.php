@@ -146,7 +146,7 @@ window.passwordStrength = window.passwordStrength || function passwordStrength(w
             <div x-data="passwordStrength('form.password')" class="">
               <x-form.input 
                 name="password" 
-                x-bind:type="type" 
+                x-bind:type="typeof type !== 'undefined' ? type : 'password'" 
                 placeholder="Password" 
                 autocomplete="new-password" 
                 x-on:input="checkStrength($event.target.value); $dispatch('update-field', {field: 'password', value: $event.target.value})"
@@ -185,10 +185,10 @@ window.passwordStrength = window.passwordStrength || function passwordStrength(w
                 <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
             @enderror
 
-            <div x-data="{ type: 'password' }" class="">
+            <div x-data="{ type: 'password' }" x-init="type = 'password'" class="">
               <x-form.input 
                 name="password_confirmation" 
-                x-bind:type="type" 
+                x-bind:type="typeof type !== 'undefined' ? type : 'password'" 
                 placeholder="Create a password" 
                 autocomplete="new-password" 
                 :tooltipModal="true" 

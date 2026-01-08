@@ -13,7 +13,7 @@ use App\Http\Controllers\PaymentController;
 
 Route::prefix('api')->group(function() {
   Route::prefix('search')->controller(SearchController::class)->group(function() {
-    Route::get('/', 'search')->name('search');
+    Route::get('/', 'search')->name('api.search');
   });
 
   Route::prefix('/data')->controller(DataController::class)->group(function() {

@@ -1,9 +1,75 @@
-<div>
+<div id="delete-account-modal">
+  <style>
+    /* Убеждаемся, что все тултипы за модальным окном находятся ниже по z-index */
+    /* Backdrop модального окна (.cartMayBe) имеет z-50, тултипы имеют z-20 */
+    /* Но тултипы могут быть видны, если они добавляются после открытия модального окна */
+    /* Поэтому мы понижаем z-index всех тултипов, которые находятся за модальным окном */
+    
+    /* Когда модальное окно открыто, все тултипы за ним должны быть ниже */
+    .cartMayBe:not(.hidden) ~ * .tooltip,
+    .cartMayBe:not(.hidden) ~ .tooltip,
+    body:has(.cartMayBe:not(.hidden)) .tooltip:not(.cartMayBe .tooltip) {
+      z-index: 1 !important;
+    }
+    
+    /* Альтернативный подход: понижаем z-index всех тултипов, когда модальное окно видимо */
+    body.modal-open .tooltip:not(.cartMayBe .tooltip),
+    body:has(.cartMayBe:not(.hidden)) .tooltip:not(.cartMayBe .tooltip) {
+      z-index: 1 !important;
+    }
+    
+    /* Самый надежный способ: понижаем z-index всех тултипов с z-20, которые не внутри модального окна */
+    .tooltip.z-20:not(.cartMayBe .tooltip),
+    [class*="tooltip"][class*="z-20"]:not(.cartMayBe [class*="tooltip"]) {
+      z-index: 1 !important;
+    }
+  </style>
+  @push('js')
+  <script>
+    (function() {
+      // Понижаем z-index всех тултипов за модальным окном
+      function lowerTooltipsZIndex() {
+        const modal = document.querySelector('.cartMayBe');
+        if (!modal || modal.classList.contains('hidden')) return;
+        
+        // Находим все тултипы, которые не внутри модального окна
+        const allTooltips = document.querySelectorAll('.tooltip, [class*="tooltip"]');
+        allTooltips.forEach(function(tooltip) {
+          // Проверяем, находится ли тултип внутри модального окна
+          const isInsideModal = modal.contains(tooltip);
+          if (!isInsideModal) {
+            // Понижаем z-index тултипов за модальным окном
+            const computedStyle = window.getComputedStyle(tooltip);
+            const zIndex = parseInt(computedStyle.zIndex) || 0;
+            if (zIndex >= 20) {
+              tooltip.style.setProperty('z-index', '1', 'important');
+            }
+          }
+        });
+      }
+      
+      // Вызываем при открытии модального окна
+      if (window.Livewire) {
+        Livewire.hook('morph.updated', function() {
+          setTimeout(lowerTooltipsZIndex, 50);
+        });
+      }
+      
+      // Также вызываем периодически
+      const intervalId = setInterval(function() {
+        const modal = document.querySelector('.cartMayBe');
+        if (modal && !modal.classList.contains('hidden')) {
+          lowerTooltipsZIndex();
+        }
+      }, 100);
+    })();
+  </script>
+  @endpush
   {{-- HEADER --}}
-  <div class="text-2xl font-semibold !mb-2 mx-auto max-w-xs sm:max-w-none">Are You Sure You Want to Delete Your Account?</div>
+  <div class="text-2xl font-semibold !mb-2 mx-auto max-w-xs sm:max-w-none" data-no-tooltip="true">Are You Sure You Want to Delete Your Account?</div>
 
   {{-- IMAGE --}}
-  <div class="flex justify-center items-center py-5">
+  <div class="flex justify-center items-center py-5" data-no-tooltip="true">
     @include('icons.warning', ['main' => '#FF2C0C', 'second' => '#ffffff'])
   </div>
 
@@ -29,6 +95,7 @@
         placeholder="Enter your current password"
         wire:model.defer="current_password"
         autocomplete="current-password"
+        :tooltip="false"
       ></x-form.input>
     </div>
 
@@ -44,6 +111,7 @@
             inputmode="numeric"
             autocomplete="one-time-code"
             class="mb-2"
+            :tooltip="false"
           ></x-form.input>
         </div>
 

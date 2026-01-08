@@ -1,6 +1,6 @@
 <div class="relative">
 
-  <h2 class="text-2xl font-bold text-center select-none !mb-6">Forgrot password?</h2>
+  <h2 class="text-2xl font-bold text-center select-none !mb-6">Forgot password?</h2>
 
   <div class="!mb-6 text-center">
     Please enter the email address associated with your account. We'll send you a verification code to reset your password.

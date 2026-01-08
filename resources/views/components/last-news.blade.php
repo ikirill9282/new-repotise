@@ -4,7 +4,7 @@
 
 @php
   // Подсчёт новостей
-  $totalNews = \App\Models\Article::whereHas('author', fn($query) => $query->where('id', 0))->count();
+  $totalNews = \App\Models\Article::whereNotNull('published_at')->count();
 @endphp
 
 <div class="">

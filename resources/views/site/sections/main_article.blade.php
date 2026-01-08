@@ -1,22 +1,24 @@
 @php
 // dd($variables);
-$article = \App\Models\Article::find($variables->firstWhere('name', 'main_article_id')->value);
-$mainImageUrl = $article->preview ? url($article->preview->image) : null;
+$mainArticleId = $variables ? ($variables->firstWhere('name', 'main_article_id')?->value ?? null) : null;
+$article = $mainArticleId ? \App\Models\Article::find($mainArticleId) : null;
+$mainImageUrl = $article && $article->preview ? url($article->preview->image) : null;
 @endphp
 
-@if($mainImageUrl)
-  @push('head')
-    <link rel="preload" as="image" href="{{ $mainImageUrl }}" fetchpriority="high">
-  @endpush
-@endif
+@if($article)
+  @if($mainImageUrl)
+    @push('head')
+      <link rel="preload" as="image" href="{{ $mainImageUrl }}" fetchpriority="high">
+    @endpush
+  @endif
 
-<section class="why_need_baby_monitor">
-  <div class="container !mx-auto">
-      <div class="about_block !items-stretch">
-				<div class="left_text">
-					@include('site.components.heading', [
-						'variables' => $variables, 
-						'header_text' => $article->title,
+  <section class="why_need_baby_monitor">
+    <div class="container !mx-auto">
+        <div class="about_block !items-stretch">
+          <div class="left_text">
+            @include('site.components.heading', [
+              'variables' => $variables, 
+              'header_text' => $article->title,
             ])
             <div class="print-content text-[#A4A0A0]">{{ strip_tags($article->short(800)) }}</div>
             <div class="name_author">
@@ -46,5 +48,6 @@ $mainImageUrl = $article->preview ? url($article->preview->image) : null;
             @endif
           </div>
         </div>
-  </div>
-</section>
+    </div>
+  </section>
+@endif

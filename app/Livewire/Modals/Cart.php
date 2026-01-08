@@ -114,7 +114,15 @@ class Cart extends Component
           return;
         }
 
-        $order->user_id = Auth::user()?->id ?? 0;
+        // Require authentication for checkout
+        $userId = Auth::id();
+        if (!$userId) {
+          session()->flash('error', 'Please log in to proceed with checkout.');
+          return redirect()->route('signin');
+        }
+
+        $order->user_id = $userId;
+        $order->buyer_user_id = $userId;
         $order = $order->savePrepared();
 
         $cart->flushCart();

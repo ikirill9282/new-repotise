@@ -6,10 +6,12 @@ $authors = \App\Models\User::query()
   ->limit(6)
   ->get();
   
-if ($authors->count() < 6) {
-  while ($authors->count() < 6) {
-    $authors = $authors->collect()->merge($authors)->slice(0, 6);
-  }
+// Безопасное дублирование элементов, если их меньше 6
+if ($authors->count() > 0 && $authors->count() < 6) {
+  $originalCount = $authors->count();
+  $needed = 6 - $originalCount;
+  $duplicates = $authors->take($needed);
+  $authors = $authors->merge($duplicates);
 }
 @endphp
 

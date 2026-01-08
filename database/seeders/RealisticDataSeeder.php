@@ -134,9 +134,11 @@ class RealisticDataSeeder extends Seeder
                 
                 // Создаем опции пользователя если их нет
                 if (!$user->options) {
+                    $firstLevel = \App\Models\Level::first();
                     $user->options()->create([
                         'description' => fake()->paragraph(3),
                         'avatar' => '/storage/images/default_avatar.png',
+                        'level_id' => $firstLevel?->id ?? null,
                         'notification_settings' => [
                             'product_updates' => true,
                             'referral_updates' => true,
@@ -183,9 +185,11 @@ class RealisticDataSeeder extends Seeder
                 }
                 
                 if (!$user->options) {
+                    $firstLevel = \App\Models\Level::first();
                     $user->options()->create([
                         'description' => null,
                         'avatar' => '/storage/images/default_avatar.png',
+                        'level_id' => $firstLevel?->id ?? null,
                         'notification_settings' => [
                             'product_updates' => true,
                             'referral_updates' => true,

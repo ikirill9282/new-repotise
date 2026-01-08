@@ -31,7 +31,7 @@
         wire:keydown.escape="closeModal" 
         wire:click.self="closeModal"
         tabindex="0" x-data="{}" 
-        x-init="
+        x-init="(() => {
                 // Check if modal should be hidden on init
                 const isVisible = @js($isVisible);
                 const closingModal = @js($this->closingModal ?? null);
@@ -105,18 +105,38 @@
                   let isOpeningModal = false;
                   
                   Livewire.on('openModalAfterClose', (event) => {
-                      const modalName = Array.isArray(event) ? event[0] : event;
+                      // Handle different event formats
+                      let modalName = null;
+                      let args = [];
+                      
+                      if (Array.isArray(event)) {
+                          // Format: ['register', ['email' => '...']]
+                          modalName = event[0];
+                          args = event[1] || [];
+                      } else if (typeof event === 'string') {
+                          // Format: 'register'
+                          modalName = event;
+                      } else if (event && typeof event === 'object') {
+                          // Format: { modalName: 'register', args: {...} }
+                          modalName = event.modalName || event[0];
+                          args = event.args || event[1] || [];
+                      }
+                      
+                      if (!modalName) {
+                          return;
+                      }
+                      
                       if (isOpeningModal) {
                           // If already opening modal, ignore repeated calls
                           return;
                       }
-                      pendingModalToOpen = modalName;
+                      pendingModalToOpen = { modalName, args };
                       isOpeningModal = true;
                       
                       // Wait for close animation (300ms) then open new window
                       setTimeout(() => {
                           if (pendingModalToOpen && !@this.get('isVisible')) {
-                              @this.call('openModalAfterClose', pendingModalToOpen);
+                              @this.call('openModalAfterClose', pendingModalToOpen.modalName, pendingModalToOpen.args);
                               pendingModalToOpen = null;
                               // Reset flag after small delay
                               setTimeout(() => {
@@ -234,7 +254,7 @@
                     }, 320);
                   }, { passive: true });
                 }
-        ">
+        })()">
         @php
           // $renderModal already calculated above
           $justifyClass = ($renderModal === 'cart') ? 'justify-end' : 'justify-center';

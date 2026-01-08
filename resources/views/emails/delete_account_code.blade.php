@@ -8,7 +8,7 @@
   <div style="padding: 20px;">
       <h2 style="margin-top: 20px;">Your TrekGuider Account Deletion Code</h2>
       <p>
-          Hi {{ $user->getName() }},
+          Hi {{ $user ? $user->getName() : 'User' }},
           <br><br>
           We've received your request to delete your TrekGuider account. To confirm this action, please use the following code:
       </p>

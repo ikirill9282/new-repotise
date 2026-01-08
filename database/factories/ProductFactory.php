@@ -31,8 +31,14 @@ class ProductFactory extends Factory
    */
   public function definition(): array
   {
+    // Get existing user IDs or create a user if none exist
+    $userIds = User::pluck('id')->toArray();
+    if (empty($userIds)) {
+      $userIds = [User::factory()->create()->id];
+    }
+    
     return [
-      'user_id' => fake()->randomElement([0,2,3]),
+      'user_id' => fake()->randomElement($userIds),
       'title' => collect(fake()->words(3))->map(fn($word) => ucfirst($word))->join(' '),
       'price' => fake()->numberBetween(100, 300),
       'subscription' => fake()->boolean(),

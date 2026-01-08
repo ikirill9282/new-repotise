@@ -16,15 +16,32 @@ class ArticleSeeder extends Seeder
      */
     public function run(): void
     {
+      // Get existing user IDs or create users if needed
+      $userIds = User::pluck('id')->toArray();
+      if (empty($userIds)) {
+        // Create at least 5 users if none exist
+        for ($i = 0; $i < 5; $i++) {
+          $userIds[] = User::factory()->create()->id;
+        }
+      }
+      
+      // Ensure we have at least 5 user IDs (create additional users if needed)
+      while (count($userIds) < 5) {
+        $userIds[] = User::factory()->create()->id;
+      }
+      
       $cnt = 1;
       for ($x = 0; $x < 6; $x++) {
         for ($i = 0; $i <= 4; $i++) {
+          // Use existing user ID from the array
+          $userId = $userIds[$i] ?? $userIds[0];
+          
           // try {
           $title = ($i == 0) ? "Why do you need a Baby Monitor? We'll tell you in our article $cnt" : "Article Title $cnt";
           $article = Article::firstOrCreate(
-            ['user_id' => $i, 'title' => $title],
+            ['user_id' => $userId, 'title' => $title],
             [
-              'user_id' => $i,
+              'user_id' => $userId,
               'title' => $title,
               'views' => 0,
               'text' => '<h3>Among the manufacturers of prestigious Swiss watches</h3>

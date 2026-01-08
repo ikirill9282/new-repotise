@@ -165,7 +165,8 @@ class SiteController extends Controller
 
     $newsPerPage = 10;
     $newsQuery = Article::query()
-      ->whereHas('author', fn($query) => $query->where('id', 0))
+      ->whereNotNull('published_at')
+      ->orderByDesc('published_at')
       ->orderByDesc('id');
 
     $newsPaginator = (clone $newsQuery)->paginate($newsPerPage, ['*'], 'news_page');
@@ -207,7 +208,8 @@ class SiteController extends Controller
     $perPage = $valid['per_page'] ?? 10;
 
     $news = Article::query()
-      ->whereHas('author', fn($query) => $query->where('id', 0))
+      ->whereNotNull('published_at')
+      ->orderByDesc('published_at')
       ->orderByDesc('id')
       ->paginate($perPage, ['*'], 'page', $page);
 

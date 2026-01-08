@@ -76,29 +76,47 @@ trait HasForm
       // Удаляем оставшиеся data-list атрибуты (на случай, если они остались)
       $text = preg_replace('/\s*data-list=["\'][^"\']*["\']/i', '', $text);
       
-      // Нормализуем пробелы, но сохраняем структуру
-      $text = preg_replace('/\s+/u', ' ', $text);
+      // Нормализуем пробелы, но сохраняем структуру (не трогаем пробелы внутри тегов)
+      // Удаляем только множественные пробелы между словами, но сохраняем отступы и переносы строк
+      $text = preg_replace('/(?<!>)\s{2,}(?!<)/u', ' ', $text);
       
-      // Удаляем только множественные пустые параграфы (3 и более подряд), но сохраняем одиночные и двойные
-      $text = preg_replace('/(?:<p[^>]*>\s*<br\s*\/?>\s*<\/p>\s*){3,}/i', '<p><br></p>', $text);
+      // Удаляем множественные пустые параграфы (2 и более подряд) - заменяем на один
+      $text = preg_replace('/(?:<p[^>]*>\s*<br\s*\/?>\s*<\/p>\s*){2,}/i', '<p><br></p>', $text);
       
-      // Удаляем только полностью пустые параграфы без атрибутов (без текста, без <br>, без пробелов)
+      // Удаляем пустые параграфы в начале и конце текста
+      $text = preg_replace('/^(?:<p[^>]*>\s*<br\s*\/?>\s*<\/p>\s*)+/i', '', $text);
+      $text = preg_replace('/(?:<p[^>]*>\s*<br\s*\/?>\s*<\/p>\s*)+$/i', '', $text);
+      
+      // Удаляем полностью пустые параграфы без атрибутов (без текста, без <br>, без пробелов)
       $text = preg_replace('/(?:<p[^>]*>\s*<\/p>)/i', '', $text);
       
-      // Удаляем стили фона и цвета из style атрибутов, но сохраняем остальные стили
-      $text = preg_replace_callback('/style="([^"]*)"/is', function($matches) {
-          $styles = $matches[1];
-          // Удаляем background-color и color, но сохраняем остальное
-          $styles = preg_replace('/(background-color|color)[^;]*;?\s*/i', '', $styles);
-          $styles = trim($styles, '; ');
-          return $styles ? 'style="' . $styles . '"' : '';
-      }, $text);
-      
-      // Заменяем множественные <br> внутри параграфов на один, но сохраняем параграфы
+      // Удаляем множественные <br> внутри параграфов (оставляем только один)
       $text = preg_replace_callback('/(<p[^>]*>)(.*?)(<\/p>)/is', function($matches) {
           $content = $matches[2];
           // Заменяем множественные <br> на один, но сохраняем структуру
           $content = preg_replace('/(<br\s*\/?>){2,}/i', '<br>', $content);
+          return $matches[1] . $content . $matches[3];
+      }, $text);
+      
+      // Сохраняем стили форматирования из Word, но удаляем только опасные стили
+      // Разрешаем: font-size, font-weight, font-style, text-align, text-indent, margin, padding, color
+      // Удаляем: background-color (может быть опасным), но сохраняем остальное
+      $text = preg_replace_callback('/style="([^"]*)"/is', function($matches) {
+          $styles = $matches[1];
+          // Удаляем только background-color (может быть опасным), но сохраняем остальные стили
+          $styles = preg_replace('/background-color[^;]*;?\s*/i', '', $styles);
+          $styles = trim($styles, '; ');
+          return $styles ? 'style="' . $styles . '"' : '';
+      }, $text);
+      
+      // Очистка только множественных <br> (2 и более подряд) внутри параграфов
+      // НЕ трогаем структуру параграфов и переносы между ними
+      $text = preg_replace_callback('/(<p[^>]*>)(.*?)(<\/p>)/is', function($matches) {
+          $content = $matches[2];
+          
+          // ТОЛЬКО удаляем множественные <br> (2 и более подряд) - заменяем на один
+          $content = preg_replace('/(<br\s*\/?>){2,}/i', '<br>', $content);
+          
           return $matches[1] . $content . $matches[3];
       }, $text);
       

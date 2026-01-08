@@ -25,11 +25,20 @@ return [
     'settings'      => [
         'default' => [
             'HTML.Doctype'             => 'HTML 4.01 Transitional',
-            'HTML.Allowed'             => 'div,b,strong[class],i,em,u,h1[class],h2[class],h3[class],h4[class],h5[class],a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
+            'HTML.Allowed'             => 'div,b,strong[class],i,em,u,h1[class],h2[class],h3[class],h4[class],h5[class],h6[class],a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src],blockquote,pre,code',
             // Allow basic typography + spacing so pasted Word/Docs content keeps paragraph gaps safely.
-            'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align,line-height,margin,margin-top,margin-right,margin-bottom,margin-left',
+            'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,padding-right,padding-top,padding-bottom,color,background-color,text-align,line-height,margin,margin-top,margin-right,margin-bottom,margin-left,text-indent',
             'AutoFormat.AutoParagraph' => false,
             'AutoFormat.RemoveEmpty'   => false, // Отключаем удаление пустых элементов, чтобы сохранить структуру
+        ],
+        'product_text' => [
+            'HTML.Doctype'             => 'HTML 4.01 Transitional',
+            'HTML.Allowed'             => 'p,br,strong,b,em,i,u,ul,ol,li,h1,h2,h3,h4,h5,h6,blockquote,pre,code,span,div,a[href|title|target],img[width|height|alt|src|style]',
+            'CSS.AllowedProperties'    => 'font-size,font-weight,font-style,text-align,text-indent,margin-left,margin-right,margin-top,margin-bottom,padding-left,padding-right,padding-top,padding-bottom,color,background-color,line-height,text-decoration',
+            'HTML.AllowedAttributes'   => 'style,class,href,title,target,width,height,alt,src',
+            'AutoFormat.AutoParagraph' => false,
+            'AutoFormat.RemoveEmpty'   => false,
+            'HTML.TidyLevel'           => 'none', // Отключаем автоматическую очистку для сохранения форматирования
         ],
         'test'    => [
             'Attr.EnableID' => 'true',

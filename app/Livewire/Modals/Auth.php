@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 use App\Services\RecaptchaService;
 use App\Services\IpRateLimitService;
+use Livewire\Attributes\On;
 
 class Auth extends Component
 {
@@ -32,7 +33,9 @@ class Auth extends Component
 
 	public ?string $user_id = null;
 
-	public int $step = 1;
+	public int $step = 1; // 1 = email only, 2 = email+password, 3 = 2FA
+
+	public bool $emailVerified = false;
 
 	public ?string $recaptcha_token = null;
 
@@ -46,6 +49,55 @@ class Auth extends Component
 	protected function getRateLimitService(): IpRateLimitService
 	{
 		return app(IpRateLimitService::class);
+	}
+
+	public function checkEmail()
+	{
+		Log::info('Auth::checkEmail called', [
+			'email' => $this->form['email'] ?? null,
+		]);
+
+		$ipAddress = request()->ip();
+		$rateLimitService = $this->getRateLimitService();
+
+		// Check IP block
+		if ($rateLimitService->isBlocked($ipAddress, 'login')) {
+			$validator = Validator::make([], []);
+			$validator->errors()->add('email', 'Your IP address has been temporarily blocked due to multiple failed login attempts. Please try again in 1 hour.');
+			throw new ValidationException($validator);
+		}
+
+		$validator = Validator::make(
+			$this->form,
+			[
+				'email' => 'required|email',
+			],
+			[
+				'email.required' => 'Please enter your email address.',
+				'email.email' => 'Please enter a valid email address.',
+			]
+		);
+
+		if ($validator->fails()) {
+			throw new ValidationException($validator);
+		}
+
+		$valid = $validator->validated();
+		$user = User::firstWhere('email', $valid['email'])?->fresh();
+
+		if (!$user) {
+			// User not found - open registration modal
+			$this->resetValidation();
+			// Use openModalAfterClose to close current modal and open registration modal with email
+			// Livewire dispatch passes parameters in order: first param, second param, etc.
+			$this->dispatch('openModalAfterClose', 'register', ['email' => $valid['email']]);
+			return;
+		}
+
+		// User found - mark email as verified and show password field
+		$this->emailVerified = true;
+		$this->step = 2;
+		$this->resetValidation();
 	}
 
 	public function attempt()
@@ -74,7 +126,14 @@ class Auth extends Component
 		// }
 		$this->showRecaptchaV2 = false;
 
-		if ($this->step == 1) {
+		// Step 1: Only email - should call checkEmail() instead
+		if ($this->step == 1 && !$this->emailVerified) {
+			$this->checkEmail();
+			return;
+		}
+
+		// Step 2: Email verified, need password
+		if ($this->step == 2) {
 			$validator = Validator::make(
 				$this->form,
 				[
@@ -134,15 +193,11 @@ class Auth extends Component
 		// }
 
 		$user = null;
-		if ($this->step == 1) {
+		if ($this->step == 2) {
+			// Email already verified, get user by email
 			$user = User::firstWhere('email', $valid['email'])?->fresh();
-
-			if (!$user) {
-				$this->resetValidation();
-				$this->dispatch('openModal', 'register', ['email' => $valid['email']]);
-				return;
-			}
 		} else {
+			// Step 3: 2FA - get user from encrypted ID
 			$user = $this->getUser()?->fresh();
 		}
 
@@ -168,18 +223,18 @@ class Auth extends Component
 			throw new ValidationException($validator);
 		}
 
-		if ($this->step == 1) {
+		if ($this->step == 2) {
 			// Validate credentials first (no 2FA field on this screen).
 			if (!Hash::check((string) $valid['password'], (string) $user->password)) {
 				$rateLimitService->recordAttempt($ipAddress, 'login', false, $user->id);
-				$validator->errors()->add('email', 'Invalid email or password. Please try again.');
+				$validator->errors()->add('password', 'Invalid password. Please try again.');
 				throw new ValidationException($validator);
 			}
 
-			// If 2FA is enabled - go to second screen, ask for code/backup code.
+			// If 2FA is enabled - go to step 3, ask for code/backup code.
 			if ($user->twofa) {
 				$this->user_id = Crypt::encrypt($user->id);
-				$this->step = 2;
+				$this->step = 3;
 				$this->form['code'] = null;
 				$this->form['use_backup'] = false;
 				return;
@@ -195,15 +250,15 @@ class Auth extends Component
 			}
 
 			$rateLimitService->recordAttempt($ipAddress, 'login', false, $user->id);
-			$validator->errors()->add('email', 'Invalid email or password. Please try again.');
+			$validator->errors()->add('password', 'Invalid password. Please try again.');
 			throw new ValidationException($validator);
 		}
 
-		// Step 2: verify 2FA or backup code then log in.
+		// Step 3: verify 2FA or backup code then log in.
 		if (!$user->twofa) {
-			$this->step = 1;
+			$this->step = 2;
 			$this->user_id = null;
-			$validator->errors()->add('email', 'Two-factor authentication is not enabled for this account.');
+			$validator->errors()->add('code', 'Two-factor authentication is not enabled for this account.');
 			throw new ValidationException($validator);
 		}
 
@@ -259,11 +314,45 @@ class Auth extends Component
 
 	public function backToLogin(): void
 	{
-		$this->step = 1;
+		$this->step = 2;
 		$this->user_id = null;
 		$this->form['code'] = null;
 		$this->form['use_backup'] = false;
 		$this->resetValidation();
+	}
+
+	public function resetForm(): void
+	{
+		$this->step = 1;
+		$this->emailVerified = false;
+		$this->user_id = null;
+		$this->form['email'] = null;
+		$this->form['password'] = null;
+		$this->form['code'] = null;
+		$this->form['use_backup'] = false;
+		$this->resetValidation();
+	}
+
+	public function mount(): void
+	{
+		// Reset form state when component is mounted
+		$this->resetForm();
+	}
+
+	#[On('modal-opened')]
+	public function handleModalOpened($data = null): void
+	{
+		// Reset form state when modal is opened
+		// Handle different event formats
+		$modal = null;
+		if (is_array($data)) {
+			$modal = $data['modal'] ?? $data[0]['modal'] ?? null;
+		}
+		
+		// Reset if this is the auth modal or if no specific modal is specified
+		if ($modal === 'auth' || $modal === null) {
+			$this->resetForm();
+		}
 	}
 
 	protected function verifyTwofa(User $user, $validator, array $valid): void

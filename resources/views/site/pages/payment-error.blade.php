@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
 @php
-  $variables = $page->variables;
+  $variables = $page->variables ?? null;
   $errorInfo = $error ?? [
     'title' => 'Payment failed',
     'message' => 'We could not process your payment. Please try again later.',
@@ -50,7 +50,7 @@
             <div class="thanks_block failed_pay">
                 <div class="text_left">
                     @include('site.components.heading', [
-                      'variables' => $variables->filter(fn($item) => str_contains($item->name, 'page')),
+                      'variables' => $variables ? $variables->filter(fn($item) => str_contains($item->name, 'page')) : collect(),
                       'header_text' => $errorTitle,
                     ])
                     @if(!empty($errorCode))
@@ -221,7 +221,7 @@
                 </div>
             </div>
             <div class="having_trouble">
-                @include('site.components.heading', ['variables' => $variables->filter(fn($item) => str_contains($item->name, 'trouble'))])
+                @include('site.components.heading', ['variables' => $variables ? $variables->filter(fn($item) => str_contains($item->name, 'trouble')) : collect()])
                 <a href="{{ url(print_var('trouble_button_link', $variables)) }}">{{ print_var('trouble_button_text', $variables) }}</a>
             </div>
         </div>

@@ -23,3 +23,21 @@ yarn-error.log
 /.zed
 .DS_Store
 **/.DS_Store
+
+# Coverage reports
+/coverage/
+
+# Temporary files and directories
+/tmp_pdf_pages*/
+/project/
+c
+php
+use
+trekguider
+er->options()->create();
+
+# PHPInfo (should not be in production)
+/public/phpinfo.php
+
+# Composer PHAR
+/composer.phar.env.bak

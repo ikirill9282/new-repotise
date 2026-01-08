@@ -4,11 +4,18 @@
   <form wire:submit.prevent="attempt" class="!space-y-4 !mb-10">
     @csrf
 
-    {{-- STEP 1 --}}
-    @if($this->step == 1)
+    {{-- STEP 1: Email only --}}
+    @if($this->step == 1 && !$this->emailVerified)
 
       <div class="">
         <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email" :tooltipModal="true" autocomplete="email"></x-form.input>
+      </div>
+
+    {{-- STEP 2: Email (readonly) + Password --}}
+    @elseif($this->step == 2 && $this->emailVerified)
+
+      <div class="">
+        <x-form.input wire:model="form.email" name="email" type="email" placeholder="Email" :tooltipModal="true" autocomplete="email" disabled readonly inputClass="!bg-gray-100 !cursor-not-allowed"></x-form.input>
       </div>
 
       <div x-data="{ type: 'password' }" class="">
@@ -21,8 +28,8 @@
         </x-form.input>
       </div>
 
-    {{-- STEP 2 --}}
-    @elseif ($this->step == 2)
+    {{-- STEP 3: 2FA --}}
+    @elseif ($this->step == 3)
 
       <div class="text-sm text-gray text-center !-mt-1">
         Enter the 6-digit code from your authenticator app.
@@ -70,7 +77,13 @@
     <div class="flex justify-between items-center !gap-2">
       <x-btn wire:click.prevent="$dispatch('closeModal')" class="basis-1/3" gray>Cancel</x-btn>
       <x-btn type="submit" class="basis-2/3" id="login-submit-btn" wire:target="attempt">
-        {{ $this->step == 2 ? 'Verify & Sign In' : 'Sign In' }}
+        @if($this->step == 3)
+          Verify & Sign In
+        @elseif($this->step == 2 && $this->emailVerified)
+          Sign In
+        @else
+          Continue
+        @endif
       </x-btn>
     </div>
 
